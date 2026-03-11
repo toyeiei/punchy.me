@@ -14,3 +14,9 @@ This log tracks the successful implementation of features and milestones for the
 - **Automated Quality Control**: Configured `ESLint` with TypeScript support to enforce high code quality and consistency.
 - **First Successful Deployment**: Deployed the MVP to Cloudflare Workers at `https://cloudflare-short-link.toy-297.workers.dev`.
 - **Test Suite Completion**: Achieved 100% pass rate on initial test suite covering Homepage, Shortening, Deduplication, and Redirection.
+- **On-Page SEO Optimization**: 
+    - Overhauled metadata with keyword-rich titles, descriptions, and Open Graph tags.
+    - Implemented JSON-LD structured data for search engine context.
+    - Added visually hidden but crawlable semantic content for better indexing.
+    - Added a favicon for improved site completeness.
+- **Search Engine Discovery**: Implemented dedicated Worker routes for `robots.txt` and `sitemap.xml`.

@@ -7,7 +7,7 @@ export const HTML = `<!DOCTYPE html>
     <meta name="description" content="Shorten long URLs instantly with PUNCHY.ME. A high-performance, neon-glitch styled link shortener built for speed, style, and smart deduplication.">
     <meta name="keywords" content="URL shortener, link shortener, shorten link, branded links, fast redirection, PUNCHY.ME">
     <link rel="canonical" href="https://punchy.me/" />
-    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%2322c55e%22/></svg>">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
