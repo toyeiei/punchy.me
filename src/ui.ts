@@ -407,16 +407,31 @@ export const HTML = `<!DOCTYPE html>
         const modalOverlay = document.getElementById('modal-overlay');
         const resultLink = document.getElementById('short-url-result');
         const copyBtn = document.getElementById('copy-btn');
+        
+        // Track if the Turnstile check was triggered by a user click
+        let isUserInitiated = false;
 
         // Global callback for invisible Turnstile
         window.onTurnstileSuccess = (token) => {
-            executeShorten(token);
+            if (isUserInitiated) {
+                executeShorten(token);
+                isUserInitiated = false; // Reset
+            }
         };
 
         form.onsubmit = async (e) => {
             e.preventDefault();
+            const urlInput = document.getElementById('url');
+            
+            // Guard: Don't execute if URL is empty or invalid
+            if (!urlInput.value || !urlInput.checkValidity()) {
+                urlInput.reportValidity();
+                return;
+            }
+
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
+            isUserInitiated = true;
 
             // Trigger Turnstile check programmatically
             if (window.turnstile) {

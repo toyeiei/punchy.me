@@ -39,7 +39,7 @@ async function verifyTurnstile(token: string, secret: string, ip: string): Promi
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
 		const url = new URL(request.url);
-		const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
+		const ip = request.headers.get("cf-connecting-ip") || request.headers.get("x-real-ip") || "127.0.0.1";
 
 		// SEO: robots.txt
 		if (url.pathname === "/robots.txt") {
@@ -73,39 +73,48 @@ export default {
 
 		// API: Shorten a URL
 		if (url.pathname === "/shorten" && request.method === "POST") {
-			try {
-				const body = await request.json() as { 
-					url: string; 
-					hp_field?: string; 
-					'cf-turnstile-response'?: string; 
-				};
-				const { url: originalUrl, hp_field, 'cf-turnstile-response': turnstileToken } = body;
+		try {
+		const body = await request.json() as { 
+			url: string; 
+			hp_field?: string; 
+			'cf-turnstile-response'?: string; 
+		};
+		const { url: originalUrl, hp_field, 'cf-turnstile-response': turnstileToken } = body;
 
-				// 1. Honeypot check
-				if (hp_field) {
-					return new Response(JSON.stringify({ error: "Bot detected." }), { 
-						status: 403,
-						headers: { "Content-Type": "application/json" }
-					});
-				}
+		// 1. Honeypot check
+		if (hp_field) {
+			return new Response(JSON.stringify({ error: "Bot detected." }), { 
+				status: 403,
+				headers: { "Content-Type": "application/json" }
+			});
+		}
 
-				// 2. Rate limiting (IP-based)
-				if (await isRateLimited(ip, env)) {
-					return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), { 
-						status: 429,
-						headers: { "Content-Type": "application/json" }
-					});
-				}
+		// 2. Basic validation (Move this up to avoid counting invalid requests in rate limit)
+		if (!originalUrl || !originalUrl.startsWith('http')) {
+			return new Response(JSON.stringify({ error: "Invalid URL. Must start with http:// or https://" }), { 
+				status: 400,
+				headers: { "Content-Type": "application/json" }
+			});
+		}
 
-				// 3. Recursive URL filtering
-				if (originalUrl.includes("punchy.me")) {
-					return new Response(JSON.stringify({ error: "Recursive shortening is not allowed." }), { 
-						status: 400,
-						headers: { "Content-Type": "application/json" }
-					});
-				}
+		// 3. Recursive URL filtering
+		if (originalUrl.includes("punchy.me")) {
+			return new Response(JSON.stringify({ error: "Recursive shortening is not allowed." }), { 
+				status: 400,
+				headers: { "Content-Type": "application/json" }
+			});
+		}
 
-				// 4. Turnstile verification (if secret is configured)
+		// 4. Rate limiting (IP-based) - Only count valid requests
+		if (await isRateLimited(ip, env)) {
+			return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), { 
+				status: 429,
+				headers: { "Content-Type": "application/json" }
+			});
+		}
+
+		// 5. Turnstile verification (if secret is configured)
+
 				if (env.TURNSTILE_SECRET_KEY && turnstileToken) {
 					const isHuman = await verifyTurnstile(turnstileToken, env.TURNSTILE_SECRET_KEY, ip);
 					if (!isHuman) {
