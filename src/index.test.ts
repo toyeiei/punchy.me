@@ -136,8 +136,8 @@ describe("PUNCHY.ME URL Shortener", () => {
     const ip = "1.2.3.4";
     const longUrl = "https://example.com/rate-limit";
     
-    // Simulate 21 requests (limit is 20)
-    for (let i = 0; i < 21; i++) {
+    // Simulate 11 requests (limit is 10)
+    for (let i = 0; i < 11; i++) {
       const response = await SELF.fetch("http://localhost/shorten", {
         method: "POST",
         headers: { 
@@ -147,7 +147,7 @@ describe("PUNCHY.ME URL Shortener", () => {
         body: JSON.stringify({ url: `${longUrl}-${i}` }),
       });
       
-      if (i < 20) {
+      if (i < 10) {
         expect(response.status).toBe(200);
       } else {
         expect(response.status).toBe(429);

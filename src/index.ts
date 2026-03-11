@@ -7,14 +7,14 @@ export interface Env {
 
 /**
  * Basic IP-based rate limiter using KV
- * Limit: 20 requests per minute
+ * Limit: 10 requests per minute
  */
 async function isRateLimited(ip: string, env: Env): Promise<boolean> {
 	const key = `rate-limit:${ip}`;
 	const current = await env.SHORT_LINKS.get(key);
 	const count = parseInt(current || "0");
 
-	if (count >= 20) return true;
+	if (count >= 10) return true;
 
 	// Increment and set TTL to 60s
 	await env.SHORT_LINKS.put(key, (count + 1).toString(), { expirationTtl: 60 });
