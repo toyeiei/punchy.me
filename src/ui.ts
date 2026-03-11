@@ -553,6 +553,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             position: relative;
         }
 
+        /* Pixel Background Animation */
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -660,6 +661,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             justify-content: center;
             align-items: center;
             z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
         }
 
         .modal {
@@ -670,9 +673,37 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             max-width: 500px;
             text-align: center;
             border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
+        #modal-overlay.show { opacity: 1; }
+        #modal-overlay.show .modal { transform: scale(1); }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1.5rem;
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .success-icon svg { width: 40px; height: 40px; color: #052e16; }
+
         .result-link { color: var(--accent); font-weight: 700; text-decoration: none; word-break: break-all; }
+
+        h2 { font-family: var(--font-brand); font-size: 2.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
+        .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1rem; }
+        .create-another:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -695,18 +726,24 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
     <div id="modal-overlay">
         <div class="modal">
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
             <h2>CARD ARMED!</h2>
             <p style="margin: 1rem 0; color: var(--text-dim);">Your dynamic card is live for 3 days:</p>
             <div style="background: #111; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem;">
                 <a href="#" id="result-url" class="result-link" target="_blank"></a>
             </div>
-            <button onclick="location.reload()" style="background: transparent; color: var(--text-dim); border: none; cursor: pointer;">Create Another</button>
+            <button onclick="location.reload()" class="create-another">Create Another</button>
         </div>
     </div>
 
     <script>
         const form = document.getElementById('bazuka-form');
         const submitBtn = document.getElementById('bazuka-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
         let isUserInitiated = false;
 
         window.onTurnstileSuccess = (token) => {
@@ -746,7 +783,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                     const url = window.location.origin + '/' + result.id;
                     document.getElementById('result-url').innerText = url;
                     document.getElementById('result-url').href = url;
-                    document.getElementById('modal-overlay').style.display = 'flex';
+                    modalOverlay.style.display = 'flex';
+                    setTimeout(() => modalOverlay.classList.add('show'), 10);
                 } else {
                     const err = await response.json();
                     alert(err.error || 'Bazuka failed.');
@@ -823,6 +861,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             position: absolute;
             width: 3px; height: 3px;
             background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
         }
@@ -831,6 +870,8 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
 
         @keyframes drift {
             0% { transform: translateX(0); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
             100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
         }
 
@@ -838,31 +879,35 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             z-index: 10;
             text-align: left;
             border-left: 4px solid var(--accent);
-            padding: 2rem;
-            background: rgba(17, 17, 17, 0.8);
-            backdrop-filter: blur(10px);
-            border-radius: 0 20px 20px 0;
-            max-width: 90%;
-            width: 400px;
-            box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
+            padding: 2.5rem;
+            background: rgba(17, 17, 17, 0.85);
+            backdrop-filter: blur(15px);
+            border-radius: 0 24px 24px 0;
+            max-width: 95%;
+            width: 440px;
+            box-shadow: 20px 20px 60px rgba(0,0,0,0.6);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-left: 4px solid var(--accent);
         }
 
         .nickname {
             font-family: var(--font-brand);
-            font-size: 3rem;
+            font-size: clamp(2rem, 10vw, 3.5rem);
             color: var(--accent);
             margin-bottom: 0.5rem;
             text-transform: uppercase;
+            line-height: 1;
+            word-break: break-word;
         }
 
-        .job { font-size: 1.2rem; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .job { font-size: clamp(1rem, 4vw, 1.25rem); color: var(--text-main); font-weight: 700; margin-bottom: 2rem; letter-spacing: 1px; }
         
-        .info-row { margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px; }
-        .label { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; width: 80px; }
-        .value { color: var(--text-main); font-size: 0.9rem; text-decoration: none; }
+        .info-row { margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
+        .label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; width: 85px; font-weight: 700; }
+        .value { color: var(--text-main); font-size: 0.95rem; text-decoration: none; word-break: break-all; }
         .value:hover { color: var(--accent); }
 
-        .footer { margin-top: 2rem; font-size: 0.7rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; }
+        .footer { margin-top: 2.5rem; font-size: 0.7rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.2rem; }
     </style>
 </head>
 <body>
