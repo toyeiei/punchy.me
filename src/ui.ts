@@ -619,7 +619,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             border-radius: 20px;
             display: flex;
             flex-direction: column;
-            gap: 1rem;
+            gap: 1.2rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
         }
@@ -627,12 +627,13 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         input {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1rem 1.2rem;
+            border-radius: 12px;
             color: var(--text-main);
             font-family: var(--font-mono);
             outline: none;
             transition: border-color 0.2s;
+            width: 100%;
         }
 
         input:focus { border-color: var(--accent); }
@@ -641,23 +642,31 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             background: var(--accent);
             color: #052e16;
             border: none;
-            padding: 1rem;
-            border-radius: 10px;
+            padding: 1.2rem;
+            border-radius: 12px;
             font-weight: 700;
             cursor: pointer;
             text-transform: uppercase;
             font-family: var(--font-mono);
             transition: all 0.3s;
+            position: relative;
+            overflow: hidden;
+            animation: bazuka-glow 2s infinite alternate;
         }
 
-        button#bazuka-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+        @keyframes bazuka-glow {
+            0% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); transform: scale(1); }
+            100% { box-shadow: 0 0 25px rgba(34, 197, 94, 0.6); transform: scale(1.02); }
+        }
+
+        button#bazuka-btn:hover { background: var(--accent-hover); }
 
         #modal-overlay {
             display: none;
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            backdrop-filter: blur(8px);
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
             justify-content: center;
             align-items: center;
             z-index: 1000;
@@ -681,13 +690,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         #modal-overlay.show .modal { transform: scale(1); }
 
         .success-icon {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             background: var(--accent);
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             margin: 0 auto 1.5rem;
             animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
@@ -702,8 +708,20 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         .result-link { color: var(--accent); font-weight: 700; text-decoration: none; word-break: break-all; }
 
         h2 { font-family: var(--font-brand); font-size: 2.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
-        .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1rem; }
+        .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1.5rem; font-size: 0.9rem; }
         .create-another:hover { color: var(--text-main); }
+
+        .footer {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            z-index: 20;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .footer:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -712,16 +730,20 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         <h1>BAZUKA</h1>
         <form id="bazuka-form">
             <div class="input-group">
-                <input type="text" id="nickname" placeholder="Nickname" required>
-                <input type="text" id="job" placeholder="Job Title" required>
-                <input type="email" id="email" placeholder="Email" required>
-                <input type="url" id="linkedin" placeholder="LinkedIn URL" required>
+                <input type="text" id="nickname" placeholder="👤 Nickname" required>
+                <input type="text" id="job" placeholder="💼 Job Title" required>
+                <input type="email" id="email" placeholder="📧 Email Address" required>
+                <input type="url" id="linkedin" placeholder="🔗 LinkedIn Profile URL" required>
                 <button type="submit" id="bazuka-btn">BAZUKA</button>
             </div>
             <div id="turnstile-container" style="display: none;">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess"></div>
             </div>
         </form>
+    </div>
+
+    <div class="footer">
+        Built with ⚡ by Toy & Gemini CLI
     </div>
 
     <div id="modal-overlay">
@@ -733,7 +755,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             </div>
             <h2>CARD ARMED!</h2>
             <p style="margin: 1rem 0; color: var(--text-dim);">Your dynamic card is live for 3 days:</p>
-            <div style="background: #111; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem;">
+            <div style="background: #111; padding: 1.2rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.05);">
                 <a href="#" id="result-url" class="result-link" target="_blank"></a>
             </div>
             <button onclick="location.reload()" class="create-another">Create Another</button>
@@ -908,6 +930,16 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         .value:hover { color: var(--accent); }
 
         .footer { margin-top: 2.5rem; font-size: 0.7rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.2rem; }
+
+        .brand-footer {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            z-index: 20;
+            opacity: 0.6;
+        }
     </style>
 </head>
 <body>
@@ -928,6 +960,10 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         <div class="footer">
             Generated via PUNCHY.ME BAZUKA • Expires in 3 days
         </div>
+    </div>
+
+    <div class="brand-footer">
+        Built with ⚡ by Toy & Gemini CLI
     </div>
 
     <script>
