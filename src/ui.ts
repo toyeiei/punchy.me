@@ -356,9 +356,9 @@ export const HTML = `<!DOCTYPE html>
                 <input type="url" id="url" placeholder="Enter your long URL here..." required>
                 <button type="submit" id="submit-btn">Get Short Link</button>
             </div>
-            <!-- Turnstile Widget -->
-            <div id="turnstile-container" style="display: flex; justify-content: center; margin-top: 1rem;">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-theme="dark"></div>
+            <!-- Invisible Turnstile Container (Hidden) -->
+            <div id="turnstile-container" style="display: none;">
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess"></div>
             </div>
         </form>
     </div>
@@ -408,14 +408,27 @@ export const HTML = `<!DOCTYPE html>
         const resultLink = document.getElementById('short-url-result');
         const copyBtn = document.getElementById('copy-btn');
 
+        // Global callback for invisible Turnstile
+        window.onTurnstileSuccess = (token) => {
+            executeShorten(token);
+        };
+
         form.onsubmit = async (e) => {
             e.preventDefault();
-            const url = document.getElementById('url').value;
-            const hp_field = document.getElementById('hp_field').value;
-            const turnstileResponse = form.querySelector('[name="cf-turnstile-response"]')?.value;
-            
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
+
+            // Trigger Turnstile check programmatically
+            if (window.turnstile) {
+                window.turnstile.execute();
+            } else {
+                executeShorten(); // Fallback if script didn't load
+            }
+        };
+
+        async function executeShorten(turnstileToken = '') {
+            const url = document.getElementById('url').value;
+            const hp_field = document.getElementById('hp_field').value;
 
             try {
                 const response = await fetch('/shorten', {
@@ -424,7 +437,7 @@ export const HTML = `<!DOCTYPE html>
                     body: JSON.stringify({ 
                         url, 
                         hp_field,
-                        'cf-turnstile-response': turnstileResponse 
+                        'cf-turnstile-response': turnstileToken 
                     })
                 });
 
@@ -447,7 +460,7 @@ export const HTML = `<!DOCTYPE html>
                 submitBtn.disabled = false;
                 submitBtn.innerText = 'Get Short Link';
             }
-        };
+        }
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(resultLink.innerText).then(() => {
