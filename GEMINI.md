@@ -25,3 +25,9 @@ We maintain senior-level engineering standards regardless of project scale.
 1. **Empirical Reproduction:** We confirm issues by creating reproduction scripts or tests before applying fixes.
 2. **Surgical Updates:** We apply precise, targeted changes to maintain system integrity.
 3. **Continuous Validation:** Success is only confirmed when behavioral correctness is verified and structural integrity is confirmed within the full project context.
+
+## Roadmap (Planned High-Impact Features)
+- **Edge Analytics & Click Tracking**: Track real-time engagement metrics (clicks, geography, referrers) using Cloudflare's high-performance data plane.
+- **Custom Alias (Slug) Support**: Empower users to create branded, memorable short links (e.g., `punchy.me/my-link`).
+- **QR Code Generation**: Instantly generate visually matching QR codes for every shortened link.
+- **Expiry Management**: Add the ability to set time-to-live (TTL) for temporary or time-sensitive links.
