@@ -240,7 +240,7 @@ export const HTML = `<!DOCTYPE html>
         }
 
         .modal {
-            background: var(--card-bg);
+            background: #000000;
             padding: 3rem 2rem;
             border-radius: 32px;
             width: 90%;
