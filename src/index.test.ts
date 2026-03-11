@@ -84,4 +84,26 @@ describe("PUNCHY.ME URL Shortener", () => {
     expect(text).toContain("<loc>https://punchy.me/</loc>");
     expect(text).toContain("<lastmod>2026-03-11</lastmod>");
   });
+
+  it("rejects invalid URL (no http/https)", async () => {
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "not-a-valid-url" }),
+    });
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error).toBe("Invalid URL. Must start with http:// or https://");
+  });
+
+  it("handles malformed JSON payload", async () => {
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: "{ invalid json: }",
+    });
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error).toBe("Invalid request");
+  });
 });
