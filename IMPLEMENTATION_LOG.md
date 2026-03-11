@@ -30,3 +30,35 @@ This log tracks the successful implementation of features and milestones for the
 - **Code Quality Excellence**:
     - Expanded test suite to 9 core tests (100% pass rate).
     - Achieved a perfectly clean ESLint state across the project.
+- **High-Performance OpenGraph Image**: 
+    - Generated a custom, neon-glitch styled cover image for social media sharing.
+    - Optimized and converted the image to `.webp` format (~43KB) for ultra-fast loading.
+    - Configured Cloudflare Workers to serve static assets from the `/public` directory for edge-cached delivery.
+- **Bot & Spam Protection System**: 
+    - **Honeypot Logic**: Integrated a hidden field to catch automated form submission bots.
+    - **Recursive Filtering**: Implemented logic to prevent recursive shortening of `punchy.me` links.
+    - **IP-Based Rate Limiting**: Added a KV-backed rate limiter (limit: 10 requests per minute per IP).
+    - **Cloudflare Turnstile Integration**: Embedded a frictionless, dark-themed Turnstile widget for human verification.
+- **Environment & CLI Optimization**:
+    - Documented PowerShell-specific command separation requirements in `GEMINI.md`.
+    - Refined the test suite to 12 core tests (100% pass rate) including security and abuse protection scenarios.
+    - Successfully deployed the updated, secure version to `https://punchy.me`.
+- **Production Security & UI Optimization**:
+    - **Invisible Turnstile**: Implemented programmatic execution for Cloudflare Turnstile to maintain a clean, distraction-free UI while keeping full protection.
+    - **Production Key Deployment**: Transitioned from testing keys to production-grade Turnstile site keys.
+    - **Rate Limit Finalization**: Stabilized the IP-based rate limit at 10 requests per minute to ensure optimal resource protection.
+    - **Bug Fix - Rate Limit Leak**: Resolved a critical issue where invisible Turnstile's auto-execution was triggering "ghost" requests and prematurely exhausting rate limits.
+    - **Validation-First Logic**: Refactored the backend to validate URLs before incrementing the rate limit, ensuring invalid attempts don't penalize users.
+- **UI & Aesthetic Refinements**:
+    - **Success Popup Enhancement**: Updated the modal background to solid black (#000000) for a seamless look with the dark glitch theme.
+    - **User Intent Tracking**: Added a `isUserInitiated` flag to the frontend to ensure security checks only fire on explicit button clicks.
+- **Developer Experience Improvements**:
+    - **Auto-Exit Tests**: Updated `npm test` to use `vitest run`, enabling tests to exit automatically without manual intervention.
+    - **Expanded Test Coverage**: Reached 17 core tests (100% pass rate) covering static assets, security pipelines, and dynamic BAZUKA card generation.
+- **BAZUKA Dynamic Business Cards**:
+    - **Feature Launch**: Implemented an automated business card generator at `/bazuka` with a neon-glitch aesthetic.
+    - **Cloudflare HTMLRewriter**: Integrated edge-side dynamic rendering to inject user data into high-performance HTML templates.
+    - **Auto-Expiration (TTL)**: Configured a 3-day (72-hour) self-destruct mechanism using Cloudflare KV's `expirationTtl`.
+    - **Branded Glitch Effects**: Ported the signature pixel-glitch animation to user nicknames on the profiles.
+    - **UI Polish**: Added glowing button animations, glassmorphism card styling, and emoji-enhanced form fields for a premium user experience.
+    - **Global Branding**: Integrated "Built with ⚡ by Toy & Gemini CLI" across all application surfaces.

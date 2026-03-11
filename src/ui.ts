@@ -3,24 +3,24 @@ export const HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUNCHY.ME | Ultra-Fast URL Shortener & Link Brander</title>
-    <meta name="description" content="Shorten long URLs instantly with PUNCHY.ME. A high-performance, neon-glitch styled link shortener built for speed, style, and smart deduplication.">
-    <meta name="keywords" content="URL shortener, link shortener, shorten link, branded links, fast redirection, PUNCHY.ME">
+    <title>PUNCHY.ME | FREE Ultra-Fast URL Shortener & Link Brander</title>
+    <meta name="description" content="Shorten long URLs for FREE with PUNCHY.ME. A high-performance, neon-glitch styled link shortener built for speed, style, and unlimited free links.">
+    <meta name="keywords" content="free URL shortener, link shortener, shorten link, branded links, fast redirection, PUNCHY.ME">
     <link rel="canonical" href="https://punchy.me/" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/">
-    <meta property="og:title" content="PUNCHY.ME | Ultra-Fast URL Shortener">
-    <meta property="og:description" content="Instant URL shortening with impact. Built for speed and style on Cloudflare Edge.">
+    <meta property="og:title" content="PUNCHY.ME | FREE Ultra-Fast URL Shortener">
+    <meta property="og:description" content="Instant URL shortening for FREE. High-impact links built for speed and style on Cloudflare Edge.">
     <meta property="og:image" content="https://punchy.me/og-image.webp">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://punchy.me/">
-    <meta property="twitter:title" content="PUNCHY.ME | Ultra-Fast URL Shortener">
-    <meta property="twitter:description" content="Instant URL shortening with impact. Built for speed and style on Cloudflare Edge.">
+    <meta property="twitter:title" content="PUNCHY.ME | FREE Ultra-Fast URL Shortener">
+    <meta property="twitter:description" content="Instant URL shortening for FREE. High-impact links built for speed and style on Cloudflare Edge.">
     <meta property="twitter:image" content="https://punchy.me/og-image.webp">
 
     <!-- Structured Data -->
@@ -30,14 +30,34 @@ export const HTML = `<!DOCTYPE html>
       "@type": "WebApplication",
       "name": "PUNCHY.ME",
       "url": "https://punchy.me/",
-      "description": "A high-performance URL shortener built on Cloudflare Workers.",
+      "description": "A FREE, ultra-fast, and easy-to-use URL shortener. Shorten your long links instantly with impact on the Cloudflare Edge.",
       "applicationCategory": "Utility",
       "operatingSystem": "Web",
+      "softwareVersion": "1.0",
+      "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       }
+    }
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Kasidis Satangmongkol",
+      "jobTitle": "Digital Writer",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "DataRockie"
+      },
+      "url": "https://datarockie.com",
+      "sameAs": [
+        "https://www.linkedin.com/in/kasidistoy",
+        "https://punchy.me/"
+      ],
+      "description": "Toy is a Digital Writer at DataRockie and the creator of PUNCHY.ME, a high-performance URL shortener built on Cloudflare Workers.",
+      "knowsAbout": ["Data Analysis", "Cloudflare Workers", "Content Writer"]
     }
     </script>
 
@@ -523,6 +543,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAZUKA | Instant Digital Business Cards</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
