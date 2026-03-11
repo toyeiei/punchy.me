@@ -1,0 +1,396 @@
+export const HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PUNCHY.ME - URL Shortener</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --card-bg: #111111;
+            --accent: #22c55e;
+            --accent-hover: #16a34a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --font-brand: 'Bitcount Prop Double', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Pixel Background Animation */
+        .pixel-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pixel {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            animation: drift var(--duration) linear infinite;
+            top: var(--top);
+            left: -10px;
+        }
+
+        .pixel.green {
+            background: var(--accent);
+            box-shadow: 0 0 5px var(--accent);
+            opacity: 0.6;
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(0); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        h1 {
+            font-family: var(--font-brand);
+            font-size: clamp(4rem, 15vw, 120px);
+            line-height: 1;
+            margin-bottom: 2rem;
+            color: var(--text-main);
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            position: relative;
+            animation: main-glitch 4s infinite;
+        }
+
+        @keyframes main-glitch {
+            0%, 20%, 40%, 45%, 55%, 70%, 100% { transform: skew(0deg); text-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
+            21% { transform: skew(2deg); text-shadow: 2px 0 0 #ff00ff, -2px 0 0 #00ffff; }
+            41% { transform: skew(-2deg); text-shadow: -2px 0 0 #ff00ff, 2px 0 0 #00ffff; }
+            51% { transform: skew(1deg); }
+        }
+
+        h1::before, h1::after {
+            content: "PUNCHY.ME";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            opacity: 0.5;
+        }
+
+        h1::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00ff;
+            animation: glitch-anim 6s infinite linear alternate-reverse;
+        }
+
+        h1::after {
+            left: -2px;
+            text-shadow: -1px 0 #00ffff;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0%, 100% { clip-path: inset(40% 0 61% 0); opacity: 0; }
+            20%, 80% { clip-path: inset(92% 0 1% 0); opacity: 0.5; }
+            40%, 60% { clip-path: inset(43% 0 1% 0); opacity: 0; }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 100% { clip-path: inset(24% 0 29% 0); opacity: 0; }
+            50% { clip-path: inset(54% 0 21% 0); opacity: 0.5; }
+        }
+
+        h1:hover {
+            text-shadow: 0 0 30px var(--accent), 0 0 60px var(--accent);
+            transition: text-shadow 0.2s;
+        }
+
+        .input-group {
+            background: var(--card-bg);
+            padding: 1rem;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        @media (min-width: 640px) {
+            .input-group {
+                flex-direction: row;
+                padding: 0.5rem;
+                border-radius: 100px;
+            }
+        }
+
+        input[type="url"] {
+            flex: 1;
+            background: transparent;
+            border: none;
+            padding: 1rem 1.5rem;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 1.1rem;
+            outline: none;
+        }
+
+        input::placeholder { color: var(--text-dim); }
+
+        button#submit-btn {
+            background: var(--accent);
+            color: #052e16;
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 15px;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+        }
+
+        @media (min-width: 640px) {
+            button#submit-btn { border-radius: 100px; }
+        }
+
+        button#submit-btn:hover {
+            transform: scale(1.05);
+            background: var(--accent-hover);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+
+        button#submit-btn:active { transform: scale(0.95); }
+
+        /* Modal / Pop-up */
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(15, 23, 42, 0.9);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal {
+            background: var(--card-bg);
+            padding: 3rem 2rem;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            position: relative;
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        #modal-overlay.show { opacity: 1; }
+        #modal-overlay.show .modal { transform: scale(1); }
+
+        .success-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin: 0 auto 1.5rem;
+            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .success-icon svg { width: 40px; height: 40px; color: #052e16; }
+
+        .result-container {
+            background: #0f172a;
+            padding: 1rem;
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .result-link {
+            flex: 1;
+            color: var(--accent);
+            text-decoration: none;
+            word-break: break-all;
+            font-size: 1.1rem;
+            font-weight: 700;
+            text-align: left;
+        }
+
+        .copy-btn {
+            background: #334155;
+            border: none;
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: background 0.2s;
+        }
+
+        .copy-btn:hover { background: #475569; }
+
+        .close-link {
+            display: block;
+            margin-top: 1rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            font-size: 0.9rem;
+            cursor: pointer;
+        }
+
+        .close-link:hover { color: var(--text-main); }
+    </style>
+</head>
+<body>
+    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="container">
+        <h1>PUNCHY.ME</h1>
+        <form id="shorten-form">
+            <div class="input-group">
+                <input type="url" id="url" placeholder="Enter your long URL here..." required>
+                <button type="submit" id="submit-btn">Get Short Link</button>
+            </div>
+        </form>
+    </div>
+
+    <div id="modal-overlay">
+        <div class="modal">
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2>PUNCHED!</h2>
+            <p style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is ready.</p>
+            
+            <div class="result-container">
+                <a href="#" id="short-url-result" class="result-link" target="_blank"></a>
+                <button class="copy-btn" id="copy-btn" title="Copy Link">
+                    <svg style="width:20px;height:20px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+                    </svg>
+                </button>
+            </div>
+            
+            <a class="close-link" onclick="closeModal()">Back to Home</a>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('shorten-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const resultLink = document.getElementById('short-url-result');
+        const copyBtn = document.getElementById('copy-btn');
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            const url = document.getElementById('url').value;
+            
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'PUNCHING...';
+
+            try {
+                const response = await fetch('/shorten', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ url })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    const shortUrl = window.location.origin + '/' + data.id;
+                    resultLink.innerText = shortUrl;
+                    resultLink.href = shortUrl;
+                    
+                    modalOverlay.style.display = 'flex';
+                    setTimeout(() => modalOverlay.classList.add('show'), 10);
+                } else {
+                    alert('Error punching URL. Try again.');
+                }
+            } catch (err) {
+                alert('Network error.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'Get Short Link';
+            }
+        };
+
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(resultLink.innerText).then(() => {
+                const originalContent = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem;">DONE!</span>';
+                setTimeout(() => copyBtn.innerHTML = originalContent, 2000);
+            });
+        };
+
+        function closeModal() {
+            modalOverlay.classList.remove('show');
+            setTimeout(() => {
+                modalOverlay.style.display = 'none';
+                document.getElementById('url').value = '';
+            }, 300);
+        }
+
+        // Close on escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') closeModal();
+        });
+
+        // Pixel Generation
+        const bg = document.getElementById('pixel-bg');
+        function createPixel() {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            if (Math.random() > 0.7) pixel.classList.add('green');
+            const top = Math.random() * 100;
+            const duration = 5 + Math.random() * 10;
+            pixel.style.setProperty('--top', top + '%');
+            pixel.style.setProperty('--duration', duration + 's');
+            bg.appendChild(pixel);
+            setTimeout(() => pixel.remove(), duration * 1000);
+        }
+        setInterval(createPixel, 300);
+        for(let i=0; i<20; i++) createPixel(); // Initial burst
+    </script>
+</body>
+</html>`;

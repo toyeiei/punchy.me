@@ -1,0 +1,11 @@
+name = "cloudflare-short-link"
+main = "src/index.ts"
+compatibility_date = "2024-04-03"
+
+[[routes]]
+pattern = "punchy.me"
+custom_domain = true
+
+[[kv_namespaces]]
+binding = "SHORT_LINKS"
+id = "e5c2bbb9a5f04d409e42350fc025ea2d"
