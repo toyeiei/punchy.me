@@ -3,7 +3,44 @@ export const HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PUNCHY.ME - URL Shortener</title>
+    <title>PUNCHY.ME | Ultra-Fast URL Shortener & Link Brander</title>
+    <meta name="description" content="Shorten long URLs instantly with PUNCHY.ME. A high-performance, neon-glitch styled link shortener built for speed, style, and smart deduplication.">
+    <meta name="keywords" content="URL shortener, link shortener, shorten link, branded links, fast redirection, PUNCHY.ME">
+    <link rel="canonical" href="https://punchy.me/" />
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><rect width=%22100%22 height=%22100%22 fill=%22%2322c55e%22/></svg>">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://punchy.me/">
+    <meta property="og:title" content="PUNCHY.ME | Ultra-Fast URL Shortener">
+    <meta property="og:description" content="Instant URL shortening with impact. Built for speed and style on Cloudflare Edge.">
+    <meta property="og:image" content="https://punchy.me/og-image.png">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://punchy.me/">
+    <meta property="twitter:title" content="PUNCHY.ME | Ultra-Fast URL Shortener">
+    <meta property="twitter:description" content="Instant URL shortening with impact. Built for speed and style on Cloudflare Edge.">
+    <meta property="twitter:image" content="https://punchy.me/og-image.png">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "PUNCHY.ME",
+      "url": "https://punchy.me/",
+      "description": "A high-performance URL shortener built on Cloudflare Workers.",
+      "applicationCategory": "Utility",
+      "operatingSystem": "Web",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -278,6 +315,18 @@ export const HTML = `<!DOCTYPE html>
         }
 
         .close-link:hover { color: var(--text-main); }
+
+        /* SEO Hidden Content */
+        .seo-content {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            border: 0;
+        }
     </style>
 </head>
 <body>
@@ -291,6 +340,17 @@ export const HTML = `<!DOCTYPE html>
             </div>
         </form>
     </div>
+
+    <footer class="seo-content">
+        <h2>Ultra-Fast URL Shortener & Link Brander</h2>
+        <p>Shorten long URLs instantly with PUNCHY.ME. Our link shortener provides fast redirection, branded links, and smart deduplication. Built on Cloudflare Workers for maximum performance and reliability. PUNCHY.ME is the best way to manage and share your links with impact.</p>
+        <nav>
+            <ul>
+                <li><a href="https://punchy.me/">Home</a></li>
+                <li><a href="https://github.com/toyeiei/punchy.me">Source Code</a></li>
+            </ul>
+        </nav>
+    </footer>
 
     <div id="modal-overlay">
         <div class="modal">

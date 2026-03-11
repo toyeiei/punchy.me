@@ -8,6 +8,29 @@ export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
 		const url = new URL(request.url);
 
+		// SEO: robots.txt
+		if (url.pathname === "/robots.txt") {
+			return new Response("User-agent: *\nAllow: /\nSitemap: https://punchy.me/sitemap.xml", {
+				headers: { "Content-Type": "text/plain" },
+			});
+		}
+
+		// SEO: sitemap.xml
+		if (url.pathname === "/sitemap.xml") {
+			const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <url>https://punchy.me/</url>
+    <lastmod>2024-03-11</lastmod>
+    <changefreq>monthly</lastfreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>`;
+			return new Response(sitemap, {
+				headers: { "Content-Type": "application/xml" },
+			});
+		}
+
 		// Serve the frontend
 		if (url.pathname === "/" && request.method === "GET") {
 			return new Response(HTML, {

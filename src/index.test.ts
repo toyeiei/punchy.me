@@ -66,4 +66,21 @@ describe("PUNCHY.ME URL Shortener", () => {
     const response = await SELF.fetch("http://localhost/unknown-id");
     expect(response.status).toBe(404);
   });
+
+  it("serves robots.txt", async () => {
+    const response = await SELF.fetch("http://localhost/robots.txt");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Type")).toBe("text/plain");
+    const text = await response.text();
+    expect(text).toContain("User-agent: *");
+  });
+
+  it("serves sitemap.xml", async () => {
+    const response = await SELF.fetch("http://localhost/sitemap.xml");
+    expect(response.status).toBe(200);
+    expect(response.headers.get("Content-Type")).toBe("application/xml");
+    const text = await response.text();
+    expect(text).toContain("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
+    expect(text).toContain("https://punchy.me/");
+  });
 });

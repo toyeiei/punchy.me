@@ -3,3 +3,5 @@ node_modules
 .dev.vars
 dist
 worker-configuration.d.ts
+chat_our_first_mvp.md
+@chat_our_first_mvp.md
