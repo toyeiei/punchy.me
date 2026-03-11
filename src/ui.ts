@@ -316,6 +316,20 @@ export const HTML = `<!DOCTYPE html>
 
         .close-link:hover { color: var(--text-main); }
 
+        /* Visible Footer */
+        .footer {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            z-index: 20;
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+
+        .footer:hover { opacity: 1; }
+
         /* SEO Hidden Content */
         .seo-content {
             position: absolute;
@@ -339,6 +353,10 @@ export const HTML = `<!DOCTYPE html>
                 <button type="submit" id="submit-btn">Get Short Link</button>
             </div>
         </form>
+    </div>
+
+    <div class="footer">
+        Built with ⚡ by Toy & Gemini CLI
     </div>
 
     <footer class="seo-content">
