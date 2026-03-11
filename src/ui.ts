@@ -14,14 +14,14 @@ export const HTML = `<!DOCTYPE html>
     <meta property="og:url" content="https://punchy.me/">
     <meta property="og:title" content="PUNCHY.ME | Ultra-Fast URL Shortener">
     <meta property="og:description" content="Instant URL shortening with impact. Built for speed and style on Cloudflare Edge.">
-    <meta property="og:image" content="https://punchy.me/og-image.png">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://punchy.me/">
     <meta property="twitter:title" content="PUNCHY.ME | Ultra-Fast URL Shortener">
     <meta property="twitter:description" content="Instant URL shortening with impact. Built for speed and style on Cloudflare Edge.">
-    <meta property="twitter:image" content="https://punchy.me/og-image.png">
+    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
 
     <!-- Structured Data -->
     <script type="application/ld+json">
