@@ -20,14 +20,14 @@ export default {
 			const sitemap = `<?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <url>https://punchy.me/</url>
-    <lastmod>2024-03-11</lastmod>
-    <changefreq>monthly</lastfreq>
+    <loc>https://punchy.me/</loc>
+    <lastmod>2026-03-11</lastmod>
+    <changefreq>monthly</changefreq>
     <priority>1.0</priority>
   </url>
 </urlset>`;
-			return new Response(sitemap, {
-				headers: { "Content-Type": "application/xml" },
+			return new Response(sitemap.trim(), {
+				headers: { "Content-Type": "text/xml; charset=utf-8" },
 			});
 		}
 

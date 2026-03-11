@@ -78,9 +78,10 @@ describe("PUNCHY.ME URL Shortener", () => {
   it("serves sitemap.xml", async () => {
     const response = await SELF.fetch("http://localhost/sitemap.xml");
     expect(response.status).toBe(200);
-    expect(response.headers.get("Content-Type")).toBe("application/xml");
+    expect(response.headers.get("Content-Type")).toBe("text/xml; charset=utf-8");
     const text = await response.text();
     expect(text).toContain("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
-    expect(text).toContain("https://punchy.me/");
+    expect(text).toContain("<loc>https://punchy.me/</loc>");
+    expect(text).toContain("<lastmod>2026-03-11</lastmod>");
   });
 });
