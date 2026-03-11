@@ -1,8 +1,31 @@
-import { HTML } from './ui';
+import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE } from './ui';
 
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	TURNSTILE_SECRET_KEY?: string;
+}
+
+/**
+ * HTMLRewriter Handler for Bazuka Cards
+ */
+class BazukaHandler {
+	private data: any;
+	constructor(data: any) { this.data = data; }
+	element(element: Element) {
+		const id = element.getAttribute('id');
+		if (id === 'card-nickname') element.setInnerContent(this.data.nickname);
+		if (id === 'card-job') element.setInnerContent(this.data.job);
+		if (id === 'card-email') {
+			element.setInnerContent(this.data.email);
+			element.setAttribute('href', `mailto:${this.data.email}`);
+		}
+		if (id === 'card-linkedin') {
+			element.setAttribute('href', this.data.linkedin);
+		}
+		if (id === 'title-tag') {
+			element.setInnerContent(`${this.data.nickname} | PUNCHY.ME BAZUKA`);
+		}
+	}
 }
 
 /**
@@ -69,6 +92,49 @@ export default {
 			return new Response(HTML, {
 				headers: { "Content-Type": "text/html" },
 			});
+		}
+
+		// BAZUKA: Serve the creation form
+		if (url.pathname === "/bazuka" && request.method === "GET") {
+			return new Response(BAZUKA_FORM_HTML, {
+				headers: { "Content-Type": "text/html" },
+			});
+		}
+
+		// BAZUKA: Create a business card
+		if (url.pathname === "/bazuka" && request.method === "POST") {
+			try {
+				const body = await request.json() as any;
+				const { nickname, job, email, linkedin, 'cf-turnstile-response': token } = body;
+
+				// Basic validation
+				if (!nickname || !job || !email || !linkedin) {
+					return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
+				}
+
+				// Rate limiting
+				if (await isRateLimited(ip, env)) {
+					return new Response(JSON.stringify({ error: "Too many requests" }), { status: 429 });
+				}
+
+				// Turnstile verification
+				if (env.TURNSTILE_SECRET_KEY && token) {
+					const isHuman = await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, ip);
+					if (!isHuman) return new Response(JSON.stringify({ error: "Verification failed" }), { status: 403 });
+				}
+
+				const id = Math.random().toString(36).substring(2, 8);
+				const data = { type: 'bazuka', nickname, job, email, linkedin };
+				
+				// Store with 3-day TTL (259200 seconds)
+				await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
+
+				return new Response(JSON.stringify({ id }), {
+					headers: { "Content-Type": "application/json" },
+				});
+			} catch (_err) {
+				return new Response(JSON.stringify({ error: "Invalid request" }), { status: 400 });
+			}
 		}
 
 		// API: Shorten a URL
@@ -160,12 +226,33 @@ export default {
 			}
 		}
 
-		// Redirect short links
+		// Redirect short links or serve BAZUKA cards
 		const id = url.pathname.slice(1); // Get path after /
 		if (id && id.length > 0) {
-			const originalUrl = await env.SHORT_LINKS.get(id);
-			if (originalUrl) {
-				return Response.redirect(originalUrl, 301);
+			const value = await env.SHORT_LINKS.get(id);
+			if (value) {
+				// Check if it's a BAZUKA card (stored as JSON)
+				if (value.startsWith('{')) {
+					try {
+						const data = JSON.parse(value);
+						if (data.type === 'bazuka') {
+							const handler = new BazukaHandler(data);
+							return new HTMLRewriter()
+								.on('#card-nickname', handler)
+								.on('#card-job', handler)
+								.on('#card-email', handler)
+								.on('#card-linkedin', handler)
+								.on('#title-tag', handler)
+								.transform(new Response(BAZUKA_CARD_TEMPLATE, {
+									headers: { "Content-Type": "text/html" },
+								}));
+						}
+					} catch (_e) {
+						// Not valid JSON, treat as URL
+					}
+				}
+				// Normal URL redirect
+				return Response.redirect(value, 301);
 			}
 			return new Response("Link not found or expired", { status: 404 });
 		}

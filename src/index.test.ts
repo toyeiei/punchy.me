@@ -177,4 +177,53 @@ describe("PUNCHY.ME URL Shortener", () => {
     // Let's refine the test to expect success since we haven't made token MANDATORY yet.
     expect(response.status).toBe(200);
   });
+
+  describe("BAZUKA Feature", () => {
+    it("serves the bazuka form", async () => {
+      const response = await SELF.fetch("http://localhost/bazuka");
+      expect(response.status).toBe(200);
+      const text = await response.text();
+      expect(text).toContain("BAZUKA");
+    });
+
+    it("creates a bazuka business card", async () => {
+      const response = await SELF.fetch("http://localhost/bazuka", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nickname: "Toy",
+          job: "Data Analyst",
+          email: "toy@example.com",
+          linkedin: "https://linkedin.com/in/toy"
+        }),
+      });
+      expect(response.status).toBe(200);
+      const data = await response.json() as { id: string };
+      expect(data.id).toHaveLength(6);
+    });
+
+    it("renders a bazuka business card via HTMLRewriter", async () => {
+      // First create one
+      const createResponse = await SELF.fetch("http://localhost/bazuka", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nickname: "BazukaBoy",
+          job: "Rocket Scientist",
+          email: "rocket@example.com",
+          linkedin: "https://linkedin.com/in/rocket"
+        }),
+      });
+      const { id } = await createResponse.json() as { id: string };
+
+      // Then view it
+      const viewResponse = await SELF.fetch(`http://localhost/${id}`);
+      expect(viewResponse.status).toBe(200);
+      const html = await viewResponse.text();
+      expect(html).toContain("BazukaBoy");
+      expect(html).toContain("Rocket Scientist");
+      expect(html).toContain("rocket@example.com");
+      expect(html).toContain("https://linkedin.com/in/rocket");
+    });
+  });
 });

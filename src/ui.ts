@@ -516,3 +516,390 @@ export const HTML = `<!DOCTYPE html>
     </script>
 </body>
 </html>`;
+
+export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BAZUKA | Instant Digital Business Cards</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
+    <style>
+        :root {
+            --bg: #000000;
+            --card-bg: #111111;
+            --accent: #22c55e;
+            --accent-hover: #16a34a;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --font-brand: 'Bitcount Prop Double', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pixel-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pixel {
+            position: absolute;
+            width: 3px;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            animation: drift var(--duration) linear infinite;
+            top: var(--top);
+            left: -10px;
+        }
+
+        .pixel.green {
+            background: var(--accent);
+            box-shadow: 0 0 5px var(--accent);
+            opacity: 0.6;
+        }
+
+        @keyframes drift {
+            0% { transform: translateX(0); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+        }
+
+        .container {
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            z-index: 10;
+            position: relative;
+        }
+
+        h1 {
+            font-family: var(--font-brand);
+            font-size: clamp(3rem, 10vw, 80px);
+            line-height: 1;
+            margin-bottom: 2rem;
+            color: var(--text-main);
+            letter-spacing: -2px;
+            text-transform: uppercase;
+            position: relative;
+            animation: main-glitch 4s infinite;
+        }
+
+        @keyframes main-glitch {
+            0%, 20%, 40%, 45%, 55%, 70%, 100% { transform: skew(0deg); text-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
+            21% { transform: skew(2deg); text-shadow: 2px 0 0 #ff00ff, -2px 0 0 #00ffff; }
+            41% { transform: skew(-2deg); text-shadow: -2px 0 0 #ff00ff, 2px 0 0 #00ffff; }
+            51% { transform: skew(1deg); }
+        }
+
+        .input-group {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        input {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem;
+            border-radius: 10px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input:focus { border-color: var(--accent); }
+
+        button#bazuka-btn {
+            background: var(--accent);
+            color: #052e16;
+            border: none;
+            padding: 1rem;
+            border-radius: 10px;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            transition: all 0.3s;
+        }
+
+        button#bazuka-btn:hover { background: var(--accent-hover); transform: translateY(-2px); }
+
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            backdrop-filter: blur(8px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal {
+            background: #000000;
+            padding: 3rem 2rem;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .result-link { color: var(--accent); font-weight: 700; text-decoration: none; word-break: break-all; }
+    </style>
+</head>
+<body>
+    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="container">
+        <h1>BAZUKA</h1>
+        <form id="bazuka-form">
+            <div class="input-group">
+                <input type="text" id="nickname" placeholder="Nickname" required>
+                <input type="text" id="job" placeholder="Job Title" required>
+                <input type="email" id="email" placeholder="Email" required>
+                <input type="url" id="linkedin" placeholder="LinkedIn URL" required>
+                <button type="submit" id="bazuka-btn">BAZUKA</button>
+            </div>
+            <div id="turnstile-container" style="display: none;">
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess"></div>
+            </div>
+        </form>
+    </div>
+
+    <div id="modal-overlay">
+        <div class="modal">
+            <h2>CARD ARMED!</h2>
+            <p style="margin: 1rem 0; color: var(--text-dim);">Your dynamic card is live for 3 days:</p>
+            <div style="background: #111; padding: 1rem; border-radius: 10px; margin-bottom: 1.5rem;">
+                <a href="#" id="result-url" class="result-link" target="_blank"></a>
+            </div>
+            <button onclick="location.reload()" style="background: transparent; color: var(--text-dim); border: none; cursor: pointer;">Create Another</button>
+        </div>
+    </div>
+
+    <script>
+        const form = document.getElementById('bazuka-form');
+        const submitBtn = document.getElementById('bazuka-btn');
+        let isUserInitiated = false;
+
+        window.onTurnstileSuccess = (token) => {
+            if (isUserInitiated) {
+                createBazuka(token);
+                isUserInitiated = false;
+            }
+        };
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'ARMING...';
+            isUserInitiated = true;
+            if (window.turnstile) window.turnstile.execute();
+            else createBazuka();
+        };
+
+        async function createBazuka(token = '') {
+            const data = {
+                nickname: document.getElementById('nickname').value,
+                job: document.getElementById('job').value,
+                email: document.getElementById('email').value,
+                linkedin: document.getElementById('linkedin').value,
+                'cf-turnstile-response': token
+            };
+
+            try {
+                const response = await fetch('/bazuka', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+
+                if (response.ok) {
+                    const result = await response.json();
+                    const url = window.location.origin + '/' + result.id;
+                    document.getElementById('result-url').innerText = url;
+                    document.getElementById('result-url').href = url;
+                    document.getElementById('modal-overlay').style.display = 'flex';
+                } else {
+                    const err = await response.json();
+                    alert(err.error || 'Bazuka failed.');
+                }
+            } catch (err) {
+                alert('Network error.');
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = 'BAZUKA';
+            }
+        }
+
+        // Pixel Background
+        const bg = document.getElementById('pixel-bg');
+        function createPixel() {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            if (Math.random() > 0.7) pixel.classList.add('green');
+            const top = Math.random() * 100;
+            const duration = 5 + Math.random() * 10;
+            pixel.style.setProperty('--top', top + '%');
+            pixel.style.setProperty('--duration', duration + 's');
+            bg.appendChild(pixel);
+            setTimeout(() => pixel.remove(), duration * 1000);
+        }
+        setInterval(createPixel, 300);
+        for(let i=0; i<20; i++) createPixel();
+    </script>
+</body>
+</html>`;
+
+export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="title-tag">Business Card | PUNCHY.ME</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #000000;
+            --accent: #22c55e;
+            --text-main: #f8fafc;
+            --text-dim: #94a3b8;
+            --font-brand: 'Bitcount Prop Double', cursive;
+            --font-mono: 'JetBrains Mono', monospace;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: var(--bg);
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .pixel-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pixel {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            animation: drift var(--duration) linear infinite;
+            top: var(--top); left: -10px;
+        }
+
+        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
+
+        @keyframes drift {
+            0% { transform: translateX(0); opacity: 0; }
+            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+        }
+
+        .card {
+            z-index: 10;
+            text-align: left;
+            border-left: 4px solid var(--accent);
+            padding: 2rem;
+            background: rgba(17, 17, 17, 0.8);
+            backdrop-filter: blur(10px);
+            border-radius: 0 20px 20px 0;
+            max-width: 90%;
+            width: 400px;
+            box-shadow: 20px 20px 60px rgba(0,0,0,0.5);
+        }
+
+        .nickname {
+            font-family: var(--font-brand);
+            font-size: 3rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+        }
+
+        .job { font-size: 1.2rem; color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; letter-spacing: 1px; }
+        
+        .info-row { margin-bottom: 0.8rem; display: flex; align-items: center; gap: 10px; }
+        .label { color: var(--text-dim); font-size: 0.8rem; text-transform: uppercase; width: 80px; }
+        .value { color: var(--text-main); font-size: 0.9rem; text-decoration: none; }
+        .value:hover { color: var(--accent); }
+
+        .footer { margin-top: 2rem; font-size: 0.7rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; }
+    </style>
+</head>
+<body>
+    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="card">
+        <div class="nickname" id="card-nickname">NAME</div>
+        <div class="job" id="card-job">JOB TITLE</div>
+        
+        <div class="info-row">
+            <span class="label">Email</span>
+            <a href="" class="value" id="card-email">email@example.com</a>
+        </div>
+        <div class="info-row">
+            <span class="label">LinkedIn</span>
+            <a href="" class="value" id="card-linkedin" target="_blank">View Profile</a>
+        </div>
+
+        <div class="footer">
+            Generated via PUNCHY.ME BAZUKA • Expires in 3 days
+        </div>
+    </div>
+
+    <script>
+        const bg = document.getElementById('pixel-bg');
+        function createPixel() {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            if (Math.random() > 0.7) pixel.classList.add('green');
+            const top = Math.random() * 100;
+            const duration = 5 + Math.random() * 10;
+            pixel.style.setProperty('--top', top + '%');
+            pixel.style.setProperty('--duration', duration + 's');
+            bg.appendChild(pixel);
+            setTimeout(() => pixel.remove(), duration * 1000);
+        }
+        setInterval(createPixel, 300);
+        for(let i=0; i<20; i++) createPixel();
+    </script>
+</body>
+</html>`;
