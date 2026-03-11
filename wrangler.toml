@@ -3,6 +3,9 @@ main = "src/index.ts"
 compatibility_date = "2024-04-03"
 assets = { directory = "./public" }
 
+[vars]
+TURNSTILE_SITE_KEY = "1x00000000000000000000AA" # Testing key
+
 [[routes]]
 pattern = "punchy.me"
 custom_domain = true

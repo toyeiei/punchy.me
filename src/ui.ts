@@ -44,6 +44,7 @@ export const HTML = `<!DOCTYPE html>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         :root {
             --bg: #000000;
@@ -349,8 +350,15 @@ export const HTML = `<!DOCTYPE html>
         <h1>PUNCHY.ME</h1>
         <form id="shorten-form">
             <div class="input-group">
+                <!-- Honeypot -->
+                <input type="text" name="hp_field" id="hp_field" style="display:none !important;" tabindex="-1" autocomplete="off">
+                
                 <input type="url" id="url" placeholder="Enter your long URL here..." required>
                 <button type="submit" id="submit-btn">Get Short Link</button>
+            </div>
+            <!-- Turnstile Widget -->
+            <div id="turnstile-container" style="display: flex; justify-content: center; margin-top: 1rem;">
+                <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark"></div>
             </div>
         </form>
     </div>
@@ -403,6 +411,8 @@ export const HTML = `<!DOCTYPE html>
         form.onsubmit = async (e) => {
             e.preventDefault();
             const url = document.getElementById('url').value;
+            const hp_field = document.getElementById('hp_field').value;
+            const turnstileResponse = form.querySelector('[name="cf-turnstile-response"]')?.value;
             
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
@@ -411,7 +421,11 @@ export const HTML = `<!DOCTYPE html>
                 const response = await fetch('/shorten', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ 
+                        url, 
+                        hp_field,
+                        'cf-turnstile-response': turnstileResponse 
+                    })
                 });
 
                 if (response.ok) {
@@ -423,7 +437,9 @@ export const HTML = `<!DOCTYPE html>
                     modalOverlay.style.display = 'flex';
                     setTimeout(() => modalOverlay.classList.add('show'), 10);
                 } else {
-                    alert('Error punching URL. Try again.');
+                    const errorData = await response.json();
+                    alert(errorData.error || 'Error punching URL. Try again.');
+                    if (window.turnstile) window.turnstile.reset();
                 }
             } catch (err) {
                 alert('Network error.');

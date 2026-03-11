@@ -106,4 +106,54 @@ describe("PUNCHY.ME URL Shortener", () => {
     const data = await response.json() as { error: string };
     expect(data.error).toBe("Invalid request");
   });
+
+  it("rejects recursive URLs (punchy.me)", async () => {
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "https://punchy.me/something" }),
+    });
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error).toBe("Recursive shortening is not allowed.");
+  });
+
+  it("rejects honeypot submission", async () => {
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        url: "https://example.com/honeypot",
+        hp_field: "I am a bot" 
+      }),
+    });
+    expect(response.status).toBe(403);
+    const data = await response.json() as { error: string };
+    expect(data.error).toBe("Bot detected.");
+  });
+
+  it("enforces rate limits (IP-based)", async () => {
+    const ip = "1.2.3.4";
+    const longUrl = "https://example.com/rate-limit";
+    
+    // Simulate 11 requests (limit is 10)
+    for (let i = 0; i < 11; i++) {
+      const response = await SELF.fetch("http://localhost/shorten", {
+        method: "POST",
+        headers: { 
+          "Content-Type": "application/json",
+          "CF-Connecting-IP": ip 
+        },
+        body: JSON.stringify({ url: `${longUrl}-${i}` }),
+      });
+      
+      if (i < 10) {
+        expect(response.status).toBe(200);
+      } else {
+        expect(response.status).toBe(429);
+        const data = await response.json() as { error: string };
+        expect(data.error).toBe("Too many requests. Please try again later.");
+      }
+    }
+  });
 });

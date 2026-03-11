@@ -2,11 +2,44 @@ import { HTML } from './ui';
 
 export interface Env {
 	SHORT_LINKS: KVNamespace;
+	TURNSTILE_SECRET_KEY?: string;
+}
+
+/**
+ * Basic IP-based rate limiter using KV
+ * Limit: 10 requests per minute
+ */
+async function isRateLimited(ip: string, env: Env): Promise<boolean> {
+	const key = `rate-limit:${ip}`;
+	const current = await env.SHORT_LINKS.get(key);
+	const count = parseInt(current || "0");
+
+	if (count >= 10) return true;
+
+	// Increment and set TTL to 60s
+	await env.SHORT_LINKS.put(key, (count + 1).toString(), { expirationTtl: 60 });
+	return false;
+}
+
+/**
+ * Verify Cloudflare Turnstile token
+ */
+async function verifyTurnstile(token: string, secret: string, ip: string): Promise<boolean> {
+	const formData = new FormData();
+	formData.append('secret', secret);
+	formData.append('response', token);
+	formData.append('remoteip', ip);
+
+	const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+	const result = await fetch(url, { body: formData, method: 'POST' });
+	const outcome = await result.json() as { success: boolean };
+	return outcome.success;
 }
 
 export default {
 	async fetch(request: Request, env: Env): Promise<Response> {
 		const url = new URL(request.url);
+		const ip = request.headers.get("CF-Connecting-IP") || "127.0.0.1";
 
 		// SEO: robots.txt
 		if (url.pathname === "/robots.txt") {
@@ -41,7 +74,47 @@ export default {
 		// API: Shorten a URL
 		if (url.pathname === "/shorten" && request.method === "POST") {
 			try {
-				const { url: originalUrl } = await request.json() as { url: string };
+				const body = await request.json() as { 
+					url: string; 
+					hp_field?: string; 
+					'cf-turnstile-response'?: string; 
+				};
+				const { url: originalUrl, hp_field, 'cf-turnstile-response': turnstileToken } = body;
+
+				// 1. Honeypot check
+				if (hp_field) {
+					return new Response(JSON.stringify({ error: "Bot detected." }), { 
+						status: 403,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
+
+				// 2. Rate limiting (IP-based)
+				if (await isRateLimited(ip, env)) {
+					return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), { 
+						status: 429,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
+
+				// 3. Recursive URL filtering
+				if (originalUrl.includes("punchy.me")) {
+					return new Response(JSON.stringify({ error: "Recursive shortening is not allowed." }), { 
+						status: 400,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
+
+				// 4. Turnstile verification (if secret is configured)
+				if (env.TURNSTILE_SECRET_KEY && turnstileToken) {
+					const isHuman = await verifyTurnstile(turnstileToken, env.TURNSTILE_SECRET_KEY, ip);
+					if (!isHuman) {
+						return new Response(JSON.stringify({ error: "Verification failed. Are you a bot?" }), { 
+							status: 403,
+							headers: { "Content-Type": "application/json" }
+						});
+					}
+				}
 				
 				// Basic validation
 				if (!originalUrl || !originalUrl.startsWith('http')) {
