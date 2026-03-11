@@ -358,7 +358,7 @@ export const HTML = `<!DOCTYPE html>
             </div>
             <!-- Turnstile Widget -->
             <div id="turnstile-container" style="display: flex; justify-content: center; margin-top: 1rem;">
-                <div class="cf-turnstile" data-sitekey="1x00000000000000000000AA" data-theme="dark"></div>
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-theme="dark"></div>
             </div>
         </form>
     </div>
