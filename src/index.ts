@@ -13,7 +13,10 @@ class BazukaHandler {
 	constructor(data: any) { this.data = data; }
 	element(element: Element) {
 		const id = element.getAttribute('id');
-		if (id === 'card-nickname') element.setInnerContent(this.data.nickname);
+		if (id === 'card-nickname') {
+			element.setInnerContent(this.data.nickname);
+			element.setAttribute('data-text', this.data.nickname);
+		}
 		if (id === 'card-job') element.setInnerContent(this.data.job);
 		if (id === 'card-email') {
 			element.setInnerContent(this.data.email);

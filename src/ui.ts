@@ -920,6 +920,46 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             text-transform: uppercase;
             line-height: 1;
             word-break: break-word;
+            position: relative;
+            animation: main-glitch 4s infinite;
+        }
+
+        @keyframes main-glitch {
+            0%, 20%, 40%, 45%, 55%, 70%, 100% { transform: skew(0deg); text-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
+            21% { transform: skew(2deg); text-shadow: 2px 0 0 #ff00ff, -2px 0 0 #00ffff; }
+            41% { transform: skew(-2deg); text-shadow: -2px 0 0 #ff00ff, 2px 0 0 #00ffff; }
+            51% { transform: skew(1deg); }
+        }
+
+        .nickname::before, .nickname::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: transparent;
+            opacity: 0.5;
+        }
+
+        .nickname::before {
+            left: 2px;
+            text-shadow: -1px 0 #ff00ff;
+            animation: glitch-anim 6s infinite linear alternate-reverse;
+        }
+
+        .nickname::after {
+            left: -2px;
+            text-shadow: -1px 0 #00ffff;
+            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+        }
+
+        @keyframes glitch-anim {
+            0%, 100% { clip-path: inset(40% 0 61% 0); opacity: 0; }
+            20%, 80% { clip-path: inset(92% 0 1% 0); opacity: 0.5; }
+            40%, 60% { clip-path: inset(43% 0 1% 0); opacity: 0; }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 100% { clip-path: inset(24% 0 29% 0); opacity: 0; }
+            50% { clip-path: inset(54% 0 21% 0); opacity: 0.5; }
         }
 
         .job { font-size: clamp(1rem, 4vw, 1.25rem); color: var(--text-main); font-weight: 700; margin-bottom: 2rem; letter-spacing: 1px; }
@@ -945,7 +985,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
     <div class="card">
-        <div class="nickname" id="card-nickname">NAME</div>
+        <div class="nickname" id="card-nickname" data-text="NAME">NAME</div>
         <div class="job" id="card-job">JOB TITLE</div>
         
         <div class="info-row">
