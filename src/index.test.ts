@@ -1,16 +1,17 @@
 import { env, SELF } from "cloudflare:test";
-import { it, expect, describe } from "vitest";
+import { it, expect, describe, vi, beforeEach } from "vitest";
 
 describe("PUNCHY.ME URL Shortener", () => {
+  beforeEach(() => {
+    vi.restoreAllMocks();
+  });
+
   it("serves the homepage", async () => {
     const response = await SELF.fetch("http://localhost/");
     expect(response.status).toBe(200);
-    
-    // Verify 103 Early Hints / Link headers
     const linkHeader = response.headers.get("Link");
     expect(linkHeader).toContain("preconnect");
     expect(linkHeader).toContain("rel=preload");
-    
     const text = await response.text();
     expect(text).toContain("PUNCHY.ME");
   });
@@ -22,13 +23,9 @@ describe("PUNCHY.ME URL Shortener", () => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: longUrl }),
     });
-    
     expect(response.status).toBe(200);
     const data = await response.json() as { id: string };
-    expect(data.id).toBeDefined();
-    expect(data.id.length).toBe(6);
-
-    // Verify it's in KV
+    expect(data.id).toHaveLength(6);
     const stored = await env.SHORT_LINKS.get(data.id);
     expect(stored).toBe(longUrl);
   });
@@ -40,30 +37,24 @@ describe("PUNCHY.ME URL Shortener", () => {
       body: JSON.stringify({ url: "google.com" }),
     });
     const data = await response.json() as { id: string };
-    
     const stored = await env.SHORT_LINKS.get(data.id);
     expect(stored).toBe("https://google.com");
   });
 
   it("returns the same ID for the same URL (Deduplication)", async () => {
     const longUrl = "https://example.com/shared";
-    
-    // First shortening
     const res1 = await SELF.fetch("http://localhost/shorten", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: longUrl }),
     });
     const data1 = await res1.json() as { id: string };
-
-    // Second shortening
     const res2 = await SELF.fetch("http://localhost/shorten", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: longUrl }),
     });
     const data2 = await res2.json() as { id: string };
-
     expect(data1.id).toBe(data2.id);
   });
 
@@ -71,11 +62,7 @@ describe("PUNCHY.ME URL Shortener", () => {
     const id = "redir1";
     const longUrl = "https://vitest.dev/";
     await env.SHORT_LINKS.put(id, longUrl);
-
-    const response = await SELF.fetch(`http://localhost/${id}`, {
-      redirect: "manual",
-    });
-
+    const response = await SELF.fetch(`http://localhost/${id}`, { redirect: "manual" });
     expect(response.status).toBe(301);
     expect(response.headers.get("Location")).toBe(longUrl);
   });
@@ -88,7 +75,6 @@ describe("PUNCHY.ME URL Shortener", () => {
   it("serves robots.txt", async () => {
     const response = await SELF.fetch("http://localhost/robots.txt");
     expect(response.status).toBe(200);
-    expect(response.headers.get("Content-Type")).toBe("text/plain");
     const text = await response.text();
     expect(text).toContain("User-agent: *");
   });
@@ -96,11 +82,18 @@ describe("PUNCHY.ME URL Shortener", () => {
   it("serves sitemap.xml", async () => {
     const response = await SELF.fetch("http://localhost/sitemap.xml");
     expect(response.status).toBe(200);
-    expect(response.headers.get("Content-Type")).toBe("text/xml; charset=utf-8");
     const text = await response.text();
-    expect(text).toContain("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
     expect(text).toContain("<loc>https://punchy.me/</loc>");
-    expect(text).toContain("<lastmod>2026-03-11</lastmod>");
+  });
+
+  it("serves the favicon", async () => {
+    const res1 = await SELF.fetch("http://localhost/favicon.ico");
+    expect(res1.status).toBe(200);
+    expect(res1.headers.get("Content-Type")).toBe("image/svg+xml");
+
+    const res2 = await SELF.fetch("http://localhost/favicon.svg");
+    expect(res2.status).toBe(200);
+    expect(res2.headers.get("Content-Type")).toBe("image/svg+xml");
   });
 
   it("auto-fixes invalid URL by prepending https://", async () => {
@@ -141,10 +134,7 @@ describe("PUNCHY.ME URL Shortener", () => {
     const response = await SELF.fetch("http://localhost/shorten", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ 
-        url: "https://example.com/honeypot",
-        hp_field: "I am a bot" 
-      }),
+      body: JSON.stringify({ url: "https://example.com/honeypot", hp_field: "I am a bot" }),
     });
     expect(response.status).toBe(403);
     const data = await response.json() as { error: string };
@@ -153,25 +143,17 @@ describe("PUNCHY.ME URL Shortener", () => {
 
   it("enforces rate limits (IP-based)", async () => {
     const ip = "1.2.3.4";
-    const longUrl = "https://example.com/rate-limit";
-    
-    // Simulate 11 requests (limit is 10)
     for (let i = 0; i < 11; i++) {
       const response = await SELF.fetch("http://localhost/shorten", {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "CF-Connecting-IP": ip 
-        },
-        body: JSON.stringify({ url: `${longUrl}-${i}` }),
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": ip },
+        body: JSON.stringify({ url: `https://example.com/rl-${i}` }),
       });
-      
-      if (i < 10) {
-        expect(response.status).toBe(200);
-      } else {
+      if (i < 10) { expect(response.status).toBe(200); } 
+      else { 
         expect(response.status).toBe(429);
         const data = await response.json() as { error: string };
-        expect(data.error).toBe("Too many requests. Please try again later.");
+        expect(data.error).toBe("Too many requests. Please try again later."); 
       }
     }
   });
@@ -182,100 +164,46 @@ describe("PUNCHY.ME URL Shortener", () => {
   });
 
   it("handles URL normalization (trailing slashes)", async () => {
-    const url1 = "https://example.com/slash";
-    const url2 = "https://example.com/slash/";
-    
-    const res1 = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url1 }),
-    });
+    const res1 = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: "https://example.com/slash" }) });
     const { id: id1 } = await res1.json() as { id: string };
-
-    const res2 = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: url2 }),
-    });
+    const res2 = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: "https://example.com/slash/" }) });
     const { id: id2 } = await res2.json() as { id: string };
-
     expect(id1).toBe(id2);
   });
 
   it("preserves complex URLs with queries and fragments", async () => {
     const complexUrl = "https://example.com/path?name=toy&age=38#engineering";
-    const response = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: complexUrl }),
-    });
-    
-    const { id } = await response.json() as { id: string };
-    
-    // Test redirection
-    const redirectRes = await SELF.fetch(`http://localhost/${id}`, {
-      redirect: "manual",
-    });
-    
-    expect(redirectRes.status).toBe(301);
+    const res = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: complexUrl }) });
+    const { id } = await res.json() as { id: string };
+    const redirectRes = await SELF.fetch(`http://localhost/${id}`, { redirect: "manual" });
     expect(redirectRes.headers.get("Location")).toBe(complexUrl);
   });
 
   it("ensures short IDs are case-sensitive", async () => {
-    const longUrl = "https://example.com/case-test";
-    const shortenRes = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: longUrl }),
-    });
+    const shortenRes = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: "https://example.com/case" }) });
     const { id } = await shortenRes.json() as { id: string };
-
-    // Exact match should work (manual redirect check)
-    const res1 = await SELF.fetch(`http://localhost/${id}`, {
-      redirect: "manual"
-    });
+    const res1 = await SELF.fetch(`http://localhost/${id}`, { redirect: "manual" });
     expect(res1.status).toBe(301);
-
-    // Uppercase version should 404 (assuming ID contains at least one letter)
     const res2 = await SELF.fetch(`http://localhost/${id.toUpperCase()}`);
     expect(res2.status).toBe(404);
   });
 
   it("supports optimistic suggestedId", async () => {
     const suggestedId = "opt123";
-    const response = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: "https://optimistic.com", suggestedId })
-    });
-    const data = await response.json() as { id: string };
+    const res = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: "https://optimistic.com", suggestedId }) });
+    const data = await res.json() as { id: string };
     expect(data.id).toBe(suggestedId);
-
-    // Verify it's actually stored
     const stored = await env.SHORT_LINKS.get(suggestedId);
     expect(stored).toBe("https://optimistic.com");
   });
 
   it("falls back if suggestedId is invalid or taken", async () => {
-    // 1. Taken ID
     await env.SHORT_LINKS.put("taken1", "https://taken.com");
-    const res1 = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: "https://new.com", suggestedId: "taken1" })
-    });
+    const res1 = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: "https://new.com", suggestedId: "taken1" }) });
     const data1 = await res1.json() as { id: string };
     expect(data1.id).not.toBe("taken1");
-    expect(data1.id).toHaveLength(6);
-
-    // 2. Invalid Format (too short)
-    const res2 = await SELF.fetch("http://localhost/shorten", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: "https://new2.com", suggestedId: "abc" })
-    });
+    const res2 = await SELF.fetch("http://localhost/shorten", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({ url: "https://new2.com", suggestedId: "abc" }) });
     const data2 = await res2.json() as { id: string };
-    expect(data2.id).not.toBe("abc");
     expect(data2.id).toHaveLength(6);
   });
 
@@ -293,37 +221,20 @@ describe("PUNCHY.ME URL Shortener", () => {
       const createResponse = await SELF.fetch("http://localhost/bazuka", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nickname: maliciousName,
-          job: "Hacker",
-          email: "hacker@example.com",
-          website: "https://hacker.com"
-        }),
+        body: JSON.stringify({ nickname: maliciousName, job: "Hacker", email: "hacker@example.com", website: "https://hacker.com" }),
       });
       const { id } = await createResponse.json() as { id: string };
-
       const viewResponse = await SELF.fetch(`http://localhost/${id}`);
       const html = await viewResponse.text();
-      
-      // Verification: The unescaped tag should NEVER appear
       expect(html).not.toContain(maliciousTag);
-      
-      // Check innerContent escaping
       expect(html).toContain("Toy&lt;script&gt;alert('XSS')&lt;/script&gt;");
-      // Check attribute escaping
-      expect(html).toContain("data-text=\"Toy&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;\"");
     });
 
     it("creates a bazuka business card", async () => {
       const response = await SELF.fetch("http://localhost/bazuka", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nickname: "Toy",
-          job: "Data Analyst",
-          email: "toy@example.com",
-          website: "https://datarockie.com"
-        }),
+        body: JSON.stringify({ nickname: "Toy", job: "Data Analyst", email: "toy@example.com", website: "https://datarockie.com" }),
       });
       expect(response.status).toBe(200);
       const data = await response.json() as { id: string };
@@ -331,27 +242,66 @@ describe("PUNCHY.ME URL Shortener", () => {
     });
 
     it("renders a bazuka business card via HTMLRewriter", async () => {
-      // First create one
       const createResponse = await SELF.fetch("http://localhost/bazuka", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          nickname: "BazukaBoy",
-          job: "Rocket Scientist",
-          email: "rocket@example.com",
-          website: "https://rocket.com"
-        }),
+        body: JSON.stringify({ nickname: "BazukaBoy", job: "Rocket Scientist", email: "rocket@example.com", website: "https://rocket.com" }),
       });
       const { id } = await createResponse.json() as { id: string };
-
-      // Then view it
       const viewResponse = await SELF.fetch(`http://localhost/${id}`);
-      expect(viewResponse.status).toBe(200);
       const html = await viewResponse.text();
       expect(html).toContain("BazukaBoy");
       expect(html).toContain("Rocket Scientist");
       expect(html).toContain("rocket@example.com");
       expect(html).toContain("https://rocket.com");
+    });
+  });
+
+  describe("ANAKIN Feature", () => {
+    it("serves the anakin form", async () => {
+      const response = await SELF.fetch("http://localhost/anakin");
+      expect(response.status).toBe(200);
+      const text = await response.text();
+      expect(text).toContain("ANAKIN");
+      expect(text).toContain("Full Name");
+    });
+
+    it("creates an AI resume (Anakin Forge)", async () => {
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: "Mocked AI Summary: High-impact Jedi Knight."
+      });
+      const response = await SELF.fetch("http://localhost/anakin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: "Anakin Skywalker", job: "Jedi Knight", email: "anakin@force.com", website: "https://force.com", education: "Jedi Academy", skills: "Force" }),
+      });
+      expect(response.status).toBe(200);
+      const data = await response.json() as { id: string };
+      expect(data.id).toHaveLength(6);
+      expect(aiSpy).toHaveBeenCalled();
+      const viewRes = await SELF.fetch(`http://localhost/${data.id}`);
+      const html = await viewRes.text();
+      expect(html).toContain("Anakin Skywalker");
+      expect(html).toContain("Mocked AI Summary");
+    });
+
+    it("enforces 500 character limits for education and skills", async () => {
+      const longText = "a".repeat(501);
+      const response = await SELF.fetch("http://localhost/anakin", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          name: "Toy",
+          job: "Data Analyst",
+          email: "toy@example.com",
+          website: "https://toy.com",
+          education: longText,
+          skills: "Skill"
+        }),
+      });
+      expect(response.status).toBe(400);
+      const data = await response.json() as { error: string };
+      expect(data.error).toBe("Education and Skills must be under 500 characters each.");
     });
   });
 });

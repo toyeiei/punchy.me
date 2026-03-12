@@ -13,3 +13,7 @@ custom_domain = true
 [[kv_namespaces]]
 binding = "SHORT_LINKS"
 id = "e5c2bbb9a5f04d409e42350fc025ea2d"
+
+[ai]
+binding = "AI"
+remote = true
