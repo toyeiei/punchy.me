@@ -25,6 +25,7 @@ interface AnakinData {
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
+	TURNSTILE_SITE_KEY: string;
 }
 
 /**
@@ -123,7 +124,48 @@ export default {
 		if (path === '/robots.txt') return new Response('User-agent: *\nAllow: /\nSitemap: https://punchy.me/sitemap.xml');
 		if (path === '/sitemap.xml') return new Response('<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"><url><loc>https://punchy.me/</loc><changefreq>weekly</changefreq></url></urlset>', { headers: { 'Content-Type': 'application/xml' } });
 
-		// 2. BAZUKA Routes
+		// 2. Shortener API
+		if (path === '/shorten' && request.method === 'POST') {
+			try {
+				const { url: longUrl, suggestedId, hp_field } = await request.json() as { url: string, suggestedId?: string, hp_field?: string };
+				
+				// Security: Bot Protection
+				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+				if (longUrl.includes('punchy.me')) return new Response(JSON.stringify({ error: 'Invalid URL.' }), { status: 400 });
+
+				// Security: IP-based Rate Limiting (10 req/min)
+				const ip = request.headers.get('CF-Connecting-IP') || 'anonymous';
+				const rlKey = `rl:${ip}`;
+				const currentRl = await env.SHORT_LINKS.get(rlKey);
+				const rlCount = currentRl ? parseInt(currentRl) : 0;
+				if (rlCount >= 10) return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
+				await env.SHORT_LINKS.put(rlKey, (rlCount + 1).toString(), { expirationTtl: 60 });
+
+				// Data: URL Normalization
+				let targetUrl = longUrl.trim();
+				if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
+				const normalized = targetUrl.replace(/\/+$/, '');
+
+				// Data: Deduplication
+				const existingId = await env.SHORT_LINKS.get(`url:${normalized}`);
+				if (existingId) return new Response(JSON.stringify({ id: existingId }), { headers: { 'Content-Type': 'application/json' } });
+
+				// Logic: ID Generation
+				let id = suggestedId || Math.random().toString(36).substring(2, 8);
+				const collision = await env.SHORT_LINKS.get(id);
+				if (collision && suggestedId) id = Math.random().toString(36).substring(2, 8); // Fallback if suggested is taken
+
+				// Logic: Persistence
+				await env.SHORT_LINKS.put(id, targetUrl);
+				await env.SHORT_LINKS.put(`url:${normalized}`, id);
+
+				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) {
+				return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
+			}
+		}
+
+		// 3. BAZUKA Routes
 		if (path === '/bazuka') {
 			if (request.method === 'GET') return new Response(BAZUKA_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
 			if (request.method === 'POST') {
@@ -139,7 +181,7 @@ export default {
 			}
 		}
 
-		// 3. ANAKIN Routes
+		// 4. ANAKIN Routes
 		if (path === '/anakin') {
 			if (request.method === 'GET') return new Response(ANAKIN_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
 			if (request.method === 'POST') {
@@ -159,7 +201,7 @@ export default {
 			}
 		}
 
-		// 4. ANAKIN Hydration Route (AI Background Task)
+		// 5. ANAKIN Hydration Route (AI Background Task)
 		if (path.startsWith('/anakin/hydrate/')) {
 			const id = path.split('/').pop();
 			if (!id) return new Response(JSON.stringify({ error: 'Invalid ID' }), { status: 400 });
@@ -196,7 +238,7 @@ export default {
 			}
 		}
 
-		// 5. Dynamic Redirection & Rendering
+		// 6. Dynamic Redirection & Rendering
 		if (path.length > 1) {
 			const id = path.substring(1);
 			const value = await env.SHORT_LINKS.get(id);
