@@ -41,15 +41,16 @@ class BazukaHandler {
 		}
 		if (id === 'card-website') {
 			element.setAttribute('href', escapeHTML(this.data.website));
+			element.setInnerContent(this.data.website);
 		}
 		if (id === 'title-tag') {
-			element.setInnerContent(`${this.data.nickname} | PUNCHY.ME BAZUKA`);
+			element.setInnerContent(`${this.data.nickname}, ${this.data.job} | PUNCHY.ME`);
 		}
 		if (id === 'og-title' || id === 'twitter-title') {
-			element.setAttribute('content', `${this.data.nickname} | Digital Business Card`);
+			element.setAttribute('content', `${this.data.nickname}, ${this.data.job} | PUNCHY.ME`);
 		}
 		if (id === 'og-description' || id === 'twitter-description') {
-			element.setAttribute('content', `Connect with ${this.data.nickname} (${this.data.job}). Powered by BAZUKA & PUNCHY.ME.`);
+			element.setAttribute('content', `Contact: ${this.data.email} | View my high-impact digital business card on BAZUKA.`);
 		}
 	}
 }

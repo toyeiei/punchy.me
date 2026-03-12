@@ -4,6 +4,12 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-12 (Version 1.5.3 - UX & Metadata Master)
+- **High-Impact Social Previews**: Implemented dynamic metadata in "{name}, {job} | PUNCHY.ME" format for all shared Bazuka cards.
+- **Versatile Bazuka Field**: Transitioned from a strict "LinkedIn" field to a generic "Website" field with updated globe icons and labels.
+- **Personalized Card Links**: Updated business cards to display the actual user-provided URL instead of generic placeholder text.
+- **Master Quality Control**: Achieved 100% clean ESLint state and verified all 23 core tests with TDD rigor.
+
 ### 2026-03-12 (Version 1.5.1 - UI Performance Patch)
 - **GPU-Accelerated Glitch**: Implemented `will-change` and hardware-accelerated transforms (`translateZ(0)`) to the main brand title to eliminate repaint lag.
 - **Rendering Optimization**: Streamlined `clip-path` and `text-shadow` animations to reduce CPU overhead and ensure 60FPS interaction on hover.

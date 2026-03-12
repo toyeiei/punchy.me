@@ -1271,7 +1271,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         </div>
         <div class="info-row">
             <span class="label">Website</span>
-            <a href="" class="value" id="card-website" target="_blank">View Website</a>
+            <a href="" class="value" id="card-website" target="_blank"></a>
         </div>
 
         <div class="footer">

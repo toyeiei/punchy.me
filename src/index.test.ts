@@ -297,7 +297,7 @@ describe("PUNCHY.ME URL Shortener", () => {
           nickname: maliciousName,
           job: "Hacker",
           email: "hacker@example.com",
-          linkedin: "https://linkedin.com/in/hacker"
+          website: "https://hacker.com"
         }),
       });
       const { id } = await createResponse.json() as { id: string };
@@ -322,7 +322,7 @@ describe("PUNCHY.ME URL Shortener", () => {
           nickname: "Toy",
           job: "Data Analyst",
           email: "toy@example.com",
-          linkedin: "https://linkedin.com/in/toy"
+          website: "https://datarockie.com"
         }),
       });
       expect(response.status).toBe(200);
@@ -339,7 +339,7 @@ describe("PUNCHY.ME URL Shortener", () => {
           nickname: "BazukaBoy",
           job: "Rocket Scientist",
           email: "rocket@example.com",
-          linkedin: "https://linkedin.com/in/rocket"
+          website: "https://rocket.com"
         }),
       });
       const { id } = await createResponse.json() as { id: string };
@@ -351,7 +351,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(html).toContain("BazukaBoy");
       expect(html).toContain("Rocket Scientist");
       expect(html).toContain("rocket@example.com");
-      expect(html).toContain("https://linkedin.com/in/rocket");
+      expect(html).toContain("https://rocket.com");
     });
   });
 });
