@@ -613,7 +613,22 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BAZUKA | Instant Digital Business Cards</title>
+    <meta name="description" content="Generate your high-impact, neon-glitch digital business card in seconds with BAZUKA. Part of the PUNCHY.ME ecosystem.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://punchy.me/bazuka">
+    <meta property="og:title" content="BAZUKA | Instant Digital Business Cards">
+    <meta property="og:description" content="Create your neon-glitch digital business card. Fast, stylish, and free.">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="BAZUKA | Instant Digital Business Cards">
+    <meta property="twitter:description" content="Create your neon-glitch digital business card. Fast, stylish, and free.">
+    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
@@ -981,6 +996,19 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="title-tag">Business Card | PUNCHY.ME</title>
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="og-title" content="Digital Business Card | PUNCHY.ME">
+    <meta property="og:description" id="og-description" content="Check out my digital business card on BAZUKA.">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" id="twitter-title" content="Digital Business Card | PUNCHY.ME">
+    <meta property="twitter:description" id="twitter-description" content="Check out my digital business card on BAZUKA.">
+    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">

@@ -45,6 +45,12 @@ class BazukaHandler {
 		if (id === 'title-tag') {
 			element.setInnerContent(`${this.data.nickname} | PUNCHY.ME BAZUKA`);
 		}
+		if (id === 'og-title' || id === 'twitter-title') {
+			element.setAttribute('content', `${this.data.nickname} | Digital Business Card`);
+		}
+		if (id === 'og-description' || id === 'twitter-description') {
+			element.setAttribute('content', `Connect with ${this.data.nickname} (${this.data.job}). Powered by BAZUKA & PUNCHY.ME.`);
+		}
 	}
 }
 
