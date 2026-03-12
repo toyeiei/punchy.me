@@ -590,13 +590,13 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .job-title { font-size: 1.25rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
-        .section { margin-bottom: 3rem; }
+        .section { margin-bottom: 1rem; }
         .section-title { 
             font-family: var(--font-brand);
             font-size: 1.25rem; 
             color: var(--accent); 
             text-transform: uppercase; 
-            margin-bottom: 1.5rem; 
+            margin-bottom: 1rem; 
             display: flex; 
             align-items: center; 
             gap: 1rem; 
@@ -608,11 +608,11 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             font-size: 1.1rem; 
             color: var(--text-main); 
             font-weight: 400; 
-            line-height: 1.8; 
+            line-height: 1.6; 
             font-style: italic; 
             background: rgba(34, 197, 94, 0.05);
             border: 1px solid rgba(34, 197, 94, 0.2);
-            padding: 2rem;
+            padding: 1.5rem;
             border-radius: 16px;
             backdrop-filter: blur(5px);
             position: relative;
@@ -630,10 +630,10 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             border-radius: 4px;
         }
 
-        .content-text { color: var(--text-main); white-space: pre-wrap; font-size: 1rem; }
+        .content-text { color: var(--text-main); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
 
         /* Sidebar Elements */
-        .sidebar-section { margin-bottom: 2.5rem; }
+        .sidebar-section { margin-bottom: 1.5rem; }
         .sidebar-label { color: var(--accent); font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; }
         .sidebar-value { color: var(--text-main); font-size: 0.9rem; word-break: break-all; text-decoration: none; display: block; }
         .sidebar-value:hover { color: var(--accent); }
@@ -648,17 +648,36 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             color: var(--text-main);
         }
 
-        .brand-footer { grid-column: 1 / -1; margin-top: 4rem; font-size: 0.75rem; color: var(--text-dim); text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 2rem; }
+        .brand-footer { grid-column: 1 / -1; margin-top: 2rem; font-size: 0.75rem; color: var(--text-dim); text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; }
+
+        .util-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-dim);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.75rem;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: all 0.2s;
+            font-family: 'JetBrains Mono', monospace;
+        }
+        .util-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
+
+        .print-footer { display: none; }
 
         @media print {
-            body { background: white; color: black; padding: 0; }
-            .pixel-bg, .hud-corner, .utility-bar, .brand-footer { display: none; }
-            .resume-card { background: white; color: black; box-shadow: none; border: none; padding: 0; max-width: 100%; }
+            @page { size: letter; margin: 10mm; }
+            body { background: white; color: black; padding: 0; margin: 0; display: block; }
+            .pixel-bg, .hud-corner, .utility-bar, .brand-footer { display: none !important; }
+            .resume-card { background: white; color: black; box-shadow: none; border: none; padding: 0; max-width: 100%; page-break-inside: avoid; height: 100%; display: flex; flex-direction: column; }
             .name { color: black; animation: none; text-shadow: none; }
             .job-title, .section-title, .sidebar-label, .ai-summary::before { color: #16a34a; }
-            .ai-summary { background: #f0fdf4; border: 1px solid #bbf7d0; color: #166534; }
+            .ai-summary { background: #f0fdf4 !important; border: 1px solid #bbf7d0 !important; color: #166534 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: inset 0 0 0 1000px #f0fdf4 !important; }
             .content-text, .sidebar-value, .skill-tag { color: black; }
             .skill-tag { border-color: #ddd; }
+            .print-footer { display: block; text-align: center; margin-top: auto; font-size: 0.75rem; color: #666; border-top: 1px solid #ddd; padding-top: 1rem; font-weight: bold; }
         }
     </style>
 </head>
@@ -720,6 +739,9 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         <div class="brand-footer">
             FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI
+        </div>
+        <div class="print-footer">
+            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME
         </div>
     </div>
 
