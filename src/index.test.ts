@@ -127,7 +127,7 @@ describe("PUNCHY.ME URL Shortener", () => {
     });
     expect(response.status).toBe(400);
     const data = await response.json() as { error: string };
-    expect(data.error).toBe("Recursive shortening is not allowed.");
+    expect(data.error).toBe("Invalid URL.");
   });
 
   it("rejects honeypot submission", async () => {
@@ -153,7 +153,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       else { 
         expect(response.status).toBe(429);
         const data = await response.json() as { error: string };
-        expect(data.error).toBe("Too many requests. Please try again later."); 
+        expect(data.error).toBe("Too many requests"); 
       }
     }
   });
@@ -223,8 +223,6 @@ describe("PUNCHY.ME URL Shortener", () => {
     const id = "corrupt";
     await env.SHORT_LINKS.put(id, "{ invalid json }");
     const response = await SELF.fetch(`http://localhost/${id}`, { redirect: "manual" });
-    // Should fall back to 404 or attempt redirect if it looks like a URL, 
-    // but definitely shouldn't 500.
     expect(response.status).not.toBe(500);
   });
 
@@ -294,12 +292,12 @@ describe("PUNCHY.ME URL Shortener", () => {
 
     it("creates an AI resume (Anakin Forge)", async () => {
       const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
-        response: "Mocked AI Summary: High-impact Jedi Knight."
+        response: "[SUMMARY] Mocked AI Summary [/SUMMARY] [EXPERIENCE] Mocked Bullet points [/EXPERIENCE]"
       });
       const response = await SELF.fetch("http://localhost/anakin", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: "Anakin Skywalker", job: "Jedi Knight", email: "anakin@force.com", website: "https://force.com", education: "Jedi Academy", skills: "Force" }),
+        body: JSON.stringify({ name: "Anakin Skywalker", job: "Jedi Knight", email: "anakin@force.com", website: "https://force.com", education: "Jedi Academy", skills: "Force", experience: "Raw history" }),
       });
       expect(response.status).toBe(200);
       const data = await response.json() as { id: string };
@@ -310,6 +308,9 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(html).toContain("Anakin Skywalker");
       expect(html).toContain("Mocked AI Summary");
       expect(html).toContain("Built with ⚡ by Toy & Gemini CLI");
+      expect(html).toContain("Portfolio");
+      expect(html).toContain("FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME");
+      expect(html).toContain("print-footer");
     });
 
     it("enforces 500 character limits for education and skills", async () => {
@@ -323,12 +324,13 @@ describe("PUNCHY.ME URL Shortener", () => {
           email: "toy@example.com",
           website: "https://toy.com",
           education: longText,
-          skills: "Skill"
+          skills: "Skill",
+          experience: "Exp"
         }),
       });
       expect(response.status).toBe(400);
       const data = await response.json() as { error: string };
-      expect(data.error).toBe("Education and Skills must be under 500 characters each.");
+      expect(data.error).toBe("Input fields must be under 500 characters each.");
     });
   });
 });

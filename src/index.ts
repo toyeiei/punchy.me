@@ -16,7 +16,9 @@ interface AnakinData {
 	website: string;
 	education: string;
 	skills: string;
+	experience: string;
 	aiSummary?: string;
+	aiExperience?: string;
 }
 
 interface Env {
@@ -86,6 +88,7 @@ class AnakinHandler {
 			element.setAttribute('href', escapeHTML(this.data.website));
 		}
 		if (id === 'res-summary') element.setInnerContent(this.data.aiSummary || 'Refining professional profile...');
+		if (id === 'res-experience') element.setInnerContent(this.data.aiExperience || this.data.experience);
 		if (id === 'res-education') element.setInnerContent(this.data.education);
 		if (id === 'res-skills') element.setInnerContent(this.data.skills);
 		if (id === 'title-tag') element.setInnerContent(`${this.data.name} | Professional Resume | PUNCHY.ME`);
@@ -181,31 +184,32 @@ export default {
 		if (url.pathname === "/anakin" && request.method === "POST") {
 			try {
 				const body = await request.json() as AnakinData & { 'cf-turnstile-response'?: string };
-				const { name, job, email, website, education, skills, 'cf-turnstile-response': token } = body;
-				if (!name || !job || !email || !website || !education || !skills) return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
-				if (education.length > 500 || skills.length > 500) return new Response(JSON.stringify({ error: "Education and Skills must be under 500 characters each." }), { status: 400 });
+				const { name, job, email, website, education, skills, experience, 'cf-turnstile-response': token } = body;
+				if (!name || !job || !email || !website || !education || !skills || !experience) return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
+				if (education.length > 500 || skills.length > 500 || experience.length > 500) return new Response(JSON.stringify({ error: "Input fields must be under 500 characters each." }), { status: 400 });
 				if (await isRateLimited(ip, env)) return new Response(JSON.stringify({ error: "Too many requests" }), { status: 429 });
 				if (env.TURNSTILE_SECRET_KEY) {
 					if (!token) return new Response(JSON.stringify({ error: "Security check required" }), { status: 403 });
 					if (!(await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, ip))) return new Response(JSON.stringify({ error: "Verification failed" }), { status: 403 });
 				}
-				// Workers AI Integration: Master Prompt (Optimized for Quality & Tokens)
+				
+				// Workers AI Integration: Anakin Forge 2.3
 				const aiResponse = (await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 					messages: [
 						{ 
 							role: 'system', 
-							content: 'You are ANAKIN, an elite Resume Architect. Write a high-impact professional summary. RULES: STRICTLY MAX 35 WORDS. Output ONLY the summary text, absolutely NO introductory or concluding phrases (e.g. do not say "Here is a summary"). Use action verbs. No "I" or "My". Tone: Professional, bold, tech-forward.' 
+							content: 'You are ANAKIN, an elite Resume Architect. Task: 1. Write a professional summary (STRICTLY MAX 35 WORDS). 2. Rewrite work history into 3 high-impact bullet points using "Action-Result" format. Rules: Use action verbs. No "I" or "My". Output format: [SUMMARY] text [/SUMMARY] [EXPERIENCE] bullet points [/EXPERIENCE].' 
 						},
-						{ role: 'user', content: `Job: ${job}\nEducation: ${education}\nSkills: ${skills}` }
+						{ role: 'user', content: `Job: ${job}\nEducation: ${education}\nSkills: ${skills}\nRaw Experience: ${experience}` }
 					]
 				})) as { response: string; usage?: { prompt_tokens: number; completion_tokens: number } };
 
-				if (aiResponse.usage) {
-					console.log(`[ANAKIN AI] Usage: ${aiResponse.usage.prompt_tokens} input, ${aiResponse.usage.completion_tokens} output tokens.`);
-				}
+				const rawAI = aiResponse.response;
+				const aiSummary = rawAI.split('[SUMMARY]')[1]?.split('[/SUMMARY]')[0]?.trim() || "Elite professional specialized in high-impact delivery.";
+				const aiExperience = rawAI.split('[EXPERIENCE]')[1]?.split('[/EXPERIENCE]')[0]?.trim() || experience;
 
 				const id = Math.random().toString(36).substring(2, 8);
-				const data: AnakinData = { type: 'anakin', name, job, email, website, education, skills, aiSummary: aiResponse.response };
+				const data: AnakinData = { type: 'anakin', name, job, email, website, education, skills, experience, aiSummary, aiExperience };
 				await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
 				return new Response(JSON.stringify({ id }), { headers: { "Content-Type": "application/json" } });
 			} catch (_err) { return new Response(JSON.stringify({ error: "Anakin Forge failed" }), { status: 500 }); }
@@ -219,8 +223,8 @@ export default {
 				if (hp_field) return new Response(JSON.stringify({ error: "Bot detected." }), { status: 403 });
 				if (!originalUrl.startsWith('http://') && !originalUrl.startsWith('https://')) originalUrl = 'https://' + originalUrl;
 				originalUrl = originalUrl.endsWith('/') ? originalUrl.slice(0, -1) : originalUrl;
-				if (!originalUrl || originalUrl.includes("punchy.me")) return new Response(JSON.stringify({ error: "Recursive shortening is not allowed." }), { status: 400 });
-				if (await isRateLimited(ip, env)) return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), { status: 429 });
+				if (!originalUrl || originalUrl.includes("punchy.me")) return new Response(JSON.stringify({ error: "Invalid URL." }), { status: 400 });
+				if (await isRateLimited(ip, env)) return new Response(JSON.stringify({ error: "Too many requests" }), { status: 429 });
 				if (env.TURNSTILE_SECRET_KEY && turnstileToken) {
 					if (!(await verifyTurnstile(turnstileToken, env.TURNSTILE_SECRET_KEY, ip))) return new Response(JSON.stringify({ error: "Verification failed" }), { status: 403 });
 				}
@@ -248,7 +252,7 @@ export default {
 						}
 						if (data.type === 'anakin') {
 							const handler = new AnakinHandler(data);
-							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-summary', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#og-description', handler).transform(new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
+							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-summary', handler).on('#res-experience', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#og-description', handler).transform(new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
 						}
 					} catch (_e) {
 						// Malformed JSON, fallback to redirect

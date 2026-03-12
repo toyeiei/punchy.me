@@ -72,8 +72,8 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         .container {
-            width: 90%;
-            max-width: 600px;
+            width: 95%;
+            max-width: 900px;
             text-align: center;
             z-index: 10;
             position: relative;
@@ -127,17 +127,29 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         .input-group {
             background: var(--card-bg);
-            padding: 2.5rem;
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
+            padding: 3rem;
+            border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: left;
         }
 
-        label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; }
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2.5rem;
+        }
+
+        @media (min-width: 768px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .field-group { margin-bottom: 1.5rem; }
+        .field-group:last-child { margin-bottom: 0; }
+
+        label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.5rem; display: block; }
 
         input, textarea {
             background: rgba(255, 255, 255, 0.05);
@@ -153,7 +165,35 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         input:focus, textarea:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
 
-        textarea { resize: vertical; min-height: 100px; }
+        /* Live Validation Styles */
+        .input-wrapper { position: relative; }
+        input.valid, textarea.valid { border-color: var(--accent); box-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
+        input.invalid, textarea.invalid { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.1); }
+        
+        .validation-hint { 
+            position: absolute; 
+            right: 15px; 
+            top: 50%; 
+            transform: translateY(-50%); 
+            font-size: 0.9rem; 
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+        input.valid + .validation-hint { opacity: 1; color: var(--accent); }
+        textarea.valid + .validation-hint { opacity: 1; color: var(--accent); top: 20px; transform: none; }
+
+        .char-counter {
+            font-size: 0.65rem;
+            color: var(--text-dim);
+            text-align: right;
+            margin-top: 6px;
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+        }
+        .char-counter.limit { color: #ef4444; font-weight: 700; }
+
+        textarea { resize: vertical; min-height: 120px; }
 
         button#anakin-btn {
             background: var(--accent);
@@ -167,12 +207,14 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             transition: all 0.3s;
             animation: anakin-glow 2s infinite alternate;
-            margin-top: 1rem;
+            width: 100%;
+            margin-top: 2rem;
+            grid-column: 1 / -1;
         }
 
         @keyframes anakin-glow {
             0% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); transform: scale(1); }
-            100% { box-shadow: 0 0 25px rgba(34, 197, 94, 0.6); transform: scale(1.02); }
+            100% { box-shadow: 0 0 25px rgba(34, 197, 94, 0.6); transform: scale(1.01); }
         }
 
         button#anakin-btn:hover { background: var(--accent-hover); }
@@ -270,32 +312,71 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         <h1>ANAKIN</h1>
         <form id="anakin-form">
             <div class="input-group">
-                <div>
-                    <label>Full Name</label>
-                    <input type="text" id="name" placeholder="Anakin Skywalker" required>
+                <div class="form-grid">
+                    <!-- Left Column: Personal Info -->
+                    <div class="form-col-left">
+                        <div class="field-group">
+                            <label>Full Name</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="name" placeholder="Anakin Skywalker" required minlength="2">
+                                <span class="validation-hint">✓</span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>Target Job Title</label>
+                            <div class="input-wrapper">
+                                <input type="text" id="job" placeholder="Jedi Knight / Sith Lord" required minlength="2">
+                                <span class="validation-hint">✓</span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>Email Address</label>
+                            <div class="input-wrapper">
+                                <input type="email" id="email" placeholder="anakin@force.com" required>
+                                <span class="validation-hint">✓</span>
+                            </div>
+                        </div>
+                        <div class="field-group">
+                            <label>Portfolio Website</label>
+                            <div class="input-wrapper">
+                                <input type="url" id="website" placeholder="https://force.com" required>
+                                <span class="validation-hint">✓</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column: Professional Content -->
+                    <div class="form-col-right">
+                        <div class="field-group">
+                            <label>Education</label>
+                            <div class="input-wrapper">
+                                <textarea id="education" placeholder="Jedi Academy, Master Yoda's Classes..." required maxlength="500"></textarea>
+                                <span class="validation-hint">✓</span>
+                            </div>
+                            <div class="char-counter" id="edu-counter">0 / 500</div>
+                        </div>
+                        <div class="field-group">
+                            <label>Skills & Expertise</label>
+                            <div class="input-wrapper">
+                                <textarea id="skills" placeholder="Lightsaber combat, Podracing, The Force..." required maxlength="500"></textarea>
+                                <span class="validation-hint">✓</span>
+                            </div>
+                            <div class="char-counter" id="skills-counter">0 / 500</div>
+                        </div>
+                        <div class="field-group">
+                            <label>Experience & Impact</label>
+                            <div class="input-wrapper">
+                                <textarea id="experience" placeholder="Built a podracer from scrap, Led the 501st Legion..." required maxlength="500"></textarea>
+                                <span class="validation-hint">✓</span>
+                            </div>
+                            <div class="char-counter" id="exp-counter">0 / 500</div>
+                        </div>
+                    </div>
                 </div>
-                <div>
-                    <label>Target Job Title</label>
-                    <input type="text" id="job" placeholder="Jedi Knight / Sith Lord" required>
-                </div>
-                <div>
-                    <label>Email Address</label>
-                    <input type="email" id="email" placeholder="anakin@tatooine.com" required>
-                </div>
-                <div>
-                    <label>Portfolio Website</label>
-                    <input type="url" id="website" placeholder="https://force.com" required>
-                </div>
-                <div>
-                    <label>Education <span style="font-size: 0.65rem; color: var(--accent); opacity: 0.8;">[MAX 500 CHARS]</span></label>
-                    <textarea id="education" placeholder="Jedi Academy, Master Yoda's Classes..." required maxlength="500"></textarea>
-                </div>
-                <div>
-                    <label>Skills & Achievements <span style="font-size: 0.65rem; color: var(--accent); opacity: 0.8;">[MAX 500 CHARS]</span></label>
-                    <textarea id="skills" placeholder="Lightsaber combat, Podracing, The Force..." required maxlength="500"></textarea>
-                </div>
+                
                 <button type="submit" id="anakin-btn">GENERATE RESUME</button>
             </div>
+            
             <div id="turnstile-container" style="display: none;">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
             </div>
@@ -328,8 +409,37 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         const modalOverlay = document.getElementById('modal-overlay');
         const resultUrl = document.getElementById('result-url');
         const copyBtn = document.getElementById('anakin-copy-btn');
-        let isUserInitiated = false;
-        let turnstileTimeoutId = null;
+        
+        const inputs = form.querySelectorAll('input, textarea');
+        const counters = {
+            'education': document.getElementById('edu-counter'),
+            'skills': document.getElementById('skills-counter'),
+            'experience': document.getElementById('exp-counter')
+        };
+
+        function validateInput(input) {
+            if (input.checkValidity() && input.value.trim().length > 0) {
+                input.classList.add('valid');
+                input.classList.remove('invalid');
+            } else if (input.value.trim().length > 0) {
+                input.classList.add('invalid');
+                input.classList.remove('valid');
+            } else {
+                input.classList.remove('valid', 'invalid');
+            }
+        }
+
+        inputs.forEach(input => {
+            input.addEventListener('input', () => {
+                validateInput(input);
+                if (counters[input.id]) {
+                    const length = input.value.length;
+                    counters[input.id].innerText = \`\${length} / 500\`;
+                    if (length >= 450) counters[input.id].classList.add('limit');
+                    else counters[input.id].classList.remove('limit');
+                }
+            });
+        });
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(resultUrl.innerText).then(() => {
@@ -348,6 +458,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 turnstileTimeoutId = null;
             }
         }
+
+        let isUserInitiated = false;
+        let turnstileTimeoutId = null;
 
         window.onTurnstileSuccess = (token) => {
             if (isUserInitiated) {
@@ -392,6 +505,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 website: document.getElementById('website').value,
                 education: document.getElementById('education').value,
                 skills: document.getElementById('skills').value,
+                experience: document.getElementById('experience').value,
                 'cf-turnstile-response': token
             };
 
@@ -546,11 +660,12 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             color: var(--text-dim);
             padding: 6px 12px;
             border-radius: 6px;
-            font-size: 0.7rem;
+            font-size: 0.75rem;
             cursor: pointer;
             text-transform: uppercase;
             font-weight: 700;
             transition: all 0.2s;
+            font-family: 'JetBrains Mono', monospace;
         }
         .util-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
 
@@ -669,15 +784,33 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         @media print {
             @page { size: letter; margin: 10mm; }
-            body { background: white; color: black; padding: 0; margin: 0; display: block; }
+            body { background: white; color: black !important; padding: 0; margin: 0; display: block; }
             .pixel-bg, .hud-corner, .utility-bar, .brand-footer { display: none !important; }
-            .resume-card { background: white; color: black; box-shadow: none; border: none; padding: 0; max-width: 100%; page-break-inside: avoid; height: 100%; display: flex; flex-direction: column; }
-            .name { color: black; animation: none; text-shadow: none; }
-            .job-title, .section-title, .sidebar-label, .ai-summary::before { color: #16a34a; }
-            .ai-summary { background: #f0fdf4 !important; border: 1px solid #bbf7d0 !important; color: #166534 !important; -webkit-print-color-adjust: exact; print-color-adjust: exact; box-shadow: inset 0 0 0 1000px #f0fdf4 !important; }
-            .content-text, .sidebar-value, .skill-tag { color: black; }
+            .resume-card { background: white !important; color: black !important; box-shadow: none; border: none; padding: 0; max-width: 100%; page-break-inside: avoid; height: 100%; display: flex !important; flex-direction: column; }
+            .name { color: black !important; animation: none; text-shadow: none; }
+            .job-title, .section-title, .sidebar-label, .ai-summary::before { color: #16a34a !important; }
+            .ai-summary { 
+                background: #f0fdf4 !important; 
+                border: 1px solid #bbf7d0 !important; 
+                color: #166534 !important; 
+                -webkit-print-color-adjust: exact; 
+                print-color-adjust: exact; 
+                box-shadow: inset 0 0 0 1000px #f0fdf4 !important;
+                display: block !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                backdrop-filter: none !important;
+                filter: none !important;
+            }
+            #res-summary { 
+                display: block !important; 
+                visibility: visible !important; 
+                color: #166534 !important; 
+                opacity: 1 !important;
+            }
+            .content-text, .sidebar-value, .skill-tag { color: black !important; }
             .skill-tag { border-color: #ddd; }
-            .print-footer { display: block; text-align: center; margin-top: auto; font-size: 0.75rem; color: #666; border-top: 1px solid #ddd; padding-top: 1rem; font-weight: bold; }
+            .print-footer { display: block !important; text-align: center; margin-top: auto; font-size: 0.75rem; color: #666; border-top: 1px solid #ddd; padding-top: 1rem; font-weight: bold; }
         }
     </style>
 </head>
@@ -712,6 +845,11 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 </div>
 
                 <div class="section">
+                    <div class="section-title">Experience & Impact</div>
+                    <div class="content-text" id="res-experience">Built a podracer from scrap...</div>
+                </div>
+
+                <div class="section">
                     <div class="section-title">Education</div>
                     <div class="content-text" id="res-education">Jedi Academy</div>
                 </div>
@@ -724,7 +862,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 </div>
 
                 <div class="sidebar-section">
-                    <div class="sidebar-label">Network</div>
+                    <div class="sidebar-label">Portfolio</div>
                     <a href="#" class="sidebar-value" id="res-website" target="_blank">PORTFOLIO</a>
                 </div>
 
