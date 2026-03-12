@@ -33,7 +33,7 @@ export const HTML = `<!DOCTYPE html>
       "description": "A FREE, ultra-fast, and easy-to-use URL shortener. Shorten your long links instantly with impact on the Cloudflare Edge.",
       "applicationCategory": "Utility",
       "operatingSystem": "Web",
-      "softwareVersion": "1.0",
+      "softwareVersion": "1.1",
       "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "offers": {
         "@type": "Offer",
