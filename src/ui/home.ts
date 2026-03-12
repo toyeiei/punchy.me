@@ -34,37 +34,17 @@ export const HTML = `<!DOCTYPE html>
       "applicationCategory": "Utility",
       "applicationSubCategory": "URL Shortener",
       "operatingSystem": "Web",
-      "softwareVersion": "1.2",
+      "softwareVersion": "2.9",
       "author": {
         "@type": "Person",
         "name": "Kasidis Satangmongkol",
         "url": "https://datarockie.com"
       },
-      "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "offers": {
         "@type": "Offer",
         "price": "0",
         "priceCurrency": "USD"
       }
-    }
-    </script>
-    <script type="application/ld+json">
-    {
-      "@context": "https://schema.org",
-      "@type": "Person",
-      "name": "Kasidis Satangmongkol",
-      "jobTitle": "Digital Writer",
-      "worksFor": {
-        "@type": "Organization",
-        "name": "DataRockie"
-      },
-      "url": "https://datarockie.com",
-      "sameAs": [
-        "https://www.linkedin.com/in/kasidistoy",
-        "https://punchy.me/"
-      ],
-      "description": "Toy is a Digital Writer at DataRockie and the creator of PUNCHY.ME, a high-performance URL shortener built on Cloudflare Workers.",
-      "knowsAbout": ["Data Analysis", "Cloudflare Workers", "Content Writer"]
     }
     </script>
 
@@ -94,8 +74,9 @@ export const HTML = `<!DOCTYPE html>
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow: hidden;
+            overflow-x: hidden;
             position: relative;
+            padding: 4rem 0;
         }
 
         .pixel-bg {
@@ -108,20 +89,14 @@ export const HTML = `<!DOCTYPE html>
 
         .pixel {
             position: absolute;
-            width: 3px;
-            height: 3px;
+            width: 3px; height: 3px;
             background: rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
-            top: var(--top);
-            left: -10px;
+            top: var(--top); left: -10px;
         }
 
-        .pixel.green {
-            background: var(--accent);
-            box-shadow: 0 0 5px var(--accent);
-            opacity: 0.6;
-        }
+        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
 
         @keyframes drift {
             0% { transform: translateX(0); opacity: 0; }
@@ -148,7 +123,7 @@ export const HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
-            will-change: transform;
+            will-change: transform, opacity;
             transform: translateZ(0);
         }
 
@@ -169,17 +144,8 @@ export const HTML = `<!DOCTYPE html>
             transform: translateZ(0);
         }
 
-        h1::before {
-            left: 1px;
-            color: #ff00ff;
-            animation: glitch-anim-1 4s infinite;
-        }
-
-        h1::after {
-            left: -1px;
-            color: #00ffff;
-            animation: glitch-anim-2 3s infinite;
-        }
+        h1::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
+        h1::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
 
         @keyframes glitch-anim-1 {
             0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
@@ -193,11 +159,6 @@ export const HTML = `<!DOCTYPE html>
             96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
-        h1:hover {
-            text-shadow: 0 0 15px var(--accent);
-            transition: text-shadow 0.1s ease;
-        }
-
         .input-group {
             background: var(--card-bg);
             padding: 1rem;
@@ -207,6 +168,7 @@ export const HTML = `<!DOCTYPE html>
             gap: 1rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            margin-bottom: 3rem;
         }
 
         @media (min-width: 640px) {
@@ -254,7 +216,60 @@ export const HTML = `<!DOCTYPE html>
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
         }
 
-        button#submit-btn:active { transform: scale(0.95); }
+        /* Command Center Suite Grid */
+        .suite-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 2rem;
+        }
+
+        @media (min-width: 640px) {
+            .suite-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .feature-card:hover {
+            background: rgba(34, 197, 94, 0.05);
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-icon {
+            font-size: 1.5rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            display: block;
+        }
+
+        .feature-title {
+            font-family: var(--font-brand);
+            font-size: 1.75rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .feature-tagline {
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            line-height: 1.5;
+        }
 
         #modal-overlay {
             display: none;
@@ -286,21 +301,15 @@ export const HTML = `<!DOCTYPE html>
         #modal-overlay.show .modal { transform: scale(1); }
 
         .success-icon {
-            width: 80px;
-            height: 80px;
+            width: 80px; height: 80px;
             background: var(--accent);
             border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
+            display: flex; justify-content: center; align-items: center;
             margin: 0 auto 1.5rem;
             animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
         }
 
-        @keyframes pop {
-            0% { transform: scale(0); }
-            100% { transform: scale(1); }
-        }
+        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
         .success-icon svg { width: 40px; height: 40px; color: #052e16; }
 
@@ -348,17 +357,7 @@ export const HTML = `<!DOCTYPE html>
         }
 
         .copy-btn:hover { background: #334155; }
-        .copy-btn:active { background: #0f172a; }
-
-        .close-link {
-            display: block;
-            margin-top: 1rem;
-            color: var(--text-dim);
-            text-decoration: none;
-            font-size: 0.9rem;
-            cursor: pointer;
-        }
-
+        .close-link { display: block; margin-top: 1rem; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
         .close-link:hover { color: var(--text-main); }
 
         .footer {
@@ -371,19 +370,7 @@ export const HTML = `<!DOCTYPE html>
             opacity: 0.6;
             transition: opacity 0.2s;
         }
-
         .footer:hover { opacity: 1; }
-
-        .seo-content {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            border: 0;
-        }
     </style>
 </head>
 <body>
@@ -392,33 +379,33 @@ export const HTML = `<!DOCTYPE html>
         <h1>PUNCHY.ME</h1>
         <form id="shorten-form">
             <div class="input-group">
-                <!-- Honeypot -->
                 <input type="text" name="hp_field" id="hp_field" style="display:none !important;" tabindex="-1" autocomplete="off">
-                
                 <input type="url" id="url" placeholder="Enter your long URL here..." required>
                 <button type="submit" id="submit-btn">Get Short Link</button>
             </div>
-            <!-- Invisible Turnstile Container (Hidden) -->
             <div id="turnstile-container" style="display: none;">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
             </div>
         </form>
+
+        <!-- Command Center: Ecosystem Suite -->
+        <div class="suite-grid">
+            <a href="/bazuka" class="feature-card">
+                <span class="feature-icon">[ 👤 ]</span>
+                <div class="feature-title">BAZUKA</div>
+                <div class="feature-tagline">Instant Digital Identity. Professional cards that explode with style.</div>
+            </a>
+            <a href="/anakin" class="feature-card">
+                <span class="feature-icon">⚡</span>
+                <div class="feature-title">ANAKIN</div>
+                <div class="feature-tagline">Elite AI Resumes. Forged by Llama 3 for career-winning impact.</div>
+            </a>
+        </div>
     </div>
 
     <div class="footer">
         Built with ⚡ by Toy & Gemini CLI
     </div>
-
-    <footer class="seo-content">
-        <h2>Ultra-Fast URL Shortener & Link Brander</h2>
-        <p>Shorten long URLs instantly with PUNCHY.ME. Our link shortener provides fast redirection, branded links, and smart deduplication. Built on Cloudflare Workers for maximum performance and reliability. PUNCHY.ME is the best way to manage and share your links with impact.</p>
-        <nav>
-            <ul>
-                <li><a href="https://punchy.me/">Home</a></li>
-                <li><a href="https://github.com/toyeiei/punchy.me">Source Code</a></li>
-            </ul>
-        </nav>
-    </footer>
 
     <div id="modal-overlay">
         <div class="modal">
@@ -429,17 +416,15 @@ export const HTML = `<!DOCTYPE html>
             </div>
             <h2>PUNCHED!</h2>
             <p style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is ready.</p>
-            
             <div class="result-container">
                 <a href="#" id="short-url-result" class="result-link" target="_blank"></a>
-                <button class="copy-btn" id="copy-btn" title="Copy Link">
+                <button class="copy-btn" id="copy-btn" title="Copy Link" type="button">
                     <svg style="width:20px;height:20px" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
                     </svg>
                 </button>
             </div>
-            
-            <a class="close-link" onclick="closeModal()">Back to Home</a>
+            <a class="close-link" id="close-modal-btn">Back to Home</a>
         </div>
     </div>
 
@@ -450,6 +435,7 @@ export const HTML = `<!DOCTYPE html>
         const modalOverlay = document.getElementById('modal-overlay');
         const resultLink = document.getElementById('short-url-result');
         const copyBtn = document.getElementById('copy-btn');
+        const closeBtn = document.getElementById('close-modal-btn');
         
         let isUserInitiated = false;
         let turnstileTimeoutId = null;
@@ -465,12 +451,9 @@ export const HTML = `<!DOCTYPE html>
             }
         }
 
-        // Speed Optimization: Pre-trigger Turnstile when user interacts
         function pretriggerTurnstile() {
             if (window.turnstile && !cachedToken && !isUserInitiated) {
-                try {
-                    window.turnstile.execute();
-                } catch (e) {}
+                try { window.turnstile.execute(); } catch (e) {}
             }
         }
 
@@ -480,65 +463,29 @@ export const HTML = `<!DOCTYPE html>
         window.onTurnstileSuccess = (token) => {
             cachedToken = token;
             if (isUserInitiated) {
-                if (turnstileTimeoutId) {
-                    clearTimeout(turnstileTimeoutId);
-                    turnstileTimeoutId = null;
-                }
+                if (turnstileTimeoutId) { clearTimeout(turnstileTimeoutId); turnstileTimeoutId = null; }
                 executeShorten(token);
             }
         };
 
-        window.onTurnstileError = () => {
-            console.error('Turnstile execution failed');
-            if (isUserInitiated) {
-                executeShorten(); // Fallback
-            }
-        };
+        window.onTurnstileError = () => { if (isUserInitiated) executeShorten(); };
 
         form.onsubmit = async (e) => {
             e.preventDefault();
-            
-            if (!urlInput.value || !urlInput.checkValidity()) {
-                urlInput.reportValidity();
-                return;
-            }
+            if (!urlInput.value || !urlInput.checkValidity()) { urlInput.reportValidity(); return; }
 
-            // OPTIMISTIC UI: Generate ID locally and show modal immediately
             const suggestedId = Math.random().toString(36).substring(2, 8);
             const optimisticUrl = window.location.origin + '/' + suggestedId;
             
-            resultLink.innerText = optimisticUrl;
-            resultLink.href = optimisticUrl;
-            modalOverlay.style.display = 'flex';
-            modalOverlay.classList.add('show');
-
-            // If we already have a cached token, skip the delay and go instant
-            if (cachedToken) {
-                submitBtn.disabled = true;
-                submitBtn.innerText = 'PUNCHING...';
-                executeShorten(cachedToken, suggestedId);
-                return;
-            }
-
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
             isUserInitiated = true;
 
-            // Safety timeout
-            turnstileTimeoutId = setTimeout(() => {
-                if (isUserInitiated) {
-                    console.warn('Turnstile timeout, falling back');
-                    executeShorten('', suggestedId);
-                }
-            }, 3000);
-
-            if (window.turnstile) {
-                try {
-                    window.turnstile.execute();
-                } catch (err) {
-                    console.error('Turnstile error:', err);
-                    executeShorten('', suggestedId);
-                }
+            if (cachedToken) {
+                executeShorten(cachedToken, suggestedId);
+            } else if (window.turnstile) {
+                turnstileTimeoutId = setTimeout(() => { if (isUserInitiated) executeShorten('', suggestedId); }, 4000);
+                try { window.turnstile.execute(); } catch (err) { executeShorten('', suggestedId); }
             } else {
                 executeShorten('', suggestedId);
             }
@@ -546,51 +493,38 @@ export const HTML = `<!DOCTYPE html>
 
         async function executeShorten(turnstileToken = '', suggestedId = '') {
             let url = urlInput.value.trim();
-            const hp_field = document.getElementById('hp_field').value;
-
-            // Auto-prepend protocol if missing
-            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
-                url = 'https://' + url;
-            }
+            if (url && !url.startsWith('http')) url = 'https://' + url;
 
             try {
                 const response = await fetch('/shorten', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        url, 
-                        suggestedId,
-                        hp_field,
-                        'cf-turnstile-response': turnstileToken 
-                    })
+                    body: JSON.stringify({ url, suggestedId, 'cf-turnstile-response': turnstileToken })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
-                    const finalShortUrl = window.location.origin + '/' + data.id;
                     
-                    // If the server returned a different ID (e.g. deduplication or collision)
-                    // we silently update the UI.
-                    if (data.id !== suggestedId) {
+                    // SMART WAIT: Tiny 300ms delay before showing modal to ensure KV breathes
+                    setTimeout(() => {
+                        const finalShortUrl = window.location.origin + '/' + data.id;
                         resultLink.innerText = finalShortUrl;
                         resultLink.href = finalShortUrl;
-                    }
-                    
-                    // Clear cache for next use
-                    cachedToken = null;
-                    if (window.turnstile) window.turnstile.reset();
+                        modalOverlay.style.display = 'flex';
+                        setTimeout(() => modalOverlay.classList.add('show'), 10);
+                        cachedToken = null;
+                        if (window.turnstile) window.turnstile.reset();
+                    }, 300);
                 } else {
                     const errorData = await response.json();
-                    alert(errorData.error || 'Error punching URL. Try again.');
-                    closeModal(); // Hide the optimistic modal if it failed
-                    if (window.turnstile) window.turnstile.reset();
-                    cachedToken = null;
+                    alert(errorData.error || 'Error punching URL.');
+                    resetSubmitBtn();
                 }
             } catch (err) {
-                alert('Network error. Check your connection.');
-                closeModal();
-            } finally {
+                alert('Network error.');
                 resetSubmitBtn();
+            } finally {
+                // Submit button resets after modal is shown or error occurs
             }
         }
 
@@ -604,15 +538,14 @@ export const HTML = `<!DOCTYPE html>
 
         function closeModal() {
             modalOverlay.classList.remove('show');
-            setTimeout(() => {
-                modalOverlay.style.display = 'none';
-                document.getElementById('url').value = '';
+            setTimeout(() => { 
+                modalOverlay.style.display = 'none'; 
+                urlInput.value = ''; 
+                resetSubmitBtn();
             }, 300);
         }
 
-        document.addEventListener('keydown', (e) => {
-            if (e.key === 'Escape') closeModal();
-        });
+        closeBtn.onclick = closeModal;
 
         const bg = document.getElementById('pixel-bg');
         function createPixel() {

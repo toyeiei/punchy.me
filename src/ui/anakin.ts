@@ -3,8 +3,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ANAKIN | AI-Powered Professional Resumes</title>
-    <meta name="description" content="Generate a high-impact, AI-refined digital resume in seconds with ANAKIN. Part of the PUNCHY.ME ecosystem.">
+    <title>ANAKIN | AI-Powered Professional Resumes | PUNCHY.ME</title>
+    <meta name="description" content="Generate a high-impact, AI-refined digital resume in seconds with ANAKIN. Built for speed and professional career impact.">
+    <link rel="canonical" href="https://punchy.me/anakin" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
     
     <!-- Open Graph / Facebook -->
@@ -13,6 +14,12 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
     <meta property="og:title" content="ANAKIN | AI-Powered Professional Resumes">
     <meta property="og:description" content="Generate your professional digital resume with AI. Fast, stylish, and free.">
     <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" content="ANAKIN | AI-Powered Professional Resumes">
+    <meta property="twitter:description" content="Generate your professional digital resume with AI. Fast, stylish, and free.">
+    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -544,8 +551,14 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:title" id="og-title" content="AI Refined Resume | PUNCHY.ME">
-    <meta property="og:description" id="og-description" content="View my professional digital resume.">
+    <meta property="og:description" id="og-description" content="View my professional digital resume. Part of the PUNCHY.ME ecosystem.">
     <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:title" id="twitter-title" content="Professional Resume | PUNCHY.ME">
+    <meta property="twitter:description" id="twitter-description" content="View my professional digital resume. Refined by Anakin AI.">
+    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -860,6 +873,8 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
 
+    <script type="application/ld+json" id="schema-block"></script>
+
     <script>
         // Copy Link Functionality
         document.getElementById('copy-resume-link').onclick = () => {
@@ -899,9 +914,11 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             const summaryBox = document.getElementById('summary-box');
             const experienceEl = document.getElementById('res-experience');
             const experienceBox = document.getElementById('experience-box');
+            const resName = document.getElementById('res-name').innerText;
+            const resJob = document.getElementById('res-job').innerText;
             
             if (!summaryEl || summaryEl.getAttribute('data-pending') !== 'true') {
-                // If already hydrated from server, show badges
+                updateSchema(resName, resJob, summaryEl?.innerText || '');
                 if (summaryBox) summaryBox.setAttribute('data-refined', 'true');
                 if (experienceBox) experienceBox.setAttribute('data-refined', 'true');
                 return;
@@ -913,28 +930,34 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 if (response.ok) {
                     const data = await response.json();
                     
-                    // Reveal AI Summary
                     summaryEl.innerText = data.aiSummary;
                     summaryEl.removeAttribute('data-pending');
                     summaryBox.setAttribute('data-refined', 'true');
-                    summaryEl.animate([
-                        { opacity: 0, transform: 'translateY(5px)' },
-                        { opacity: 1, transform: 'translateY(0)' }
-                    ], { duration: 800, easing: 'ease-out' });
-
-                    // Reveal AI Experience
+                    
                     experienceEl.innerText = data.aiExperience;
                     experienceEl.removeAttribute('data-pending');
                     experienceBox.setAttribute('data-refined', 'true');
-                    experienceBox.style.fontStyle = 'normal'; // Remove loading italic
-                    experienceEl.animate([
-                        { opacity: 0 },
-                        { opacity: 1 }
-                    ], { duration: 800, easing: 'ease-in' });
+                    experienceBox.style.fontStyle = 'normal';
+
+                    updateSchema(resName, resJob, data.aiSummary);
                 }
             } catch (err) {
                 console.error('Hydration failed', err);
             }
+        }
+
+        function updateSchema(name, job, summary) {
+            const schema = {
+                "@context": "https://schema.org",
+                "@type": "ProfilePage",
+                "mainEntity": {
+                    "@type": "Person",
+                    "name": name,
+                    "jobTitle": job,
+                    "description": summary
+                }
+            };
+            document.getElementById('schema-block').textContent = JSON.stringify(schema);
         }
 
         window.onload = hydrateAI;

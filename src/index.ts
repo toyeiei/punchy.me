@@ -61,9 +61,13 @@ class BazukaHandler {
 			element.setInnerContent(this.data.website.replace(/^https?:\/\//, ''));
 			element.setAttribute('href', escapeHTML(this.data.website));
 		}
+		
+		// SEO Injection
 		if (id === 'title-tag') element.setInnerContent(`${this.data.nickname} | Digital Business Card | PUNCHY.ME`);
-		if (id === 'og-title') element.setAttribute('content', escapeHTML(`${this.data.nickname} | Digital Business Card | PUNCHY.ME`));
-		if (id === 'og-description') {
+		if (id === 'og-title' || id === 'twitter-title') {
+			element.setAttribute('content', escapeHTML(`${this.data.nickname} | Digital Business Card | PUNCHY.ME`));
+		}
+		if (id === 'og-description' || id === 'twitter-description') {
 			element.setAttribute('content', escapeHTML(`Contact: ${this.data.email} | View my high-impact digital business card on BAZUKA.`));
 		}
 	}
@@ -104,9 +108,16 @@ class AnakinHandler {
 		}
 		if (id === 'res-education') element.setInnerContent(this.data.education);
 		if (id === 'res-skills') element.setInnerContent(this.data.skills);
+		
+		// SEO Injection
 		if (id === 'title-tag') element.setInnerContent(`${this.data.name} | Professional Resume | PUNCHY.ME`);
-		if (id === 'og-title') element.setAttribute('content', escapeHTML(`${this.data.name} | Professional Resume | PUNCHY.ME`));
-		if (id === 'og-description') element.setAttribute('content', escapeHTML(`View the professional resume of ${this.data.name} (${this.data.job}). Refined by Anakin AI.`));
+		if (id === 'og-title' || id === 'twitter-title') {
+			element.setAttribute('content', escapeHTML(`${this.data.name} | Professional Resume | PUNCHY.ME`));
+		}
+		if (id === 'og-description' || id === 'twitter-description') {
+			const desc = this.data.aiSummary || `View the professional resume of ${this.data.name} (${this.data.job}). Refined by Anakin AI.`;
+			element.setAttribute('content', escapeHTML(desc));
+		}
 	}
 }
 
@@ -241,7 +252,15 @@ export default {
 		// 6. Dynamic Redirection & Rendering
 		if (path.length > 1) {
 			const id = path.substring(1);
-			const value = await env.SHORT_LINKS.get(id);
+			let value = await env.SHORT_LINKS.get(id);
+			
+			// KV Resilience: If not found, assumption is eventual consistency propagation.
+			// Sleep for 500ms and try one more time before failing.
+			if (!value) {
+				await new Promise(resolve => setTimeout(resolve, 500));
+				value = await env.SHORT_LINKS.get(id);
+			}
+
 			if (value) {
 				if (value.startsWith('http')) {
 					try {
@@ -254,12 +273,36 @@ export default {
 						const data = JSON.parse(value);
 						if (data.type === 'bazuka') {
 							const handler = new BazukaHandler(data);
-							return new HTMLRewriter().on('#card-nickname', handler).on('#card-job', handler).on('#card-email', handler).on('#card-website', handler).on('#title-tag', handler).on('#og-title', handler).on('#og-description', handler).transform(new Response(BAZUKA_CARD_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
+							return new HTMLRewriter()
+								.on('#card-nickname', handler)
+								.on('#card-job', handler)
+								.on('#card-email', handler)
+								.on('#card-website', handler)
+								.on('#title-tag', handler)
+								.on('#og-title', handler)
+								.on('#twitter-title', handler)
+								.on('#og-description', handler)
+								.on('#twitter-description', handler)
+								.transform(new Response(BAZUKA_CARD_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
 						}
 						if (data.type === 'anakin') {
 							const handler = new AnakinHandler(data);
 							const res = new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } });
-							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-summary', handler).on('#res-experience', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#og-description', handler).transform(res);
+							return new HTMLRewriter()
+								.on('#res-name', handler)
+								.on('#res-job', handler)
+								.on('#res-email', handler)
+								.on('#res-website', handler)
+								.on('#res-summary', handler)
+								.on('#res-experience', handler)
+								.on('#res-education', handler)
+								.on('#res-skills', handler)
+								.on('#title-tag', handler)
+								.on('#og-title', handler)
+								.on('#twitter-title', handler)
+								.on('#og-description', handler)
+								.on('#twitter-description', handler)
+								.transform(res);
 						}
 					} catch (_e) {
 						// Malformed JSON fallback

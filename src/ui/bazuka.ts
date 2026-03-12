@@ -3,8 +3,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BAZUKA | Instant Digital Business Cards</title>
-    <meta name="description" content="Generate your high-impact, neon-glitch digital business card in seconds with BAZUKA. Part of the PUNCHY.ME ecosystem.">
+    <title>BAZUKA | Instant Digital Business Cards | PUNCHY.ME</title>
+    <meta name="description" content="Generate your high-impact, neon-glitch digital business card in seconds with BAZUKA. Built for speed and professional impact.">
+    <link rel="canonical" href="https://punchy.me/bazuka" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
     
     <!-- Open Graph / Facebook -->
@@ -476,7 +477,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
     <meta property="og:title" id="og-title" content="Digital Business Card | PUNCHY.ME">
-    <meta property="og:description" id="og-description" content="Check out my digital business card on BAZUKA.">
+    <meta property="og:description" id="og-description" content="Check out my digital business card on BAZUKA. Part of the PUNCHY.ME ecosystem.">
     <meta property="og:image" content="https://punchy.me/og-image.webp">
 
     <!-- Twitter -->
@@ -652,6 +653,8 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         Built with ⚡ by Toy & Gemini CLI
     </div>
 
+    <script type="application/ld+json" id="schema-block"></script>
+
     <script>
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
@@ -667,6 +670,26 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
+
+        // Dynamic Schema Generation
+        const nickname = document.getElementById('card-nickname').innerText;
+        const job = document.getElementById('card-job').innerText;
+        const email = document.getElementById('card-email').innerText;
+        const website = document.getElementById('card-website').href;
+
+        const schema = {
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": nickname,
+            "jobTitle": job,
+            "email": email,
+            "url": website,
+            "mainEntityOfPage": {
+                "@type": "ContactPage",
+                "@id": window.location.href
+            }
+        };
+        document.getElementById('schema-block').textContent = JSON.stringify(schema);
     </script>
 </body>
 </html>`;
