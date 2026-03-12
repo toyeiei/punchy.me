@@ -4,6 +4,13 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-12 (Version 2.0.1 - Master AI & Collaboration)
+- **Anakin Master Prompt**: Upgraded the AI engine with a token-optimized few-shot prompt for superior, action-oriented resume summaries.
+- **Collaborative Branding**: Integrated "Built with ⚡ by Toy & Gemini CLI" across all Anakin-generated surfaces.
+- **UI Simplification**: Refined the Anakin form for a cleaner, more professional user experience.
+- **Token Efficiency**: Implemented real-time token usage logging and strict character limits to optimize AI resource consumption.
+- **Branding Continuity**: Added a dedicated brand favicon route to eliminate 404s globally.
+
 ### 2026-03-12 (Version 1.5.3 - UX & Metadata Master)
 - **High-Impact Social Previews**: Implemented dynamic metadata in "{name}, {job} | PUNCHY.ME" format for all shared Bazuka cards.
 - **Versatile Bazuka Field**: Transitioned from a strict "LinkedIn" field to a generic "Website" field with updated globe icons and labels.

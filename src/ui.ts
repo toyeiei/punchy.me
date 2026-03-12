@@ -944,7 +944,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 <input type="text" id="job" placeholder="💼 Job Title" required>
                 <input type="email" id="email" placeholder="📧 Email Address" required>
                 <input type="url" id="website" placeholder="🌐 Website URL" required>
-                <button type="submit" id="bazuka-btn">BAZUKA</button>
+                <button type="submit" id="bazuka-btn">GENERATE DIGITAL CARD</button>
             </div>
             <div id="turnstile-container" style="display: none;">
                 <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
@@ -1589,11 +1589,11 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                     <input type="url" id="website" placeholder="https://force.com" required>
                 </div>
                 <div>
-                    <label>Education (Raw Details)</label>
+                    <label>Education <span style="font-size: 0.65rem; color: var(--accent); opacity: 0.8;">[MAX 500 CHARS]</span></label>
                     <textarea id="education" placeholder="Jedi Academy, Master Yoda's Classes..." required maxlength="500"></textarea>
                 </div>
                 <div>
-                    <label>Skills & Achievements (Raw List)</label>
+                    <label>Skills & Achievements <span style="font-size: 0.65rem; color: var(--accent); opacity: 0.8;">[MAX 500 CHARS]</span></label>
                     <textarea id="skills" placeholder="Lightsaber combat, Podracing, The Force..." required maxlength="500"></textarea>
                 </div>
                 <button type="submit" id="anakin-btn">GENERATE RESUME</button>
@@ -1904,7 +1904,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <div class="brand-footer">
-            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME
+            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI
         </div>
     </div>
 

@@ -194,10 +194,13 @@ export default {
 					if (!token) return new Response(JSON.stringify({ error: "Security check required" }), { status: 403 });
 					if (!(await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, ip))) return new Response(JSON.stringify({ error: "Verification failed" }), { status: 403 });
 				}
-				// Workers AI Integration
+				// Workers AI Integration: Master Prompt (Optimized for Quality & Tokens)
 				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 					messages: [
-						{ role: 'system', content: 'You are a professional resume writer. Write a punchy, high-impact professional summary (max 3 sentences) based on the user data. Tone: Professional but bold.' },
+						{ 
+							role: 'system', 
+							content: 'You are ANAKIN, an elite Resume Architect. Write a high-impact, 3-sentence summary. Rules: Use action verbs. No "I" or "My". Tone: Professional, bold, tech-forward. Examples: 1. "Engineered high-velocity pipelines using Python to drive ML models. Deploying sub-ms insights for global systems." 2. "Architecting immersive interfaces with React. Building frictionless user experiences through aesthetic disruption."' 
+						},
 						{ role: 'user', content: `Job: ${job}\nEducation: ${education}\nSkills: ${skills}` }
 					]
 				}) as any;

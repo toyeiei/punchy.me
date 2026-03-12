@@ -283,6 +283,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       const html = await viewRes.text();
       expect(html).toContain("Anakin Skywalker");
       expect(html).toContain("Mocked AI Summary");
+      expect(html).toContain("Built with ⚡ by Toy & Gemini CLI");
     });
 
     it("enforces 500 character limits for education and skills", async () => {
