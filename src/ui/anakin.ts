@@ -83,13 +83,13 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-brand);
             font-size: clamp(3rem, 10vw, 80px);
             line-height: 1;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             color: var(--text-main);
             letter-spacing: -2px;
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
-            will-change: transform;
+            will-change: transform, opacity;
             transform: translateZ(0);
         }
 
@@ -123,6 +123,18 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
             95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
             96% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
+        .punchy-desc {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 2.5rem;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .input-group {
@@ -220,6 +232,17 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
 
+        .integrated-footer {
+            grid-column: 1 / -1;
+            text-align: center;
+            margin-top: 1.5rem;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            opacity: 0.6;
+            transition: opacity 0.2s;
+        }
+        .integrated-footer:hover { opacity: 1; }
+
         #modal-overlay {
             display: none;
             position: fixed;
@@ -294,22 +317,13 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         .copy-btn:hover { background: #334155; }
         .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1.5rem; font-size: 0.9rem; }
         .create-another:hover { color: var(--text-main); }
-
-        .footer {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            font-size: 0.8rem;
-            color: var(--text-dim);
-            z-index: 20;
-            opacity: 0.6;
-        }
     </style>
 </head>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
     <div class="container">
         <h1>ANAKIN</h1>
+        <p class="punchy-desc">Harnessing Llama 3 to forge elite professional resumes. Transform your raw data into career-winning impact.</p>
         <form id="anakin-form">
             <div class="input-group">
                 <div class="form-grid">
@@ -375,6 +389,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 </div>
                 
                 <button type="submit" id="anakin-btn">GENERATE RESUME</button>
+                <div class="integrated-footer">
+                    Built with ⚡ by Toy & Gemini CLI
+                </div>
             </div>
             
             <div id="turnstile-container" style="display: none;">
@@ -383,32 +400,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         </form>
     </div>
 
-    <div class="footer">
-        Built with ⚡ by Toy & Gemini CLI
-    </div>
-
-    <div id="modal-overlay">
-        <div class="modal">
-            <h2>RESUME FORGED!</h2>
-            <p style="margin: 1rem 0; color: var(--text-dim);">Your AI-powered resume is ready:</p>
-            <div class="result-container">
-                <a href="#" id="result-url" class="result-link" target="_blank"></a>
-                <button class="copy-btn" id="anakin-copy-btn" title="Copy Link" type="button">
-                    <svg style="width:20px;height:20px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
-                    </svg>
-                </button>
-            </div>
-            <button onclick="location.reload()" class="create-another">Create Another</button>
-        </div>
-    </div>
-
     <script>
         const form = document.getElementById('anakin-form');
         const submitBtn = document.getElementById('anakin-btn');
-        const modalOverlay = document.getElementById('modal-overlay');
-        const resultUrl = document.getElementById('result-url');
-        const copyBtn = document.getElementById('anakin-copy-btn');
         
         const inputs = form.querySelectorAll('input, textarea');
         const counters = {
@@ -440,14 +434,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 }
             });
         });
-
-        copyBtn.onclick = () => {
-            navigator.clipboard.writeText(resultUrl.innerText).then(() => {
-                const originalContent = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem; font-weight: 700;">DONE!</span>';
-                setTimeout(() => copyBtn.innerHTML = originalContent, 2000);
-            });
-        };
 
         function resetSubmitBtn() {
             submitBtn.disabled = false;
@@ -518,18 +504,14 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
                 if (response.ok) {
                     const result = await response.json();
-                    const url = window.location.origin + '/' + result.id;
-                    resultUrl.innerText = url;
-                    resultUrl.href = url;
-                    modalOverlay.style.display = 'flex';
-                    setTimeout(() => modalOverlay.classList.add('show'), 10);
+                    window.location.href = '/' + result.id;
                 } else {
                     const err = await response.json();
                     alert(err.error || 'Anakin failed.');
+                    resetSubmitBtn();
                 }
             } catch (err) {
                 alert('Network error.');
-            } finally {
                 resetSubmitBtn();
             }
         }
@@ -590,6 +572,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             min-height: 100vh;
             padding: 4rem 1rem;
             line-height: 1.6;
+            overflow-x: hidden;
         }
 
         .pixel-bg {
@@ -620,16 +603,15 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .resume-card {
             z-index: 10;
-            background: rgba(17, 17, 17, 0.85);
-            backdrop-filter: blur(15px);
+            background: #111111;
             border-radius: 24px;
             max-width: 900px;
             width: 100%;
             padding: 4rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         /* HUD Accents */
@@ -690,17 +672,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             text-transform: uppercase;
             line-height: 1;
             margin-bottom: 0.5rem;
-            position: relative;
-            animation: main-glitch 5s infinite;
-            will-change: transform;
-            transform: translateZ(0);
-        }
-
-        @keyframes main-glitch {
-            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
-            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
-            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
-            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
         }
 
         .job-title { font-size: 1.25rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
@@ -718,7 +689,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         }
         .section-title::after { content: ""; flex: 1; height: 1px; background: rgba(34, 197, 94, 0.2); }
 
-        /* Glassmorphism AI Summary */
         .ai-summary { 
             font-size: 1.1rem; 
             color: var(--text-main); 
@@ -743,6 +713,24 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             font-weight: 900;
             padding: 2px 8px;
             border-radius: 4px;
+            z-index: 5;
+        }
+
+        /* Loading Animation for Hydration */
+        [data-pending="true"] {
+            color: var(--accent) !important;
+            animation: forge-glitch 1s infinite alternate;
+            opacity: 0.7;
+        }
+
+        @keyframes forge-glitch {
+            0% { opacity: 0.4; filter: blur(1px); }
+            100% { opacity: 1; filter: blur(0); }
+        }
+
+        #res-summary {
+            display: inline-block;
+            transition: all 0.5s ease;
         }
 
         .content-text { color: var(--text-main); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
@@ -753,64 +741,52 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         .sidebar-value { color: var(--text-main); font-size: 0.9rem; word-break: break-all; text-decoration: none; display: block; }
         .sidebar-value:hover { color: var(--accent); }
 
-        .skill-tags { display: flex; flex-wrap: wrap; gap: 0.5rem; }
-        .skill-tag { 
-            background: rgba(255,255,255,0.05); 
-            padding: 4px 10px; 
-            border-radius: 4px; 
-            font-size: 0.75rem; 
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-main);
-        }
-
         .brand-footer { grid-column: 1 / -1; margin-top: 2rem; font-size: 0.75rem; color: var(--text-dim); text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; }
-
-        .util-btn {
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.1);
-            color: var(--text-dim);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.75rem;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-weight: 700;
-            transition: all 0.2s;
-            font-family: 'JetBrains Mono', monospace;
-        }
-        .util-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
 
         .print-footer { display: none; }
 
         @media print {
             @page { size: letter; margin: 10mm; }
-            body { background: white; color: black !important; padding: 0; margin: 0; display: block; }
+            body { background: white !important; color: black !important; padding: 0; margin: 0; display: block !important; }
             .pixel-bg, .hud-corner, .utility-bar, .brand-footer { display: none !important; }
-            .resume-card { background: white !important; color: black !important; box-shadow: none; border: none; padding: 0; max-width: 100%; page-break-inside: avoid; height: 100%; display: flex !important; flex-direction: column; }
-            .name { color: black !important; animation: none; text-shadow: none; }
-            .job-title, .section-title, .sidebar-label, .ai-summary::before { color: #16a34a !important; }
+            .resume-card { background: white !important; color: black !important; box-shadow: none !important; border: none !important; padding: 0 !important; max-width: 100% !important; page-break-inside: avoid !important; height: auto !important; display: block !important; }
+            .name { color: black !important; }
+            .job-title, .section-title, .sidebar-label { color: #16a34a !important; }
+            
+            /* DEFINITIVE FIX: Minimalist AI summary for print */
             .ai-summary { 
-                background: #f0fdf4 !important; 
-                border: 1px solid #bbf7d0 !important; 
-                color: #166534 !important; 
-                -webkit-print-color-adjust: exact; 
-                print-color-adjust: exact; 
-                box-shadow: inset 0 0 0 1000px #f0fdf4 !important;
+                background: white !important; 
+                border: 1.5pt solid black !important; 
+                color: black !important; 
                 display: block !important;
                 visibility: visible !important;
                 opacity: 1 !important;
+                padding: 10pt !important;
+                margin: 10pt 0 !important;
+                height: auto !important;
+                min-height: 50pt !important;
+                overflow: visible !important;
                 backdrop-filter: none !important;
-                filter: none !important;
+                -webkit-print-color-adjust: economy !important;
+                print-color-adjust: economy !important;
+            }
+            .ai-summary::before { 
+                border: 1pt solid black !important; 
+                background: white !important; 
+                color: black !important; 
+                top: -8pt !important;
             }
             #res-summary { 
                 display: block !important; 
                 visibility: visible !important; 
-                color: #166534 !important; 
+                color: black !important; 
                 opacity: 1 !important;
+                font-size: 11pt !important;
+                line-height: 1.4 !important;
             }
-            .content-text, .sidebar-value, .skill-tag { color: black !important; }
-            .skill-tag { border-color: #ddd; }
-            .print-footer { display: block !important; text-align: center; margin-top: auto; font-size: 0.75rem; color: #666; border-top: 1px solid #ddd; padding-top: 1rem; font-weight: bold; }
+            
+            .content-text, .sidebar-value { color: black !important; }
+            .print-footer { display: block !important; text-align: center; margin-top: 20pt; font-size: 8pt; color: #666; border-top: 0.5pt solid #ddd; padding-top: 10pt; font-weight: bold; }
         }
     </style>
 </head>
@@ -839,8 +815,8 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             <div class="main-col">
                 <div class="section">
                     <div class="section-title">Professional Summary</div>
-                    <div class="ai-summary" id="res-summary">
-                        Refining professional profile...
+                    <div class="ai-summary">
+                        <div id="res-summary">Refining professional profile...</div>
                     </div>
                 </div>
 
@@ -900,6 +876,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             });
         };
 
+        // Background Animation
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
             const pixel = document.createElement('div');
@@ -914,6 +891,41 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
+
+        // Client-Side AI Hydration
+        async function hydrateAI() {
+            const summaryEl = document.getElementById('res-summary');
+            const experienceEl = document.getElementById('res-experience');
+            if (!summaryEl || summaryEl.getAttribute('data-pending') !== 'true') return;
+
+            const id = window.location.pathname.substring(1);
+            try {
+                const response = await fetch('/anakin/hydrate/' + id, { method: 'POST' });
+                if (response.ok) {
+                    const data = await response.json();
+                    
+                    // Reveal AI Summary
+                    summaryEl.innerText = data.aiSummary;
+                    summaryEl.removeAttribute('data-pending');
+                    summaryEl.animate([
+                        { opacity: 0, transform: 'translateY(5px)' },
+                        { opacity: 1, transform: 'translateY(0)' }
+                    ], { duration: 800, easing: 'ease-out' });
+
+                    // Reveal AI Experience
+                    experienceEl.innerText = data.aiExperience;
+                    experienceEl.removeAttribute('data-pending');
+                    experienceEl.animate([
+                        { opacity: 0 },
+                        { opacity: 1 }
+                    ], { duration: 800, easing: 'ease-in' });
+                }
+            } catch (err) {
+                console.error('Hydration failed', err);
+            }
+        }
+
+        window.onload = hydrateAI;
     </script>
 </body>
 </html>`;

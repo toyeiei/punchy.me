@@ -94,13 +94,13 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-brand);
             font-size: clamp(3rem, 10vw, 80px);
             line-height: 1;
-            margin-bottom: 2rem;
+            margin-bottom: 1rem;
             color: var(--text-main);
             letter-spacing: -2px;
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
-            will-change: transform;
+            will-change: transform, opacity;
             transform: translateZ(0);
         }
 
@@ -121,17 +121,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             transform: translateZ(0);
         }
 
-        h1::before {
-            left: 1px;
-            color: #ff00ff;
-            animation: glitch-anim-1 4s infinite;
-        }
-
-        h1::after {
-            left: -1px;
-            color: #00ffff;
-            animation: glitch-anim-2 3s infinite;
-        }
+        h1::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
+        h1::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
 
         @keyframes glitch-anim-1 {
             0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
@@ -145,6 +136,15 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
+        .punchy-desc {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            margin-bottom: 2rem;
+            line-height: 1.5;
+            letter-spacing: 0.5px;
+        }
+
         .input-group {
             background: var(--card-bg);
             padding: 2rem;
@@ -154,6 +154,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             gap: 1.2rem;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
+            text-align: left;
         }
 
         input {
@@ -166,6 +167,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             outline: none;
             transition: border-color 0.2s;
             width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
         }
 
         input:focus { border-color: var(--accent); }
@@ -304,6 +308,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <div class="pixel-bg" id="pixel-bg"></div>
     <div class="container">
         <h1>BAZUKA</h1>
+        <p class="punchy-desc">Forging high-impact digital presence in seconds. Fast, stylish, and built for the Edge.</p>
         <form id="bazuka-form">
             <div class="input-group">
                 <input type="text" id="nickname" placeholder="👤 Nickname" required>
@@ -362,7 +367,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         function resetSubmitBtn() {
             submitBtn.disabled = false;
-            submitBtn.innerText = 'BAZUKA';
+            submitBtn.innerText = 'GENERATE DIGITAL CARD';
             isUserInitiated = false;
             if (turnstileTimeoutId) {
                 clearTimeout(turnstileTimeoutId);
