@@ -36,6 +36,9 @@ We maintain senior-level engineering standards regardless of project scale.
 ## CLI & Environment
 - **Command Separation**: Always use `;` to separate multiple commands in a single line (PowerShell requirement). Do **NOT** use `&&` as it is not supported in this environment.
 
+## Deployment Protocol
+- **Explicit Approval**: NEVER deploy automatically (e.g., `wrangler deploy` or `npm run deploy`). You MUST ask for explicit user permission before every deployment to production.
+
 ## Roadmap (Planned High-Impact Features)
 - **Edge Analytics & Click Tracking**: Track real-time engagement metrics (clicks, geography, referrers) using Cloudflare's high-performance data plane.
 - **Custom Alias (Slug) Support**: Empower users to create branded, memorable short links (e.g., `punchy.me/my-link`).
