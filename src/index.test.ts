@@ -5,6 +5,12 @@ describe("PUNCHY.ME URL Shortener", () => {
   it("serves the homepage", async () => {
     const response = await SELF.fetch("http://localhost/");
     expect(response.status).toBe(200);
+    
+    // Verify 103 Early Hints / Link headers
+    const linkHeader = response.headers.get("Link");
+    expect(linkHeader).toContain("preconnect");
+    expect(linkHeader).toContain("rel=preload");
+    
     const text = await response.text();
     expect(text).toContain("PUNCHY.ME");
   });
@@ -25,6 +31,18 @@ describe("PUNCHY.ME URL Shortener", () => {
     // Verify it's in KV
     const stored = await env.SHORT_LINKS.get(data.id);
     expect(stored).toBe(longUrl);
+  });
+
+  it("automatically prepends https:// if protocol is missing", async () => {
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "google.com" }),
+    });
+    const data = await response.json() as { id: string };
+    
+    const stored = await env.SHORT_LINKS.get(data.id);
+    expect(stored).toBe("https://google.com");
   });
 
   it("returns the same ID for the same URL (Deduplication)", async () => {
@@ -85,15 +103,16 @@ describe("PUNCHY.ME URL Shortener", () => {
     expect(text).toContain("<lastmod>2026-03-11</lastmod>");
   });
 
-  it("rejects invalid URL (no http/https)", async () => {
+  it("auto-fixes invalid URL by prepending https://", async () => {
     const response = await SELF.fetch("http://localhost/shorten", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ url: "not-a-valid-url" }),
     });
-    expect(response.status).toBe(400);
-    const data = await response.json() as { error: string };
-    expect(data.error).toBe("Invalid URL. Must start with http:// or https://");
+    expect(response.status).toBe(200);
+    const data = await response.json() as { id: string };
+    const stored = await env.SHORT_LINKS.get(data.id);
+    expect(stored).toBe("https://not-a-valid-url");
   });
 
   it("handles malformed JSON payload", async () => {
@@ -220,6 +239,44 @@ describe("PUNCHY.ME URL Shortener", () => {
     // Uppercase version should 404 (assuming ID contains at least one letter)
     const res2 = await SELF.fetch(`http://localhost/${id.toUpperCase()}`);
     expect(res2.status).toBe(404);
+  });
+
+  it("supports optimistic suggestedId", async () => {
+    const suggestedId = "opt123";
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "https://optimistic.com", suggestedId })
+    });
+    const data = await response.json() as { id: string };
+    expect(data.id).toBe(suggestedId);
+
+    // Verify it's actually stored
+    const stored = await env.SHORT_LINKS.get(suggestedId);
+    expect(stored).toBe("https://optimistic.com");
+  });
+
+  it("falls back if suggestedId is invalid or taken", async () => {
+    // 1. Taken ID
+    await env.SHORT_LINKS.put("taken1", "https://taken.com");
+    const res1 = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "https://new.com", suggestedId: "taken1" })
+    });
+    const data1 = await res1.json() as { id: string };
+    expect(data1.id).not.toBe("taken1");
+    expect(data1.id).toHaveLength(6);
+
+    // 2. Invalid Format (too short)
+    const res2 = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "https://new2.com", suggestedId: "abc" })
+    });
+    const data2 = await res2.json() as { id: string };
+    expect(data2.id).not.toBe("abc");
+    expect(data2.id).toHaveLength(6);
   });
 
   describe("BAZUKA Feature", () => {

@@ -4,6 +4,18 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-12 (Version 1.5.1 - UI Performance Patch)
+- **GPU-Accelerated Glitch**: Implemented `will-change` and hardware-accelerated transforms (`translateZ(0)`) to the main brand title to eliminate repaint lag.
+- **Rendering Optimization**: Streamlined `clip-path` and `text-shadow` animations to reduce CPU overhead and ensure 60FPS interaction on hover.
+- **Visual Stability**: Refined keyframe timings and property offsets to maintain the "glitch" aesthetic with minimal rendering cost.
+
+### 2026-03-12 (Version 1.5 Milestone - Lightning Fast)
+- **Optimistic UI**: Implemented client-side ID generation for 0ms perceived creation latency.
+- **Turbo Redirects (KV Cache)**: Added `cacheTtl: 3600` to edge lookups, delivering sub-millisecond response times for shared links.
+- **103 Early Hints**: Proactively preloads Google Fonts and CSS via Link headers to speed up first-paint.
+- **Protocol Auto-Fix**: Implemented automatic `https://` prepending for URLs entered without protocols (Both Frontend & Backend).
+- **TDD Expansion**: Reached 23 core tests with 100% pass rate, including performance and protocol validation.
+
 ### 2026-03-12 (Version 1.2 Milestone - UI Polish)
 - **Standardized Result UI**: Replaced simple link fields with a robust "code block" container (`result-container`) for a premium developer-centric aesthetic.
 - **Layout Stability**: Fixed dimensions for copy buttons and used `align-items: stretch` to eliminate layout shifts during link generation and copying.

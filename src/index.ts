@@ -5,7 +5,7 @@ interface BazukaData {
 	nickname: string;
 	job: string;
 	email: string;
-	linkedin: string;
+	website: string;
 }
 
 /**
@@ -39,8 +39,8 @@ class BazukaHandler {
 			element.setInnerContent(this.data.email);
 			element.setAttribute('href', `mailto:${escapeHTML(this.data.email)}`);
 		}
-		if (id === 'card-linkedin') {
-			element.setAttribute('href', escapeHTML(this.data.linkedin));
+		if (id === 'card-website') {
+			element.setAttribute('href', escapeHTML(this.data.website));
 		}
 		if (id === 'title-tag') {
 			element.setInnerContent(`${this.data.nickname} | PUNCHY.ME BAZUKA`);
@@ -133,14 +133,20 @@ export default {
 		// Serve the frontend
 		if (url.pathname === "/" && request.method === "GET") {
 			return new Response(HTML, {
-				headers: { "Content-Type": "text/html" },
+				headers: { 
+					"Content-Type": "text/html",
+					"Link": "<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect; crossorigin, <https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap>; rel=preload; as=style"
+				},
 			});
 		}
 
 		// BAZUKA: Serve the creation form
 		if (url.pathname === "/bazuka" && request.method === "GET") {
 			return new Response(BAZUKA_FORM_HTML, {
-				headers: { "Content-Type": "text/html" },
+				headers: { 
+					"Content-Type": "text/html",
+					"Link": "<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect; crossorigin, <https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap>; rel=preload; as=style"
+				},
 			});
 		}
 
@@ -148,10 +154,10 @@ export default {
 		if (url.pathname === "/bazuka" && request.method === "POST") {
 			try {
 				const body = await request.json() as BazukaData & { 'cf-turnstile-response'?: string };
-				const { nickname, job, email, linkedin, 'cf-turnstile-response': token } = body;
+				const { nickname, job, email, website, 'cf-turnstile-response': token } = body;
 
 				// Basic validation
-				if (!nickname || !job || !email || !linkedin) {
+				if (!nickname || !job || !email || !website) {
 					return new Response(JSON.stringify({ error: "All fields are required" }), { 
 						status: 400,
 						headers: { "Content-Type": "application/json" }
@@ -182,7 +188,7 @@ export default {
 				}
 
 				const id = Math.random().toString(36).substring(2, 8);
-				const data: BazukaData = { type: 'bazuka', nickname, job, email, linkedin };
+				const data: BazukaData = { type: 'bazuka', nickname, job, email, website };
 				
 				// Store with 3-day TTL
 				await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
@@ -203,10 +209,11 @@ export default {
 			try {
 				const body = await request.json() as { 
 					url: string; 
+					suggestedId?: string;
 					hp_field?: string; 
 					'cf-turnstile-response'?: string; 
 				};
-				const { hp_field, 'cf-turnstile-response': turnstileToken } = body;
+				const { hp_field, 'cf-turnstile-response': turnstileToken, suggestedId } = body;
 				let { url: originalUrl } = body;
 
 				// 1. Honeypot check
@@ -219,6 +226,11 @@ export default {
 
 				// 2. Normalization & Basic validation
 				if (originalUrl) {
+					originalUrl = originalUrl.trim();
+					// Auto-prepend protocol if missing
+					if (!originalUrl.startsWith('http://') && !originalUrl.startsWith('https://')) {
+						originalUrl = 'https://' + originalUrl;
+					}
 					// Remove trailing slash
 					originalUrl = originalUrl.endsWith('/') ? originalUrl.slice(0, -1) : originalUrl;
 				}
@@ -264,15 +276,27 @@ export default {
 				}
 
 				// Check if URL already has a short ID (Reverse Mapping)
-				const existingId = await env.SHORT_LINKS.get(`url:${originalUrl}`);
+				const existingId = await env.SHORT_LINKS.get(`url:${originalUrl}`, { cacheTtl: 3600 });
 				if (existingId) {
 					return new Response(JSON.stringify({ id: existingId }), {
 						headers: { "Content-Type": "application/json" },
 					});
 				}
 
-				// Generate a random 6-character ID
-				const id = Math.random().toString(36).substring(2, 8);
+				let id = suggestedId;
+				
+				// Validate suggestedId (must be 6 alphanumeric and NOT taken)
+				if (id) {
+					const isValidFormat = /^[a-z0-9]{6}$/.test(id);
+					const isTaken = isValidFormat ? await env.SHORT_LINKS.get(id, { cacheTtl: 3600 }) : true;
+					
+					if (!isValidFormat || isTaken) {
+						// If invalid or taken, ignore suggestion and generate new
+						id = Math.random().toString(36).substring(2, 8);
+					}
+				} else {
+					id = Math.random().toString(36).substring(2, 8);
+				}
 				
 				// Store mapping (Parallel)
 				await Promise.all([
@@ -294,7 +318,8 @@ export default {
 		// Redirect short links or serve BAZUKA cards
 		const id = url.pathname.slice(1);
 		if (id && id.length > 0) {
-			const value = await env.SHORT_LINKS.get(id);
+			// TURBO REDIRECT: Cache lookup in local edge memory for 1 hour (3600s)
+			const value = await env.SHORT_LINKS.get(id, { cacheTtl: 3600 });
 			if (value) {
 				// Check if it's a BAZUKA card
 				if (value.startsWith('{')) {
@@ -306,7 +331,7 @@ export default {
 								.on('#card-nickname', handler)
 								.on('#card-job', handler)
 								.on('#card-email', handler)
-								.on('#card-linkedin', handler)
+								.on('#card-website', handler)
 								.on('#title-tag', handler)
 								.transform(new Response(BAZUKA_CARD_TEMPLATE, {
 									headers: { "Content-Type": "text/html" },

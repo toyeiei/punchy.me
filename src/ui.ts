@@ -32,8 +32,14 @@ export const HTML = `<!DOCTYPE html>
       "url": "https://punchy.me/",
       "description": "A FREE, ultra-fast, and easy-to-use URL shortener. Shorten your long links instantly with impact on the Cloudflare Edge.",
       "applicationCategory": "Utility",
+      "applicationSubCategory": "URL Shortener",
       "operatingSystem": "Web",
-      "softwareVersion": "1.1",
+      "softwareVersion": "1.2",
+      "author": {
+        "@type": "Person",
+        "name": "Kasidis Satangmongkol",
+        "url": "https://datarockie.com"
+      },
       "browserRequirements": "Requires JavaScript. Requires HTML5.",
       "offers": {
         "@type": "Offer",
@@ -142,14 +148,16 @@ export const HTML = `<!DOCTYPE html>
             letter-spacing: -2px;
             text-transform: uppercase;
             position: relative;
-            animation: main-glitch 4s infinite;
+            animation: main-glitch 5s infinite;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         @keyframes main-glitch {
-            0%, 20%, 40%, 45%, 55%, 70%, 100% { transform: skew(0deg); text-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
-            21% { transform: skew(2deg); text-shadow: 2px 0 0 #ff00ff, -2px 0 0 #00ffff; }
-            41% { transform: skew(-2deg); text-shadow: -2px 0 0 #ff00ff, 2px 0 0 #00ffff; }
-            51% { transform: skew(1deg); }
+            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
         }
 
         h1::before, h1::after {
@@ -157,35 +165,38 @@ export const HTML = `<!DOCTYPE html>
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: var(--bg);
-            opacity: 0.5;
+            opacity: 0;
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
 
         h1::before {
-            left: 2px;
-            text-shadow: -1px 0 #ff00ff;
-            animation: glitch-anim 6s infinite linear alternate-reverse;
+            left: 1px;
+            color: #ff00ff;
+            animation: glitch-anim-1 4s infinite;
         }
 
         h1::after {
-            left: -2px;
-            text-shadow: -1px 0 #00ffff;
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            left: -1px;
+            color: #00ffff;
+            animation: glitch-anim-2 3s infinite;
         }
 
-        @keyframes glitch-anim {
-            0%, 100% { clip-path: inset(40% 0 61% 0); opacity: 0; }
-            20%, 80% { clip-path: inset(92% 0 1% 0); opacity: 0.5; }
-            40%, 60% { clip-path: inset(43% 0 1% 0); opacity: 0; }
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
         @keyframes glitch-anim-2 {
-            0%, 100% { clip-path: inset(24% 0 29% 0); opacity: 0; }
-            50% { clip-path: inset(54% 0 21% 0); opacity: 0.5; }
+            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
         h1:hover {
-            text-shadow: 0 0 30px var(--accent), 0 0 60px var(--accent);
-            transition: text-shadow 0.2s;
+            text-shadow: 0 0 15px var(--accent);
+            transition: text-shadow 0.1s ease;
         }
 
         .input-group {
@@ -352,7 +363,6 @@ export const HTML = `<!DOCTYPE html>
 
         .close-link:hover { color: var(--text-main); }
 
-        /* Visible Footer */
         .footer {
             position: fixed;
             bottom: 1.5rem;
@@ -366,7 +376,6 @@ export const HTML = `<!DOCTYPE html>
 
         .footer:hover { opacity: 1; }
 
-        /* SEO Hidden Content */
         .seo-content {
             position: absolute;
             width: 1px;
@@ -496,11 +505,20 @@ export const HTML = `<!DOCTYPE html>
                 return;
             }
 
+            // OPTIMISTIC UI: Generate ID locally and show modal immediately
+            const suggestedId = Math.random().toString(36).substring(2, 8);
+            const optimisticUrl = window.location.origin + '/' + suggestedId;
+            
+            resultLink.innerText = optimisticUrl;
+            resultLink.href = optimisticUrl;
+            modalOverlay.style.display = 'flex';
+            modalOverlay.classList.add('show');
+
             // If we already have a cached token, skip the delay and go instant
             if (cachedToken) {
                 submitBtn.disabled = true;
                 submitBtn.innerText = 'PUNCHING...';
-                executeShorten(cachedToken);
+                executeShorten(cachedToken, suggestedId);
                 return;
             }
 
@@ -512,7 +530,7 @@ export const HTML = `<!DOCTYPE html>
             turnstileTimeoutId = setTimeout(() => {
                 if (isUserInitiated) {
                     console.warn('Turnstile timeout, falling back');
-                    executeShorten();
+                    executeShorten('', suggestedId);
                 }
             }, 3000);
 
@@ -521,16 +539,21 @@ export const HTML = `<!DOCTYPE html>
                     window.turnstile.execute();
                 } catch (err) {
                     console.error('Turnstile error:', err);
-                    executeShorten();
+                    executeShorten('', suggestedId);
                 }
             } else {
-                executeShorten();
+                executeShorten('', suggestedId);
             }
         };
 
-        async function executeShorten(turnstileToken = '') {
-            const url = urlInput.value;
+        async function executeShorten(turnstileToken = '', suggestedId = '') {
+            let url = urlInput.value.trim();
             const hp_field = document.getElementById('hp_field').value;
+
+            // Auto-prepend protocol if missing
+            if (url && !url.startsWith('http://') && !url.startsWith('https://')) {
+                url = 'https://' + url;
+            }
 
             try {
                 const response = await fetch('/shorten', {
@@ -538,6 +561,7 @@ export const HTML = `<!DOCTYPE html>
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({ 
                         url, 
+                        suggestedId,
                         hp_field,
                         'cf-turnstile-response': turnstileToken 
                     })
@@ -545,13 +569,14 @@ export const HTML = `<!DOCTYPE html>
 
                 if (response.ok) {
                     const data = await response.json();
-                    const shortUrl = window.location.origin + '/' + data.id;
-                    resultLink.innerText = shortUrl;
-                    resultLink.href = shortUrl;
+                    const finalShortUrl = window.location.origin + '/' + data.id;
                     
-                    // Instant display
-                    modalOverlay.style.display = 'flex';
-                    modalOverlay.classList.add('show');
+                    // If the server returned a different ID (e.g. deduplication or collision)
+                    // we silently update the UI.
+                    if (data.id !== suggestedId) {
+                        resultLink.innerText = finalShortUrl;
+                        resultLink.href = finalShortUrl;
+                    }
                     
                     // Clear cache for next use
                     cachedToken = null;
@@ -559,11 +584,13 @@ export const HTML = `<!DOCTYPE html>
                 } else {
                     const errorData = await response.json();
                     alert(errorData.error || 'Error punching URL. Try again.');
+                    closeModal(); // Hide the optimistic modal if it failed
                     if (window.turnstile) window.turnstile.reset();
                     cachedToken = null;
                 }
             } catch (err) {
                 alert('Network error. Check your connection.');
+                closeModal();
             } finally {
                 resetSubmitBtn();
             }
@@ -708,14 +735,50 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             letter-spacing: -2px;
             text-transform: uppercase;
             position: relative;
-            animation: main-glitch 4s infinite;
+            animation: main-glitch 5s infinite;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         @keyframes main-glitch {
-            0%, 20%, 40%, 45%, 55%, 70%, 100% { transform: skew(0deg); text-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
-            21% { transform: skew(2deg); text-shadow: 2px 0 0 #ff00ff, -2px 0 0 #00ffff; }
-            41% { transform: skew(-2deg); text-shadow: -2px 0 0 #ff00ff, 2px 0 0 #00ffff; }
-            51% { transform: skew(1deg); }
+            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+        }
+
+        h1::before, h1::after {
+            content: "BAZUKA";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            opacity: 0;
+            will-change: transform, opacity;
+            transform: translateZ(0);
+        }
+
+        h1::before {
+            left: 1px;
+            color: #ff00ff;
+            animation: glitch-anim-1 4s infinite;
+        }
+
+        h1::after {
+            left: -1px;
+            color: #00ffff;
+            animation: glitch-anim-2 3s infinite;
+        }
+
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
         .input-group {
@@ -810,7 +873,51 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         .success-icon svg { width: 40px; height: 40px; color: #052e16; }
 
-        .result-link { color: var(--accent); font-weight: 700; text-decoration: none; word-break: break-all; }
+        .result-container {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: stretch;
+            min-height: 56px;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .result-link {
+            flex: 1;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: var(--font-mono);
+        }
+
+        .copy-btn {
+            background: #1e293b;
+            border: none;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .copy-btn:hover { background: #334155; }
+        .copy-btn:active { background: #0f172a; }
 
         h2 { font-family: var(--font-brand); font-size: 2.5rem; color: var(--text-main); margin-bottom: 0.5rem; }
         .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1.5rem; font-size: 0.9rem; }
@@ -838,7 +945,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 <input type="text" id="nickname" placeholder="👤 Nickname" required>
                 <input type="text" id="job" placeholder="💼 Job Title" required>
                 <input type="email" id="email" placeholder="📧 Email Address" required>
-                <input type="url" id="linkedin" placeholder="🔗 LinkedIn Profile URL" required>
+                <input type="url" id="website" placeholder="🌐 Website URL" required>
                 <button type="submit" id="bazuka-btn">BAZUKA</button>
             </div>
             <div id="turnstile-container" style="display: none;">
@@ -943,7 +1050,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 nickname: document.getElementById('nickname').value,
                 job: document.getElementById('job').value,
                 email: document.getElementById('email').value,
-                linkedin: document.getElementById('linkedin').value,
+                website: document.getElementById('website').value,
                 'cf-turnstile-response': token
             };
 
@@ -1086,14 +1193,16 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             line-height: 1;
             word-break: break-word;
             position: relative;
-            animation: main-glitch 4s infinite;
+            animation: main-glitch 5s infinite;
+            will-change: transform;
+            transform: translateZ(0);
         }
 
         @keyframes main-glitch {
-            0%, 20%, 40%, 45%, 55%, 70%, 100% { transform: skew(0deg); text-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
-            21% { transform: skew(2deg); text-shadow: 2px 0 0 #ff00ff, -2px 0 0 #00ffff; }
-            41% { transform: skew(-2deg); text-shadow: -2px 0 0 #ff00ff, 2px 0 0 #00ffff; }
-            51% { transform: skew(1deg); }
+            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
         }
 
         .nickname::before, .nickname::after {
@@ -1101,30 +1210,33 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             background: transparent;
-            opacity: 0.5;
+            opacity: 0;
+            will-change: transform, opacity;
+            transform: translateZ(0);
         }
 
         .nickname::before {
-            left: 2px;
-            text-shadow: -1px 0 #ff00ff;
-            animation: glitch-anim 6s infinite linear alternate-reverse;
+            left: 1px;
+            color: #ff00ff;
+            animation: glitch-anim-1 4s infinite;
         }
 
         .nickname::after {
-            left: -2px;
-            text-shadow: -1px 0 #00ffff;
-            animation: glitch-anim-2 3s infinite linear alternate-reverse;
+            left: -1px;
+            color: #00ffff;
+            animation: glitch-anim-2 3s infinite;
         }
 
-        @keyframes glitch-anim {
-            0%, 100% { clip-path: inset(40% 0 61% 0); opacity: 0; }
-            20%, 80% { clip-path: inset(92% 0 1% 0); opacity: 0.5; }
-            40%, 60% { clip-path: inset(43% 0 1% 0); opacity: 0; }
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
         @keyframes glitch-anim-2 {
-            0%, 100% { clip-path: inset(24% 0 29% 0); opacity: 0; }
-            50% { clip-path: inset(54% 0 21% 0); opacity: 0.5; }
+            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
         .job { font-size: clamp(1rem, 4vw, 1.25rem); color: var(--text-main); font-weight: 700; margin-bottom: 2rem; letter-spacing: 1px; }
@@ -1158,8 +1270,8 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             <a href="" class="value" id="card-email">email@example.com</a>
         </div>
         <div class="info-row">
-            <span class="label">LinkedIn</span>
-            <a href="" class="value" id="card-linkedin" target="_blank">View Profile</a>
+            <span class="label">Website</span>
+            <a href="" class="value" id="card-website" target="_blank">View Website</a>
         </div>
 
         <div class="footer">
