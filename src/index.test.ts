@@ -207,6 +207,32 @@ describe("PUNCHY.ME URL Shortener", () => {
     expect(data2.id).toHaveLength(6);
   });
 
+  it("ensures protocol prepending is idempotent (no https://https://)", async () => {
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: "https://already-correct.com" }),
+    });
+    const data = await response.json() as { id: string };
+    const stored = await env.SHORT_LINKS.get(data.id);
+    expect(stored).toBe("https://already-correct.com");
+    expect(stored).not.toContain("https://https://");
+  });
+
+  it("gracefully handles corrupted JSON in dynamic routes", async () => {
+    const id = "corrupt";
+    await env.SHORT_LINKS.put(id, "{ invalid json }");
+    const response = await SELF.fetch(`http://localhost/${id}`, { redirect: "manual" });
+    // Should fall back to 404 or attempt redirect if it looks like a URL, 
+    // but definitely shouldn't 500.
+    expect(response.status).not.toBe(500);
+  });
+
+  it("serves the favicon with correct content-type", async () => {
+    const response = await SELF.fetch("http://localhost/favicon.svg");
+    expect(response.headers.get("Content-Type")).toBe("image/svg+xml");
+  });
+
   describe("BAZUKA Feature", () => {
     it("serves the bazuka form", async () => {
       const response = await SELF.fetch("http://localhost/bazuka");

@@ -147,7 +147,7 @@ export default {
 
 		// GET Routes
 		if (url.pathname === "/favicon.ico" || url.pathname === "/favicon.svg") {
-			const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#000000" /><g transform="rotate(15, 50, 50)"><path d="M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80" stroke="#22c55e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" /><path d="M45 45 H55" stroke="#22c55e" stroke-width="10" stroke-linecap="round" fill="none" /></g></svg>`;
+			const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy='50' r='48' fill='#000000' /><g transform='rotate(15, 50, 50)'><path d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='#22c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /><path d='M45 45 H55' stroke='#22c55e' stroke-width='10' stroke-linecap='round' fill='none' /></g></svg>`;
 			return new Response(svg, { headers: { "Content-Type": "image/svg+xml" } });
 		}
 		if (url.pathname === "/" && request.method === "GET") {
@@ -183,19 +183,14 @@ export default {
 				const body = await request.json() as AnakinData & { 'cf-turnstile-response'?: string };
 				const { name, job, email, website, education, skills, 'cf-turnstile-response': token } = body;
 				if (!name || !job || !email || !website || !education || !skills) return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
-				
-				// Enforce character limits (500 chars)
-				if (education.length > 500 || skills.length > 500) {
-					return new Response(JSON.stringify({ error: "Education and Skills must be under 500 characters each." }), { status: 400 });
-				}
-
+				if (education.length > 500 || skills.length > 500) return new Response(JSON.stringify({ error: "Education and Skills must be under 500 characters each." }), { status: 400 });
 				if (await isRateLimited(ip, env)) return new Response(JSON.stringify({ error: "Too many requests" }), { status: 429 });
 				if (env.TURNSTILE_SECRET_KEY) {
 					if (!token) return new Response(JSON.stringify({ error: "Security check required" }), { status: 403 });
 					if (!(await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, ip))) return new Response(JSON.stringify({ error: "Verification failed" }), { status: 403 });
 				}
 				// Workers AI Integration: Master Prompt (Optimized for Quality & Tokens)
-				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+				const aiResponse = (await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 					messages: [
 						{ 
 							role: 'system', 
@@ -203,9 +198,8 @@ export default {
 						},
 						{ role: 'user', content: `Job: ${job}\nEducation: ${education}\nSkills: ${skills}` }
 					]
-				}) as any;
+				})) as { response: string; usage?: { prompt_tokens: number; completion_tokens: number } };
 
-				// Log token usage for transparency
 				if (aiResponse.usage) {
 					console.log(`[ANAKIN AI] Usage: ${aiResponse.usage.prompt_tokens} input, ${aiResponse.usage.completion_tokens} output tokens.`);
 				}
@@ -256,9 +250,15 @@ export default {
 							const handler = new AnakinHandler(data);
 							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-summary', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#og-description', handler).transform(new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
 						}
-					} catch (_e) {}
+					} catch (_e) {
+						// Malformed JSON, fallback to redirect
+					}
 				}
-				return Response.redirect(value, 301);
+				try {
+					return Response.redirect(value, 301);
+				} catch (_e) {
+					return new Response("Invalid redirect destination", { status: 400 });
+				}
 			}
 			return new Response("Link not found or expired", { status: 404 });
 		}
