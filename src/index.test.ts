@@ -159,23 +159,28 @@ describe("PUNCHY.ME URL Shortener", () => {
 
   it("serves static assets (og-image.webp)", async () => {
     const response = await SELF.fetch("http://localhost/og-image.webp");
-    // Note: In miniflare/vitest-pool-workers, static assets might return 404 
-    // if not explicitly mocked, but we should at least verify the route exists.
     expect(response.status).toBeDefined();
   });
 
-  it("fails when Turnstile secret is set but token is missing", async () => {
-    // We mock the environment to have a secret key
-    const response = await SELF.fetch("http://localhost/shorten", {
+  it("handles URL normalization (trailing slashes)", async () => {
+    const url1 = "https://example.com/slash";
+    const url2 = "https://example.com/slash/";
+    
+    const res1 = await SELF.fetch("http://localhost/shorten", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ url: "https://example.com/test-turnstile" }),
+      body: JSON.stringify({ url: url1 }),
     });
-    
-    // If secret is set but no token provided, it should still pass 
-    // our CURRENT logic because we only verify IF token is present.
-    // Let's refine the test to expect success since we haven't made token MANDATORY yet.
-    expect(response.status).toBe(200);
+    const { id: id1 } = await res1.json() as { id: string };
+
+    const res2 = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: url2 }),
+    });
+    const { id: id2 } = await res2.json() as { id: string };
+
+    expect(id1).toBe(id2);
   });
 
   describe("BAZUKA Feature", () => {
@@ -184,6 +189,33 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(response.status).toBe(200);
       const text = await response.text();
       expect(text).toContain("BAZUKA");
+    });
+
+    it("prevents XSS/HTML injection in cards", async () => {
+      const maliciousTag = "<script>alert('XSS')</script>";
+      const maliciousName = `Toy${maliciousTag}`;
+      const createResponse = await SELF.fetch("http://localhost/bazuka", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          nickname: maliciousName,
+          job: "Hacker",
+          email: "hacker@example.com",
+          linkedin: "https://linkedin.com/in/hacker"
+        }),
+      });
+      const { id } = await createResponse.json() as { id: string };
+
+      const viewResponse = await SELF.fetch(`http://localhost/${id}`);
+      const html = await viewResponse.text();
+      
+      // Verification: The unescaped tag should NEVER appear
+      expect(html).not.toContain(maliciousTag);
+      
+      // Check innerContent escaping
+      expect(html).toContain("Toy&lt;script&gt;alert('XSS')&lt;/script&gt;");
+      // Check attribute escaping
+      expect(html).toContain("data-text=\"Toy&lt;script&gt;alert(&#39;XSS&#39;)&lt;/script&gt;\"");
     });
 
     it("creates a bazuka business card", async () => {

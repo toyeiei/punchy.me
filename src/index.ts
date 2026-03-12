@@ -1,29 +1,46 @@
 import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE } from './ui';
 
-export interface Env {
-	SHORT_LINKS: KVNamespace;
-	TURNSTILE_SECRET_KEY?: string;
+interface BazukaData {
+	type?: string;
+	nickname: string;
+	job: string;
+	email: string;
+	linkedin: string;
+}
+
+/**
+ * Escapes characters for HTML attributes
+ */
+function escapeHTML(str: string): string {
+	return str
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&#39;");
 }
 
 /**
  * HTMLRewriter Handler for Bazuka Cards
  */
 class BazukaHandler {
-	private data: any;
-	constructor(data: any) { this.data = data; }
+	private data: BazukaData;
+	constructor(data: BazukaData) { this.data = data; }
 	element(element: Element) {
 		const id = element.getAttribute('id');
 		if (id === 'card-nickname') {
 			element.setInnerContent(this.data.nickname);
-			element.setAttribute('data-text', this.data.nickname);
+			// setAttribute does NOT auto-escape in some environments/versions of HTMLRewriter
+			// for security, we manually escape the nickname for the data-text attribute
+			element.setAttribute('data-text', escapeHTML(this.data.nickname));
 		}
 		if (id === 'card-job') element.setInnerContent(this.data.job);
 		if (id === 'card-email') {
 			element.setInnerContent(this.data.email);
-			element.setAttribute('href', `mailto:${this.data.email}`);
+			element.setAttribute('href', `mailto:${escapeHTML(this.data.email)}`);
 		}
 		if (id === 'card-linkedin') {
-			element.setAttribute('href', this.data.linkedin);
+			element.setAttribute('href', escapeHTML(this.data.linkedin));
 		}
 		if (id === 'title-tag') {
 			element.setInnerContent(`${this.data.nickname} | PUNCHY.ME BAZUKA`);
@@ -37,29 +54,46 @@ class BazukaHandler {
  */
 async function isRateLimited(ip: string, env: Env): Promise<boolean> {
 	const key = `rate-limit:${ip}`;
-	const current = await env.SHORT_LINKS.get(key);
-	const count = parseInt(current || "0");
+	try {
+		const current = await env.SHORT_LINKS.get(key);
+		const count = parseInt(current || "0");
 
-	if (count >= 10) return true;
+		if (count >= 10) return true;
 
-	// Increment and set TTL to 60s
-	await env.SHORT_LINKS.put(key, (count + 1).toString(), { expirationTtl: 60 });
-	return false;
+		// Increment and set TTL to 60s
+		await env.SHORT_LINKS.put(key, (count + 1).toString(), { expirationTtl: 60 });
+		return false;
+	} catch (err) {
+		console.error("Rate limit error:", err);
+		return false; // Fail open to not block users if KV is slow
+	}
 }
 
 /**
  * Verify Cloudflare Turnstile token
  */
 async function verifyTurnstile(token: string, secret: string, ip: string): Promise<boolean> {
-	const formData = new FormData();
-	formData.append('secret', secret);
-	formData.append('response', token);
-	formData.append('remoteip', ip);
+	try {
+		const formData = new FormData();
+		formData.append('secret', secret);
+		formData.append('response', token);
+		formData.append('remoteip', ip);
 
-	const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
-	const result = await fetch(url, { body: formData, method: 'POST' });
-	const outcome = await result.json() as { success: boolean };
-	return outcome.success;
+		const url = 'https://challenges.cloudflare.com/turnstile/v0/siteverify';
+		const result = await fetch(url, { 
+			body: formData, 
+			method: 'POST',
+			headers: { 'Accept': 'application/json' }
+		});
+		
+		if (!result.ok) return false;
+		
+		const outcome = await result.json() as { success: boolean };
+		return outcome.success;
+	} catch (err) {
+		console.error("Turnstile verification error:", err);
+		return false;
+	}
 }
 
 export default {
@@ -107,84 +141,113 @@ export default {
 		// BAZUKA: Create a business card
 		if (url.pathname === "/bazuka" && request.method === "POST") {
 			try {
-				const body = await request.json() as any;
+				const body = await request.json() as BazukaData & { 'cf-turnstile-response'?: string };
 				const { nickname, job, email, linkedin, 'cf-turnstile-response': token } = body;
 
 				// Basic validation
 				if (!nickname || !job || !email || !linkedin) {
-					return new Response(JSON.stringify({ error: "All fields are required" }), { status: 400 });
+					return new Response(JSON.stringify({ error: "All fields are required" }), { 
+						status: 400,
+						headers: { "Content-Type": "application/json" }
+					});
 				}
 
 				// Rate limiting
 				if (await isRateLimited(ip, env)) {
-					return new Response(JSON.stringify({ error: "Too many requests" }), { status: 429 });
+					return new Response(JSON.stringify({ error: "Too many requests" }), { 
+						status: 429,
+						headers: { "Content-Type": "application/json" }
+					});
 				}
 
 				// Turnstile verification
-				if (env.TURNSTILE_SECRET_KEY && token) {
+				if (env.TURNSTILE_SECRET_KEY) {
+					if (!token) {
+						return new Response(JSON.stringify({ error: "Security check required" }), { 
+							status: 403,
+							headers: { "Content-Type": "application/json" }
+						});
+					}
 					const isHuman = await verifyTurnstile(token, env.TURNSTILE_SECRET_KEY, ip);
-					if (!isHuman) return new Response(JSON.stringify({ error: "Verification failed" }), { status: 403 });
+					if (!isHuman) return new Response(JSON.stringify({ error: "Verification failed" }), { 
+						status: 403,
+						headers: { "Content-Type": "application/json" }
+					});
 				}
 
 				const id = Math.random().toString(36).substring(2, 8);
-				const data = { type: 'bazuka', nickname, job, email, linkedin };
+				const data: BazukaData = { type: 'bazuka', nickname, job, email, linkedin };
 				
-				// Store with 3-day TTL (259200 seconds)
+				// Store with 3-day TTL
 				await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
 
 				return new Response(JSON.stringify({ id }), {
 					headers: { "Content-Type": "application/json" },
 				});
 			} catch (_err) {
-				return new Response(JSON.stringify({ error: "Invalid request" }), { status: 400 });
+				return new Response(JSON.stringify({ error: "Invalid request" }), { 
+					status: 400,
+					headers: { "Content-Type": "application/json" }
+				});
 			}
 		}
 
 		// API: Shorten a URL
 		if (url.pathname === "/shorten" && request.method === "POST") {
-		try {
-		const body = await request.json() as { 
-			url: string; 
-			hp_field?: string; 
-			'cf-turnstile-response'?: string; 
-		};
-		const { url: originalUrl, hp_field, 'cf-turnstile-response': turnstileToken } = body;
+			try {
+				const body = await request.json() as { 
+					url: string; 
+					hp_field?: string; 
+					'cf-turnstile-response'?: string; 
+				};
+				const { hp_field, 'cf-turnstile-response': turnstileToken } = body;
+				let { url: originalUrl } = body;
 
-		// 1. Honeypot check
-		if (hp_field) {
-			return new Response(JSON.stringify({ error: "Bot detected." }), { 
-				status: 403,
-				headers: { "Content-Type": "application/json" }
-			});
-		}
+				// 1. Honeypot check
+				if (hp_field) {
+					return new Response(JSON.stringify({ error: "Bot detected." }), { 
+						status: 403,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
 
-		// 2. Basic validation (Move this up to avoid counting invalid requests in rate limit)
-		if (!originalUrl || !originalUrl.startsWith('http')) {
-			return new Response(JSON.stringify({ error: "Invalid URL. Must start with http:// or https://" }), { 
-				status: 400,
-				headers: { "Content-Type": "application/json" }
-			});
-		}
+				// 2. Normalization & Basic validation
+				if (originalUrl) {
+					// Remove trailing slash
+					originalUrl = originalUrl.endsWith('/') ? originalUrl.slice(0, -1) : originalUrl;
+				}
 
-		// 3. Recursive URL filtering
-		if (originalUrl.includes("punchy.me")) {
-			return new Response(JSON.stringify({ error: "Recursive shortening is not allowed." }), { 
-				status: 400,
-				headers: { "Content-Type": "application/json" }
-			});
-		}
+				if (!originalUrl || !originalUrl.startsWith('http')) {
+					return new Response(JSON.stringify({ error: "Invalid URL. Must start with http:// or https://" }), { 
+						status: 400,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
 
-		// 4. Rate limiting (IP-based) - Only count valid requests
-		if (await isRateLimited(ip, env)) {
-			return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), { 
-				status: 429,
-				headers: { "Content-Type": "application/json" }
-			});
-		}
+				// 3. Recursive URL filtering
+				if (originalUrl.includes("punchy.me")) {
+					return new Response(JSON.stringify({ error: "Recursive shortening is not allowed." }), { 
+						status: 400,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
 
-		// 5. Turnstile verification (if secret is configured)
+				// 4. Rate limiting (IP-based)
+				if (await isRateLimited(ip, env)) {
+					return new Response(JSON.stringify({ error: "Too many requests. Please try again later." }), { 
+						status: 429,
+						headers: { "Content-Type": "application/json" }
+					});
+				}
 
-				if (env.TURNSTILE_SECRET_KEY && turnstileToken) {
+				// 5. Turnstile verification
+				if (env.TURNSTILE_SECRET_KEY) {
+					if (!turnstileToken) {
+						return new Response(JSON.stringify({ error: "Security check required." }), { 
+							status: 403,
+							headers: { "Content-Type": "application/json" }
+						});
+					}
 					const isHuman = await verifyTurnstile(turnstileToken, env.TURNSTILE_SECRET_KEY, ip);
 					if (!isHuman) {
 						return new Response(JSON.stringify({ error: "Verification failed. Are you a bot?" }), { 
@@ -192,14 +255,6 @@ export default {
 							headers: { "Content-Type": "application/json" }
 						});
 					}
-				}
-				
-				// Basic validation
-				if (!originalUrl || !originalUrl.startsWith('http')) {
-					return new Response(JSON.stringify({ error: "Invalid URL. Must start with http:// or https://" }), { 
-						status: 400,
-						headers: { "Content-Type": "application/json" }
-					});
 				}
 
 				// Check if URL already has a short ID (Reverse Mapping)
@@ -213,10 +268,11 @@ export default {
 				// Generate a random 6-character ID
 				const id = Math.random().toString(36).substring(2, 8);
 				
-				// Store ID -> URL mapping
-				await env.SHORT_LINKS.put(id, originalUrl);
-				// Store URL -> ID mapping (Reverse)
-				await env.SHORT_LINKS.put(`url:${originalUrl}`, id);
+				// Store mapping (Parallel)
+				await Promise.all([
+					env.SHORT_LINKS.put(id, originalUrl),
+					env.SHORT_LINKS.put(`url:${originalUrl}`, id)
+				]);
 
 				return new Response(JSON.stringify({ id }), {
 					headers: { "Content-Type": "application/json" },
@@ -230,14 +286,14 @@ export default {
 		}
 
 		// Redirect short links or serve BAZUKA cards
-		const id = url.pathname.slice(1); // Get path after /
+		const id = url.pathname.slice(1);
 		if (id && id.length > 0) {
 			const value = await env.SHORT_LINKS.get(id);
 			if (value) {
-				// Check if it's a BAZUKA card (stored as JSON)
+				// Check if it's a BAZUKA card
 				if (value.startsWith('{')) {
 					try {
-						const data = JSON.parse(value);
+						const data = JSON.parse(value) as BazukaData;
 						if (data.type === 'bazuka') {
 							const handler = new BazukaHandler(data);
 							return new HTMLRewriter()
@@ -251,7 +307,7 @@ export default {
 								}));
 						}
 					} catch (_e) {
-						// Not valid JSON, treat as URL
+						// Not valid JSON, ignore and proceed to redirect
 					}
 				}
 				// Normal URL redirect

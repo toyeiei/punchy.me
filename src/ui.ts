@@ -41,6 +41,7 @@ export const HTML = `<!DOCTYPE html>
         "priceCurrency": "USD"
       }
     }
+    </script>
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -322,6 +323,7 @@ export const HTML = `<!DOCTYPE html>
             cursor: pointer;
             color: var(--text-main);
             transition: background 0.2s;
+            font-family: var(--font-mono);
         }
 
         .copy-btn:hover { background: #475569; }
@@ -378,7 +380,7 @@ export const HTML = `<!DOCTYPE html>
             </div>
             <!-- Invisible Turnstile Container (Hidden) -->
             <div id="turnstile-container" style="display: none;">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess"></div>
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
             </div>
         </form>
     </div>
@@ -428,14 +430,33 @@ export const HTML = `<!DOCTYPE html>
         const resultLink = document.getElementById('short-url-result');
         const copyBtn = document.getElementById('copy-btn');
         
-        // Track if the Turnstile check was triggered by a user click
         let isUserInitiated = false;
+        let turnstileTimeoutId = null;
 
-        // Global callback for invisible Turnstile
+        function resetSubmitBtn() {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'Get Short Link';
+            isUserInitiated = false;
+            if (turnstileTimeoutId) {
+                clearTimeout(turnstileTimeoutId);
+                turnstileTimeoutId = null;
+            }
+        }
+
         window.onTurnstileSuccess = (token) => {
             if (isUserInitiated) {
+                if (turnstileTimeoutId) {
+                    clearTimeout(turnstileTimeoutId);
+                    turnstileTimeoutId = null;
+                }
                 executeShorten(token);
-                isUserInitiated = false; // Reset
+            }
+        };
+
+        window.onTurnstileError = () => {
+            console.error('Turnstile execution failed');
+            if (isUserInitiated) {
+                executeShorten(); // Fallback
             }
         };
 
@@ -443,7 +464,6 @@ export const HTML = `<!DOCTYPE html>
             e.preventDefault();
             const urlInput = document.getElementById('url');
             
-            // Guard: Don't execute if URL is empty or invalid
             if (!urlInput.value || !urlInput.checkValidity()) {
                 urlInput.reportValidity();
                 return;
@@ -453,11 +473,23 @@ export const HTML = `<!DOCTYPE html>
             submitBtn.innerText = 'PUNCHING...';
             isUserInitiated = true;
 
-            // Trigger Turnstile check programmatically
+            // Safety timeout: if Turnstile takes too long, fallback
+            turnstileTimeoutId = setTimeout(() => {
+                if (isUserInitiated) {
+                    console.warn('Turnstile timeout, falling back');
+                    executeShorten();
+                }
+            }, 4000);
+
             if (window.turnstile) {
-                window.turnstile.execute();
+                try {
+                    window.turnstile.execute();
+                } catch (err) {
+                    console.error('Turnstile error:', err);
+                    executeShorten();
+                }
             } else {
-                executeShorten(); // Fallback if script didn't load
+                executeShorten();
             }
         };
 
@@ -490,17 +522,16 @@ export const HTML = `<!DOCTYPE html>
                     if (window.turnstile) window.turnstile.reset();
                 }
             } catch (err) {
-                alert('Network error.');
+                alert('Network error. Check your connection.');
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'Get Short Link';
+                resetSubmitBtn();
             }
         }
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(resultLink.innerText).then(() => {
                 const originalContent = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem;">DONE!</span>';
+                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem; font-family: var(--font-mono);">DONE!</span>';
                 setTimeout(() => copyBtn.innerHTML = originalContent, 2000);
             });
         };
@@ -513,12 +544,10 @@ export const HTML = `<!DOCTYPE html>
             }, 300);
         }
 
-        // Close on escape
         document.addEventListener('keydown', (e) => {
             if (e.key === 'Escape') closeModal();
         });
 
-        // Pixel Generation
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
             const pixel = document.createElement('div');
@@ -532,7 +561,7 @@ export const HTML = `<!DOCTYPE html>
             setTimeout(() => pixel.remove(), duration * 1000);
         }
         setInterval(createPixel, 300);
-        for(let i=0; i<20; i++) createPixel(); // Initial burst
+        for(let i=0; i<20; i++) createPixel();
     </script>
 </body>
 </html>`;
@@ -574,7 +603,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             position: relative;
         }
 
-        /* Pixel Background Animation */
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -758,7 +786,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 <button type="submit" id="bazuka-btn">BAZUKA</button>
             </div>
             <div id="turnstile-container" style="display: none;">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess"></div>
+                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
             </div>
         </form>
     </div>
@@ -788,11 +816,31 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         const submitBtn = document.getElementById('bazuka-btn');
         const modalOverlay = document.getElementById('modal-overlay');
         let isUserInitiated = false;
+        let turnstileTimeoutId = null;
+
+        function resetSubmitBtn() {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'BAZUKA';
+            isUserInitiated = false;
+            if (turnstileTimeoutId) {
+                clearTimeout(turnstileTimeoutId);
+                turnstileTimeoutId = null;
+            }
+        }
 
         window.onTurnstileSuccess = (token) => {
             if (isUserInitiated) {
+                if (turnstileTimeoutId) {
+                    clearTimeout(turnstileTimeoutId);
+                    turnstileTimeoutId = null;
+                }
                 createBazuka(token);
-                isUserInitiated = false;
+            }
+        };
+
+        window.onTurnstileError = () => {
+            if (isUserInitiated) {
+                createBazuka(); // Fallback
             }
         };
 
@@ -801,8 +849,22 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             submitBtn.disabled = true;
             submitBtn.innerText = 'ARMING...';
             isUserInitiated = true;
-            if (window.turnstile) window.turnstile.execute();
-            else createBazuka();
+
+            turnstileTimeoutId = setTimeout(() => {
+                if (isUserInitiated) {
+                    createBazuka();
+                }
+            }, 4000);
+
+            if (window.turnstile) {
+                try {
+                    window.turnstile.execute();
+                } catch (err) {
+                    createBazuka();
+                }
+            } else {
+                createBazuka();
+            }
         };
 
         async function createBazuka(token = '') {
@@ -835,12 +897,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             } catch (err) {
                 alert('Network error.');
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = 'BAZUKA';
+                resetSubmitBtn();
             }
         }
 
-        // Pixel Background
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
             const pixel = document.createElement('div');
