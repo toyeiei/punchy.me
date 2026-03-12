@@ -328,7 +328,7 @@ export const HTML = `<!DOCTYPE html>
             color: var(--text-main);
             transition: all 0.2s;
             font-family: var(--font-mono);
-            min-width: 40px;
+            width: 70px;
             flex-shrink: 0;
             display: flex;
             justify-content: center;
