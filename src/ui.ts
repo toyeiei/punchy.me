@@ -297,45 +297,49 @@ export const HTML = `<!DOCTYPE html>
 
         .result-container {
             background: #0f172a;
-            padding: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
             border-radius: 12px;
             margin: 1.5rem 0;
             display: flex;
-            align-items: center;
-            gap: 10px;
-            min-height: 60px;
+            align-items: stretch;
+            min-height: 56px;
             text-align: left;
+            overflow: hidden;
         }
 
         .result-link {
             flex: 1;
             color: var(--accent);
             text-decoration: none;
-            word-break: break-all;
             font-size: 1.1rem;
             font-weight: 700;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
+            font-family: var(--font-mono);
         }
 
         .copy-btn {
-            background: #334155;
+            background: #1e293b;
             border: none;
-            padding: 8px;
-            border-radius: 8px;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0;
             cursor: pointer;
             color: var(--text-main);
             transition: all 0.2s;
             font-family: var(--font-mono);
-            width: 70px;
+            width: 80px;
             flex-shrink: 0;
             display: flex;
             justify-content: center;
             align-items: center;
         }
 
-        .copy-btn:hover { background: #475569; }
+        .copy-btn:hover { background: #334155; }
+        .copy-btn:active { background: #0f172a; }
 
         .close-link {
             display: block;
@@ -841,8 +845,13 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             </div>
             <h2>CARD ARMED!</h2>
             <p style="margin: 1rem 0; color: var(--text-dim);">Your dynamic card is live for 3 days:</p>
-            <div style="background: #111; padding: 1.2rem; border-radius: 12px; margin-bottom: 1rem; border: 1px solid rgba(255,255,255,0.05);">
+            <div class="result-container" style="margin-top: 1.5rem;">
                 <a href="#" id="result-url" class="result-link" target="_blank"></a>
+                <button class="copy-btn" id="bazuka-copy-btn" title="Copy Link" type="button">
+                    <svg style="width:20px;height:20px" viewBox="0 0 24 24">
+                        <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
+                    </svg>
+                </button>
             </div>
             <button onclick="location.reload()" class="create-another">Create Another</button>
         </div>
@@ -852,8 +861,18 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         const form = document.getElementById('bazuka-form');
         const submitBtn = document.getElementById('bazuka-btn');
         const modalOverlay = document.getElementById('modal-overlay');
+        const resultUrl = document.getElementById('result-url');
+        const copyBtn = document.getElementById('bazuka-copy-btn');
         let isUserInitiated = false;
         let turnstileTimeoutId = null;
+
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(resultUrl.innerText).then(() => {
+                const originalContent = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem; font-weight: 700;">DONE!</span>';
+                setTimeout(() => copyBtn.innerHTML = originalContent, 2000);
+            });
+        };
 
         function resetSubmitBtn() {
             submitBtn.disabled = false;

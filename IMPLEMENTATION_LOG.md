@@ -4,6 +4,13 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-12 (Version 1.2 Milestone - UI Polish)
+- **Standardized Result UI**: Replaced simple link fields with a robust "code block" container (`result-container`) for a premium developer-centric aesthetic.
+- **Layout Stability**: Fixed dimensions for copy buttons and used `align-items: stretch` to eliminate layout shifts during link generation and copying.
+- **Enhanced Bazuka UX**: Synchronized the Bazuka success modal with the main shortener's UI, adding a dedicated copy button and standardized code-block display.
+- **Interactive Feedback**: Improved copy button feedback with a fixed-width "DONE!" transition to ensure visual consistency.
+- **Test Integrity**: Verified all UI changes through the 20-test suite with 100% pass rate.
+
 ### 2026-03-12 (Version 1.1 Milestone)
 - **Instant Punch Performance**: Implemented pre-emptive Turnstile verification (triggers on input/hover) to eliminate security check wait times.
 - **Enhanced UI Stability**: Resolved layout shifts in the result container by applying stable dimensions and text-overflow handling.
