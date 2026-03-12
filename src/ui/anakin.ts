@@ -676,7 +676,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .job-title { font-size: 1.25rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
 
-        .section { margin-bottom: 1rem; }
+        .section { margin-bottom: 1rem; position: relative; }
         .section-title { 
             font-family: var(--font-brand);
             font-size: 1.25rem; 
@@ -689,12 +689,12 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         }
         .section-title::after { content: ""; flex: 1; height: 1px; background: rgba(34, 197, 94, 0.2); }
 
-        .ai-summary { 
-            font-size: 1.1rem; 
+        /* Glassmorphism AI Box */
+        .ai-box { 
+            font-size: 1rem; 
             color: var(--text-main); 
             font-weight: 400; 
             line-height: 1.6; 
-            font-style: italic; 
             background: rgba(34, 197, 94, 0.05);
             border: 1px solid rgba(34, 197, 94, 0.2);
             padding: 1.5rem;
@@ -702,7 +702,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             backdrop-filter: blur(5px);
             position: relative;
         }
-        .ai-summary::before {
+        .ai-box::before {
             content: "AI REFINED";
             position: absolute;
             top: -10px;
@@ -714,7 +714,10 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             padding: 2px 8px;
             border-radius: 4px;
             z-index: 5;
+            opacity: 0;
+            transition: opacity 0.5s ease;
         }
+        .ai-box[data-refined="true"]::before { opacity: 1; }
 
         /* Loading Animation for Hydration */
         [data-pending="true"] {
@@ -726,11 +729,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         @keyframes forge-glitch {
             0% { opacity: 0.4; filter: blur(1px); }
             100% { opacity: 1; filter: blur(0); }
-        }
-
-        #res-summary {
-            display: inline-block;
-            transition: all 0.5s ease;
         }
 
         .content-text { color: var(--text-main); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
@@ -754,7 +752,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             .job-title, .section-title, .sidebar-label { color: #16a34a !important; }
             
             /* DEFINITIVE FIX: Minimalist AI summary for print */
-            .ai-summary { 
+            .ai-box { 
                 background: white !important; 
                 border: 1.5pt solid black !important; 
                 color: black !important; 
@@ -770,13 +768,14 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 -webkit-print-color-adjust: economy !important;
                 print-color-adjust: economy !important;
             }
-            .ai-summary::before { 
+            .ai-box::before { 
                 border: 1pt solid black !important; 
                 background: white !important; 
                 color: black !important; 
                 top: -8pt !important;
+                opacity: 1 !important;
             }
-            #res-summary { 
+            #res-summary, #res-experience { 
                 display: block !important; 
                 visibility: visible !important; 
                 color: black !important; 
@@ -815,14 +814,16 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             <div class="main-col">
                 <div class="section">
                     <div class="section-title">Professional Summary</div>
-                    <div class="ai-summary">
+                    <div class="ai-box" id="summary-box">
                         <div id="res-summary">Refining professional profile...</div>
                     </div>
                 </div>
 
                 <div class="section">
                     <div class="section-title">Experience & Impact</div>
-                    <div class="content-text" id="res-experience">Built a podracer from scrap...</div>
+                    <div class="ai-box" id="experience-box" style="font-style: italic;">
+                        <div id="res-experience">Preparing impact data...</div>
+                    </div>
                 </div>
 
                 <div class="section">
@@ -895,8 +896,16 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         // Client-Side AI Hydration
         async function hydrateAI() {
             const summaryEl = document.getElementById('res-summary');
+            const summaryBox = document.getElementById('summary-box');
             const experienceEl = document.getElementById('res-experience');
-            if (!summaryEl || summaryEl.getAttribute('data-pending') !== 'true') return;
+            const experienceBox = document.getElementById('experience-box');
+            
+            if (!summaryEl || summaryEl.getAttribute('data-pending') !== 'true') {
+                // If already hydrated from server, show badges
+                if (summaryBox) summaryBox.setAttribute('data-refined', 'true');
+                if (experienceBox) experienceBox.setAttribute('data-refined', 'true');
+                return;
+            }
 
             const id = window.location.pathname.substring(1);
             try {
@@ -907,6 +916,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                     // Reveal AI Summary
                     summaryEl.innerText = data.aiSummary;
                     summaryEl.removeAttribute('data-pending');
+                    summaryBox.setAttribute('data-refined', 'true');
                     summaryEl.animate([
                         { opacity: 0, transform: 'translateY(5px)' },
                         { opacity: 1, transform: 'translateY(0)' }
@@ -915,6 +925,8 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                     // Reveal AI Experience
                     experienceEl.innerText = data.aiExperience;
                     experienceEl.removeAttribute('data-pending');
+                    experienceBox.setAttribute('data-refined', 'true');
+                    experienceBox.style.fontStyle = 'normal'; // Remove loading italic
                     experienceEl.animate([
                         { opacity: 0 },
                         { opacity: 1 }

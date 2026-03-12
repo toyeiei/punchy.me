@@ -214,12 +214,12 @@ export default {
 				if (data.type !== 'anakin') return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
 				if (data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
 
-				// Perform Turbo AI Hydration
+				// Perform AI Hydration
 				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-					max_tokens: 150,
-					temperature: 0.2,
+					max_tokens: 300,
+					temperature: 0.6,
 					messages: [
-						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Task: 1. Professional summary (MAX 42 WORDS). 2. Rewrite work history into 3 Action-Result bullet points. Rule: Use action verbs. Output: [SUMMARY] text [/SUMMARY] [EXPERIENCE] bullet points [/EXPERIENCE].' },
+						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Task: 1. Write professional summary (MIN 30 WORDS, MAX 42 WORDS). 2. Rewrite work history into 3 Action-Result bullet points. Rule: Use action verbs. Output: [SUMMARY] text [/SUMMARY] [EXPERIENCE] bullet points [/EXPERIENCE].' },
 						{ role: 'user', content: `Job: ${data.job}\nEducation: ${data.education}\nSkills: ${data.skills}\nExperience: ${data.experience}` }
 					]
 				}) as { response: string };
