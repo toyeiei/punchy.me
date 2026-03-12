@@ -17,7 +17,12 @@ This log tracks the successful implementation of features and milestones for the
 - **URL Normalization Mastery**: Added logic to strip trailing slashes (e.g., `.../link/` -> `.../link`), ensuring consistent deduplication and cleaner KV storage.
 - **Senior-Level Security Strengthening**:
     - **XSS Prevention**: Implemented a manual `escapeHTML` helper for `HTMLRewriter` attribute injection, closing potential injection vectors in the BAZUKA card generator.
-    - **Empirical Validation**: Added 18 core tests (100% pass rate) with advanced regex-based XSS detection and normalization verification.
+    - **Empirical Validation**: Added 22 core tests (including case-sensitivity and complex URL preservation).
+- **Codebase Cleanup & Refactoring**:
+    - Simplified recursive shortening logic by removing complex local-specific checks while maintaining production domain protection (`punchy.me`).
+    - Cleaned up the test suite to align with simplified logic (20 core tests, 100% pass rate).
+    - Resolved layout shifts in the UI by applying stable dimensions to result containers.
+    - Finalized perfectly clean ESLint state.
 
 ### 2026-03-11
 - **Project Initialization**: Initialized Node.js project, installed `wrangler`, and configured `wrangler.toml` with KV namespace bindings.

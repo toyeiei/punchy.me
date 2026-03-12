@@ -183,6 +183,45 @@ describe("PUNCHY.ME URL Shortener", () => {
     expect(id1).toBe(id2);
   });
 
+  it("preserves complex URLs with queries and fragments", async () => {
+    const complexUrl = "https://example.com/path?name=toy&age=38#engineering";
+    const response = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: complexUrl }),
+    });
+    
+    const { id } = await response.json() as { id: string };
+    
+    // Test redirection
+    const redirectRes = await SELF.fetch(`http://localhost/${id}`, {
+      redirect: "manual",
+    });
+    
+    expect(redirectRes.status).toBe(301);
+    expect(redirectRes.headers.get("Location")).toBe(complexUrl);
+  });
+
+  it("ensures short IDs are case-sensitive", async () => {
+    const longUrl = "https://example.com/case-test";
+    const shortenRes = await SELF.fetch("http://localhost/shorten", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ url: longUrl }),
+    });
+    const { id } = await shortenRes.json() as { id: string };
+
+    // Exact match should work (manual redirect check)
+    const res1 = await SELF.fetch(`http://localhost/${id}`, {
+      redirect: "manual"
+    });
+    expect(res1.status).toBe(301);
+
+    // Uppercase version should 404 (assuming ID contains at least one letter)
+    const res2 = await SELF.fetch(`http://localhost/${id.toUpperCase()}`);
+    expect(res2.status).toBe(404);
+  });
+
   describe("BAZUKA Feature", () => {
     it("serves the bazuka form", async () => {
       const response = await SELF.fetch("http://localhost/bazuka");

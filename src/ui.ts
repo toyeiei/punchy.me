@@ -303,6 +303,8 @@ export const HTML = `<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 10px;
+            min-height: 60px;
+            text-align: left;
         }
 
         .result-link {
@@ -312,7 +314,9 @@ export const HTML = `<!DOCTYPE html>
             word-break: break-all;
             font-size: 1.1rem;
             font-weight: 700;
-            text-align: left;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .copy-btn {
@@ -322,8 +326,13 @@ export const HTML = `<!DOCTYPE html>
             border-radius: 8px;
             cursor: pointer;
             color: var(--text-main);
-            transition: background 0.2s;
+            transition: all 0.2s;
             font-family: var(--font-mono);
+            min-width: 40px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
 
         .copy-btn:hover { background: #475569; }
@@ -426,12 +435,14 @@ export const HTML = `<!DOCTYPE html>
     <script>
         const form = document.getElementById('shorten-form');
         const submitBtn = document.getElementById('submit-btn');
+        const urlInput = document.getElementById('url');
         const modalOverlay = document.getElementById('modal-overlay');
         const resultLink = document.getElementById('short-url-result');
         const copyBtn = document.getElementById('copy-btn');
         
         let isUserInitiated = false;
         let turnstileTimeoutId = null;
+        let cachedToken = null;
 
         function resetSubmitBtn() {
             submitBtn.disabled = false;
@@ -443,7 +454,20 @@ export const HTML = `<!DOCTYPE html>
             }
         }
 
+        // Speed Optimization: Pre-trigger Turnstile when user interacts
+        function pretriggerTurnstile() {
+            if (window.turnstile && !cachedToken && !isUserInitiated) {
+                try {
+                    window.turnstile.execute();
+                } catch (e) {}
+            }
+        }
+
+        urlInput.addEventListener('input', pretriggerTurnstile, { once: true });
+        submitBtn.addEventListener('mouseenter', pretriggerTurnstile);
+
         window.onTurnstileSuccess = (token) => {
+            cachedToken = token;
             if (isUserInitiated) {
                 if (turnstileTimeoutId) {
                     clearTimeout(turnstileTimeoutId);
@@ -462,10 +486,17 @@ export const HTML = `<!DOCTYPE html>
 
         form.onsubmit = async (e) => {
             e.preventDefault();
-            const urlInput = document.getElementById('url');
             
             if (!urlInput.value || !urlInput.checkValidity()) {
                 urlInput.reportValidity();
+                return;
+            }
+
+            // If we already have a cached token, skip the delay and go instant
+            if (cachedToken) {
+                submitBtn.disabled = true;
+                submitBtn.innerText = 'PUNCHING...';
+                executeShorten(cachedToken);
                 return;
             }
 
@@ -473,13 +504,13 @@ export const HTML = `<!DOCTYPE html>
             submitBtn.innerText = 'PUNCHING...';
             isUserInitiated = true;
 
-            // Safety timeout: if Turnstile takes too long, fallback
+            // Safety timeout
             turnstileTimeoutId = setTimeout(() => {
                 if (isUserInitiated) {
                     console.warn('Turnstile timeout, falling back');
                     executeShorten();
                 }
-            }, 4000);
+            }, 3000);
 
             if (window.turnstile) {
                 try {
@@ -494,7 +525,7 @@ export const HTML = `<!DOCTYPE html>
         };
 
         async function executeShorten(turnstileToken = '') {
-            const url = document.getElementById('url').value;
+            const url = urlInput.value;
             const hp_field = document.getElementById('hp_field').value;
 
             try {
@@ -514,12 +545,18 @@ export const HTML = `<!DOCTYPE html>
                     resultLink.innerText = shortUrl;
                     resultLink.href = shortUrl;
                     
+                    // Instant display
                     modalOverlay.style.display = 'flex';
-                    setTimeout(() => modalOverlay.classList.add('show'), 10);
+                    modalOverlay.classList.add('show');
+                    
+                    // Clear cache for next use
+                    cachedToken = null;
+                    if (window.turnstile) window.turnstile.reset();
                 } else {
                     const errorData = await response.json();
                     alert(errorData.error || 'Error punching URL. Try again.');
                     if (window.turnstile) window.turnstile.reset();
+                    cachedToken = null;
                 }
             } catch (err) {
                 alert('Network error. Check your connection.');
