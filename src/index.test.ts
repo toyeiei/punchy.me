@@ -81,13 +81,15 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(id1).toBe(id2);
     });
 
-    it("rejects recursive shortening of punchy.me links", async () => {
+    it("rejects recursive shortening of own links", async () => {
       const response = await SELF.fetch("http://localhost/shorten", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ url: "https://punchy.me/xyz" }),
+        body: JSON.stringify({ url: "https://localhost/xyz" }),
       });
       expect(response.status).toBe(400);
+      const data = await response.json() as { error: string };
+      expect(data.error).toContain("Recursive shortening detected");
     });
 
     it("rejects bot submissions (honeypot)", async () => {

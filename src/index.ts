@@ -143,13 +143,23 @@ export default {
 			try {
 				const { url: longUrl, suggestedId, hp_field } = await request.json() as { url: string, suggestedId?: string, hp_field?: string };
 				
-				// Security: Bot Protection
+				// Security: Bot Protection (Honeypot)
 				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
-				if (longUrl.includes('punchy.me')) return new Response(JSON.stringify({ error: 'Invalid URL.' }), { status: 400 });
 
 				// Data: URL Normalization
 				let targetUrl = longUrl.trim();
 				if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
+				
+				// Security: Recursive Shortening Prevention (Routing Loop Fix)
+				try {
+					const targetHost = new URL(targetUrl).hostname;
+					if (targetHost === url.hostname || targetHost.endsWith('punchy.me') || targetHost.endsWith('workers.dev')) {
+						return new Response(JSON.stringify({ error: 'Recursive shortening detected.' }), { status: 400 });
+					}
+				} catch (_e) {
+					return new Response(JSON.stringify({ error: 'Invalid URL format.' }), { status: 400 });
+				}
+
 				const normalized = targetUrl.replace(/\/+$/, '');
 				targetUrl = normalized; // Use normalized for persistence too
 
