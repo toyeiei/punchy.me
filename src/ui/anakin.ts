@@ -453,6 +453,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                                 <textarea id="skills" placeholder="Lightsaber combat, Podracing, The Force..." required maxlength="500"></textarea>
                                 <span class="validation-hint">✓</span>
                             </div>
+                            <div class="field-note">Separate skills with <b>commas</b> (e.g. Marketing, SEO, Vibe Coding) to generate tactical resume tags.</div>
                             <div class="char-counter" id="skills-counter">0 / 500</div>
                         </div>
                         <div class="field-group">
@@ -943,13 +944,13 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             <div class="job-title" id="res-job">JEDI KNIGHT</div>
             
             <div class="contact-bar">
-                <a href="#" class="contact-item" id="res-email">
-                    <span class="contact-label">Email:</span> 
-                    <span>anakin@force.com</span>
+                <a href="#" class="contact-item" id="res-email-link">
+                    <svg style="width:14px;height:14px" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+                    <span id="res-email">anakin@force.com</span>
                 </a>
-                <a href="#" class="contact-item" id="res-website" target="_blank">
-                    <span class="contact-label">Portfolio:</span> 
-                    <span>PORTFOLIO</span>
+                <a href="#" class="contact-item" id="res-website-link" target="_blank">
+                    <svg style="width:14px;height:14px" viewBox="0 0 24 24"><path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>
+                    <span id="res-website">PORTFOLIO</span>
                 </a>
             </div>
 
