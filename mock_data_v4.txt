@@ -1,0 +1,16 @@
+Target Job Intel: Senior Cloud Architect @ TechNinja Systems (Bangkok Office)
+
+The Mission:
+As our Senior Cloud Architect, you will be the tactical lead for our Southeast Asian expansion. You will design and implement highly resilient, multi-region cloud infrastructures on AWS and GCP to support our million-user real-time trading platform. Your role involves orchestrating complex migrations from legacy systems to a unified serverless architecture while maintaining 99.99% uptime.
+
+Key Requirements:
+- 10+ years of experience in cloud engineering and architectural design.
+- Mastery of Infrastructure as Code (Terraform/CloudFormation) and container orchestration (Kubernetes).
+- Deep expertise in Go, Python, and shell scripting for automation.
+- Proven track record of securing edge networks using Cloudflare WAF and Zero Trust protocols.
+- Ability to lead a team of 15+ engineers in a high-pressure, agile environment.
+
+Perks:
+- Competitive THB salary package + USD-indexed performance bonuses.
+- Modern headquarters in Silom, Bangkok with a hybrid work model.
+- Yearly R&D budget for cloud certifications and international tech conferences.

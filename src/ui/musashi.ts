@@ -9,6 +9,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         :root {
             --bg: #000000;
             --accent: #22c55e;
+            --accent-hover: #4ade80; /* Brighter green for hover */
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --font-brand: 'Bitcount Prop Double', cursive;
@@ -21,11 +22,13 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Changed from center to allow scrolling */
             min-height: 100vh;
-            overflow: hidden;
+            overflow-y: auto; /* Enable vertical scroll */
+            overflow-x: hidden;
             text-align: center;
             position: relative;
+            padding: 4rem 0; /* Add top/bottom buffer */
         }
 
         /* Pulse Grid Background */
@@ -191,6 +194,68 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
         .intel-content { color: var(--text-main); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         
+        .skills-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            margin-top: 1rem;
+        }
+        .skill-badge {
+            background: rgba(34, 197, 94, 0.1);
+            color: #ffffff; /* White font for better readability */
+            border: 1px solid var(--accent);
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .json-fallback {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.5rem;
+            border-radius: 12px;
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            text-align: left;
+            white-space: pre-wrap;
+            overflow-x: auto;
+            line-height: 1.5;
+        }
+        .json-key { color: var(--accent); }
+        .json-string { color: #ffffff; }
+        .json-number { color: #fbbf24; }
+        .json-boolean { color: #f472b6; }
+
+        .view-toggle {
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        .toggle-btn {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.1);
+            color: var(--text-dim);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.2s;
+            font-family: var(--font-mono); /* Applied JetBrains Mono */
+        }
+        .toggle-btn.active {
+            background: var(--accent);
+            color: #000;
+            border-color: var(--accent);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.3);
+        }
+
         .terminal-log {
             font-family: var(--font-mono);
             font-size: 0.8rem;
@@ -266,6 +331,14 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             top: var(--top); left: -10px;
             z-index: 1;
         }
+
+        @keyframes fadeInUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .fade-in-up {
+            animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+        }
     </style>
 </head>
 <body>
@@ -276,7 +349,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     <div class="container">
         <div class="title-container">
             <h1>MUSASHI</h1>
-            <span class="status-badge">COMING SOON</span>
+            <span class="status-badge">BETA</span>
         </div>
         
         <div class="quote-box">
@@ -287,12 +360,13 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         <div class="musashi-grid">
             <div class="panel">
                 <label>Target Job Intel</label>
-                <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..." maxlength="3000"></textarea>
+                <div style="display: none;"><input type="text" id="hp_field" tabindex="-1" autocomplete="off"></div>
+                <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..." maxlength="1000"></textarea>
                 <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 1.5rem;">
-                    <div>Maximum intel depth: 3,000 characters.</div>
-                    <div id="char-counter">0 / 3000</div>
+                    <div>Maximum intel depth: 1,000 characters.</div>
+                    <div id="char-counter">0 / 1000</div>
                 </div>
-                <button class="btn-forge" id="forge-btn" style="margin-top: 0.5rem; background: var(--accent); color: #000; border: none; padding: 1rem; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 1px;">Execute Cold Attack</button>
+                <button class="btn-forge" id="forge-btn">Get Musashi's Advice</button>
             </div>
 
             <div class="panel">
@@ -305,39 +379,42 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     </div>
 
     <script>
+        let lastForgedData = null;
+        let currentViewMode = 'tactical';
+
         window.onload = () => {
             const forgeBtn = document.getElementById('forge-btn');
             const jobInput = document.getElementById('job-description');
             const intelOutput = document.getElementById('intel-output');
             const charCounter = document.getElementById('char-counter');
+            const bg = document.getElementById('pixel-bg');
 
+            // 1. Character Counter
             jobInput.addEventListener('input', () => {
                 const count = jobInput.value.length;
-                charCounter.innerText = count.toLocaleString() + ' / 3000';
-                if (count > 2800) charCounter.style.color = '#ff4444';
-                else charCounter.style.color = 'var(--text-dim)';
+                charCounter.innerText = count.toLocaleString() + ' / 1000';
+                charCounter.style.color = count > 800 ? '#ff4444' : 'var(--text-dim)';
             });
 
+            // 2. Forge Action
             forgeBtn.onclick = async () => {
                 const description = jobInput.value.trim();
                 if (description.length < 50) {
-                    alert("Target Intel is too shallow. Provide at least 50 characters.");
+                    alert('Target Intel is too shallow. Provide at least 50 characters.');
                     return;
                 }
 
                 forgeBtn.innerText = 'FORGING ATTACK PATH...';
                 forgeBtn.disabled = true;
                 
-                // Reset HUD
+                // Show Terminal Animation
                 intelOutput.style.paddingTop = '0';
                 intelOutput.innerHTML = '<div class="terminal-log"></div>';
                 const log = intelOutput.querySelector('.terminal-log');
-                
                 const messages = [
                     '> INITIALIZING MUSASHI AI...',
                     '> PARSING JOB TARGET...',
                     '> ANALYZING ARSENAL MATCHES...',
-                    '> DETECTING INTERVIEW THREATS...',
                     '> FORGING TACTICAL ATTACK PATH...'
                 ];
                 
@@ -352,72 +429,130 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                     } else {
                         clearInterval(logInterval);
                     }
-                }, 800);
+                }, 1000);
 
                 try {
+                    const hp_field = document.getElementById('hp_field').value;
                     const response = await fetch('/musashi/forge', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ description })
+                        body: JSON.stringify({ description, hp_field })
                     });
 
                     if (response.ok) {
                         const data = await response.json();
-                        clearInterval(logInterval); // Stop log immediately
-                        renderIntelligence(data);
+                        clearInterval(logInterval);
+                        if (data && (data.intel || data.skills)) {
+                            lastForgedData = data;
+                            renderIntelligence(data, intelOutput);
+                        } else {
+                            alert('Forge error: Intelligence schema mismatched.');
+                        }
                     } else {
                         const err = await response.json();
-                        alert(err.error || 'Forge failed.');
+                        alert('Forge failed: ' + (err.error || 'Unknown error'));
                         clearInterval(logInterval);
                     }
                 } catch (err) {
-                    alert('Network strike failed.');
+                    alert('Network strike failed: ' + err.message);
                     clearInterval(logInterval);
                 } finally {
-                    forgeBtn.innerText = 'Execute Cold Attack';
+                    forgeBtn.innerText = "Get Musashi's Advice";
                     forgeBtn.disabled = false;
                 }
             };
+
+            // 3. Pixel Animation
+            function createPixel() {
+                const pixel = document.createElement('div');
+                pixel.className = 'pixel';
+                const top = Math.random() * 100;
+                const duration = 5 + Math.random() * 10;
+                pixel.style.setProperty('--top', top + '%');
+                pixel.style.setProperty('--duration', duration + 's');
+                bg.appendChild(pixel);
+                setTimeout(() => pixel.remove(), duration * 1000);
+            }
+            setInterval(createPixel, 300);
+            for(let i=0; i<20; i++) createPixel();
         };
 
-        function renderIntelligence(data) {
-            intelOutput.style.paddingTop = '0';
-            let html = '';
-            html += '<div class="intel-block"><div class="intel-title"><span>📡</span> Target Intel</div>';
-            html += '<div class="intel-content">' + data.intel + '</div></div>';
-            html += '<div class="intel-block"><div class="intel-title"><span>🎯</span> Strategic Analysis</div>';
-            html += '<div class="intel-content">' + data.analysis + '</div></div>';
-            intelOutput.innerHTML = html;
-        }
+        window.switchView = (mode) => {
+            currentViewMode = mode;
+            if (lastForgedData) {
+                renderIntelligence(lastForgedData, document.getElementById('intel-output'));
+            }
+        };
 
-        window.copyToClipboard = (elementId, btn) => {
-            const text = document.getElementById(elementId).innerText;
-            navigator.clipboard.writeText(text).then(() => {
-                const originalText = btn.innerText;
-                btn.innerText = 'COPIED TO ARSENAL';
-                btn.style.background = 'var(--accent)';
-                btn.style.color = '#000';
-                setTimeout(() => {
-                    btn.innerText = originalText;
-                    btn.style.background = 'rgba(34, 197, 94, 0.1)';
-                    btn.style.color = 'var(--accent)';
-                }, 2000);
+        function syntaxHighlight(json) {
+            if (typeof json != 'string') json = JSON.stringify(json, undefined, 2);
+            json = json.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+            return json.replace(/("(\\u[a-zA-Z0-9]{4}|\\[^u]|[^\\"])*"(\s*:)?|\b(true|false|null)\b|-?\d+(?:\.\d*)?(?:[eE][+\-]?\d+)?)/g, (match) => {
+                let cls = 'json-number';
+                if (/^"/.test(match)) {
+                    if (/:$/.test(match)) cls = 'json-key';
+                    else cls = 'json-string';
+                } else if (/true|false/.test(match)) cls = 'json-boolean';
+                return '<span class="' + cls + '">' + match + '</span>';
             });
-        };
-
-        const bg = document.getElementById('pixel-bg');
-        function createPixel() {
-            const pixel = document.createElement('div');
-            pixel.className = 'pixel';
-            const top = Math.random() * 100;
-            const duration = 5 + Math.random() * 10;
-            pixel.style.setProperty('--top', top + '%');
-            pixel.style.setProperty('--duration', duration + 's');
-            bg.appendChild(pixel);
-            setTimeout(() => pixel.remove(), duration * 1000);
         }
-        setInterval(createPixel, 300);
-        for(let i=0; i<20; i++) createPixel();
+
+        function renderIntelligence(data, container) {
+            container.style.paddingTop = '0';
+            container.classList.remove('fade-in-up');
+            void container.offsetWidth; // Trigger reflow
+            container.classList.add('fade-in-up');
+            
+            // Build Toggle Header
+            let html = '<div class="view-toggle">';
+            html += '<button class="toggle-btn ' + (currentViewMode === 'tactical' ? 'active' : '') + '" onclick="switchView(\\'tactical\\')">Musashi\\'s Analysis</button>';
+            html += '<button class="toggle-btn ' + (currentViewMode === 'raw' ? 'active' : '') + '" onclick="switchView(\\'raw\\')">Raw JSON</button>';
+            html += '</div>';
+
+            if (currentViewMode === 'raw') {
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>🛠️</span> Strategic JSON</div>';
+                html += '<pre class="json-fallback">' + syntaxHighlight(data) + '</pre></div>';
+                container.innerHTML = html;
+                return;
+            }
+            
+            const formatList = (arr) => {
+                if (!Array.isArray(arr)) return arr;
+                // Double line break between bullets for elite readability
+                return arr.map(item => '• ' + item).join('<br><br>');
+            };
+
+            if (data.intel) {
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>📡</span> Target Summary</div>';
+                html += '<div class="intel-content">' + data.intel + '</div></div>';
+            }
+
+            if (data.skills && Array.isArray(data.skills)) {
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>⚡</span> CORE SKILLS</div>';
+                html += '<div class="skills-container">';
+                data.skills.forEach(skill => {
+                    html += '<span class="skill-badge">' + skill + '</span>';
+                });
+                html += '</div></div>';
+            }
+            
+            if (data.projects) {
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>🎯</span> PORTFOLIO PROJECTS</div>';
+                html += '<div class="intel-content">' + formatList(data.projects) + '</div></div>';
+            }
+
+            if (data.salary) {
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>💰</span> Market Intel</div>';
+                html += '<div class="intel-content"><strong>ESTIMATED RANGE:</strong> ' + data.salary + '</div></div>';
+            }
+
+            if (data.questions) {
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>⚔️</span> KEY INTERVIEW QUESTIONS</div>';
+                html += '<div class="intel-content">' + formatList(data.questions) + '</div></div>';
+            }
+
+            container.innerHTML = html;
+        }
     </script>
 </body>
 </html>`;

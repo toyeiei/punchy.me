@@ -32,6 +32,7 @@ export interface Env {
  * High-performance HTML escaper
  */
 function escapeHTML(str: string): string {
+	if (!str) return '';
 	return str
 		.replace(/&/g, '&amp;')
 		.replace(/</g, '&lt;')
@@ -206,40 +207,49 @@ export default {
 
 		if (path === '/musashi/forge' && request.method === 'POST') {
 			try {
-				const { description } = await request.json() as { description: string };
-				if (!description || description.length < 50) return new Response(JSON.stringify({ error: 'Intel too shallow.' }), { status: 400 });
-				if (description.length > 3000) return new Response(JSON.stringify({ error: 'Intel too dense. Limit 3000 characters.' }), { status: 400 });
+				const { description, hp_field } = await request.json() as { description: string, hp_field?: string };
+				
+				// Tier 2: Bot Protection (Honeypot)
+				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
 
-				// Execute AI Forge with Master Prompt & Strategic Anchors (No JSON mode for speed/reliability)
-				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct-awq', {
-					max_tokens: 1500,
-					temperature: 0.6,
+				if (!description || description.length < 50) return new Response(JSON.stringify({ error: 'Intel too shallow.' }), { status: 400 });
+				if (description.length > 1000) return new Response(JSON.stringify({ error: 'Intel too dense. Limit 1000 characters.' }), { status: 400 });
+
+				// Tier 1: IP-based AI Rate Limiting (5 NEW forges per minute)
+				const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
+				const aiRlKey = `rl:ai:${ip}`;
+				const currentAiRl = await env.SHORT_LINKS.get(aiRlKey);
+				const aiRlCount = currentAiRl ? parseInt(currentAiRl) : 0;
+				if (aiRlCount >= 5) return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 5 per minute.' }), { status: 429 });
+				await env.SHORT_LINKS.put(aiRlKey, (aiRlCount + 1).toString(), { expirationTtl: 60 });
+
+				// Execute AI Forge with Optimized Speed Schema
+				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+					max_tokens: 350, // Leaner for faster edge response
+					temperature: 0.2,
+					response_format: { type: 'json_object' }, 
 					messages: [
-						{ role: 'system', content: 'You are MUSASHI, Career Strategist. Analyze the job and provide INTEL and ANALYSIS. Strictly wrap content in ###INTEL### and ###ANALYSIS### tags.' },
+						{ role: 'system', content: 'You are MUSASHI, Elite Strategist. Output ONLY JSON. Be extremely brief.' },
 						{ 
 							role: 'user', 
-							content: `[CONTEXT]\nTarget Job Description:\n${description}\n\n[DIRECTIVE]\nForge tactical insights. \nUse exactly these anchors:\n###INTEL###\n(role, skills, tools summary)\n###ANALYSIS###\n(3 portfolio projects, salary range, 3 interview questions)`
+							content: `Job: ${description}\n\nReturn JSON strictly matching this schema:\n{\n  "intel": "1-sentence summary",\n  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],\n  "projects": ["P1", "P2", "Project 3 description"],\n  "salary": "THB/USD range",\n  "questions": ["Q1", "Q2", "Q3"]\n}`
 						}
 					]
-				}) as { response: string };
+				}) as { response: any };
 
-				const text = aiResponse.response || '';
-				console.log('--- RAW AI RESPONSE ---');
-				console.log(text);
-				
-				const extract = (tag: string) => {
-					const parts = text.split(`###${tag}###`);
-					if (parts.length < 2) return "Forge failed for segment.";
-					return parts[1].split('###')[0].trim();
-				};
-
-				const result = {
-					intel: extract('INTEL'),
-					analysis: extract('ANALYSIS')
-				};
+				// Normalize response (JSON mode often returns an object directly in some environments)
+				let result;
+				try {
+					result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+				} catch (e) {
+					// Fallback for malformed strings
+					const cleanText = (aiResponse.response || '').replace(/```json|```/g, '').trim();
+					result = JSON.parse(cleanText);
+				}
 
 				console.log('--- FORGED JSON PAYLOAD ---');
 				console.log(JSON.stringify(result, null, 2));
+
 				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
 
 			} catch (_e) {

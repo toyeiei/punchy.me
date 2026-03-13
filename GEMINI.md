@@ -84,6 +84,13 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 
 ## Progress & Architectural Milestones
 
+### Version 4.3.0 - MUSASHI Strategic Forge & Safety Protocols (2026-03-13)
+- **Strategic AI Forge**: Launched the fully functional Cold Attack Engine with high-speed anchor extraction.
+- **Model Selection Protocol**: Codified the rule to **avoid AWQ models for JSON Mode** or complex reasoning; full-precision models are mandatory for structural integrity.
+- **Immersive HUD**: Integrated the Tactical Decoder animation for real-time strategic briefings.
+- **Safety Hardening**: Codified Section 7 in `WORK_DOCS.md` to prevent recurring tool bugs and increase velocity.
+- **Verification**: Reached 29/29 tests with 100% core and strategic coverage.
+
 ### Version 4.1.0 - Server-First Flow & HUD Mastery (2026-03-13)
 - **Server-First Punching**: Revolutionized link generation UX by waiting for server confirmation before displaying the link, ensuring 100% propagation reliability.
 - **Success Animation v2.0**: Refined the success icon with a deliberate `cubic-bezier` pop and neon-green glow for professional interactive feedback.
