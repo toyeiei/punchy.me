@@ -53,14 +53,11 @@ class BazukaHandler {
 			element.setAttribute('data-text', this.data.nickname);
 		}
 		if (id === 'card-job') element.setInnerContent(this.data.job);
-		if (id === 'card-email') {
-			element.setInnerContent(this.data.email);
-			element.setAttribute('href', `mailto:${this.data.email}`);
-		}
-		if (id === 'card-website') {
-			element.setInnerContent(this.data.website.replace(/^https?:\/\//, ''));
-			element.setAttribute('href', escapeHTML(this.data.website));
-		}
+		if (id === 'card-email') element.setInnerContent(this.data.email);
+		if (id === 'card-website') element.setInnerContent("PORTFOLIO");
+		
+		if (id === 'card-email-link') element.setAttribute('href', `mailto:${this.data.email}`);
+		if (id === 'card-website-link') element.setAttribute('href', escapeHTML(this.data.website));
 		
 		// SEO Injection
 		if (id === 'title-tag') element.setInnerContent(`${this.data.nickname} | Digital Business Card | PUNCHY.ME`);
@@ -84,10 +81,10 @@ class AnakinHandler {
 		if (id === 'res-name') element.setInnerContent(this.data.name);
 		if (id === 'res-job') element.setInnerContent(this.data.job);
 		if (id === 'res-email') element.setInnerContent(this.data.email);
-		if (id === 'res-website') {
-			element.setInnerContent(this.data.website.replace(/^https?:\/\//, ''));
-			element.setAttribute('href', escapeHTML(this.data.website));
-		}
+		if (id === 'res-website') element.setInnerContent("PORTFOLIO");
+
+		if (id === 'res-email-link') element.setAttribute('href', `mailto:${this.data.email}`);
+		if (id === 'res-website-link') element.setAttribute('href', escapeHTML(this.data.website));
 		if (id === 'res-summary') {
 			if (this.data.aiSummary) {
 				element.setInnerContent(this.data.aiSummary);
@@ -344,6 +341,8 @@ export default {
 								.on('#res-job', handler)
 								.on('#res-email', handler)
 								.on('#res-website', handler)
+								.on('#res-email-link', handler)
+								.on('#res-website-link', handler)
 								.on('#res-summary', handler)
 								.on('#res-experience', handler)
 								.on('#res-education', handler)

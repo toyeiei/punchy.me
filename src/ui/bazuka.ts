@@ -110,7 +110,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
 
         .back-home {
-            position: absolute;
+            position: fixed;
             top: 1.5rem;
             left: 1.5rem;
             color: var(--accent);
@@ -650,16 +650,23 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         .card {
             z-index: 10;
             text-align: left;
-            border-left: 4px solid var(--accent);
-            padding: 2.5rem;
+            padding: 3rem;
             background: rgba(17, 17, 17, 0.85);
             backdrop-filter: blur(15px);
-            border-radius: 0 24px 24px 0;
+            border-radius: 24px;
             max-width: 95%;
-            width: 440px;
+            width: 480px;
             box-shadow: 20px 20px 60px rgba(0,0,0,0.6);
             border: 1px solid rgba(255, 255, 255, 0.05);
-            border-left: 4px solid var(--accent);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 4px;
+            background: var(--accent);
         }
 
         .nickname {
@@ -683,48 +690,22 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
         }
 
-        .nickname::before, .nickname::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: transparent;
-            opacity: 0;
-            will-change: transform, opacity;
-            transform: translateZ(0);
-        }
-
-        .nickname::before {
-            left: 1px;
-            color: #ff00ff;
-            animation: glitch-anim-1 4s infinite;
-        }
-
-        .nickname::after {
-            left: -1px;
-            color: #00ffff;
-            animation: glitch-anim-2 3s infinite;
-        }
-
-        @keyframes glitch-anim-1 {
-            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
-            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
-            92% { opacity: 0; transform: translate(0) translateZ(0); }
-        }
-
-        @keyframes glitch-anim-2 {
-            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
-            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
-            96% { opacity: 0; transform: translate(0) translateZ(0); }
-        }
-
-        .job { font-size: clamp(1rem, 4vw, 1.25rem); color: var(--text-main); font-weight: 700; margin-bottom: 2rem; letter-spacing: 1px; }
+        .job { font-size: clamp(1rem, 4vw, 1.25rem); color: var(--text-main); font-weight: 700; margin-bottom: 1.5rem; letter-spacing: 1px; }
         
-        .info-row { margin-bottom: 1rem; display: flex; align-items: center; gap: 12px; }
-        .label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; width: 85px; font-weight: 700; }
-        .value { color: var(--text-main); font-size: 0.95rem; text-decoration: none; word-break: break-all; }
-        .value:hover { color: var(--accent); }
+        .contact-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.2rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            margin-bottom: 2rem;
+        }
 
-        .footer { margin-top: 2.5rem; font-size: 0.7rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.2rem; }
+        .contact-item { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit; transition: color 0.2s; }
+        .contact-item:hover { color: var(--accent); }
+
+        .footer { margin-top: 1rem; font-size: 0.7rem; color: var(--text-dim); border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1.2rem; }
 
         .brand-footer {
             position: fixed;
@@ -740,16 +721,18 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
     <div class="card">
-        <div class="nickname" id="card-nickname" data-text="NAME">NAME</div>
+        <h1 class="nickname" id="card-nickname" data-text="NAME">NAME</h1>
         <div class="job" id="card-job">JOB TITLE</div>
         
-        <div class="info-row">
-            <span class="label">Email</span>
-            <a href="" class="value" id="card-email">email@example.com</a>
-        </div>
-        <div class="info-row">
-            <span class="label">Website</span>
-            <a href="" class="value" id="card-website" target="_blank"></a>
+        <div class="contact-bar">
+            <a href="#" class="contact-item" id="card-email-link">
+                <svg style="width:14px;height:14px" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+                <span id="card-email">email@example.com</span>
+            </a>
+            <a href="#" class="contact-item" id="card-website-link" target="_blank">
+                <svg style="width:14px;height:14px" viewBox="0 0 24 24"><path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>
+                <span id="card-website">PORTFOLIO</span>
+            </a>
         </div>
 
         <div class="footer">

@@ -89,6 +89,32 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
         .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
+        .pixel-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+
+        .pixel {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            animation: drift var(--duration) linear infinite;
+            top: var(--top); left: -10px;
+        }
+
+        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
+
+        @keyframes drift {
+            0% { transform: translateX(0); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+        }
+
         .container {
             width: 100%;
             max-width: 900px;
