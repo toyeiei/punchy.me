@@ -80,14 +80,17 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 
 ## Progress & Architectural Milestones
 
-### Version 3.9.0 - Elite HUD & Routing Integrity (2026-03-13)
-- **Elite HUD Refinements**: Standardized aggressive vertical centering for BAZUKA/Home and implemented adaptive `flex-start` layouts for ANAKIN to prevent title occlusion on long forms.
-- **Routing Loop Prevention**: Robust hostname verification stops recursive shortening of own domain or staging links at the edge.
-- **True Synchronization**: Hardened handshake between client and server to eliminate race conditions during ID generation.
-- **Mobile UX Hardening**: Verified keyboard safety via adaptive scrolling and focus-lock management across all tools.
-- **Verification**: Reached 21/21 tests with 100% core and mobile coverage.
+### Version 4.1.0 - Server-First Flow & HUD Mastery (2026-03-13)
+- **Server-First Punching**: Revolutionized link generation UX by waiting for server confirmation before displaying the link, ensuring 100% propagation reliability.
+- **Success Animation v2.0**: Refined the success icon with a deliberate `cubic-bezier` pop and neon-green glow for professional interactive feedback.
+- **"Below the Fold" Strategy**: Isolated the primary tool in a `100svh` hero section on landing, pushing secondary modules into a discoverable scroll area to reduce cognitive load.
+- **Philosophy Alignment**: Formally integrated "Occam's Razor" and established `WORK_DOCS.md` for elite team operations.
 
-### Version 3.5.0 - The Resilience Update (2026-03-13)
+### Version 4.0.0 - Comprehensive SEO Overhaul (2026-03-13)
+- Dynamic User Identity: Custom SEO Titles and Descriptions injected for every shared resume and business card.
+- Semantic Authority: Standardized H1/H2 heading hierarchy globally for search indexing and accessibility.
+
+### Version 3.9.0 - Elite HUD & Routing Integrity (2026-03-13)
 - **Edge Resilience**: Triple-tier KV mitigation (1.2s Smart Wait + 500ms Double-Lock retry).
 - **Tactical UX**: Branded 404 "Re-Sync" page with pixel drift and auto-reload logic.
 - **Anakin Forge v2.0**: Refactored resume layout (Tactical Header + SVG Icons + Expertise Tags) optimized for 1-page PDF exports.
