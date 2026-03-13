@@ -270,4 +270,48 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(response.status).toBe(400);
     });
   });
+
+  describe("Mobile UX & Accessibility", () => {
+    it("serves mobile-optimized viewports across all tools", async () => {
+      const pages = ["/", "/bazuka", "/anakin"];
+      for (const page of pages) {
+        const res = await SELF.fetch(`http://localhost${page}`);
+        const html = await res.text();
+        expect(html).toContain('meta name="viewport" content="width=device-width, initial-scale=1.0"');
+      }
+    });
+
+    it("implements adaptive scrolling on BAZUKA for keyboard safety", async () => {
+      const res = await SELF.fetch("http://localhost/bazuka");
+      const html = await res.text();
+      expect(html).toContain("min-height: -webkit-fill-available");
+      expect(html).toContain("overflow-y: auto");
+      expect(html).toContain("-webkit-overflow-scrolling: touch");
+    });
+
+    it("implements adaptive scrolling on ANAKIN for keyboard safety", async () => {
+      const res = await SELF.fetch("http://localhost/anakin");
+      const html = await res.text();
+      expect(html).toContain("min-height: -webkit-fill-available");
+      expect(html).toContain("overflow-y: auto");
+    });
+
+    it("contains mobile focus-lock scripts on forms", async () => {
+      const pages = ["/bazuka", "/anakin"];
+      for (const page of pages) {
+        const res = await SELF.fetch(`http://localhost${page}`);
+        const html = await res.text();
+        expect(html).toContain("scrollIntoView");
+        expect(html).toContain("behavior: 'smooth'");
+        expect(html).toContain("block: 'center'");
+      }
+    });
+
+    it("ensures touch-friendly interaction targets on mobile", async () => {
+      const res = await SELF.fetch("http://localhost/");
+      const html = await res.text();
+      // Verify that feature cards have appropriate padding for touch (2rem)
+      expect(html).toContain("padding: 2rem");
+    });
+  });
 });

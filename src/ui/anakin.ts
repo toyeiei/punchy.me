@@ -47,9 +47,11 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             justify-content: center;
             align-items: center;
             min-height: 100vh;
-            overflow-x: hidden;
+            min-height: -webkit-fill-available;
             position: relative;
-            padding: 4rem 0;
+            padding: 2rem 0;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
         }
 
         .pixel-bg {
@@ -602,6 +604,16 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 resetSubmitBtn();
             }
         }
+
+        // Mobile UX: Scroll into view on focus
+        const formInputs = form.querySelectorAll('input, textarea');
+        formInputs.forEach(input => {
+            input.addEventListener('focus', () => {
+                setTimeout(() => {
+                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                }, 300);
+            });
+        });
 
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
