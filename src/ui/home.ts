@@ -71,12 +71,44 @@ export const HTML = `<!DOCTYPE html>
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            padding: 4rem 0;
+            padding: 0;
+            margin: 0;
+        }
+
+        .hero-section {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 2rem 1.5rem;
+            min-height: 100vh;
+            min-height: 100svh;
+            z-index: 10;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+            position: relative;
+        }
+
+        .feature-section {
+            width: 100%;
+            max-width: 800px;
+            padding: 0 1.5rem 4rem;
+            z-index: 10;
+        }
+
+        @media (min-width: 640px) {
+            .hero-section { min-height: auto; padding-top: 8rem; padding-bottom: 2rem; }
+            .feature-section { padding-top: 0; }
         }
 
         .pixel-bg {
@@ -103,14 +135,6 @@ export const HTML = `<!DOCTYPE html>
             5% { opacity: 1; }
             95% { opacity: 1; }
             100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
-        }
-
-        .container {
-            width: 90%;
-            max-width: 800px;
-            text-align: center;
-            z-index: 10;
-            position: relative;
         }
 
         h1 {
@@ -410,20 +434,25 @@ export const HTML = `<!DOCTYPE html>
 </head>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
-    <div class="container">
-        <h1>PUNCHY.ME</h1>
-        <form id="shorten-form">
-            <div class="input-group">
-                <input type="text" name="hp_field" id="hp_field" style="display:none !important;" tabindex="-1" autocomplete="off">
-                <input type="url" id="url" placeholder="Enter your long URL here..." required>
-                <button type="submit" id="submit-btn">Get Short Link</button>
-            </div>
-            <div id="turnstile-container" style="display: none;">
-                <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
-            </div>
-        </form>
+    
+    <section class="hero-section">
+        <div class="container">
+            <h1>PUNCHY.ME</h1>
+            <form id="shorten-form">
+                <div class="input-group">
+                    <input type="text" name="hp_field" id="hp_field" style="display:none !important;" tabindex="-1" autocomplete="off">
+                    <input type="url" id="url" placeholder="Enter your long URL here..." required>
+                    <button type="submit" id="submit-btn">Get Short Link</button>
+                </div>
+                <div id="turnstile-container" style="display: none;">
+                    <div class="cf-turnstile" data-sitekey="0x4AAAAAACpO5kHNRhLAhQOH" data-size="invisible" data-callback="onTurnstileSuccess" data-error-callback="onTurnstileError"></div>
+                </div>
+            </form>
+        </div>
+    </section>
 
-        <!-- Command Center: Ecosystem Suite -->
+    <!-- Command Center: Ecosystem Suite (Below the fold on mobile) -->
+    <section class="feature-section">
         <div class="suite-grid">
             <a href="/bazuka" class="feature-card">
                 <span class="feature-icon">[ 👤 ]</span>
@@ -436,7 +465,7 @@ export const HTML = `<!DOCTYPE html>
                 <div class="feature-tagline">Elite AI Resumes. Forged by Llama 3 for career-winning impact.</div>
             </a>
         </div>
-    </div>
+    </section>
 
     <div class="footer">
         Built with ⚡ by Toy & Gemini CLI
