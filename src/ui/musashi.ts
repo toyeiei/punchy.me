@@ -54,7 +54,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             100% { transform: translateY(100vh); }
         }
         
-        .container { z-index: 10; padding: 2rem; position: relative; max-width: 800px; }
+        .container { z-index: 10; padding: 2rem; position: relative; max-width: 1100px; }
         
         .title-container {
             display: flex;
@@ -145,6 +145,48 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             letter-spacing: 2px;
         }
 
+        /* SHINOBI GLASS Design System */
+        .panel {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 2.5rem;
+            border-radius: 24px;
+            transition: all 0.3s ease;
+            text-align: left;
+        }
+        .panel:hover {
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .musashi-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 2rem;
+            margin-top: 4rem;
+            width: 100%;
+        }
+
+        @media (min-width: 900px) {
+            .musashi-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.75rem; display: block; }
+        textarea {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1.2rem;
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            width: 100%;
+            min-height: 200px;
+            outline: none;
+            resize: vertical;
+        }
+
         .back-home {
             position: fixed;
             top: 1.5rem;
@@ -214,6 +256,78 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             <p class="quote-text">"You must reach the point where you have no specialized equipment and depend on nothing outside yourself."</p>
             <p class="quote-author">— MIYAMOTO MUSASHI, The Book of Five Rings</p>
         </div>
+
+        <div class="musashi-grid">
+            <!-- Left Panel: The Strategic Input -->
+            <div class="panel">
+                <label>Target Job Intel</label>
+                <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..."></textarea>
+                <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: -1rem; margin-bottom: 1.5rem;">Maximum intel depth: 3,000 characters.</div>
+                <button class="btn-forge" id="forge-btn" style="margin-top: 1.5rem; background: var(--accent); color: #000; border: none; padding: 1rem; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 1px;">Execute Cold Attack</button>
+            </div>
+
+            <!-- Right Panel: Strategic Intelligence -->
+            <div class="panel">
+                <div id="intel-output" style="color: var(--text-dim); text-align: center; padding-top: 4rem;">
+                    <div style="font-size: 2rem; margin-bottom: 1rem;">📡</div>
+                    Awaiting Target Data...
+                </div>
+            </div>
+        </div>
     </div>
+
+    <script>
+        const forgeBtn = document.getElementById('forge-btn');
+        const jobInput = document.getElementById('job-description');
+        const intelOutput = document.getElementById('intel-output');
+
+        forgeBtn.onclick = async () => {
+            const description = jobInput.value.trim();
+            if (description.length < 50) {
+                alert("Target Intel is too shallow. Provide at least 50 characters of job description.");
+                return;
+            }
+
+            // HUD STATE: Show 'Forging'
+            forgeBtn.innerText = 'FORGING ATTACK PATH...';
+            forgeBtn.disabled = true;
+            
+            intelOutput.innerHTML = \`
+                <div style=\"padding-top: 4rem; text-align: center; color: var(--accent);\">
+                    <div style=\"font-size: 2rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;\">📡</div>
+                    ANALYZING TARGET INTEL...
+                </div>
+            \`;
+
+            try {
+                const response = await fetch('/musashi/forge', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ description })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    renderIntelligence(data);
+                } else {
+                    const err = await response.json();
+                    alert(err.error || 'Forge failed.');
+                }
+            } catch (err) {
+                alert('Network strike failed. Check connection.');
+            } finally {
+                forgeBtn.innerText = 'Execute Cold Attack';
+                forgeBtn.disabled = false;
+            }
+        };
+
+        function renderIntelligence(data) {
+            // Placeholder for Phase 3 rendering logic
+            intelOutput.innerHTML = \`<pre style=\"color: var(--text-main); font-size: 0.8rem; text-align: left; overflow: auto; max-height: 500px;\">\${JSON.stringify(data, null, 2)}</pre>\`;
+        }
+
+        const bg = document.getElementById('pixel-bg');
+        // Animation logic here...
+    </script>
 </body>
 </html>`;

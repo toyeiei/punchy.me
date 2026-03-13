@@ -204,6 +204,45 @@ export default {
 			return new Response(YAIBA_HTML, { headers: { 'Content-Type': 'text/html' } });
 		}
 
+		if (path === '/musashi/forge' && request.method === 'POST') {
+			try {
+				const { description } = await request.json() as { description: string };
+				if (!description || description.length < 50) return new Response(JSON.stringify({ error: 'Intel too shallow.' }), { status: 400 });
+				if (description.length > 3000) return new Response(JSON.stringify({ error: 'Intel too dense. Limit 3000 characters.' }), { status: 400 });
+
+				// Execute AI Forge with Master Prompt
+				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct-awq', {
+					max_tokens: 1500,
+					temperature: 0.6,
+					messages: [
+						{ role: 'system', content: 'You are MUSASHI, Elite Career Outreach Strategist. Analyze job intel and forge an attack path. Strictly use [INTEL], [ANALYSIS], [HOOK], and [STRIKE] tags.' },
+						{ 
+							role: 'user', 
+							content: `[CONTEXT]\nTarget Job Description:\n${description}\n\n[DIRECTIVE]\n1. Parse job into [INTEL] (Role, Exp, Skills, Tools, Responsibilities).\n2. Generate [ANALYSIS] (3 Portfolio ideas, Salary range, Interview strategy, ATS keywords).\n3. Forge [HOOK] (LinkedIn Hook < 300 chars).\n4. Forge [STRIKE] (Full outreach email).\n\n[OUTPUT FORMAT]\n[INTEL]...[/INTEL]\n[ANALYSIS]...[/ANALYSIS]\n[HOOK]...[/HOOK]\n[STRIKE]...[/STRIKE]`
+						}
+					]
+				}) as { response: string };
+
+				const text = aiResponse.response || '';
+				
+				// Surgical Extraction
+				const extract = (tag: string) => {
+					const match = text.match(new RegExp(`\\[${tag}\\](.*?)\\[\\/${tag}\\]`, 'si'));
+					return match ? match[1].trim() : "Forge failed for this segment.";
+				};
+
+				return new Response(JSON.stringify({
+					intel: extract('INTEL'),
+					analysis: extract('ANALYSIS'),
+					hook: extract('HOOK'),
+					strike: extract('STRIKE')
+				}), { headers: { 'Content-Type': 'application/json' } });
+
+			} catch (_e) {
+				return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 });
+			}
+		}
+
 		// 4. BAZUKA Routes
 		if (path === '/bazuka') {
 			if (request.method === 'GET') return new Response(BAZUKA_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
