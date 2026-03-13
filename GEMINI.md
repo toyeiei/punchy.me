@@ -38,6 +38,7 @@ We maintain senior-level engineering standards regardless of project scale.
 
 ## Deployment Protocol
 - **Explicit Approval**: NEVER deploy automatically (e.g., `wrangler deploy` or `npm run deploy`). You MUST ask for explicit user permission before every deployment to production.
+- **Progress Tracking**: Update `GEMINI.md` with our latest progress and architectural changes every time we deploy a new version of the application.
 
 ## Roadmap (Planned High-Impact Features)
 - **MUSASHI | The Strategic Weapon**:
@@ -61,4 +62,21 @@ We have identified a recurring high-impact bug: **Unterminated Template Literals
 - **Symptom:** `HTMLRewriter` returns an empty response (`''`), causing tests to fail with messages like `expected '' to contain 'Anakin Skywalker'`.
 - **Root Cause:** Malformed template exports or erroneous backslashes (e.g., `\`;`) at the end of template strings.
 - **Mandate:** After modifying any UI template in `src/ui/`, engineers **MUST** surgically verify the transition points between exported template constants. Use `read_file` or `grep` to confirm that all template literals are properly terminated with a simple backtick (`) and semicolon (;).
-- **Validation:** A task is not complete until `npm test` confirms that `HTMLRewriter` is successfully injecting content into the relevant template.
+- **Validation:** A task is not complete until `npm test` confirms that `HTMLRewriter` is successfully injections content into the relevant template.
+
+### 2. Consistency Mitigation (KV Resilience)
+Cloudflare KV is eventually consistent. To maintain an "Instant" feel without broken links, we employ a triple-tier strategy:
+- **Smart Wait (Frontend):** The result link is "locked" for 300ms with a visual progress bar. This prevents users from clicking before the data has likely propagated.
+- **Double-Lock (Backend):** If a lookup fails, the Worker pauses for 500ms and retries the KV fetch before returning a 404.
+- **Optimistic UI:** We generate the short ID client-side to show the result at 0ms, while the actual persistence happens asynchronously in the background.
+
+### 3. AI Engine Standards (ANAKIN)
+To ensure consistent and high-quality professional narratives, the ANAKIN engine MUST adhere to these standard parameters:
+- **Model:** `@cf/meta/llama-3-8b-instruct`
+- **Max Tokens:** 250 (Ensures sufficient length for summary and 3 bullets)
+- **Temperature:** 0.6 (Balances professional structure with narrative variety)
+- **Prompt Structure:** Always use the `[CONTEXT]`, `[DIRECTIVE]`, and `[OUTPUT FORMAT]` blocks for precision.
+- **Narrative Constraints:** 
+    - **Professional Summary:** 20-28 words.
+    - **Experience Bullets:** 15-20 words per bullet (Total 3 bullets).
+    - **Tone:** Senior-level, action-oriented, and result-focused.

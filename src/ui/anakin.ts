@@ -49,7 +49,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             min-height: 100vh;
             overflow-x: hidden;
             position: relative;
-            padding: 2rem 0;
+            padding: 4rem 0;
         }
 
         .pixel-bg {
@@ -77,6 +77,29 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             95% { opacity: 1; }
             100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
         }
+
+        .back-home {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            z-index: 100;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 12px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         .container {
             width: 95%;
@@ -371,6 +394,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 </head>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
+    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
     <div class="container">
         <div class="title-container">
             <h1>ANAKIN</h1>
@@ -889,14 +913,14 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 <div class="section">
                     <div class="section-title">Professional Summary</div>
                     <div class="ai-box" id="summary-box">
-                        <div id="res-summary">Refining professional profile...</div>
+                        <div id="res-summary" class="content-text">Refining professional profile...</div>
                     </div>
                 </div>
 
                 <div class="section">
                     <div class="section-title">Experience & Impact</div>
                     <div class="ai-box" id="experience-box" style="font-style: italic;">
-                        <div id="res-experience">Preparing impact data...</div>
+                        <div id="res-experience" class="content-text">Preparing impact data...</div>
                     </div>
                 </div>
 

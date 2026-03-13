@@ -233,9 +233,8 @@ export default {
 						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Your goal is to transform raw career data into elite narratives. IMPORTANT: You MUST wrap your response in [SUMMARY] and [EXPERIENCE] tags exactly as shown in the output format. No conversational filler.' },
 						{ 
 							role: 'user', 
-							content: `[CONTEXT]\nTarget Role: ${data.job}\nAcademic Foundation: ${data.education}\nTechnical Arsenal: ${data.skills}\nRaw Field Data: ${data.experience}\n\n[DIRECTIVE]\n1. Write professional summary (MIN 20 WORDS, MAX 28 WORDS).\n2. Rewrite work history into 3 Action-Result bullet points using high-impact action verbs.\n\n[OUTPUT FORMAT]\n[SUMMARY] (summary text here) [/SUMMARY]\n[EXPERIENCE] (3 bullet points here) [/EXPERIENCE]` 
-						}
-					]
+							content: `[CONTEXT]\nTarget Role: ${data.job}\nAcademic Foundation: ${data.education}\nTechnical Arsenal: ${data.skills}\nRaw Field Data: ${data.experience}\n\n[DIRECTIVE]\n1. Write professional summary (MIN 20 WORDS, MAX 28 WORDS).\n2. Rewrite work history into 3 Action-Result bullet points (MIN 15 WORDS, MAX 20 WORDS PER BULLET) using high-impact action verbs.\n\n[OUTPUT FORMAT]\n[SUMMARY] (summary text here) [/SUMMARY]\n[EXPERIENCE] (3 bullet points here) [/EXPERIENCE]` 
+						}					]
 				}) as { response: string };
 
 				const responseText = aiResponse.response || '';

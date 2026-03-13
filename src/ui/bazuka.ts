@@ -49,6 +49,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             min-height: 100vh;
             overflow: hidden;
             position: relative;
+            padding: 4rem 0;
         }
 
         .pixel-bg {
@@ -61,20 +62,14 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         .pixel {
             position: absolute;
-            width: 3px;
-            height: 3px;
+            width: 3px; height: 3px;
             background: rgba(255, 255, 255, 0.4);
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
-            top: var(--top);
-            left: -10px;
+            top: var(--top); left: -10px;
         }
 
-        .pixel.green {
-            background: var(--accent);
-            box-shadow: 0 0 5px var(--accent);
-            opacity: 0.6;
-        }
+        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
 
         @keyframes drift {
             0% { transform: translateX(0); opacity: 0; }
@@ -82,6 +77,29 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             95% { opacity: 1; }
             100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
         }
+
+        .back-home {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            opacity: 0.7;
+            z-index: 100;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 12px;
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+        }
+        .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         .container {
             width: 90%;
@@ -331,6 +349,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 </head>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
+    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
     <div class="container">
         <div class="title-container">
             <h1>BAZUKA</h1>
@@ -490,6 +509,26 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
+
+        // Dynamic Schema Generation
+        const nickname = document.getElementById('card-nickname').innerText;
+        const job = document.getElementById('card-job').innerText;
+        const email = document.getElementById('card-email').innerText;
+        const website = document.getElementById('card-website').href;
+
+        const schema = {
+            "@context": "https://schema.org",
+            "@type": "Person",
+            "name": nickname,
+            "jobTitle": job,
+            "email": email,
+            "url": website,
+            "mainEntityOfPage": {
+                "@type": "ContactPage",
+                "@id": window.location.href
+            }
+        };
+        document.getElementById('schema-block').textContent = JSON.stringify(schema);
     </script>
 </body>
 </html>`;

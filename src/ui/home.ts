@@ -307,7 +307,9 @@ export const HTML = `<!DOCTYPE html>
             display: flex; justify-content: center; align-items: center;
             margin: 0 auto 1.5rem;
             animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
         }
+        .success-icon.show { opacity: 1; }
 
         @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
 
@@ -323,6 +325,39 @@ export const HTML = `<!DOCTYPE html>
             min-height: 56px;
             text-align: left;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .sync-status {
+            position: absolute;
+            bottom: -20px;
+            right: 0;
+            font-size: 0.6rem;
+            color: var(--accent);
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .sync-status.show { opacity: 0.6; }
+
+        /* Sync Progress Bar */
+        .sync-progress {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            height: 2px;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s linear;
+            box-shadow: 0 0 10px var(--accent);
+        }
+
+        .result-link.syncing {
+            pointer-events: none;
+            opacity: 0.7;
+            filter: blur(0.5px);
         }
 
         .result-link {
@@ -409,20 +444,22 @@ export const HTML = `<!DOCTYPE html>
 
     <div id="modal-overlay">
         <div class="modal">
-            <div class="success-icon">
+            <div class="success-icon show" id="success-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
-            <h2>PUNCHED!</h2>
-            <p style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is ready.</p>
-            <div class="result-container">
-                <a href="#" id="short-url-result" class="result-link" target="_blank"></a>
+            <h2 id="modal-title">PUNCHED!</h2>
+            <p id="modal-subtitle" style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is live.</p>
+            <div class="result-container" id="result-container" style="position: relative;">
+                <a href="#" id="short-url-result" class="result-link syncing" target="_blank">forging...</a>
+                <div class="sync-progress" id="sync-progress"></div>
                 <button class="copy-btn" id="copy-btn" title="Copy Link" type="button">
                     <svg style="width:20px;height:20px" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
                     </svg>
                 </button>
+                <div class="sync-status" id="sync-status">SYNCING TO EDGE...</div>
             </div>
             <a class="close-link" id="close-modal-btn">Back to Home</a>
         </div>
@@ -432,8 +469,16 @@ export const HTML = `<!DOCTYPE html>
         const form = document.getElementById('shorten-form');
         const submitBtn = document.getElementById('submit-btn');
         const urlInput = document.getElementById('url');
+        
         const modalOverlay = document.getElementById('modal-overlay');
+        const modalTitle = document.getElementById('modal-title');
+        const modalSubtitle = document.getElementById('modal-subtitle');
+        const successIcon = document.getElementById('success-icon');
+        const resultContainer = document.getElementById('result-container');
         const resultLink = document.getElementById('short-url-result');
+        const syncStatus = document.getElementById('sync-status');
+        const syncProgress = document.getElementById('sync-progress');
+        
         const copyBtn = document.getElementById('copy-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         
@@ -474,20 +519,43 @@ export const HTML = `<!DOCTYPE html>
             e.preventDefault();
             if (!urlInput.value || !urlInput.checkValidity()) { urlInput.reportValidity(); return; }
 
-            const suggestedId = Math.random().toString(36).substring(2, 8);
-            const optimisticUrl = window.location.origin + '/' + suggestedId;
+            // TRUE OPTIMISTIC UI: Generate link and show modal INSTANTLY (0ms)
+            const id = Math.random().toString(36).substring(2, 8);
+            const instantUrl = window.location.origin + '/' + id;
             
+            resultLink.innerText = instantUrl;
+            resultLink.href = instantUrl;
+            resultLink.classList.add('syncing');
+            syncProgress.style.width = '0%';
+            
+            modalTitle.innerText = 'PUNCHED!';
+            modalSubtitle.innerText = 'Your short link is live.';
+            successIcon.classList.add('show');
+            syncStatus.classList.add('show');
+            
+            modalOverlay.style.display = 'flex';
+            setTimeout(() => modalOverlay.classList.add('show'), 10);
+
+            // Start Smart Wait Progress (300ms mechanical sympathy)
+            setTimeout(() => {
+                syncProgress.style.width = '100%';
+                setTimeout(() => {
+                    resultLink.classList.remove('syncing');
+                    syncProgress.style.width = '0%';
+                }, 300);
+            }, 50);
+
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
             isUserInitiated = true;
 
             if (cachedToken) {
-                executeShorten(cachedToken, suggestedId);
+                executeShorten(cachedToken, id);
             } else if (window.turnstile) {
-                turnstileTimeoutId = setTimeout(() => { if (isUserInitiated) executeShorten('', suggestedId); }, 4000);
-                try { window.turnstile.execute(); } catch (err) { executeShorten('', suggestedId); }
+                turnstileTimeoutId = setTimeout(() => { if (isUserInitiated) executeShorten('', id); }, 4000);
+                try { window.turnstile.execute(); } catch (err) { executeShorten('', id); }
             } else {
-                executeShorten('', suggestedId);
+                executeShorten('', id);
             }
         };
 
@@ -504,27 +572,23 @@ export const HTML = `<!DOCTYPE html>
 
                 if (response.ok) {
                     const data = await response.json();
-                    
-                    // SMART WAIT: Tiny 300ms delay before showing modal to ensure KV breathes
-                    setTimeout(() => {
-                        const finalShortUrl = window.location.origin + '/' + data.id;
-                        resultLink.innerText = finalShortUrl;
-                        resultLink.href = finalShortUrl;
-                        modalOverlay.style.display = 'flex';
-                        setTimeout(() => modalOverlay.classList.add('show'), 10);
-                        cachedToken = null;
-                        if (window.turnstile) window.turnstile.reset();
-                    }, 300);
+                    if (data.id !== suggestedId) {
+                        const finalUrl = window.location.origin + '/' + data.id;
+                        resultLink.innerText = finalUrl;
+                        resultLink.href = finalUrl;
+                    }
+                    syncStatus.classList.remove('show');
+                    cachedToken = null;
+                    if (window.turnstile) window.turnstile.reset();
                 } else {
                     const errorData = await response.json();
-                    alert(errorData.error || 'Error punching URL.');
-                    resetSubmitBtn();
+                    alert(errorData.error || 'Sync failed.');
+                    closeModal();
                 }
             } catch (err) {
-                alert('Network error.');
-                resetSubmitBtn();
+                console.error('Background sync failed', err);
             } finally {
-                // Submit button resets after modal is shown or error occurs
+                resetSubmitBtn();
             }
         }
 
