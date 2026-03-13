@@ -35,7 +35,23 @@ Standardized card/panel effect for the PUNCHY.ME ecosystem:
 *   **Base**: Semi-transparent background (`rgba(255, 255, 255, 0.03)`).
 *   **Blur**: `backdrop-filter: blur(10px)` for glassmorphism.
 *   **Border**: 1px thin stealth border (`rgba(255, 255, 255, 0.08)`).
-*   **Hover**: Interactive `translateY(-5px)` lift + `var(--accent)` border-glow.
+*   **Hover**: Interactive `var(--accent)` border-glow (no vertical lift).
+
+## 7. Tool-Specific Safety Protocols (Anti-Bug Mandates)
+To maintain world-class speed, we must bypass recurring tool limitations:
+
+### 7.1. Nested Template Literal Bug
+*   **Problem**: `write_file` and `replace` erroneously escape backticks (e.g., \`;) in nested templates.
+*   **Prevention**: **NEVER** use nested backticks. Use single quotes and string concatenation (`' + var + '`) for inner HTML generation (e.g., in `renderIntelligence`).
+*   **Audit**: After every UI file write, surgically verify the final 5 lines of the file for escaped backslashes.
+
+### 7.2. Context-Locking for Replacements
+*   **Problem**: Fuzzy matching applies changes to the wrong location.
+*   **Prevention**: Always provide **3-5 lines of context** in `old_string`. Avoid replacing single lines or generic tags.
+
+### 7.3. Immediate Validation
+*   **Problem**: Small syntax errors compound into large system failures.
+*   **Prevention**: Run `npm run lint` immediately after any modification to a `src/ui/` file.
 
 ---
 *This document is foundational. We do not just fix bugs; we harden the architecture.*

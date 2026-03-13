@@ -210,33 +210,37 @@ export default {
 				if (!description || description.length < 50) return new Response(JSON.stringify({ error: 'Intel too shallow.' }), { status: 400 });
 				if (description.length > 3000) return new Response(JSON.stringify({ error: 'Intel too dense. Limit 3000 characters.' }), { status: 400 });
 
-				// Execute AI Forge with Master Prompt
+				// Execute AI Forge with Master Prompt & Strategic Anchors (No JSON mode for speed/reliability)
 				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct-awq', {
 					max_tokens: 1500,
 					temperature: 0.6,
 					messages: [
-						{ role: 'system', content: 'You are MUSASHI, Elite Career Outreach Strategist. Analyze job intel and forge an attack path. Strictly use [INTEL], [ANALYSIS], [HOOK], and [STRIKE] tags.' },
+						{ role: 'system', content: 'You are MUSASHI, Career Strategist. Analyze the job and provide INTEL and ANALYSIS. Strictly wrap content in ###INTEL### and ###ANALYSIS### tags.' },
 						{ 
 							role: 'user', 
-							content: `[CONTEXT]\nTarget Job Description:\n${description}\n\n[DIRECTIVE]\n1. Parse job into [INTEL] (Role, Exp, Skills, Tools, Responsibilities).\n2. Generate [ANALYSIS] (3 Portfolio ideas, Salary range, Interview strategy, ATS keywords).\n3. Forge [HOOK] (LinkedIn Hook < 300 chars).\n4. Forge [STRIKE] (Full outreach email).\n\n[OUTPUT FORMAT]\n[INTEL]...[/INTEL]\n[ANALYSIS]...[/ANALYSIS]\n[HOOK]...[/HOOK]\n[STRIKE]...[/STRIKE]`
+							content: `[CONTEXT]\nTarget Job Description:\n${description}\n\n[DIRECTIVE]\nForge tactical insights. \nUse exactly these anchors:\n###INTEL###\n(role, skills, tools summary)\n###ANALYSIS###\n(3 portfolio projects, salary range, 3 interview questions)`
 						}
 					]
 				}) as { response: string };
 
 				const text = aiResponse.response || '';
+				console.log('--- RAW AI RESPONSE ---');
+				console.log(text);
 				
-				// Surgical Extraction
 				const extract = (tag: string) => {
-					const match = text.match(new RegExp(`\\[${tag}\\](.*?)\\[\\/${tag}\\]`, 'si'));
-					return match ? match[1].trim() : "Forge failed for this segment.";
+					const parts = text.split(`###${tag}###`);
+					if (parts.length < 2) return "Forge failed for segment.";
+					return parts[1].split('###')[0].trim();
 				};
 
-				return new Response(JSON.stringify({
+				const result = {
 					intel: extract('INTEL'),
-					analysis: extract('ANALYSIS'),
-					hook: extract('HOOK'),
-					strike: extract('STRIKE')
-				}), { headers: { 'Content-Type': 'application/json' } });
+					analysis: extract('ANALYSIS')
+				};
+
+				console.log('--- FORGED JSON PAYLOAD ---');
+				console.log(JSON.stringify(result, null, 2));
+				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
 
 			} catch (_e) {
 				return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 });

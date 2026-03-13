@@ -122,7 +122,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
 
         .quote-box {
-            margin-top: 1rem; /* Moved closer to title */
+            margin-top: 1rem;
             border-left: 2px solid var(--accent);
             padding: 1rem 2rem;
             text-align: left;
@@ -165,7 +165,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             display: grid;
             grid-template-columns: 1fr;
             gap: 2rem;
-            margin-top: 48px; /* Standardized to exactly 48px */
+            margin-top: 48px;
             width: 100%;
         }
 
@@ -175,7 +175,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 
         label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.75rem; display: block; }
         textarea {
-            background: #000000; /* Solid background for clear text */
+            background: #000000;
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1.2rem;
             border-radius: 12px;
@@ -191,22 +191,45 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
         .intel-content { color: var(--text-main); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         
-        .copy-action {
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+        .terminal-log {
+            font-family: var(--font-mono);
+            font-size: 0.8rem;
             color: var(--accent);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.7rem;
-            font-weight: 700;
-            cursor: pointer;
-            margin-top: 1rem;
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.2s;
+            text-align: left;
+            padding: 2rem;
+            line-height: 2;
+            opacity: 0.8;
         }
-        .copy-action:hover { background: var(--accent); color: #000; }
+        .log-line { overflow: hidden; white-space: nowrap; border-right: 2px solid var(--accent); animation: typing 2s steps(40, end), blink .75s step-end infinite; margin-bottom: 0.5rem; width: fit-content; }
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
+
+        .btn-forge {
+            margin-top: 0.5rem;
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 900;
+            width: 100%;
+            cursor: pointer;
+            text-transform: uppercase;
+            font-family: var(--font-mono);
+            letter-spacing: 1px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.2);
+        }
+        .btn-forge:hover {
+            transform: scale(1.02);
+            background: var(--accent-hover);
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.5);
+        }
+        .btn-forge:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+        }
 
         .back-home {
             position: fixed;
@@ -264,8 +287,11 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         <div class="musashi-grid">
             <div class="panel">
                 <label>Target Job Intel</label>
-                <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..."></textarea>
-                <div style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 1.5rem;">Maximum intel depth: 3,000 characters.</div>
+                <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..." maxlength="3000"></textarea>
+                <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 1.5rem;">
+                    <div>Maximum intel depth: 3,000 characters.</div>
+                    <div id="char-counter">0 / 3000</div>
+                </div>
                 <button class="btn-forge" id="forge-btn" style="margin-top: 0.5rem; background: var(--accent); color: #000; border: none; padding: 1rem; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 1px;">Execute Cold Attack</button>
             </div>
 
@@ -279,41 +305,79 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     </div>
 
     <script>
-        const forgeBtn = document.getElementById('forge-btn');
-        const jobInput = document.getElementById('job-description');
-        const intelOutput = document.getElementById('intel-output');
+        window.onload = () => {
+            const forgeBtn = document.getElementById('forge-btn');
+            const jobInput = document.getElementById('job-description');
+            const intelOutput = document.getElementById('intel-output');
+            const charCounter = document.getElementById('char-counter');
 
-        forgeBtn.onclick = async () => {
-            const description = jobInput.value.trim();
-            if (description.length < 50) {
-                alert("Target Intel is too shallow. Provide at least 50 characters of job description.");
-                return;
-            }
+            jobInput.addEventListener('input', () => {
+                const count = jobInput.value.length;
+                charCounter.innerText = count.toLocaleString() + ' / 3000';
+                if (count > 2800) charCounter.style.color = '#ff4444';
+                else charCounter.style.color = 'var(--text-dim)';
+            });
 
-            forgeBtn.innerText = 'FORGING ATTACK PATH...';
-            forgeBtn.disabled = true;
-            intelOutput.innerHTML = '<div style="padding-top: 4rem; text-align: center; color: var(--accent);"><div style="font-size: 2rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">📡</div>ANALYZING TARGET INTEL...</div>';
-
-            try {
-                const response = await fetch('/musashi/forge', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ description })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    renderIntelligence(data);
-                } else {
-                    const err = await response.json();
-                    alert(err.error || 'Forge failed.');
+            forgeBtn.onclick = async () => {
+                const description = jobInput.value.trim();
+                if (description.length < 50) {
+                    alert("Target Intel is too shallow. Provide at least 50 characters.");
+                    return;
                 }
-            } catch (err) {
-                alert('Network strike failed.');
-            } finally {
-                forgeBtn.innerText = 'Execute Cold Attack';
-                forgeBtn.disabled = false;
-            }
+
+                forgeBtn.innerText = 'FORGING ATTACK PATH...';
+                forgeBtn.disabled = true;
+                
+                // Reset HUD
+                intelOutput.style.paddingTop = '0';
+                intelOutput.innerHTML = '<div class="terminal-log"></div>';
+                const log = intelOutput.querySelector('.terminal-log');
+                
+                const messages = [
+                    '> INITIALIZING MUSASHI AI...',
+                    '> PARSING JOB TARGET...',
+                    '> ANALYZING ARSENAL MATCHES...',
+                    '> DETECTING INTERVIEW THREATS...',
+                    '> FORGING TACTICAL ATTACK PATH...'
+                ];
+                
+                let currentMsg = 0;
+                const logInterval = setInterval(() => {
+                    if (currentMsg < messages.length) {
+                        const line = document.createElement('div');
+                        line.className = 'log-line';
+                        line.innerText = messages[currentMsg];
+                        log.appendChild(line);
+                        currentMsg++;
+                    } else {
+                        clearInterval(logInterval);
+                    }
+                }, 800);
+
+                try {
+                    const response = await fetch('/musashi/forge', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ description })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        clearInterval(logInterval); // Stop log immediately
+                        renderIntelligence(data);
+                    } else {
+                        const err = await response.json();
+                        alert(err.error || 'Forge failed.');
+                        clearInterval(logInterval);
+                    }
+                } catch (err) {
+                    alert('Network strike failed.');
+                    clearInterval(logInterval);
+                } finally {
+                    forgeBtn.innerText = 'Execute Cold Attack';
+                    forgeBtn.disabled = false;
+                }
+            };
         };
 
         function renderIntelligence(data) {
@@ -323,12 +387,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             html += '<div class="intel-content">' + data.intel + '</div></div>';
             html += '<div class="intel-block"><div class="intel-title"><span>🎯</span> Strategic Analysis</div>';
             html += '<div class="intel-content">' + data.analysis + '</div></div>';
-            html += '<div class="intel-block"><div class="intel-title"><span>⚔️</span> The Tactical Hook (LinkedIn)</div>';
-            html += '<div class="intel-content" id="hook-text">' + data.hook + '</div>';
-            html += '<button class="copy-action" onclick="copyToClipboard(\\'hook-text\\', this)">Copy Hook to Arsenal</button></div>';
-            html += '<div class="intel-block"><div class="intel-title"><span>🔥</span> The Deep Strike (Email)</div>';
-            html += '<div class="intel-content" id="strike-text">' + data.strike + '</div>';
-            html += '<button class="copy-action" onclick="copyToClipboard(\\'strike-text\\', this)">Copy Strike to Arsenal</button></div>';
             intelOutput.innerHTML = html;
         }
 
