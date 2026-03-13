@@ -162,6 +162,42 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             transition: all 0.3s;
         }
         .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
+
+        /* Suite Grid Styling */
+        .suite-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 1.5rem;
+            margin-top: 4rem;
+            width: 100%;
+        }
+
+        @media (min-width: 768px) {
+            .suite-grid { grid-template-columns: 1fr 1fr; }
+        }
+
+        .feature-card {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            padding: 2rem;
+            text-decoration: none;
+            color: var(--text-main);
+            transition: all 0.3s ease;
+            text-align: left;
+            backdrop-filter: blur(10px);
+        }
+
+        .feature-card:hover {
+            background: rgba(34, 197, 94, 0.05);
+            border-color: var(--accent);
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-icon { font-size: 1.5rem; color: var(--accent); margin-bottom: 1rem; display: block; }
+        .feature-title { font-family: var(--font-brand); font-size: 1.75rem; margin-bottom: 0.5rem; text-transform: uppercase; }
+        .feature-tagline { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
     </style>
 </head>
 <body>

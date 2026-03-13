@@ -115,3 +115,6 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
     - **Professional Summary:** 20-28 words.
     - **Experience Bullets:** 15-20 words per bullet (Total 3 bullets).
     - **Tone:** Senior-level, action-oriented, and result-focused.
+
+### 5. Design Language System (Local Memory)
+- **SHINOBI GLASS**: Standardized card/panel effect consisting of `rgba(255, 255, 255, 0.03)` background, `backdrop-filter: blur(10px)`, `1px solid rgba(255, 255, 255, 0.08)` border, and a `translateY(-5px)` hover lift with `var(--accent)` border-glow. Apply this aesthetic to all new feature modules.

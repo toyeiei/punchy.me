@@ -30,5 +30,12 @@ Before implementing complex roadmap items (e.g., MUSASHI blades), demand **Techn
 - **Strengths**: Conceptual curiosity, quality obsession, iterative refinement.
 - **Opportunities**: Strictly defining boundaries between "Mobile" and "Desktop" logic, increasing instruction density to capture edge cases earlier.
 
+## 6. Design Language System (SHINOBI GLASS)
+Standardized card/panel effect for the PUNCHY.ME ecosystem:
+*   **Base**: Semi-transparent background (`rgba(255, 255, 255, 0.03)`).
+*   **Blur**: `backdrop-filter: blur(10px)` for glassmorphism.
+*   **Border**: 1px thin stealth border (`rgba(255, 255, 255, 0.08)`).
+*   **Hover**: Interactive `translateY(-5px)` lift + `var(--accent)` border-glow.
+
 ---
 *This document is foundational. We do not just fix bugs; we harden the architecture.*

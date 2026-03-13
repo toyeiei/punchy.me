@@ -80,6 +80,17 @@ export const HTML = `<!DOCTYPE html>
             margin: 0;
         }
 
+        /* Responsive Viewport Locking (The Senior Strategy) */
+        @media (min-width: 900px) {
+            body {
+                height: 100vh;
+                overflow: hidden; /* Lock viewport on desktop */
+                justify-content: center;
+            }
+            .hero-section { min-height: auto; padding: 2rem 1.5rem 16px; } 
+            .feature-section { padding-bottom: 0; margin-top: 1.0rem; }
+        }
+
         .hero-section {
             width: 100%;
             display: flex;
@@ -94,14 +105,14 @@ export const HTML = `<!DOCTYPE html>
 
         .container {
             width: 90%;
-            max-width: 800px;
+            max-width: 800px; /* Keep punch box narrow and focused */
             text-align: center;
             position: relative;
         }
 
         .feature-section {
             width: 100%;
-            max-width: 800px;
+            max-width: 1100px; /* Expanded cards area (+20% from 920px) */
             padding: 0 1.5rem 4rem;
             z-index: 10;
         }
@@ -248,9 +259,9 @@ export const HTML = `<!DOCTYPE html>
             margin-top: 2rem;
         }
 
-        @media (min-width: 640px) {
+        @media (min-width: 900px) {
             .suite-grid {
-                grid-template-columns: 1fr 1fr;
+                grid-template-columns: 1fr 1fr 1fr;
             }
         }
 
@@ -287,6 +298,22 @@ export const HTML = `<!DOCTYPE html>
             margin-bottom: 0.5rem;
             text-transform: uppercase;
             letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .coming-soon-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
         }
 
         .feature-tagline {
@@ -324,16 +351,56 @@ export const HTML = `<!DOCTYPE html>
         #modal-overlay.show { opacity: 1; }
         #modal-overlay.show .modal { transform: scale(1); }
 
+        /* Status Stage: Unified container for Radar and Success Icon */
+        .status-stage {
+            width: 80px; height: 80px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar-container {
+            position: absolute;
+            width: 60px; height: 60px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            pointer-events: none;
+        }
+        .radar-container.show { opacity: 1; }
+
+        .radar {
+            width: 60px; height: 60px;
+            border-radius: 50%;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            position: relative;
+            overflow: hidden;
+        }
+        .radar::after {
+            content: "";
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: conic-gradient(from 0deg, transparent 0%, rgba(34, 197, 94, 0.5) 30%, transparent 40%);
+            animation: radar-spin 2s linear infinite;
+        }
+        @keyframes radar-spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
         .success-icon {
             width: 80px; height: 80px;
             background: var(--accent);
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
-            margin: 0 auto 1.5rem;
+            position: absolute;
             opacity: 0;
-            transform: scale(0.5) translateY(20px);
+            transform: scale(0.5) translateY(10px);
             transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 0 0 rgba(34, 197, 94, 0);
+            z-index: 5;
         }
         .success-icon.show { 
             opacity: 1; 
@@ -459,7 +526,7 @@ export const HTML = `<!DOCTYPE html>
     <section class="feature-section">
         <div class="suite-grid">
             <a href="/bazuka" class="feature-card">
-                <span class="feature-icon">[ 👤 ]</span>
+                <span class="feature-icon">👤</span>
                 <div class="feature-title">BAZUKA</div>
                 <div class="feature-tagline">Instant Digital Identity. Professional cards that explode with style.</div>
             </a>
@@ -467,6 +534,14 @@ export const HTML = `<!DOCTYPE html>
                 <span class="feature-icon">⚡</span>
                 <div class="feature-title">ANAKIN</div>
                 <div class="feature-tagline">Elite AI Resumes. Forged by Llama 3 for career-winning impact.</div>
+            </a>
+            <a href="/musashi" class="feature-card">
+                <span class="feature-icon">⚔️</span>
+                <div class="feature-title">
+                    MUSASHI
+                    <span class="coming-soon-badge">Coming Soon</span>
+                </div>
+                <div class="feature-tagline">The Way is in training. Mastery is found in relentless practice and discipline.</div>
             </a>
         </div>
     </section>
@@ -477,12 +552,17 @@ export const HTML = `<!DOCTYPE html>
 
     <div id="modal-overlay">
         <div class="modal">
-            <div class="success-icon show" id="success-icon">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                </svg>
+            <div class="status-stage">
+                <div class="radar-container" id="radar-container">
+                    <div class="radar"></div>
+                </div>
+                <div class="success-icon" id="success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
             </div>
-            <h2 id="modal-title">PUNCHED!</h2>
+            <h2 id="modal-title">PUNCHING...</h2>
             <p id="modal-subtitle" style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is live.</p>
             <div class="result-container" id="result-container" style="position: relative;">
                 <a href="#" id="short-url-result" class="result-link syncing" target="_blank">forging...</a>
@@ -507,6 +587,7 @@ export const HTML = `<!DOCTYPE html>
         const modalTitle = document.getElementById('modal-title');
         const modalSubtitle = document.getElementById('modal-subtitle');
         const successIcon = document.getElementById('success-icon');
+        const radarContainer = document.getElementById('radar-container');
         const resultContainer = document.getElementById('result-container');
         const resultLink = document.getElementById('short-url-result');
         const syncStatus = document.getElementById('sync-status');
@@ -552,7 +633,7 @@ export const HTML = `<!DOCTYPE html>
             e.preventDefault();
             if (!urlInput.value || !urlInput.checkValidity()) { urlInput.reportValidity(); return; }
 
-            // MODAL LOAD: Show 'Forging' state, no link yet
+            // MODAL LOAD: Show 'Forging' state with Radar
             resultLink.innerText = 'forging tactical link...';
             resultLink.href = '#';
             resultLink.classList.add('syncing');
@@ -560,6 +641,7 @@ export const HTML = `<!DOCTYPE html>
             
             modalTitle.innerText = 'PUNCHING...';
             modalSubtitle.innerText = 'Forging your link on the edge.';
+            radarContainer.classList.add('show');
             successIcon.classList.remove('show');
             syncStatus.classList.add('show');
             
@@ -599,7 +681,10 @@ export const HTML = `<!DOCTYPE html>
                     const data = await response.json();
                     const finalUrl = window.location.origin + '/' + data.id;
                     
-                    // SUCCESS: Show link and complete bar
+                    // SUCCESS: Hide Radar and show Success Pop
+                    radarContainer.classList.remove('show');
+                    successIcon.classList.add('show');
+                    
                     resultLink.innerText = finalUrl;
                     resultLink.href = finalUrl;
                     resultLink.classList.remove('syncing');
@@ -609,7 +694,6 @@ export const HTML = `<!DOCTYPE html>
                     
                     modalTitle.innerText = 'PUNCHED!';
                     modalSubtitle.innerText = 'Your tactical link is ready.';
-                    successIcon.classList.add('show');
                     syncStatus.classList.remove('show');
 
                     cachedToken = null;
