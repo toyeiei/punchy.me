@@ -104,6 +104,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
+            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
@@ -121,6 +122,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             text-align: center;
             z-index: 10;
             position: relative;
+            margin-bottom: 5rem; /* Added consistent bottom margin */
         }
 
         .title-container {
@@ -212,6 +214,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: left;
+            margin-bottom: 5rem; /* Added spacing below the form panel */
         }
 
         .form-grid {
@@ -708,6 +711,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
+            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }

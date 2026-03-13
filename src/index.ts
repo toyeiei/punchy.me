@@ -1,4 +1,4 @@
-import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, ATTACK_FORM_HTML, YAIBA_HTML } from './ui';
+import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_HTML } from './ui';
 
 interface BazukaData {
 	type?: string;
@@ -197,7 +197,7 @@ export default {
 
 		// 3. MUSASHI Routes
 		if (path === '/musashi') {
-			return new Response(ATTACK_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
+			return new Response(MUSASHI_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
 		}
 
 		if (path === '/yaiba') {

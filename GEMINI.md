@@ -5,9 +5,13 @@ To build a high-performance, visually striking, and reliable URL shortening serv
 
 ## Engineering Philosophy
 "This is our way. This is the only way to create great software."
+- **MIYAMOTO MUSASHI Strategy**: One feature at a time. Total focus. We tackle one mission until it is perfected before moving to the next.
+- **Speed & Simplicity**: Speed is our priority, simplicity is in our blood. Elegant solutions are stronger than complex ones.
+- **Reliability & Strength**: We forge things that are strong and consistent. We build systems that aren't easily broken.
 - **TDD (Test-Driven Development)**: We build with confidence by writing tests before code.
 - **Occam's Razor**: Simple is better than complex. We prioritize the simplest solution that reliably solves the problem.
 - **High Quality**: We never settle for "good enough." Every line of code must meet senior-level standards.
+- **Design Regression Integrity**: When forging new features, we perform rigorous regression tests. We ensure that not only is the logic functional, but the **UI Design and Brand Aesthetic** remain perfectly intact and unbroken across all tools.
 - **Continuous Validation**: We test, lint, and refactor relentlessly. Validation is the only path to finality.
 - **Surgical Precision**: We make targeted, clean updates to maintain system integrity and avoid technical debt.
 
