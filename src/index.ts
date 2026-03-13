@@ -225,13 +225,16 @@ export default {
 				if (data.type !== 'anakin') return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
 				if (data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
 
-				// Perform AI Hydration
+				// Perform AI Hydration with Tactical Context
 				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 					max_tokens: 300,
 					temperature: 0.6,
 					messages: [
 						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Task: 1. Write professional summary (MIN 30 WORDS, MAX 42 WORDS). 2. Rewrite work history into 3 Action-Result bullet points. Rule: Use action verbs. Output: [SUMMARY] text [/SUMMARY] [EXPERIENCE] bullet points [/EXPERIENCE].' },
-						{ role: 'user', content: `Job: ${data.job}\nEducation: ${data.education}\nSkills: ${data.skills}\nExperience: ${data.experience}` }
+						{ 
+							role: 'user', 
+							content: `[CONTEXT]\nTarget Role: ${data.job}\nAcademic Foundation: ${data.education}\nTechnical Arsenal: ${data.skills}\nRaw Field Data: ${data.experience}\n\n[DIRECTIVE]\nForge a professional narrative that positions the candidate as an elite expert in ${data.job}. Ensure the summary captures their unique value proposition. Transform raw field data into 3 measurable mission-critical achievements.` 
+						}
 					]
 				}) as { response: string };
 
@@ -254,8 +257,7 @@ export default {
 			const id = path.substring(1);
 			let value = await env.SHORT_LINKS.get(id);
 			
-			// KV Resilience: If not found, assumption is eventual consistency propagation.
-			// Sleep for 500ms and try one more time before failing.
+			// KV Resilience
 			if (!value) {
 				await new Promise(resolve => setTimeout(resolve, 500));
 				value = await env.SHORT_LINKS.get(id);
