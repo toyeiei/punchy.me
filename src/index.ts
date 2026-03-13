@@ -1,4 +1,4 @@
-import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_HTML } from './ui';
+import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_HTML, LOKI_HTML } from './ui';
 
 interface BazukaData {
 	type?: string;
@@ -25,7 +25,9 @@ interface AnakinData {
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
+	LOKI_DB: D1Database;
 	TURNSTILE_SITE_KEY: string;
+	RESEND_API_KEY?: string;
 }
 
 /**
@@ -203,6 +205,40 @@ export default {
 
 		if (path === '/yaiba') {
 			return new Response(YAIBA_HTML, { headers: { 'Content-Type': 'text/html' } });
+		}
+
+		if (path === '/loki') {
+			return new Response(LOKI_HTML, { headers: { 'Content-Type': 'text/html' } });
+		}
+
+		if (path === '/loki/timeline' && request.method === 'GET') {
+			try {
+				const { results } = await env.LOKI_DB.prepare('SELECT * FROM loki_timeline ORDER BY created_at DESC LIMIT 10').all();
+				return new Response(JSON.stringify(results), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) {
+				return new Response(JSON.stringify({ error: 'Database strike failed.' }), { status: 500 });
+			}
+		}
+
+		if (path === '/loki/support' && request.method === 'POST') {
+			try {
+				const { name, email, message, hp_field } = await request.json() as { name: string, email: string, message?: string, hp_field?: string };
+				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+				if (!name || !email) return new Response(JSON.stringify({ error: 'Identity and Frequency required.' }), { status: 400 });
+
+				await env.LOKI_DB.prepare('INSERT INTO loki_supporters (name, email, message) VALUES (?, ?, ?)')
+					.bind(name, email, message || '')
+					.run();
+
+				// OPTIONAL: RESEND TRIGGER (Mocked structure)
+				if (env.RESEND_API_KEY) {
+					// We would perform a fetch here to api.resend.com
+				}
+
+				return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) {
+				return new Response(JSON.stringify({ error: 'Pledge failed.' }), { status: 500 });
+			}
 		}
 
 		if (path === '/musashi/forge' && request.method === 'POST') {

@@ -14,6 +14,11 @@ custom_domain = true
 binding = "SHORT_LINKS"
 id = "e5c2bbb9a5f04d409e42350fc025ea2d"
 
+[[d1_databases]]
+binding = "LOKI_DB"
+database_name = "loki-db"
+database_id = "00000000-0000-0000-0000-000000000000"
+
 [ai]
 binding = "AI"
 remote = true
