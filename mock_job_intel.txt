@@ -1,0 +1,23 @@
+Target Job Intel: Senior Data Analyst @ TechStrike Global
+
+The Mission:
+We are seeking a Senior Data Analyst to join our Tactical Intelligence Unit. You will be responsible for transforming raw operational data into high-impact strategic decisions that drive our global expansion.
+
+Key Responsibilities:
+- Engineer and maintain complex automated dashboards using SQL and Tableau/Looker.
+- Conduct deep-dive exploratory data analysis (EDA) to identify market anomalies and growth opportunities.
+- Collaborate with Product and Engineering teams to optimize our data pipeline architecture.
+- Present quarterly performance intel to executive leadership with actionable recommendations.
+
+Your Arsenal (Requirements):
+- 5+ years of experience in data analytics or business intelligence.
+- Mastery of SQL (BigQuery/PostgreSQL) and Python (Pandas, Scikit-learn).
+- Proven track record of improving operational efficiency by at least 20% through data-driven insights.
+- Experience with Cloudflare Workers or Edge Computing is a significant plus.
+- Strong communication skills—ability to explain complex "Data Gaps" to non-technical stakeholders.
+
+The Perks:
+- Competitive salary + performance-based bonuses.
+- 100% Remote Work (Global Edge).
+- Unlimited Vacation Policy.
+- High-spec hardware budget.

@@ -28,7 +28,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             position: relative;
         }
 
-        /* Pulse Grid Background (Inherited from YAIBA) */
+        /* Pulse Grid Background */
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -122,7 +122,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
 
         .quote-box {
-            margin-top: 3rem;
+            margin-top: 1rem; /* Moved closer to title */
             border-left: 2px solid var(--accent);
             padding: 1rem 2rem;
             text-align: left;
@@ -165,7 +165,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             display: grid;
             grid-template-columns: 1fr;
             gap: 2rem;
-            margin-top: 4rem;
+            margin-top: 48px; /* Standardized to exactly 48px */
             width: 100%;
         }
 
@@ -175,7 +175,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 
         label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.75rem; display: block; }
         textarea {
-            background: rgba(255, 255, 255, 0.03);
+            background: #000000; /* Solid background for clear text */
             border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 1.2rem;
             border-radius: 12px;
@@ -186,6 +186,27 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             outline: none;
             resize: vertical;
         }
+
+        .intel-block { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem; }
+        .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
+        .intel-content { color: var(--text-main); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
+        
+        .copy-action {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--accent);
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 1rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.2s;
+        }
+        .copy-action:hover { background: var(--accent); color: #000; }
 
         .back-home {
             position: fixed;
@@ -205,46 +226,29 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
         .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
-        /* Suite Grid Styling */
-        .suite-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 1.5rem;
-            margin-top: 4rem;
-            width: 100%;
+        .pixel-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+            overflow: hidden;
         }
 
-        @media (min-width: 768px) {
-            .suite-grid { grid-template-columns: 1fr 1fr; }
+        .pixel {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            animation: drift var(--duration) linear infinite;
+            top: var(--top); left: -10px;
+            z-index: 1;
         }
-
-        .feature-card {
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 20px;
-            padding: 2rem;
-            text-decoration: none;
-            color: var(--text-main);
-            transition: all 0.3s ease;
-            text-align: left;
-            backdrop-filter: blur(10px);
-        }
-
-        .feature-card:hover {
-            background: rgba(34, 197, 94, 0.05);
-            border-color: var(--accent);
-            transform: translateY(-5px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-        }
-
-        .feature-icon { font-size: 1.5rem; color: var(--accent); margin-bottom: 1rem; display: block; }
-        .feature-title { font-family: var(--font-brand); font-size: 1.75rem; margin-bottom: 0.5rem; text-transform: uppercase; }
-        .feature-tagline { color: var(--text-dim); font-size: 0.85rem; line-height: 1.5; }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
+    <div class="pixel-bg" id="pixel-bg"></div>
     <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
     <div class="container">
         <div class="title-container">
@@ -258,15 +262,13 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         </div>
 
         <div class="musashi-grid">
-            <!-- Left Panel: The Strategic Input -->
             <div class="panel">
                 <label>Target Job Intel</label>
                 <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..."></textarea>
-                <div style="font-size: 0.7rem; color: var(--text-dim); margin-top: -1rem; margin-bottom: 1.5rem;">Maximum intel depth: 3,000 characters.</div>
-                <button class="btn-forge" id="forge-btn" style="margin-top: 1.5rem; background: var(--accent); color: #000; border: none; padding: 1rem; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 1px;">Execute Cold Attack</button>
+                <div style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 1.5rem;">Maximum intel depth: 3,000 characters.</div>
+                <button class="btn-forge" id="forge-btn" style="margin-top: 0.5rem; background: var(--accent); color: #000; border: none; padding: 1rem; border-radius: 12px; font-weight: 900; width: 100%; cursor: pointer; text-transform: uppercase; font-family: var(--font-mono); letter-spacing: 1px;">Execute Cold Attack</button>
             </div>
 
-            <!-- Right Panel: Strategic Intelligence -->
             <div class="panel">
                 <div id="intel-output" style="color: var(--text-dim); text-align: center; padding-top: 4rem;">
                     <div style="font-size: 2rem; margin-bottom: 1rem;">📡</div>
@@ -288,16 +290,9 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                 return;
             }
 
-            // HUD STATE: Show 'Forging'
             forgeBtn.innerText = 'FORGING ATTACK PATH...';
             forgeBtn.disabled = true;
-            
-            intelOutput.innerHTML = \`
-                <div style=\"padding-top: 4rem; text-align: center; color: var(--accent);\">
-                    <div style=\"font-size: 2rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;\">📡</div>
-                    ANALYZING TARGET INTEL...
-                </div>
-            \`;
+            intelOutput.innerHTML = '<div style="padding-top: 4rem; text-align: center; color: var(--accent);"><div style="font-size: 2rem; margin-bottom: 1rem; animation: pulse 1.5s infinite;">📡</div>ANALYZING TARGET INTEL...</div>';
 
             try {
                 const response = await fetch('/musashi/forge', {
@@ -314,7 +309,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                     alert(err.error || 'Forge failed.');
                 }
             } catch (err) {
-                alert('Network strike failed. Check connection.');
+                alert('Network strike failed.');
             } finally {
                 forgeBtn.innerText = 'Execute Cold Attack';
                 forgeBtn.disabled = false;
@@ -322,12 +317,49 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         };
 
         function renderIntelligence(data) {
-            // Placeholder for Phase 3 rendering logic
-            intelOutput.innerHTML = \`<pre style=\"color: var(--text-main); font-size: 0.8rem; text-align: left; overflow: auto; max-height: 500px;\">\${JSON.stringify(data, null, 2)}</pre>\`;
+            intelOutput.style.paddingTop = '0';
+            let html = '';
+            html += '<div class="intel-block"><div class="intel-title"><span>📡</span> Target Intel</div>';
+            html += '<div class="intel-content">' + data.intel + '</div></div>';
+            html += '<div class="intel-block"><div class="intel-title"><span>🎯</span> Strategic Analysis</div>';
+            html += '<div class="intel-content">' + data.analysis + '</div></div>';
+            html += '<div class="intel-block"><div class="intel-title"><span>⚔️</span> The Tactical Hook (LinkedIn)</div>';
+            html += '<div class="intel-content" id="hook-text">' + data.hook + '</div>';
+            html += '<button class="copy-action" onclick="copyToClipboard(\\'hook-text\\', this)">Copy Hook to Arsenal</button></div>';
+            html += '<div class="intel-block"><div class="intel-title"><span>🔥</span> The Deep Strike (Email)</div>';
+            html += '<div class="intel-content" id="strike-text">' + data.strike + '</div>';
+            html += '<button class="copy-action" onclick="copyToClipboard(\\'strike-text\\', this)">Copy Strike to Arsenal</button></div>';
+            intelOutput.innerHTML = html;
         }
 
+        window.copyToClipboard = (elementId, btn) => {
+            const text = document.getElementById(elementId).innerText;
+            navigator.clipboard.writeText(text).then(() => {
+                const originalText = btn.innerText;
+                btn.innerText = 'COPIED TO ARSENAL';
+                btn.style.background = 'var(--accent)';
+                btn.style.color = '#000';
+                setTimeout(() => {
+                    btn.innerText = originalText;
+                    btn.style.background = 'rgba(34, 197, 94, 0.1)';
+                    btn.style.color = 'var(--accent)';
+                }, 2000);
+            });
+        };
+
         const bg = document.getElementById('pixel-bg');
-        // Animation logic here...
+        function createPixel() {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            const top = Math.random() * 100;
+            const duration = 5 + Math.random() * 10;
+            pixel.style.setProperty('--top', top + '%');
+            pixel.style.setProperty('--duration', duration + 's');
+            bg.appendChild(pixel);
+            setTimeout(() => pixel.remove(), duration * 1000);
+        }
+        setInterval(createPixel, 300);
+        for(let i=0; i<20; i++) createPixel();
     </script>
 </body>
 </html>`;

@@ -326,4 +326,109 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(text).toContain("mysterious feature is coming soon");
     });
   });
+
+  describe("MUSASHI Feature (Attack Engine)", () => {
+    it("forges a complete attack path from job description", async () => {
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: "[INTEL] Parsed Intel [/INTEL] [ANALYSIS] Tactical Analysis [/ANALYSIS] [HOOK] LinkedIn Hook [/HOOK] [STRIKE] Outreach Email [/STRIKE]"
+      });
+
+      const response = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "Target job description that is long enough to pass validation check." }),
+      });
+
+      expect(response.status).toBe(200);
+      const data = await response.json() as { intel: string, analysis: string, hook: string, strike: string };
+      expect(data.intel).toBe("Parsed Intel");
+      expect(data.analysis).toBe("Tactical Analysis");
+      expect(data.hook).toBe("LinkedIn Hook");
+      expect(data.strike).toBe("Outreach Email");
+      expect(aiSpy).toHaveBeenCalled();
+    });
+
+    it("enforces character limits on job intel", async () => {
+      // Too short
+      const resShort = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "short" }),
+      });
+      expect(resShort.status).toBe(400);
+
+      // Too long (over 3000)
+      const resLong = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "a".repeat(3001) }),
+      });
+      expect(resLong.status).toBe(400);
+    });
+
+    it("handles missing or malformed AI tags gracefully", async () => {
+      vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: "No tags here, just plain text from a confused AI."
+      });
+
+      const response = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "Target job description that is definitely long enough to pass the 50 char check." }),
+      });
+
+      expect(response.status).toBe(200);
+      const data = await response.json() as { intel: string, analysis: string };
+      // Should return the fallback error message
+      expect(data.intel).toBe("Forge failed for this segment.");
+    });
+
+    it("handles special characters in job descriptions", async () => {
+      const complexDescription = "Data Scientist Role! Needs SQL, Python, & R. Salary: $100k-$150k. Must handle 'Big Data' and \"AI\" pipelines. And some extra text to pass the check.";
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({ response: "[INTEL] Success [/INTEL]" });
+
+      const response = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: complexDescription }),
+      });
+
+      expect(response.status).toBe(200);
+      expect(aiSpy).toHaveBeenCalled();
+    });
+
+    it("processes multiline AI responses with the same tag", async () => {
+      vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: "[ANALYSIS]\nProject 1\nProject 2\nProject 3\n[/ANALYSIS]"
+      });
+
+      const response = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "Job description text here that is long enough to pass validation." }),
+      });
+
+      const data = await response.json() as { analysis: string };
+      expect(data.analysis).toContain("Project 1");
+      expect(data.analysis).toContain("Project 3");
+    });
+
+    it("rejects empty job description payload", async () => {
+      const response = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "" }),
+      });
+      expect(response.status).toBe(400);
+    });
+
+    it("enforces exact character boundaries (min 50)", async () => {
+      const response = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ description: "a".repeat(49) }),
+      });
+      expect(response.status).toBe(400);
+    });
+  });
 });
