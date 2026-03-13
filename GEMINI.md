@@ -6,6 +6,7 @@ To build a high-performance, visually striking, and reliable URL shortening serv
 ## Engineering Philosophy
 "This is our way. This is the only way to create great software."
 - **TDD (Test-Driven Development)**: We build with confidence by writing tests before code.
+- **Occam's Razor**: Simple is better than complex. We prioritize the simplest solution that reliably solves the problem.
 - **High Quality**: We never settle for "good enough." Every line of code must meet senior-level standards.
 - **Continuous Validation**: We test, lint, and refactor relentlessly. Validation is the only path to finality.
 - **Surgical Precision**: We make targeted, clean updates to maintain system integrity and avoid technical debt.

@@ -394,7 +394,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 <div class="form-grid">
                     <!-- Left Column: Personal Info -->
                     <div class="form-col-left">
-                        <h2 style="font-size: 0.8rem; color: var(--accent); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Identity</h2>
                         <div class="field-group">
                             <label>Full Name</label>
                             <div class="input-wrapper">

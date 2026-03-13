@@ -302,9 +302,13 @@ export default {
 			const id = path.substring(1);
 			let value = await env.SHORT_LINKS.get(id);
 			
-			// KV Resilience
+			// ADAPTIVE DOUBLE-LOCK: Retry up to 3 times with increasing delays
 			if (!value) {
-				await new Promise(resolve => setTimeout(resolve, 500));
+				await new Promise(resolve => setTimeout(resolve, 500)); // First Wait
+				value = await env.SHORT_LINKS.get(id);
+			}
+			if (!value) {
+				await new Promise(resolve => setTimeout(resolve, 1000)); // Second Wait
 				value = await env.SHORT_LINKS.get(id);
 			}
 

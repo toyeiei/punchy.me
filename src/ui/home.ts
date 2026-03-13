@@ -330,12 +330,16 @@ export const HTML = `<!DOCTYPE html>
             border-radius: 50%;
             display: flex; justify-content: center; align-items: center;
             margin: 0 auto 1.5rem;
-            animation: pop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
             opacity: 0;
+            transform: scale(0.5) translateY(20px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 0 0 rgba(34, 197, 94, 0);
         }
-        .success-icon.show { opacity: 1; }
-
-        @keyframes pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .success-icon.show { 
+            opacity: 1; 
+            transform: scale(1) translateY(0); 
+            box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
+        }
 
         .success-icon svg { width: 40px; height: 40px; color: #052e16; }
 
@@ -548,42 +552,39 @@ export const HTML = `<!DOCTYPE html>
             e.preventDefault();
             if (!urlInput.value || !urlInput.checkValidity()) { urlInput.reportValidity(); return; }
 
-            // TRUE OPTIMISTIC UI: Generate link and show modal INSTANTLY (0ms)
-            const id = Math.random().toString(36).substring(2, 8);
-            const instantUrl = window.location.origin + '/' + id;
-            
-            resultLink.innerText = instantUrl;
-            resultLink.href = instantUrl;
+            // MODAL LOAD: Show 'Forging' state, no link yet
+            resultLink.innerText = 'forging tactical link...';
+            resultLink.href = '#';
             resultLink.classList.add('syncing');
             syncProgress.style.width = '0%';
             
-            modalTitle.innerText = 'PUNCHED!';
-            modalSubtitle.innerText = 'Your short link is live.';
-            successIcon.classList.add('show');
+            modalTitle.innerText = 'PUNCHING...';
+            modalSubtitle.innerText = 'Forging your link on the edge.';
+            successIcon.classList.remove('show');
             syncStatus.classList.add('show');
             
             modalOverlay.style.display = 'flex';
             setTimeout(() => modalOverlay.classList.add('show'), 10);
 
-            // Start Initial Smart Wait Progress (mechanical sympathy)
-            syncProgress.style.transition = 'width 1.2s linear';
-            setTimeout(() => syncProgress.style.width = '100%', 50);
+            // Start Forge Progress (Artificial sympathy)
+            syncProgress.style.transition = 'width 2s cubic-bezier(0.1, 0.5, 0.1, 1)';
+            setTimeout(() => syncProgress.style.width = '70%', 50);
 
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
             isUserInitiated = true;
 
             if (cachedToken) {
-                executeShorten(cachedToken, id);
+                executeShorten(cachedToken);
             } else if (window.turnstile) {
-                turnstileTimeoutId = setTimeout(() => { if (isUserInitiated) executeShorten('', id); }, 4000);
-                try { window.turnstile.execute(); } catch (err) { executeShorten('', id); }
+                turnstileTimeoutId = setTimeout(() => { if (isUserInitiated) executeShorten(''); }, 4000);
+                try { window.turnstile.execute(); } catch (err) { executeShorten(''); }
             } else {
-                executeShorten('', id);
+                executeShorten('');
             }
         };
 
-        async function executeShorten(turnstileToken = '', suggestedId = '') {
+        async function executeShorten(turnstileToken = '') {
             let url = urlInput.value.trim();
             if (url && !url.startsWith('http')) url = 'https://' + url;
 
@@ -591,43 +592,37 @@ export const HTML = `<!DOCTYPE html>
                 const response = await fetch('/shorten', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, suggestedId, 'cf-turnstile-response': turnstileToken })
+                    body: JSON.stringify({ url, 'cf-turnstile-response': turnstileToken })
                 });
 
                 if (response.ok) {
                     const data = await response.json();
+                    const finalUrl = window.location.origin + '/' + data.id;
                     
-                    // If server gave us a different ID (Deduplication or Collision)
-                    if (data.id !== suggestedId) {
-                        const finalUrl = window.location.origin + '/' + data.id;
-                        resultLink.innerText = finalUrl;
-                        resultLink.href = finalUrl;
-                        
-                        // RESTART Sync Timer for the NEW real ID
-                        resultLink.classList.add('syncing');
-                        syncProgress.style.transition = 'none';
-                        syncProgress.style.width = '0%';
-                        setTimeout(() => {
-                            syncProgress.style.transition = 'width 1.2s linear';
-                            syncProgress.style.width = '100%';
-                        }, 50);
-                    }
-
-                    // FINAL UNLOCK: Only after 1.2s from the FINAL ID assignment
-                    setTimeout(() => {
-                        resultLink.classList.remove('syncing');
-                        syncStatus.classList.remove('show');
-                    }, 1200);
+                    // SUCCESS: Show link and complete bar
+                    resultLink.innerText = finalUrl;
+                    resultLink.href = finalUrl;
+                    resultLink.classList.remove('syncing');
+                    
+                    syncProgress.style.transition = 'width 0.3s ease-out';
+                    syncProgress.style.width = '100%';
+                    
+                    modalTitle.innerText = 'PUNCHED!';
+                    modalSubtitle.innerText = 'Your tactical link is ready.';
+                    successIcon.classList.add('show');
+                    syncStatus.classList.remove('show');
 
                     cachedToken = null;
                     if (window.turnstile) window.turnstile.reset();
                 } else {
                     const errorData = await response.json();
-                    alert(errorData.error || 'Sync failed.');
+                    alert(errorData.error || 'Forge failed.');
                     closeModal();
                 }
             } catch (err) {
                 console.error('Background sync failed', err);
+                alert('Network error. Please try again.');
+                closeModal();
             } finally {
                 resetSubmitBtn();
             }
@@ -688,7 +683,7 @@ export const SYNC_ERROR_HTML = `<!DOCTYPE html>
         h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; }
         p { color: #94a3b8; line-height: 1.6; font-size: 0.9rem; margin-bottom: 2rem; }
         .loader { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; border-radius: 2px; }
-        .loader-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; animation: sync 2s linear forwards; box-shadow: 0 0 10px var(--accent); }
+        .loader-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; animation: sync 1.5s linear forwards; box-shadow: 0 0 10px var(--accent); }
         @keyframes sync { 0% { width: 0%; } 100% { width: 100%; } }
         .status { margin-top: 1rem; font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; opacity: 0.8; }
     </style>
@@ -699,7 +694,7 @@ export const SYNC_ERROR_HTML = `<!DOCTYPE html>
         <h1>SYNCING...</h1>
         <p>Forging your link across the global edge network. This usually takes a few seconds.</p>
         <div class="loader"><div class="loader-bar"></div></div>
-        <div class="status">RE-SYNCING IN 2s</div>
+        <div class="status">RE-SYNCING IN 1.5s</div>
     </div>
     <script>
         const bg = document.getElementById('pixel-bg');
@@ -717,8 +712,8 @@ export const SYNC_ERROR_HTML = `<!DOCTYPE html>
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
 
-        // Auto-Reload after 2 seconds
-        setTimeout(() => window.location.reload(), 2000);
+        // Auto-Reload after 1.5 seconds
+        setTimeout(() => window.location.reload(), 1500);
     </script>
 </body>
 </html>`;
