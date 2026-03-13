@@ -144,22 +144,23 @@ export default {
 				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
 				if (longUrl.includes('punchy.me')) return new Response(JSON.stringify({ error: 'Invalid URL.' }), { status: 400 });
 
-				// Security: IP-based Rate Limiting (10 req/min)
-				const ip = request.headers.get('CF-Connecting-IP') || 'anonymous';
+				// Data: URL Normalization
+				let targetUrl = longUrl.trim();
+				if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
+				const normalized = targetUrl.replace(/\/+$/, '');
+				targetUrl = normalized; // Use normalized for persistence too
+
+				// Data: Deduplication
+				const existingId = await env.SHORT_LINKS.get(`url:${normalized}`);
+				if (existingId) return new Response(JSON.stringify({ id: existingId }), { headers: { 'Content-Type': 'application/json' } });
+
+				// Security: IP-based Rate Limiting (10 NEW links per minute)
+				const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
 				const rlKey = `rl:${ip}`;
 				const currentRl = await env.SHORT_LINKS.get(rlKey);
 				const rlCount = currentRl ? parseInt(currentRl) : 0;
 				if (rlCount >= 10) return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
 				await env.SHORT_LINKS.put(rlKey, (rlCount + 1).toString(), { expirationTtl: 60 });
-
-				// Data: URL Normalization
-				let targetUrl = longUrl.trim();
-				if (!targetUrl.startsWith('http')) targetUrl = 'https://' + targetUrl;
-				const normalized = targetUrl.replace(/\/+$/, '');
-
-				// Data: Deduplication
-				const existingId = await env.SHORT_LINKS.get(`url:${normalized}`);
-				if (existingId) return new Response(JSON.stringify({ id: existingId }), { headers: { 'Content-Type': 'application/json' } });
 
 				// Logic: ID Generation
 				let id = suggestedId || Math.random().toString(36).substring(2, 8);

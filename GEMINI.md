@@ -70,7 +70,13 @@ Cloudflare KV is eventually consistent. To maintain an "Instant" feel without br
 - **Double-Lock (Backend):** If a lookup fails, the Worker pauses for 500ms and retries the KV fetch before returning a 404.
 - **Optimistic UI:** We generate the short ID client-side to show the result at 0ms, while the actual persistence happens asynchronously in the background.
 
-### 3. AI Engine Standards (ANAKIN)
+### 3. Smart Rate Limiting
+To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is strategically positioned:
+- **Free Re-Punches:** Deduplication checks happen *before* the rate limit is incremented. Shortening the same URL multiple times is "free" and does not consume the limit.
+- **Strict Normalization:** All URLs are normalized (trailing slashes removed) before deduplication to ensure consistency.
+- **IP-Based Tracking:** Requests are tracked via the `cf-connecting-ip` header.
+
+### 4. AI Engine Standards (ANAKIN)
 To ensure consistent and high-quality professional narratives, the ANAKIN engine MUST adhere to these standard parameters:
 - **Model:** `@cf/meta/llama-3-8b-instruct`
 - **Max Tokens:** 250 (Ensures sufficient length for summary and 3 bullets)

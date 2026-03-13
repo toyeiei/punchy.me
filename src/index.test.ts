@@ -2,8 +2,13 @@ import { env, SELF } from "cloudflare:test";
 import { it, expect, describe, vi, beforeEach } from "vitest";
 
 describe("PUNCHY.ME URL Shortener", () => {
-  beforeEach(() => {
+  beforeEach(async () => {
     vi.restoreAllMocks();
+    // Clear KV state for isolation
+    const keys = await env.SHORT_LINKS.list();
+    for (const key of keys.keys) {
+      await env.SHORT_LINKS.delete(key.name);
+    }
   });
 
   describe("Shortener Core", () => {
@@ -18,7 +23,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       const longUrl = "https://example.com/very/long/url";
       const response = await SELF.fetch("http://localhost/shorten", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "1.1.1.1" },
         body: JSON.stringify({ url: longUrl }),
       });
       
@@ -94,22 +99,41 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(response.status).toBe(403);
     });
 
-    it("enforces IP-based rate limiting (10 req/min)", async () => {
-      const longUrl = "https://test.com";
-      // Perform 10 requests (Rate limit is 10)
+    it("enforces IP-based rate limiting (10 NEW links per minute)", async () => {
+      const testIp = `ip-${Math.random().toString(36).substring(2, 10)}`;
+      
+      // 1. First link (NEW) -> Count 1
+      await SELF.fetch("http://localhost/shorten", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": testIp },
+        body: JSON.stringify({ url: "https://limit-test.com" }),
+      });
+
+      // 2. Same link 10 times (DUPLICATE) -> Should stay at Count 1
       for (let i = 0; i < 10; i++) {
-        await SELF.fetch("http://localhost/shorten", {
+        const res = await SELF.fetch("http://localhost/shorten", {
           method: "POST",
-          headers: { "Content-Type": "application/json", "CF-Connecting-IP": "1.2.3.4" },
-          body: JSON.stringify({ url: `${longUrl}/${i}` }),
+          headers: { "Content-Type": "application/json", "cf-connecting-ip": testIp },
+          body: JSON.stringify({ url: "https://limit-test.com" }),
         });
+        expect(res.status).toBe(200);
       }
       
-      // 11th request should fail
+      // 3. 9 More NEW links -> Total Count 10
+      for (let i = 0; i < 9; i++) {
+        const res = await SELF.fetch("http://localhost/shorten", {
+          method: "POST",
+          headers: { "Content-Type": "application/json", "cf-connecting-ip": testIp },
+          body: JSON.stringify({ url: `https://new-link-${i}.com` }),
+        });
+        expect(res.status).toBe(200);
+      }
+      
+      // 4. 11th NEW link should fail
       const response = await SELF.fetch("http://localhost/shorten", {
         method: "POST",
-        headers: { "Content-Type": "application/json", "CF-Connecting-IP": "1.2.3.4" },
-        body: JSON.stringify({ url: "https://fail.com" }),
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": testIp },
+        body: JSON.stringify({ url: "https://fail-now.com" }),
       });
       expect(response.status).toBe(429);
     });
