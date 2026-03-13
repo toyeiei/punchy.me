@@ -225,24 +225,41 @@ export default {
 				if (data.type !== 'anakin') return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
 				if (data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
 
-				// Perform AI Hydration with Tactical Context
+				// Perform AI Hydration with Hardened Format Instructions
 				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-					max_tokens: 300,
+					max_tokens: 350,
 					temperature: 0.6,
 					messages: [
-						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Task: 1. Write professional summary (MIN 30 WORDS, MAX 42 WORDS). 2. Rewrite work history into 3 Action-Result bullet points. Rule: Use action verbs. Output: [SUMMARY] text [/SUMMARY] [EXPERIENCE] bullet points [/EXPERIENCE].' },
+						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Your goal is to transform raw career data into elite narratives. IMPORTANT: You MUST wrap your response in [SUMMARY] and [EXPERIENCE] tags exactly as shown in the output format.' },
 						{ 
 							role: 'user', 
-							content: `[CONTEXT]\nTarget Role: ${data.job}\nAcademic Foundation: ${data.education}\nTechnical Arsenal: ${data.skills}\nRaw Field Data: ${data.experience}\n\n[DIRECTIVE]\nForge a professional narrative that positions the candidate as an elite expert in ${data.job}. Ensure the summary captures their unique value proposition. Transform raw field data into 3 measurable mission-critical achievements.` 
+							content: `[CONTEXT]\nTarget Role: ${data.job}\nAcademic Foundation: ${data.education}\nTechnical Arsenal: ${data.skills}\nRaw Field Data: ${data.experience}\n\n[DIRECTIVE]\n1. Write professional summary (MIN 30 WORDS, MAX 42 WORDS).\n2. Rewrite work history into 3 Action-Result bullet points using high-impact action verbs.\n\n[OUTPUT FORMAT]\n[SUMMARY] (summary text here) [/SUMMARY]\n[EXPERIENCE] (3 bullet points here) [/EXPERIENCE]` 
 						}
 					]
 				}) as { response: string };
 
-				const summaryMatch = aiResponse.response.match(/\[SUMMARY\](.*?)\[\/SUMMARY\]/s);
-				const experienceMatch = aiResponse.response.match(/\[EXPERIENCE\](.*?)\[\/EXPERIENCE\]/s);
+				const responseText = aiResponse.response || '';
+				
+				// DEFENSIVE EXTRACTION: Case-insensitive and whitespace-tolerant
+				const summaryMatch = responseText.match(/\[SUMMARY\](.*?)\[\/SUMMARY\]/si);
+				const experienceMatch = responseText.match(/\[EXPERIENCE\](.*?)\[\/EXPERIENCE\]/si);
 
-				data.aiSummary = summaryMatch ? summaryMatch[1].trim() : "Elite professional profile forged.";
-				data.aiExperience = experienceMatch ? experienceMatch[1].trim() : data.experience;
+				if (summaryMatch) {
+					data.aiSummary = summaryMatch[1].trim();
+				} else {
+					// Fallback: If tags are missing, take the first paragraph
+					const paragraphs = responseText.split('\n\n').filter(p => p.trim().length > 20);
+					data.aiSummary = paragraphs[0] ? paragraphs[0].trim() : "Elite professional profile forged.";
+				}
+
+				if (experienceMatch) {
+					data.aiExperience = experienceMatch[1].trim();
+				} else {
+					// Fallback: If tags are missing, take the last part of the response or the raw data
+					const paragraphs = responseText.split('\n\n').filter(p => p.trim().length > 20);
+					data.aiExperience = paragraphs.length > 1 ? paragraphs.slice(1).join('\n\n').trim() : data.experience;
+				}
+
 				data.aiHydrated = true;
 
 				await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });

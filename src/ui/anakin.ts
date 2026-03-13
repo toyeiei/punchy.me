@@ -86,11 +86,18 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             position: relative;
         }
 
+        .title-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1.5rem;
+            margin-bottom: 1rem;
+        }
+
         h1 {
             font-family: var(--font-brand);
             font-size: clamp(3rem, 10vw, 80px);
             line-height: 1;
-            margin-bottom: 1rem;
             color: var(--text-main);
             letter-spacing: -2px;
             text-transform: uppercase;
@@ -98,6 +105,23 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             animation: main-glitch 5s infinite;
             will-change: transform, opacity;
             transform: translateZ(0);
+        }
+
+        .beta-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
         }
 
         @keyframes main-glitch {
@@ -348,7 +372,10 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
     <div class="container">
-        <h1>ANAKIN</h1>
+        <div class="title-container">
+            <h1>ANAKIN</h1>
+            <span class="beta-badge">BETA</span>
+        </div>
         <p class="punchy-desc">Harnessing Llama 3 to forge elite professional resumes. Transform your raw data into career-winning impact.</p>
         <form id="anakin-form">
             <div class="input-group">
