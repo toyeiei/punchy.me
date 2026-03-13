@@ -316,4 +316,14 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(html).toContain("padding: 2rem");
     });
   });
+
+  describe("YAIBA Teaser", () => {
+    it("serves the YAIBA mysterious teaser page", async () => {
+      const response = await SELF.fetch("http://localhost/yaiba");
+      expect(response.status).toBe(200);
+      const text = await response.text();
+      expect(text).toContain("YAIBA");
+      expect(text).toContain("mysterious feature is coming soon");
+    });
+  });
 });
