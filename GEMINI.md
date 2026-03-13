@@ -62,21 +62,29 @@ We have identified a recurring high-impact bug: **Unterminated Template Literals
 - **Symptom:** `HTMLRewriter` returns an empty response (`''`), causing tests to fail with messages like `expected '' to contain 'Anakin Skywalker'`.
 - **Root Cause:** Malformed template exports or erroneous backslashes (e.g., `\`;`) at the end of template strings.
 - **Mandate:** After modifying any UI template in `src/ui/`, engineers **MUST** surgically verify the transition points between exported template constants. Use `read_file` or `grep` to confirm that all template literals are properly terminated with a simple backtick (`) and semicolon (;).
-- **Validation:** A task is not complete until `npm test` confirms that `HTMLRewriter` is successfully injections content into the relevant template.
+- **Validation:** A task is not complete until `npm test` confirms that `HTMLRewriter` is successfully injecting content into the relevant template.
 
 ### 2. Consistency Mitigation (KV Resilience)
 Cloudflare KV is eventually consistent. To maintain an "Instant" feel without broken links, we employ a triple-tier strategy:
-- **Smart Wait (Frontend):** The result link is "locked" for 300ms with a visual progress bar. This prevents users from clicking before the data has likely propagated.
+- **Smart Wait (Frontend):** The result link is "locked" for 1.2s with a visual progress bar. This prevents users from clicking before the data has likely propagated.
+- **True Synchronization:** The frontend waits for final ID confirmation from the server and restarts the propagation timer if the ID changed, eliminating race conditions.
 - **Double-Lock (Backend):** If a lookup fails, the Worker pauses for 500ms and retries the KV fetch before returning a 404.
 - **Optimistic UI:** We generate the short ID client-side to show the result at 0ms, while the actual persistence happens asynchronously in the background.
 
 ### 3. Smart Rate Limiting
 To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is strategically positioned:
-- **Free Re-Punches:** Deduplication checks happen *before* the rate limit is incremented. Shortening the same URL multiple times is "free" and does not consume the limit.
+- **Free Re-Punches:** Deduplication checks happen *after* normalization but *before* the rate limit is incremented. Shortening the same URL multiple times is "free."
 - **Strict Normalization:** All URLs are normalized (trailing slashes removed) before deduplication to ensure consistency.
-- **IP-Based Tracking:** Requests are tracked via the `cf-connecting-ip` header.
+- **IP-Based Tracking:** Requests are tracked via the lowercase `cf-connecting-ip` header for reliable edge identification.
 
 ## Progress & Architectural Milestones
+
+### Version 3.9.0 - Elite HUD & Routing Integrity (2026-03-13)
+- **Elite HUD Refinements**: Standardized aggressive vertical centering for BAZUKA/Home and implemented adaptive `flex-start` layouts for ANAKIN to prevent title occlusion on long forms.
+- **Routing Loop Prevention**: Robust hostname verification stops recursive shortening of own domain or staging links at the edge.
+- **True Synchronization**: Hardened handshake between client and server to eliminate race conditions during ID generation.
+- **Mobile UX Hardening**: Verified keyboard safety via adaptive scrolling and focus-lock management across all tools.
+- **Verification**: Reached 21/21 tests with 100% core and mobile coverage.
 
 ### Version 3.5.0 - The Resilience Update (2026-03-13)
 - **Edge Resilience**: Triple-tier KV mitigation (1.2s Smart Wait + 500ms Double-Lock retry).

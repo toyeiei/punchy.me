@@ -394,6 +394,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 <div class="form-grid">
                     <!-- Left Column: Personal Info -->
                     <div class="form-col-left">
+                        <h2 style="font-size: 0.8rem; color: var(--accent); margin-bottom: 1.5rem; text-transform: uppercase; letter-spacing: 2px;">Identity</h2>
                         <div class="field-group">
                             <label>Full Name</label>
                             <div class="input-wrapper">
@@ -938,7 +939,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <div class="header">
-            <div class="name" id="res-name">ANAKIN SKYWALKER</div>
+            <h1 class="name" id="res-name">ANAKIN SKYWALKER</h1>
             <div class="job-title" id="res-job">JEDI KNIGHT</div>
             
             <div class="contact-bar">
@@ -962,21 +963,21 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         <div class="resume-grid">
             <div class="main-col">
                 <div class="section">
-                    <div class="section-title">Professional Summary</div>
+                    <h2 class="section-title">Professional Summary</h2>
                     <div class="ai-box" id="summary-box">
                         <div id="res-summary" class="content-text">Refining professional profile...</div>
                     </div>
                 </div>
 
                 <div class="section">
-                    <div class="section-title">Experience & Impact</div>
+                    <h2 class="section-title">Experience & Impact</h2>
                     <div class="ai-box" id="experience-box" style="font-style: italic;">
                         <div id="res-experience" class="content-text">Preparing impact data...</div>
                     </div>
                 </div>
 
                 <div class="section">
-                    <div class="section-title">Education</div>
+                    <h2 class="section-title">Education</h2>
                     <div class="content-text" id="res-education">Jedi Academy</div>
                 </div>
             </div>

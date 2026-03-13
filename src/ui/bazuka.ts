@@ -18,8 +18,32 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" content="BAZUKA | Instant Digital Business Cards">
-    <meta property="twitter:description" content="Create your neon-glitch digital business card. Fast, stylish, and free.">
+    <meta property="twitter:description" content="Generate high-impact digital business cards in seconds. Fast, stylish, and free.">
     <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebPage",
+      "name": "BAZUKA Digital Business Cards | PUNCHY.ME",
+      "description": "Generate high-impact digital business cards in seconds.",
+      "breadcrumb": {
+        "@type": "BreadcrumbList",
+        "itemListElement": [{
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://punchy.me/"
+        },{
+          "@type": "ListItem",
+          "position": 2,
+          "name": "BAZUKA",
+          "item": "https://punchy.me/bazuka"
+        }]
+      }
+    }
+    </script>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
