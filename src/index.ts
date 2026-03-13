@@ -230,7 +230,7 @@ export default {
 					max_tokens: 250,
 					temperature: 0.6,
 					messages: [
-						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Your goal is to transform raw career data into elite narratives. IMPORTANT: You MUST wrap your response in [SUMMARY] and [EXPERIENCE] tags exactly as shown in the output format.' },
+						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Your goal is to transform raw career data into elite narratives. IMPORTANT: You MUST wrap your response in [SUMMARY] and [EXPERIENCE] tags exactly as shown in the output format. No conversational filler.' },
 						{ 
 							role: 'user', 
 							content: `[CONTEXT]\nTarget Role: ${data.job}\nAcademic Foundation: ${data.education}\nTechnical Arsenal: ${data.skills}\nRaw Field Data: ${data.experience}\n\n[DIRECTIVE]\n1. Write professional summary (MIN 20 WORDS, MAX 28 WORDS).\n2. Rewrite work history into 3 Action-Result bullet points using high-impact action verbs.\n\n[OUTPUT FORMAT]\n[SUMMARY] (summary text here) [/SUMMARY]\n[EXPERIENCE] (3 bullet points here) [/EXPERIENCE]` 
@@ -240,24 +240,31 @@ export default {
 
 				const responseText = aiResponse.response || '';
 				
-				// DEFENSIVE EXTRACTION: Case-insensitive and whitespace-tolerant
+				// DEFENSIVE EXTRACTION
 				const summaryMatch = responseText.match(/\[SUMMARY\](.*?)\[\/SUMMARY\]/si);
 				const experienceMatch = responseText.match(/\[EXPERIENCE\](.*?)\[\/EXPERIENCE\]/si);
 
+				// Helper to strip tags and inject list spacing
+				const cleanResult = (text: string) => {
+					return text
+						.replace(/\[\/?SUMMARY\]/gi, '')
+						.replace(/\[\/?EXPERIENCE\]/gi, '')
+						.replace(/(\n|^)[-•]\s?/g, '\n\n- ') // Inject spacing before bullet points
+						.trim();
+				};
+
 				if (summaryMatch) {
-					data.aiSummary = summaryMatch[1].trim();
+					data.aiSummary = cleanResult(summaryMatch[1]);
 				} else {
-					// Fallback: If tags are missing, take the first paragraph
 					const paragraphs = responseText.split('\n\n').filter(p => p.trim().length > 20);
-					data.aiSummary = paragraphs[0] ? paragraphs[0].trim() : "Elite professional profile forged.";
+					data.aiSummary = paragraphs[0] ? cleanResult(paragraphs[0]) : "Elite professional profile forged.";
 				}
 
 				if (experienceMatch) {
-					data.aiExperience = experienceMatch[1].trim();
+					data.aiExperience = cleanResult(experienceMatch[1]);
 				} else {
-					// Fallback: If tags are missing, take the last part of the response or the raw data
 					const paragraphs = responseText.split('\n\n').filter(p => p.trim().length > 20);
-					data.aiExperience = paragraphs.length > 1 ? paragraphs.slice(1).join('\n\n').trim() : data.experience;
+					data.aiExperience = paragraphs.length > 1 ? cleanResult(paragraphs.slice(1).join('\n\n')) : cleanResult(data.experience);
 				}
 
 				data.aiHydrated = true;
