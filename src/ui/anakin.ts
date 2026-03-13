@@ -202,6 +202,25 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         input.valid + .validation-hint { opacity: 1; color: var(--accent); }
         textarea.valid + .validation-hint { opacity: 1; color: var(--accent); top: 20px; transform: none; }
 
+        .ai-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+        .field-note {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            margin-top: 6px;
+            line-height: 1.4;
+        }
+        .field-note b { color: var(--accent); }
+
         .char-counter {
             font-size: 0.65rem;
             color: var(--text-dim);
@@ -344,11 +363,12 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                             </div>
                         </div>
                         <div class="field-group">
-                            <label>Target Job Title</label>
+                            <label>Target Job Title <span class="ai-badge">AI</span></label>
                             <div class="input-wrapper">
                                 <input type="text" id="job" placeholder="Jedi Knight / Sith Lord" required minlength="2">
                                 <span class="validation-hint">✓</span>
                             </div>
+                            <div class="field-note">ANAKIN will surgically craft your resume specifically for <b>this role</b>. Precision is critical for AI alignment.</div>
                         </div>
                         <div class="field-group">
                             <label>Email Address</label>
@@ -419,7 +439,15 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         };
 
         function validateInput(input) {
-            if (input.checkValidity() && input.value.trim().length > 0) {
+            let isValid = input.checkValidity() && input.value.trim().length > 0;
+            
+            // Stricter Email Validation Pattern
+            if (input.id === 'email') {
+                const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$/;
+                isValid = isValid && emailPattern.test(input.value.trim());
+            }
+
+            if (isValid) {
                 input.classList.add('valid');
                 input.classList.remove('invalid');
             } else if (input.value.trim().length > 0) {
