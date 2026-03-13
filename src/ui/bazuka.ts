@@ -39,6 +39,12 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text-main);
@@ -49,11 +55,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             min-height: 100vh;
             min-height: -webkit-fill-available;
             position: relative;
-            padding: 2rem 0;
+            padding: 1.5rem;
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
@@ -81,7 +86,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
 
         .back-home {
-            position: fixed;
+            position: absolute;
             top: 1.5rem;
             left: 1.5rem;
             color: var(--accent);
@@ -104,7 +109,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         .container {
-            width: 90%;
+            width: 100%;
             max-width: 500px;
             text-align: center;
             z-index: 10;

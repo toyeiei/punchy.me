@@ -39,49 +39,35 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
+        html, body {
+            height: 100%;
+            margin: 0;
+            padding: 0;
+        }
+
         body {
             background-color: var(--bg);
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start; /* Start at top for long forms */
             min-height: 100vh;
             min-height: -webkit-fill-available;
             position: relative;
-            padding: 2rem 0;
+            padding: 6rem 1.5rem 2rem; /* Added extra top padding for the back-button badge */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
 
-        .pixel-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
-        }
-
-        .pixel {
-            position: absolute;
-            width: 3px; height: 3px;
-            background: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-            animation: drift var(--duration) linear infinite;
-            top: var(--top); left: -10px;
-        }
-
-        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
-
-        @keyframes drift {
-            0% { transform: translateX(0); opacity: 0; }
-            5% { opacity: 1; }
-            95% { opacity: 1; }
-            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
-        }
-
         .back-home {
-            position: fixed;
+            position: absolute;
             top: 1.5rem;
             left: 1.5rem;
             color: var(--accent);
@@ -104,7 +90,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         .container {
-            width: 95%;
+            width: 100%;
             max-width: 900px;
             text-align: center;
             z-index: 10;
