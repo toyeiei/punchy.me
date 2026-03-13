@@ -1,4 +1,4 @@
-import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE } from './ui';
+import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML } from './ui';
 
 interface BazukaData {
 	type?: string;
@@ -334,7 +334,7 @@ export default {
 					}
 				}
 			}
-			return new Response("Link not found or expired", { status: 404 });
+			return new Response(SYNC_ERROR_HTML, { status: 404, headers: { 'Content-Type': 'text/html' } });
 		}
 
 		return new Response("Not Found", { status: 404 });

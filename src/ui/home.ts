@@ -350,7 +350,7 @@ export const HTML = `<!DOCTYPE html>
             height: 2px;
             background: var(--accent);
             width: 0%;
-            transition: width 0.3s linear;
+            transition: width 1.2s linear;
             box-shadow: 0 0 10px var(--accent);
         }
 
@@ -536,13 +536,12 @@ export const HTML = `<!DOCTYPE html>
             modalOverlay.style.display = 'flex';
             setTimeout(() => modalOverlay.classList.add('show'), 10);
 
-            // Start Smart Wait Progress (300ms mechanical sympathy)
+            // Start Smart Wait Progress (1.2s mechanical sympathy)
             setTimeout(() => {
                 syncProgress.style.width = '100%';
                 setTimeout(() => {
                     resultLink.classList.remove('syncing');
-                    syncProgress.style.width = '0%';
-                }, 300);
+                }, 1200);
             }, 50);
 
             submitBtn.disabled = true;
@@ -625,6 +624,59 @@ export const HTML = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
+    </script>
+</body>
+</html>`;
+
+export const SYNC_ERROR_HTML = `<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SYNCING TO EDGE | PUNCHY.ME</title>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg: #000000; --accent: #22c55e; --text: #f8fafc; --font-brand: 'Bitcount Prop Double', cursive; --font-mono: 'JetBrains Mono', monospace; }
+        body { background: var(--bg); color: var(--text); font-family: var(--font-mono); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; margin: 0; text-align: center; }
+        .pixel-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
+        .pixel { position: absolute; width: 3px; height: 3px; background: rgba(255, 255, 255, 0.4); animation: drift var(--duration) linear infinite; top: var(--top); left: -10px; }
+        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
+        @keyframes drift { 0% { transform: translateX(0); opacity: 0; } 5% { opacity: 1; } 100% { transform: translateX(calc(100vw + 20px)); opacity: 0; } }
+        .container { z-index: 10; padding: 2rem; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); max-width: 400px; }
+        h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; }
+        p { color: #94a3b8; line-height: 1.6; font-size: 0.9rem; margin-bottom: 2rem; }
+        .loader { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; border-radius: 2px; }
+        .loader-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; animation: sync 2s linear forwards; box-shadow: 0 0 10px var(--accent); }
+        @keyframes sync { 0% { width: 0%; } 100% { width: 100%; } }
+        .status { margin-top: 1rem; font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="container">
+        <h1>SYNCING...</h1>
+        <p>Forging your link across the global edge network. This usually takes a few seconds.</p>
+        <div class="loader"><div class="loader-bar"></div></div>
+        <div class="status">RE-SYNCING IN 2s</div>
+    </div>
+    <script>
+        const bg = document.getElementById('pixel-bg');
+        function createPixel() {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            if (Math.random() > 0.7) pixel.classList.add('green');
+            const top = Math.random() * 100;
+            const duration = 5 + Math.random() * 10;
+            pixel.style.setProperty('--top', top + '%');
+            pixel.style.setProperty('--duration', duration + 's');
+            bg.appendChild(pixel);
+            setTimeout(() => pixel.remove(), duration * 1000);
+        }
+        setInterval(createPixel, 300);
+        for(let i=0; i<20; i++) createPixel();
+
+        // Auto-Reload after 2 seconds
+        setTimeout(() => window.location.reload(), 2000);
     </script>
 </body>
 </html>`;
