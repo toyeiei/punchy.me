@@ -107,7 +107,10 @@ class AnakinHandler {
 			}
 		}
 		if (id === 'res-education') element.setInnerContent(this.data.education);
-		if (id === 'res-skills') element.setInnerContent(this.data.skills);
+		if (id === 'res-skills') {
+			const tags = this.data.skills.split(',').map(s => `<span class="expertise-tag">${escapeHTML(s.trim())}</span>`).join('');
+			element.setInnerContent(tags, { html: true });
+		}
 		
 		// SEO Injection
 		if (id === 'title-tag') element.setInnerContent(`${this.data.name} | Professional Resume | PUNCHY.ME`);

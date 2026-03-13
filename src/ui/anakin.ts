@@ -747,16 +747,10 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         .resume-grid {
             display: grid;
             grid-template-columns: 1fr;
-            gap: 4rem;
+            gap: 2.5rem;
         }
 
-        @media (min-width: 768px) {
-            .resume-grid {
-                grid-template-columns: 2fr 1fr;
-            }
-        }
-
-        .header { margin-bottom: 3rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; grid-column: 1 / -1; }
+        .header { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; text-align: left; }
 
         .name {
             font-family: var(--font-brand);
@@ -767,7 +761,41 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             margin-bottom: 0.5rem;
         }
 
-        .job-title { font-size: 1.25rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; }
+        .job-title { font-size: 1.5rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.5rem; }
+
+        .contact-bar {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.5rem;
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+        }
+
+        .contact-item { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit; transition: color 0.2s; }
+        .contact-item:hover { color: var(--accent); }
+        .contact-label { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; }
+
+        .expertise-tags {
+            margin-top: 1rem;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.75rem;
+            font-size: 0.8rem;
+            color: var(--text-main);
+            opacity: 0.9;
+        }
+
+        .expertise-tag {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            font-size: 0.7rem;
+            font-weight: 700;
+        }
 
         .section { margin-bottom: 1rem; position: relative; }
         .section-title { 
@@ -882,7 +910,14 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 line-height: 1.4 !important;
             }
             
-            .content-text, .sidebar-value { color: black !important; }
+            .content-text, .sidebar-value, .contact-item { color: black !important; }
+            .contact-label { color: #16a34a !important; }
+            .expertise-tag { 
+                background: white !important; 
+                border: 1pt solid black !important; 
+                color: black !important; 
+                padding: 2pt 6pt !important;
+            }
             .print-footer { display: block !important; text-align: center; margin-top: 20pt; font-size: 8pt; color: #666; border-top: 0.5pt solid #ddd; padding-top: 10pt; font-weight: bold; }
         }
     </style>
@@ -906,6 +941,23 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         <div class="header">
             <div class="name" id="res-name">ANAKIN SKYWALKER</div>
             <div class="job-title" id="res-job">JEDI KNIGHT</div>
+            
+            <div class="contact-bar">
+                <a href="#" class="contact-item" id="res-email">
+                    <span class="contact-label">Email:</span> 
+                    <span>anakin@force.com</span>
+                </a>
+                <a href="#" class="contact-item" id="res-website" target="_blank">
+                    <span class="contact-label">Portfolio:</span> 
+                    <span>PORTFOLIO</span>
+                </a>
+            </div>
+
+            <div class="expertise-tags" id="res-skills">
+                <span class="expertise-tag">The Force</span>
+                <span class="expertise-tag">Lightsaber Combat</span>
+                <span class="expertise-tag">Podracing</span>
+            </div>
         </div>
 
         <div class="resume-grid">
@@ -927,25 +979,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 <div class="section">
                     <div class="section-title">Education</div>
                     <div class="content-text" id="res-education">Jedi Academy</div>
-                </div>
-            </div>
-
-            <div class="sidebar-col">
-                <div class="sidebar-section">
-                    <div class="sidebar-label">Contact</div>
-                    <a href="#" class="sidebar-value" id="res-email">anakin@force.com</a>
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="sidebar-label">Portfolio</div>
-                    <a href="#" class="sidebar-value" id="res-website" target="_blank">PORTFOLIO</a>
-                </div>
-
-                <div class="sidebar-section">
-                    <div class="sidebar-label">Expertise</div>
-                    <div class="content-text" id="res-skills" style="font-size: 0.9rem; line-height: 2;">
-                        The Force, Lightsaber Combat, Podracing
-                    </div>
                 </div>
             </div>
         </div>
