@@ -802,6 +802,11 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .content-text { color: var(--text-main); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
 
+        /* Experience List Spacing */
+        #res-experience ul, #res-experience ol { padding-left: 1.5rem; margin: 0; }
+        #res-experience li { margin-bottom: 1.25rem; }
+        #res-experience li:last-child { margin-bottom: 0; }
+
         /* Sidebar Elements */
         .sidebar-section { margin-bottom: 1.5rem; }
         .sidebar-label { color: var(--accent); font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; }
@@ -922,7 +927,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <div class="brand-footer">
-            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI
+            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI • Expires in 3 days
         </div>
         <div class="print-footer">
             FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME
