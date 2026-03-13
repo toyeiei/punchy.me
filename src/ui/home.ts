@@ -536,13 +536,9 @@ export const HTML = `<!DOCTYPE html>
             modalOverlay.style.display = 'flex';
             setTimeout(() => modalOverlay.classList.add('show'), 10);
 
-            // Start Smart Wait Progress (1.2s mechanical sympathy)
-            setTimeout(() => {
-                syncProgress.style.width = '100%';
-                setTimeout(() => {
-                    resultLink.classList.remove('syncing');
-                }, 1200);
-            }, 50);
+            // Start Initial Smart Wait Progress (mechanical sympathy)
+            syncProgress.style.transition = 'width 1.2s linear';
+            setTimeout(() => syncProgress.style.width = '100%', 50);
 
             submitBtn.disabled = true;
             submitBtn.innerText = 'PUNCHING...';
@@ -571,12 +567,29 @@ export const HTML = `<!DOCTYPE html>
 
                 if (response.ok) {
                     const data = await response.json();
+                    
+                    // If server gave us a different ID (Deduplication or Collision)
                     if (data.id !== suggestedId) {
                         const finalUrl = window.location.origin + '/' + data.id;
                         resultLink.innerText = finalUrl;
                         resultLink.href = finalUrl;
+                        
+                        // RESTART Sync Timer for the NEW real ID
+                        resultLink.classList.add('syncing');
+                        syncProgress.style.transition = 'none';
+                        syncProgress.style.width = '0%';
+                        setTimeout(() => {
+                            syncProgress.style.transition = 'width 1.2s linear';
+                            syncProgress.style.width = '100%';
+                        }, 50);
                     }
-                    syncStatus.classList.remove('show');
+
+                    // FINAL UNLOCK: Only after 1.2s from the FINAL ID assignment
+                    setTimeout(() => {
+                        resultLink.classList.remove('syncing');
+                        syncStatus.classList.remove('show');
+                    }, 1200);
+
                     cachedToken = null;
                     if (window.turnstile) window.turnstile.reset();
                 } else {

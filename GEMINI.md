@@ -76,6 +76,19 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 - **Strict Normalization:** All URLs are normalized (trailing slashes removed) before deduplication to ensure consistency.
 - **IP-Based Tracking:** Requests are tracked via the `cf-connecting-ip` header.
 
+## Progress & Architectural Milestones
+
+### Version 3.5.0 - The Resilience Update (2026-03-13)
+- **Edge Resilience**: Triple-tier KV mitigation (1.2s Smart Wait + 500ms Double-Lock retry).
+- **Tactical UX**: Branded 404 "Re-Sync" page with pixel drift and auto-reload logic.
+- **Anakin Forge v2.0**: Refactored resume layout (Tactical Header + SVG Icons + Expertise Tags) optimized for 1-page PDF exports.
+- **Smart Rate Limiting**: Moved rate limiting after deduplication to allow unlimited "Free Re-Punches."
+- **Verification**: Expanded core suite to 16/16 tests with 100% environment isolation.
+
+### Version 2.9.9 - Elite AI & SEO (2026-03-13)
+- Overhauled AI engine with role-aligned context blocks and strict token/temperature standards.
+- Integrated comprehensive SEO metadata and client-side hydrated JSON-LD schemas.
+
 ### 4. AI Engine Standards (ANAKIN)
 To ensure consistent and high-quality professional narratives, the ANAKIN engine MUST adhere to these standard parameters:
 - **Model:** `@cf/meta/llama-3-8b-instruct`

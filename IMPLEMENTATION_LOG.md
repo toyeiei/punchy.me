@@ -4,6 +4,15 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-13 (Version 3.5.0 - Triple-Tier Resilience & Tactical Resumes)
+- **Triple-Tier Resilience (KV Hardening)**: Solved Cloudflare KV eventual consistency race conditions using a multi-layered strategy: 1.2s frontend **"Smart Wait"** with a persistent progress bar and a 500ms backend **"Double-Lock"** retry logic.
+- **Tactical Re-Sync (Branded 404)**: Launched a custom, branded 404 page featuring the signature pixel drift animation and a 2-second auto-reload script, turning propagation delays into a seamless "forging" experience.
+- **Smart Rate Limiting (User-Friendly)**: Optimized the rate limiter by moving it *after* deduplication. "Re-Punching" existing URLs is now **free**, ensuring the 10 req/min limit only applies to genuine new link generations.
+- **Anakin Resume v2.0 (Tactical Header)**: Refactored the resume layout into a horizontally-driven "Command Center" header. Integrated high-impact SVG icons for Email and Portfolio (Lightning Bolt) and transformed expertise into tactical "tags" to guarantee a clean 1-page PDF output.
+- **Elite AI Precision**: Hardened Llama 3 prompts to enforce strict word counts (20-28 for summaries, 15-20 for bullets), ensuring every professional narrative is punchy and scannable.
+- **Core Suite Expansion (100% Stability)**: Reached 16 core tests with a 100% pass rate. Implemented absolute test isolation by clearing KV state before every test and using high-entropy unique IPs for rate-limit verification.
+- **Progress Tracking Mandate**: Updated the project's core philosophy to require documentation of progress in `GEMINI.md` after every deployment.
+
 ### 2026-03-13 (Version 2.9.9 - Elite AI & Edge Hardening)
 - **Elite AI Narrative (Tactical Context)**: Overhauled the Anakin AI engine by structuring user data into role-aligned `[CONTEXT]` and `[DIRECTIVE]` blocks. This primes Llama 3 to generate authoritative professional narratives with 3 measurable, mission-critical achievements.
 - **Edge-Hardened UX (KV Resilience)**: Solved Cloudflare KV's eventual consistency race conditions by implementing a **"Double-Lock"** strategy: backend retry logic (500ms sleep) and frontend **"Smart Wait"** (300ms delay) before showing successful links.
