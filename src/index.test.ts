@@ -470,4 +470,37 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(data.some(e => e.content === "Test Strategic Update")).toBe(true);
     });
   });
+
+  describe("ODIN Feature (Tactical Analysis)", () => {
+    it("serves the ODIN HUD page", async () => {
+      const res = await SELF.fetch("http://localhost/odin");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("ODIN");
+      expect(html).toContain("DROP MISSION INTEL");
+      expect(html).toContain("arquero");
+    });
+
+    it("analyzes dataset payload via AI and returns strategic insights", async () => {
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({
+          strategic_overview: "Healthy sample.",
+          anomalies_detected: "None.",
+          tactical_recommendations: "Scale operations."
+        })
+      });
+
+      const res = await SELF.fetch("http://localhost/odin/analyze", {
+        method: "POST",
+        body: JSON.stringify({ columns: ["Job", "Salary"], numRows: 10, sample: [{ Job: "Data Analyst", Salary: 120000 }] }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(res.status).toBe(200);
+      const data = await res.json() as any;
+      expect(data.strategic_overview).toBe("Healthy sample.");
+      
+      aiSpy.mockRestore();
+    });
+  });
 });

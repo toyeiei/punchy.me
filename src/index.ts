@@ -1,4 +1,4 @@
-import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_HTML, LOKI_HTML } from './ui';
+import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_HTML, LOKI_HTML, ODIN_HTML } from './ui';
 
 interface BazukaData {
 	type?: string;
@@ -211,6 +211,10 @@ export default {
 			return new Response(LOKI_HTML, { headers: { 'Content-Type': 'text/html' } });
 		}
 
+		if (path === '/odin') {
+			return new Response(ODIN_HTML, { headers: { 'Content-Type': 'text/html' } });
+		}
+
 		if (path === '/loki/timeline' && request.method === 'GET') {
 			try {
 				const { results } = await env.LOKI_DB.prepare('SELECT * FROM loki_timeline ORDER BY created_at DESC LIMIT 10').all();
@@ -285,6 +289,45 @@ export default {
 
 				console.log('--- FORGED JSON PAYLOAD ---');
 				console.log(JSON.stringify(result, null, 2));
+
+				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
+
+			} catch (_e) {
+				return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 });
+			}
+		}
+
+		if (path === '/odin/analyze' && request.method === 'POST') {
+			try {
+				const { columns, numRows, sample } = await request.json() as { columns: string[], numRows: number, sample: any[] };
+				
+				// Rate Limiting
+				const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
+				const aiRlKey = `rl:odin:${ip}`;
+				const currentAiRl = await env.SHORT_LINKS.get(aiRlKey);
+				const aiRlCount = currentAiRl ? parseInt(currentAiRl) : 0;
+				if (aiRlCount >= 5) return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 5 per minute.' }), { status: 429 });
+				await env.SHORT_LINKS.put(aiRlKey, (aiRlCount + 1).toString(), { expirationTtl: 60 });
+
+				const promptContext = `Dataset shape: ${columns.length} columns, ${numRows} rows.\nColumns: ${columns.join(', ')}\nSample data:\n${JSON.stringify(sample)}`;
+
+				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+					max_tokens: 350,
+					temperature: 0.2,
+					response_format: { type: 'json_object' }, 
+					messages: [
+						{ role: 'system', content: 'You are ODIN, Elite Data Strategist. Output ONLY JSON. Be concise. Schema: {"strategic_overview":"string","anomalies_detected":"string","tactical_recommendations":"string"}' },
+						{ role: 'user', content: promptContext }
+					]
+				}) as { response: any };
+
+				let result;
+				try {
+					result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+				} catch (e) {
+					const cleanText = (aiResponse.response || '').replace(/```json|```/g, '').trim();
+					result = JSON.parse(cleanText);
+				}
 
 				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
 
