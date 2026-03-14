@@ -222,6 +222,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         function createPixel() {
             const pixel = document.createElement('div');
             pixel.className = 'pixel';
+            if (Math.random() > 0.7) pixel.classList.add('green');
             const top = Math.random() * 100;
             const duration = 5 + Math.random() * 10;
             pixel.style.setProperty('--top', top + '%');
@@ -266,6 +267,28 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             padding: 0;
             overflow-y: auto;
         }
+        .pixel-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: -1;
+            pointer-events: none;
+            overflow: hidden;
+        }
+        .pixel {
+            position: absolute;
+            width: 3px; height: 3px;
+            background: rgba(255, 255, 255, 0.4);
+            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
+            animation: drift var(--duration) linear infinite;
+            top: var(--top); left: -10px;
+        }
+        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
+        @keyframes drift {
+            0% { transform: translateX(0); opacity: 0; }
+            5% { opacity: 1; }
+            95% { opacity: 1; }
+            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+        }
         .card-container {
             flex-grow: 1;
             display: flex;
@@ -301,6 +324,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <div class="pixel-bg" id="pixel-bg"></div>
     <div class="card-container">
         <div class="card">
             <h1 class="nickname" id="card-nickname">NAME</h1>
@@ -312,5 +336,21 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
     <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
+    <script>
+        const bg = document.getElementById('pixel-bg');
+        function createPixel() {
+            const pixel = document.createElement('div');
+            pixel.className = 'pixel';
+            if (Math.random() > 0.7) pixel.classList.add('green');
+            const top = Math.random() * 100;
+            const duration = 5 + Math.random() * 10;
+            pixel.style.setProperty('--top', top + '%');
+            pixel.style.setProperty('--duration', duration + 's');
+            bg.appendChild(pixel);
+            setTimeout(() => pixel.remove(), duration * 1000);
+        }
+        setInterval(createPixel, 300);
+        for(let i=0; i<20; i++) createPixel();
+    </script>
 </body>
 </html>`;
