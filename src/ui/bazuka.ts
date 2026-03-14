@@ -231,11 +231,68 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             0% { transform: scale(1); opacity: 0.8; }
             100% { transform: scale(1.05); opacity: 1; }
         }
+
+        /* SUCCESS MODAL */
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none; align-items: center; justify-content: center;
+            z-index: 2000; opacity: 0; transition: opacity 0.3s;
+        }
+        #modal-overlay.show { display: flex; opacity: 1; }
+        .modal {
+            background: #000; border: 1px solid var(--accent);
+            padding: 3rem; border-radius: 24px; text-align: center;
+            max-width: 450px; width: 90%; transform: scale(0.9); transition: transform 0.3s;
+            box-shadow: 0 0 50px rgba(34, 197, 94, 0.2);
+            position: relative;
+        }
+        #modal-overlay.show .modal { transform: scale(1); }
+        .success-icon {
+            width: 80px; height: 80px; background: var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 30px var(--accent);
+            animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes success-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .success-icon svg { width: 40px; height: 40px; color: #000; }
+
+        /* SYNCING OVERLAY */
+        #sync-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #000; z-index: 3000; display: none;
+            flex-direction: column; align-items: center; justify-content: center;
+        }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
+
+    <div id="modal-overlay">
+        <div class="modal">
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
+            </div>
+            <h2 style="font-family: var(--font-brand); font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem;">CARD FORGED</h2>
+            <p style="color: var(--text-dim); font-family: var(--font-mono); font-size: 0.9rem;">Your high-impact identity is live.</p>
+        </div>
+    </div>
+
+    <div id="sync-overlay">
+        <div class="grid-bg"></div>
+        <div class="container" style="max-width: 400px; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px);">
+            <h1 style="font-size: 2.5rem; color: var(--accent);">SYNCING...</h1>
+            <p style="color: var(--text-dim); margin: 1rem 0;">Propagating tactical data to the edge...</p>
+            <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
+                <div style="width: 0%; height: 100%; background: var(--accent); animation: progress 1.2s linear forwards;"></div>
+            </div>
+        </div>
+        <style>@keyframes progress { to { width: 100%; } }</style>
+    </div>
 
     <a href="/" class="punchy-portal">
         <div class="portal-trigger">⚡</div>
@@ -357,8 +414,17 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 });
                 
                 if (res.ok) {
-                    // ELITE REDIRECT: Bypass modal for instant impact
-                    window.location.href = '/' + suggestedId;
+                    // ELITE FLOW: Show success, then sync, then redirect
+                    document.getElementById('modal-overlay').classList.add('show');
+                    
+                    setTimeout(() => {
+                        document.getElementById('modal-overlay').classList.remove('show');
+                        document.getElementById('sync-overlay').style.display = 'flex';
+                        
+                        setTimeout(() => {
+                            window.location.href = '/' + suggestedId;
+                        }, 1200);
+                    }, 1500);
                 } else {
                     alert('Forge failed. Please try again.');
                     resetSubmitBtn();

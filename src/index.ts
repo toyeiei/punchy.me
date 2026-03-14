@@ -487,6 +487,8 @@ export default {
 								.on('#card-job', handler)
 								.on('#card-email', handler)
 								.on('#card-website', handler)
+								.on('#card-email-link', handler)
+								.on('#card-website-link', handler)
 								.on('#title-tag', handler)
 								.on('#og-title', handler)
 								.on('#twitter-title', handler)
