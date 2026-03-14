@@ -472,35 +472,83 @@ describe("PUNCHY.ME URL Shortener", () => {
   });
 
   describe("ODIN Feature (Tactical Analysis)", () => {
-    it("serves the ODIN HUD page", async () => {
+    it("serves the ODIN HUD page with all tactical dependencies", async () => {
       const res = await SELF.fetch("http://localhost/odin");
       expect(res.status).toBe(200);
       const html = await res.text();
       expect(html).toContain("ODIN");
-      expect(html).toContain("DROP MISSION INTEL");
-      expect(html).toContain("arquero");
+      expect(html).toContain("SUPREME DATA COMMAND");
+      expect(html).toContain("arquero"); // Verify dependency link
+      expect(html).toContain("PIVOT"); // Verify new tactical button
     });
 
-    it("analyzes dataset payload via AI and returns strategic insights", async () => {
+    it("rejects AI analysis without a security handshake (Turnstile)", async () => {
+      const res = await SELF.fetch("http://localhost/odin/analyze", {
+        method: "POST",
+        body: JSON.stringify({ columns: ["Job"], numRows: 1, sample: [] }),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(res.status).toBe(403);
+      const data = await res.json() as any;
+      expect(data.error).toContain("Security handshake required");
+    });
+
+    it("performs AI analysis with a valid test token", async () => {
       const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
         response: JSON.stringify({
-          strategic_overview: "Healthy sample.",
+          strategic_overview: "Battle ready.",
           anomalies_detected: "None.",
-          tactical_recommendations: "Scale operations."
+          tactical_recommendations: "Full scale deployment."
         })
       });
 
       const res = await SELF.fetch("http://localhost/odin/analyze", {
         method: "POST",
-        body: JSON.stringify({ columns: ["Job", "Salary"], numRows: 10, sample: [{ Job: "Data Analyst", Salary: 120000 }] }),
+        body: JSON.stringify({ 
+          columns: ["Role"], 
+          numRows: 10, 
+          sample: [{ Role: "Commander" }],
+          turnstileToken: "test-token" 
+        }),
         headers: { "Content-Type": "application/json" },
       });
 
       expect(res.status).toBe(200);
       const data = await res.json() as any;
-      expect(data.strategic_overview).toBe("Healthy sample.");
-      
+      expect(data.strategic_overview).toBe("Battle ready.");
       aiSpy.mockRestore();
     });
+
+    it("enforces a tactical cooldown (rate limiting) for AI requests", async () => {
+      const ip = "1.2.3.4";
+      const makeRequest = () => SELF.fetch("http://localhost/odin/analyze", {
+        method: "POST",
+        body: JSON.stringify({ columns: ["X"], numRows: 1, sample: [], turnstileToken: "test-token" }),
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": ip },
+      });
+
+      // Exhaust 5 requests sequentially
+      for (let i = 0; i < 5; i++) {
+        const r = await makeRequest();
+        expect(r.status).toBe(200);
+      }
+
+      const res = await makeRequest();
+      expect(res.status).toBe(429);
+      const data = await res.json() as any;
+      expect(data.error).toContain("Tactical cooling");
+    }, 20000); 
+
+    it("regression: ensures core URL shortener remains functional", async () => {
+      const res = await SELF.fetch("http://localhost/shorten", {
+        method: "POST",
+        body: JSON.stringify({ url: "https://example.com/odin-test" }),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(res.status).toBe(200);
+      const data = await res.json() as any;
+      expect(data.id).toBeDefined();
+    });
   });
+
 });

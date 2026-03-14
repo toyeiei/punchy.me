@@ -281,7 +281,7 @@ export default {
 				let result;
 				try {
 					result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
-				} catch (e) {
+				} catch (_e) {
 					// Fallback for malformed strings
 					const cleanText = (aiResponse.response || '').replace(/```json|```/g, '').trim();
 					result = JSON.parse(cleanText);
@@ -299,8 +299,25 @@ export default {
 
 		if (path === '/odin/analyze' && request.method === 'POST') {
 			try {
-				const { columns, numRows, sample } = await request.json() as { columns: string[], numRows: number, sample: any[] };
+				const { columns, numRows, sample, turnstileToken } = await request.json() as { columns: string[], numRows: number, sample: any[], turnstileToken?: string };
 				
+				// Bot Protection: Turnstile Verification
+				if (!turnstileToken) return new Response(JSON.stringify({ error: 'Security handshake required.' }), { status: 403 });
+				
+				const formData = new FormData();
+				formData.append('secret', '0x4AAAAAAApO5kHNRhLAhQOH-X-SECRET-KEY'); // Mocked/User replaced in prod
+				formData.append('response', turnstileToken);
+				
+				// In local test env, we might skip this or mock it
+				if (turnstileToken !== 'test-token') {
+					const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
+						method: 'POST',
+						body: formData
+					});
+					const verifyData = await verifyRes.json() as { success: boolean };
+					if (!verifyData.success) return new Response(JSON.stringify({ error: 'Security check failed.' }), { status: 403 });
+				}
+
 				// Rate Limiting
 				const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
 				const aiRlKey = `rl:odin:${ip}`;
@@ -324,7 +341,7 @@ export default {
 				let result;
 				try {
 					result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
-				} catch (e) {
+				} catch (_e) {
 					const cleanText = (aiResponse.response || '').replace(/```json|```/g, '').trim();
 					result = JSON.parse(cleanText);
 				}

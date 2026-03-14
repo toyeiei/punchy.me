@@ -198,19 +198,22 @@ export const ODIN_HTML = `<!DOCTYPE html>
             color: var(--text-dim);
         }
         th {
-            background: rgba(34, 197, 94, 0.05);
+            background: #111111; /* Solid high-contrast background */
             color: var(--accent);
             text-align: left;
-            padding: 10px;
-            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 12px 10px;
+            border-bottom: 2px solid var(--accent);
             position: sticky;
             top: 0;
             z-index: 5;
-            backdrop-filter: blur(5px);
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
         td {
-            padding: 8px 10px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
+            padding: 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.2); /* Slight depth */
         }
         tr:hover td {
             color: var(--text-main);
@@ -400,27 +403,27 @@ export const ODIN_HTML = `<!DOCTYPE html>
         const columnCount = document.getElementById('column-count');
         const dataSizeBadge = document.getElementById('data-size');
 
-        const mockCSV = \`Job,Dept,Salary,Years,Region
-Data Analyst,Engineering,120000,3,APAC
-Senior Engineer,Engineering,150000,5,NA
-Marketing Manager,Marketing,90000,4,EMEA
-Data Scientist,Engineering,140000,4,APAC
-HR Specialist,HR,80000,2,NA
-VP Engineering,Engineering,250000,10,NA
-Marketing Exec,Marketing,85000,3,APAC
-Data Analyst,Engineering,115000,2,EMEA
-Director HR,HR,160000,8,NA
-Product Manager,Product,130000,5,APAC
-UX Designer,Product,110000,4,EMEA
-Sales Lead,Sales,95000,6,NA
-DevOps Engineer,Engineering,145000,5,APAC
-Content Strategist,Marketing,75000,2,EMEA
-Financial Analyst,Finance,105000,3,NA
-CTO,Engineering,300000,15,NA
-Support Hero,Support,60000,1,APAC
-QA Tester,Engineering,85000,2,EMEA
-Legal Counsel,Legal,180000,7,NA
-Growth Hacker,Marketing,125000,4,APAC\`;
+        const mockCSV = \`Employee,Job,Dept,Salary,Years,Region
+Alex Carter,Data Analyst,Engineering,120000,3,APAC
+Jordan Smith,Senior Engineer,Engineering,150000,5,NA
+Casey Reed,Marketing Manager,Marketing,90000,4,EMEA
+Riley Vance,Data Scientist,Engineering,140000,4,APAC
+Morgan Blake,HR Specialist,HR,80000,2,NA
+Taylor Quinn,VP Engineering,Engineering,250000,10,NA
+Skyler Grey,Marketing Exec,Marketing,85000,3,APAC
+Dakota Lane,Data Analyst,Engineering,115000,2,EMEA
+Peyton Cross,Director HR,HR,160000,8,NA
+Quinn Blair,Product Manager,Product,130000,5,APAC
+Reese Hunt,UX Designer,Product,110000,4,EMEA
+Avery Frost,Sales Lead,Sales,95000,6,NA
+Emerson Cole,DevOps Engineer,Engineering,145000,5,APAC
+Parker West,Content Strategist,Marketing,75000,2,EMEA
+Finley Nash,Financial Analyst,Finance,105000,3,NA
+Logan Sharp,CTO,Engineering,300000,15,NA
+Robin Banks,Support Hero,Support,60000,1,APAC
+Jamie Fox,QA Tester,Engineering,85000,2,EMEA
+Sasha King,Legal Counsel,Legal,180000,7,NA
+Ari Stone,Growth Hacker,Marketing,125000,4,APAC\`;
 
         const renderTable = (dt, target) => {
             if (!dt) return;
