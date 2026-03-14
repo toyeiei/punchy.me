@@ -341,7 +341,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
-    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
+    <a href=\"/\" class=\"punchy-portal\"><div class=\"portal-trigger\">?</div><div class=\"portal-brand\">PUNCHY.ME</div><div class=\"portal-tools\"><object><a href=\"/bazuka\" class=\"portal-tool-link\" title=\"BAZUKA\">??</a></object><object><a href=\"/anakin\" class=\"portal-tool-link\" title=\"ANAKIN\">?</a></object><object><a href=\"/musashi\" class=\"portal-tool-link\" title=\"MUSASHI\">??</a></object><object><a href=\"/odin\" class=\"portal-tool-link\" title=\"ODIN\">????</a></object></div></a>
     
     <div class="container">
         <div class="title-container">
