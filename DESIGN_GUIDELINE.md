@@ -109,9 +109,9 @@ Every new professional tool must be initialized with these 3 tactical pillars:
 The standard back-link is replaced by an interactive portal that allows rapid movement between professional tools.
 
 - **Trigger**: A compact `44x44px` glass square with the brand `⚡` icon.
-- **Position**: `fixed`, `bottom: 1.5rem`, `left: 1.5rem`.
+- **Position**: `fixed`, `bottom: 1.5rem`, `right: 1.5rem`.
 - **Interaction**:
-    - **Hover**: Expands horizontally to reveal the `PUNCHY.ME` brand name and a row of tool icons (`👤` BAZUKA, `⚡` ANAKIN, `⚔️` MUSASHI, `🐦‍⬛` ODIN).
+    - **Hover**: Expands horizontally (to the left) to reveal the `PUNCHY.ME` brand name and a row of tool icons.
     - **Visuals**: SHINOBI GLASS background, 12px radius, neon-green border shift.
 - **Mobile Profile**: Stays compact (icon-only) or expands on tap to ensure touch targets remain clean.
 

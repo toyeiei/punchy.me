@@ -62,12 +62,13 @@ export const ODIN_HTML = `<!DOCTYPE html>
             100% { transform: translateY(100vh) translateZ(0); }
         }
 
-        /* ECOSYSTEM PORTAL (Fast-Switcher) */
+        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
         .punchy-portal {
             position: fixed;
             bottom: 1.5rem;
-            left: 1.5rem;
+            right: 1.5rem;
             display: flex;
+            flex-direction: row-reverse; /* Expand to the left */
             align-items: center;
             background: rgba(0, 0, 0, 0.8);
             backdrop-filter: blur(10px);
@@ -465,10 +466,10 @@ export const ODIN_HTML = `<!DOCTYPE html>
             }
             .punchy-portal {
                 bottom: 1rem;
-                left: 1rem;
+                right: 1rem;
             }
             .punchy-portal:hover {
-                width: 44px; /* Disable expansion on mobile hover to avoid UX clutter */
+                width: 44px; 
             }
         }
 
