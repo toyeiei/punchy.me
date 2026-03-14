@@ -127,7 +127,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             text-align: center;
             z-index: 10;
             position: relative;
-            padding: 8rem 1.5rem 2rem;
+            padding: 6rem 1.5rem 2rem;
             flex-grow: 1;
         }
 
@@ -140,7 +140,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 80px); font-weight: 400;
+            font-family: var(--font-brand); font-size: clamp(3rem, 12vw, 100px); font-weight: 400;
             line-height: 0.8;
             color: var(--text-main);
             letter-spacing: -3px;
