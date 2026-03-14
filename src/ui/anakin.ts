@@ -45,29 +45,21 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             padding: 0;
         }
 
-        html, body {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-        }
-
         body {
             background-color: var(--bg);
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Start at top for long forms */
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            min-height: -webkit-fill-available;
             position: relative;
-            padding: 6rem 1.5rem 2rem; /* Added extra top padding for the back-button badge */
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
 
         .back-home {
-            position: absolute;
+            position: fixed;
             top: 1.5rem;
             left: 1.5rem;
             color: var(--accent);
@@ -79,7 +71,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             align-items: center;
             gap: 0.5rem;
             transition: all 0.3s ease;
-            opacity: 0.7;
             z-index: 100;
             background: rgba(0,0,0,0.5);
             padding: 8px 12px;
@@ -92,7 +83,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+            z-index: -1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -104,7 +95,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
-            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
@@ -122,7 +112,8 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             text-align: center;
             z-index: 10;
             position: relative;
-            margin-bottom: 5rem; /* Added consistent bottom margin */
+            padding: 8rem 1.5rem 2rem;
+            flex-grow: 1;
         }
 
         .title-container {
@@ -214,7 +205,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
             border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: left;
-            margin-bottom: 5rem; /* Added spacing below the form panel */
         }
 
         .form-grid {
@@ -248,7 +238,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         input:focus, textarea:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
 
-        /* Live Validation Styles */
         .input-wrapper { position: relative; }
         input.valid, textarea.valid { border-color: var(--accent); box-shadow: 0 0 10px rgba(34, 197, 94, 0.1); }
         input.invalid, textarea.invalid { border-color: #ef4444; box-shadow: 0 0 10px rgba(239, 68, 68, 0.1); }
@@ -322,16 +311,18 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
 
-        .integrated-footer {
-            grid-column: 1 / -1;
-            text-align: center;
-            margin-top: 1.5rem;
-            font-size: 0.75rem;
+        .footer-credits {
+            width: 100%;
+            padding: 2rem;
+            font-size: 0.7rem;
             color: var(--text-dim);
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            font-family: var(--font-mono);
+            text-align: center;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            margin-top: auto;
+            z-index: 1;
         }
-        .integrated-footer:hover { opacity: 1; }
 
         #modal-overlay {
             display: none;
@@ -421,7 +412,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         <form id="anakin-form">
             <div class="input-group">
                 <div class="form-grid">
-                    <!-- Left Column: Personal Info -->
                     <div class="form-col-left">
                         <div class="field-group">
                             <label>Full Name</label>
@@ -454,7 +444,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                         </div>
                     </div>
 
-                    <!-- Right Column: Professional Content -->
                     <div class="form-col-right">
                         <div class="field-group">
                             <label>Education</label>
@@ -485,9 +474,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
                 </div>
                 
                 <button type="submit" id="anakin-btn">GENERATE RESUME</button>
-                <div class="integrated-footer">
-                    Built with ⚡ by Toy & Gemini CLI
-                </div>
             </div>
             
             <div id="turnstile-container" style="display: none;">
@@ -495,6 +481,8 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             </div>
         </form>
     </div>
+
+    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         const form = document.getElementById('anakin-form');
@@ -510,7 +498,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         function validateInput(input) {
             let isValid = input.checkValidity() && input.value.trim().length > 0;
             
-            // Stricter Email Validation Pattern
             if (input.id === 'email') {
                 const emailPattern = /^[a-zA-Z0-9._-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,6}$/;
                 isValid = isValid && emailPattern.test(input.value.trim());
@@ -620,7 +607,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             }
         }
 
-        // Mobile UX: Scroll into view on focus
         const formInputs = form.querySelectorAll('input, textarea');
         formInputs.forEach(input => {
             input.addEventListener('focus', () => {
@@ -683,23 +669,25 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
+        html, body { height: 100%; background-color: var(--bg); }
+
         body {
-            background-color: var(--bg);
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
-            justify-content: center;
-            align-items: flex-start;
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            padding: 4rem 1rem;
+            padding: 0;
             line-height: 1.6;
             overflow-x: hidden;
+            overflow-y: auto;
         }
 
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+            z-index: -1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -711,7 +699,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
-            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
@@ -728,7 +715,8 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             background: #111111;
             border-radius: 24px;
             max-width: 900px;
-            width: 100%;
+            width: 95%;
+            margin: 4rem auto 2rem;
             padding: 4rem;
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
@@ -772,12 +760,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             font-family: 'JetBrains Mono', monospace;
         }
         .util-btn:hover { background: var(--accent); color: #000; border-color: var(--accent); }
-
-        .resume-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2.5rem;
-        }
 
         .header { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 2rem; text-align: left; }
 
@@ -839,7 +821,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         }
         .section-title::after { content: ""; flex: 1; height: 1px; background: rgba(34, 197, 94, 0.2); }
 
-        /* Glassmorphism AI Box */
         .ai-box { 
             font-size: 1rem; 
             color: var(--text-main); 
@@ -869,7 +850,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         }
         .ai-box[data-refined="true"]::before { opacity: 1; }
 
-        /* Loading Animation for Hydration */
         [data-pending="true"] {
             color: var(--accent) !important;
             animation: forge-glitch 1s infinite alternate;
@@ -883,30 +863,33 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .content-text { color: var(--text-main); white-space: pre-wrap; font-size: 1rem; line-height: 1.5; }
 
-        /* Experience List Spacing */
         #res-experience ul, #res-experience ol { padding-left: 1.5rem; margin: 0; }
         #res-experience li { margin-bottom: 1.25rem; }
         #res-experience li:last-child { margin-bottom: 0; }
 
-        /* Sidebar Elements */
-        .sidebar-section { margin-bottom: 1.5rem; }
-        .sidebar-label { color: var(--accent); font-size: 0.7rem; font-weight: 900; text-transform: uppercase; letter-spacing: 2px; margin-bottom: 0.5rem; }
-        .sidebar-value { color: var(--text-main); font-size: 0.9rem; word-break: break-all; text-decoration: none; display: block; }
-        .sidebar-value:hover { color: var(--accent); }
-
-        .brand-footer { grid-column: 1 / -1; margin-top: 2rem; font-size: 0.75rem; color: var(--text-dim); text-align: center; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 1rem; }
+        .footer-credits {
+            width: 100%;
+            padding: 2rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            text-align: center;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            margin-top: auto;
+            z-index: 1;
+        }
 
         .print-footer { display: none; }
 
         @media print {
             @page { size: letter; margin: 10mm; }
             body { background: white !important; color: black !important; padding: 0; margin: 0; display: block !important; }
-            .pixel-bg, .hud-corner, .utility-bar, .brand-footer { display: none !important; }
+            .pixel-bg, .hud-corner, .utility-bar, .footer-credits { display: none !important; }
             .resume-card { background: white !important; color: black !important; box-shadow: none !important; border: none !important; padding: 0 !important; max-width: 100% !important; page-break-inside: avoid !important; height: auto !important; display: block !important; }
             .name { color: black !important; }
-            .job-title, .section-title, .sidebar-label { color: #16a34a !important; }
+            .job-title, .section-title { color: #16a34a !important; }
             
-            /* DEFINITIVE FIX: Minimalist AI summary for print */
             .ai-box { 
                 background: white !important; 
                 border: 1.5pt solid black !important; 
@@ -939,7 +922,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
                 line-height: 1.4 !important;
             }
             
-            .content-text, .sidebar-value, .contact-item { color: black !important; }
+            .content-text, .contact-item { color: black !important; }
             .contact-label { color: #16a34a !important; }
             .expertise-tag { 
                 background: white !important; 
@@ -955,13 +938,11 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
     <div class="pixel-bg" id="pixel-bg"></div>
     
     <div class="resume-card">
-        <!-- HUD Accents -->
         <div class="hud-corner top-left"></div>
         <div class="hud-corner top-right"></div>
         <div class="hud-corner bottom-left"></div>
         <div class="hud-corner bottom-right"></div>
 
-        <!-- Utility Buttons -->
         <div class="utility-bar">
             <button class="util-btn" onclick="window.print()">Print PDF</button>
             <button class="util-btn" id="copy-resume-link">Copy URL</button>
@@ -1012,18 +993,18 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
 
-        <div class="brand-footer">
+        <div class="print-footer">
             FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI • Expires in 3 days
         </div>
-        <div class="print-footer">
-            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME
-        </div>
+    </div>
+
+    <div class="footer-credits">
+        FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI • Expires in 3 days
     </div>
 
     <script type="application/ld+json" id="schema-block"></script>
 
     <script>
-        // Copy Link Functionality
         document.getElementById('copy-resume-link').onclick = () => {
             navigator.clipboard.writeText(window.location.href).then(() => {
                 const btn = document.getElementById('copy-resume-link');
@@ -1039,7 +1020,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             });
         };
 
-        // Background Animation
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
             const pixel = document.createElement('div');
@@ -1055,7 +1035,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
 
-        // Client-Side AI Hydration
         async function hydrateAI() {
             const summaryEl = document.getElementById('res-summary');
             const summaryBox = document.getElementById('summary-box');
