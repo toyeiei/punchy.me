@@ -152,6 +152,40 @@ export const ODIN_HTML = `<!DOCTYPE html>
             line-height: 0.8;
             letter-spacing: -3px;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            position: relative;
+            animation: odin-glitch 5s infinite;
+        }
+
+        @keyframes odin-glitch {
+            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+        }
+
+        .odin-brand::before, .odin-brand::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            opacity: 0;
+            will-change: transform, opacity;
+            transform: translateZ(0);
+        }
+
+        .odin-brand::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
+        .odin-brand::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
+
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
         .odin-desc {
@@ -477,7 +511,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
 
     <header class="global-header">
         <div class="brand-block">
-            <div class="odin-brand">ODIN</div>
+            <div class="odin-brand" data-text="ODIN">ODIN</div>
             <div class="odin-desc">SUPREME DATA COMMAND // CRUNCH INTEL AT THE EDGE</div>
         </div>
         <div class="tactical-badges">

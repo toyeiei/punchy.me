@@ -139,16 +139,16 @@ export const HTML = `<!DOCTYPE html>
         h1 {
             font-family: var(--font-brand);
             font-size: clamp(4rem, 15vw, 120px);
-            line-height: 1;
+            line-height: 0.8;
             margin-bottom: 2rem;
             color: var(--text-main);
-            letter-spacing: -2px;
+            letter-spacing: -3px;
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
             will-change: transform, opacity;
             transform: translateZ(0);
-            font-weight: 900; /* HEAVY WEIGHT APPLIED */
+            font-weight: 900;
         }
 
         @keyframes main-glitch {

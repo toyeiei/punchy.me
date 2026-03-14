@@ -127,9 +127,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         h1 {
             font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 80px); font-weight: 900;
-            line-height: 1;
+            line-height: 0.8;
             color: var(--text-main);
-            letter-spacing: -2px;
+            letter-spacing: -3px;
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
