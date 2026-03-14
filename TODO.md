@@ -23,5 +23,10 @@
 - [ ] **Mobile UX Audit**: Refine the LOKI dual-pane layout for small-screen "Single-Column" fluidity.
 - [ ] **Accessibility Strike**: Ensure all forms and timeline entries meet high-contrast accessibility standards.
 
+## Phase 5: ODIN Strategic Evolution
+- [ ] **ODIN Oracle Forge**: Implement Natural Language AI to translate English queries into raw Arquero code for non-coders.
+- [ ] **ODIN Visual HUD**: Integrate ECharts/Vega-Lite for real-time charting and data visualization directly in the results panel.
+- [ ] **ODIN Tactical Save**: Implement state persistence via KV, allowing users to share their analysis results via PUNCHY.ME short links.
+
 ---
-*Status: LOKI Infrastructure Primed. 36/36 Tests Passing.*
+*Status: ODIN Hardened & Secured. 41/41 Tests Passing.*

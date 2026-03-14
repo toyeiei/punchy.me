@@ -112,7 +112,7 @@ export const HTML = `<!DOCTYPE html>
 
         .feature-section {
             width: 100%;
-            max-width: 1100px; /* Expanded cards area (+20% from 920px) */
+            max-width: 1200px; /* Expanded cards area for 4-column layout */
             padding: 0 1.5rem 4rem;
             z-index: 10;
         }
@@ -259,9 +259,15 @@ export const HTML = `<!DOCTYPE html>
             margin-top: 2rem;
         }
 
-        @media (min-width: 900px) {
+        @media (min-width: 640px) {
             .suite-grid {
-                grid-template-columns: 1fr 1fr 1fr;
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+
+        @media (min-width: 1100px) {
+            .suite-grid {
+                grid-template-columns: 1fr 1fr 1fr 1fr;
             }
         }
 
@@ -537,11 +543,13 @@ export const HTML = `<!DOCTYPE html>
             </a>
             <a href="/musashi" class="feature-card">
                 <span class="feature-icon">⚔️</span>
-                <div class="feature-title">
-                    MUSASHI
-                    <span class="coming-soon-badge">Coming Soon</span>
-                </div>
-                <div class="feature-tagline">The Way is in training. Mastery is found in relentless practice and discipline.</div>
+                <div class="feature-title">MUSASHI</div>
+                <div class="feature-tagline">The Way is in training. Mastery is found in relentless discipline.</div>
+            </a>
+            <a href="/odin" class="feature-card">
+                <span class="feature-icon">👁️</span>
+                <div class="feature-title">ODIN</div>
+                <div class="feature-tagline">Tactical Data Command. Supreme edge-native analytics HUD.</div>
             </a>
         </div>
     </section>

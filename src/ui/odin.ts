@@ -26,6 +26,11 @@ export const ODIN_HTML = `<!DOCTYPE html>
             position: relative;
         }
 
+        /* Responsive Body Scroll */
+        @media (max-width: 1024px) {
+            body { height: auto; overflow-y: auto; }
+        }
+
         /* Pulse Grid Background */
         .grid-bg {
             position: fixed;
@@ -54,100 +59,83 @@ export const ODIN_HTML = `<!DOCTYPE html>
             100% { transform: translateY(100vh) translateZ(0); }
         }
 
-        /* ODIN BRANDING (Massive) */
-        .odin-brand-container {
+        /* UNIFIED TACTICAL HEADER */
+        .global-header {
             position: fixed;
-            top: 1.5rem;
-            left: 1.5rem;
+            top: 0;
+            left: 0;
+            width: 100%;
+            padding: 1.5rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
             z-index: 100;
-            pointer-events: none;
+            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
+            backdrop-filter: blur(5px);
         }
+
+        .brand-block {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+        }
+
         .odin-brand {
             font-family: var(--font-brand);
-            font-size: 4.5rem;
+            font-size: 5.5rem;
             color: var(--text-main);
             line-height: 0.8;
             letter-spacing: -3px;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
         }
+
         .odin-desc {
             font-family: var(--font-mono);
-            font-size: 0.7rem;
-            color: var(--accent);
+            font-size: 0.85rem;
+            color: var(--text-main);
             text-transform: uppercase;
             letter-spacing: 2px;
-            margin-top: 0.5rem;
             font-weight: bold;
+            border-right: 1px solid rgba(255, 255, 255, 0.2);
+            padding-right: 1.5rem;
+            height: fit-content;
+            white-space: nowrap;
         }
 
-        /* Tactical Header (Top Right) */
-        .tactical-header {
-            position: fixed;
-            top: 1.5rem;
-            right: 1.5rem;
+        .tactical-badges {
             display: flex;
             align-items: center;
             gap: 1rem;
-            z-index: 100;
         }
+
         .badge {
             background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 8px 16px;
             border-radius: 8px;
             font-size: 0.7rem;
-            color: var(--accent);
+            color: var(--text-main);
             font-weight: bold;
             letter-spacing: 1px;
-            min-width: 120px; /* Prevent header shift */
+            min-width: 110px;
             text-align: center;
-        }
-        
-        @keyframes neon-glow {
-            0% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); }
-            50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
-            100% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); }
-        }
-
-        .btn-demo {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-dim);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.7rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            backdrop-filter: blur(10px);
-        }
-        .btn-demo:hover {
-            background: rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            transform: translateY(-2px);
         }
 
         .punchy-badge {
+            color: var(--accent);
             text-decoration: none;
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            font-weight: bold;
             font-size: 0.8rem;
-            background: rgba(0,0,0,0.5);
+            font-weight: 700;
             padding: 8px 12px;
+            background: rgba(0,0,0,0.5);
             border: 1px solid rgba(34, 197, 94, 0.2);
             border-radius: 8px;
-            backdrop-filter: blur(5px);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: all 0.3s ease;
         }
         .punchy-badge:hover {
             border-color: var(--accent);
-            color: var(--accent);
-            transform: translateY(-2px);
             box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
-            background: rgba(34, 197, 94, 0.05);
+            transform: translateY(-2px);
         }
 
         .container { 
@@ -156,12 +144,11 @@ export const ODIN_HTML = `<!DOCTYPE html>
             height: 100vh; 
             z-index: 10; 
             position: relative; 
-            padding-top: 8rem; /* Space for large header */
+            padding-top: 8rem; 
         }
 
-        /* Panel Structure: 50/50 */
+        /* Panel Structure: 60/40 */
         .panel {
-            width: 50%;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -169,7 +156,13 @@ export const ODIN_HTML = `<!DOCTYPE html>
             gap: 1rem;
             overflow: hidden;
         }
-        .panel-left { border-right: 1px solid rgba(255, 255, 255, 0.05); }
+        .panel-left { 
+            width: 60%;
+            border-right: 1px solid rgba(255, 255, 255, 0.05); 
+        }
+        .panel-right {
+            width: 40%;
+        }
 
         .panel-title {
             font-size: 0.7rem;
@@ -180,7 +173,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             justify-content: space-between;
             align-items: center;
         }
-        .panel-title span { color: var(--accent); font-weight: bold; }
 
         .preview-box {
             flex-grow: 1;
@@ -198,11 +190,11 @@ export const ODIN_HTML = `<!DOCTYPE html>
             color: var(--text-dim);
         }
         th {
-            background: #111111; /* Solid high-contrast background */
-            color: var(--accent);
+            background: #111111;
+            color: var(--text-main);
             text-align: left;
             padding: 12px 10px;
-            border-bottom: 2px solid var(--accent);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             position: sticky;
             top: 0;
             z-index: 5;
@@ -213,7 +205,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
         td {
             padding: 10px;
             border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            background: rgba(0, 0, 0, 0.2); /* Slight depth */
+            background: rgba(0, 0, 0, 0.2);
         }
         tr:hover td {
             color: var(--text-main);
@@ -225,32 +217,37 @@ export const ODIN_HTML = `<!DOCTYPE html>
             display: flex;
             gap: 10px;
             overflow-x: auto;
-            padding: 5px 0;
+            padding: 10px 0;
             scrollbar-width: none;
         }
         .recipes-container::-webkit-scrollbar { display: none; }
         
         .btn-recipe {
-            background: rgba(255, 255, 255, 0.02);
-            color: var(--text-dim);
-            border: 1px solid rgba(255, 255, 255, 0.05);
-            padding: 6px 14px;
-            border-radius: 20px;
-            font-size: 0.65rem;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-main);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            padding: 12px 16px;
+            border-radius: 8px;
+            font-size: 0.7rem;
             font-family: var(--font-mono);
-            font-weight: 600;
+            font-weight: 700;
+            line-height: 1; 
             white-space: nowrap;
             cursor: pointer;
             transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1.5px;
+            flex-shrink: 0;
         }
         .btn-recipe:hover {
             background: rgba(34, 197, 94, 0.1);
             color: var(--accent);
-            border-color: rgba(34, 197, 94, 0.3);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
-            transform: translateY(-1px);
+            border-color: var(--accent);
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.25);
+            transform: translateY(-2px);
         }
 
         .terminal-container {
@@ -263,7 +260,52 @@ export const ODIN_HTML = `<!DOCTYPE html>
             gap: 10px;
             font-family: var(--font-mono);
             box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.1);
+            position: relative;
         }
+        
+        .history-btn {
+            background: transparent;
+            color: var(--text-dim);
+            border: none;
+            cursor: pointer;
+            font-size: 1rem;
+            display: flex;
+            align-items: center;
+            transition: color 0.2s ease;
+        }
+        .history-btn:hover { color: var(--accent); }
+
+        .history-dropdown {
+            position: absolute;
+            bottom: 100%;
+            left: 0;
+            width: 100%;
+            background: rgba(17, 17, 17, 0.95);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            border-bottom: none;
+            border-radius: 8px 8px 0 0;
+            display: none;
+            flex-direction: column;
+            z-index: 50;
+            backdrop-filter: blur(10px);
+            overflow: hidden;
+        }
+        .history-item {
+            padding: 10px 15px;
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .history-item:hover {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent);
+        }
+        .show-history { display: flex; }
         .terminal-container.error {
             border-color: #ef4444;
             box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.1);
@@ -298,31 +340,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             transform: scale(1.05);
         }
 
-        .upload-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 20;
-        }
-        .file-input { display: none; }
-        .upload-label {
-            padding: 2.5rem;
-            border: 1px dashed rgba(34, 197, 94, 0.3);
-            border-radius: 12px;
-            cursor: pointer;
-            text-align: center;
-            transition: all 0.3s ease;
-        }
-        .upload-label:hover {
-            border-color: var(--accent);
-            background: rgba(34, 197, 94, 0.05);
-        }
-        .hidden { display: none !important; }
-
         /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
@@ -343,28 +360,94 @@ export const ODIN_HTML = `<!DOCTYPE html>
             scrollbar-color: rgba(34, 197, 94, 0.2) rgba(0, 0, 0, 0.2);
         }
 
+        /* Footer Credits */
+        .footer-credits {
+            margin-top: 4rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            text-align: right;
+            padding: 0 2rem 2rem 0;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            width: 100%;
+            z-index: 1;
+        }
+
+        /* World-Class Mobile HUD */
+        @media (max-width: 1024px) {
+            .footer-credits {
+                text-align: center;
+                padding: 2rem 0;
+            }
+            .global-header {
+                padding: 1rem;
+                background: rgba(0,0,0,0.9);
+            }
+            .tactical-badges {
+                display: none; /* Stealth Mode: Hide badges on mobile */
+            }
+            .odin-brand { font-size: 3.5rem; } /* Scaled up from 2.5rem */
+            .odin-desc { 
+                border-left: 1px solid rgba(255, 255, 255, 0.2);
+                border-right: none;
+                padding-left: 1rem;
+                padding-right: 0;
+                font-size: 0.8rem; /* Scaled up from 0.6rem */
+                white-space: normal;
+                max-width: 280px; /* Expanded from 180px */
+            }
+            .container {
+                flex-direction: column;
+                height: auto;
+                overflow-y: auto;
+                padding-top: 6rem; /* Reduced for mobile */
+            }
+            .panel {
+                width: 100% !important;
+                height: auto;
+                min-height: 350px;
+                border-right: none;
+                padding: 1rem;
+            }
+            .panel-left {
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+            .preview-box {
+                height: 300px; /* Fixed height for data scroll on mobile */
+                flex-grow: 0;
+            }
+            .panel-right {
+                margin-top: 1rem;
+                padding-bottom: 4rem;
+            }
+        }
+
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     
-    <div class="odin-brand-container">
-        <div class="odin-brand">ODIN</div>
-        <div class="odin-desc">SUPREME DATA COMMAND // CRUNCH INTEL AT THE EDGE</div>
-    </div>
-
-    <header class="tactical-header">
-        <div class="badge" id="record-count">0 RECORDS</div>
-        <div class="badge" id="column-count">0 COLUMNS</div>
-        <div class="badge" id="data-size">0.0 KB</div>
-        <a href="/" class="punchy-badge">[ ⚡ PUNCHY.ME ]</a>
+    <header class="global-header">
+        <div class="brand-block">
+            <div class="odin-brand">ODIN</div>
+            <div class="odin-desc">SUPREME DATA COMMAND // CRUNCH INTEL AT THE EDGE</div>
+        </div>
+        <div class="tactical-badges">
+            <div class="badge" id="record-count">0 RECORDS</div>
+            <div class="badge" id="column-count">0 COLUMNS</div>
+            <div class="badge" id="data-size">0.0 KB</div>
+            <a href="/" class="punchy-badge">[ ⚡ PUNCHY.ME ]</a>
+        </div>
     </header>
+
+    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <div class="container">
         <!-- LEFT PANEL: SOURCE -->
         <section class="panel panel-left">
-            <h2 class="panel-title">SOURCE INTEL <span>// DEMO PAYLOAD</span></h2>
+            <h2 class="panel-title">SOURCE INTEL</h2>
             <div class="preview-box">
                 <table id="source-table"></table>
             </div>
@@ -375,10 +458,14 @@ export const ODIN_HTML = `<!DOCTYPE html>
                 <button class="btn-recipe" data-code="table.orderby(aq.desc('Salary')).slice(0, 10)">[ TOP 10 ]</button>
                 <button class="btn-recipe" data-code="table.groupby('Dept').count()">[ GROUP BY ]</button>
                 <button class="btn-recipe" data-code="table.sample(5)">[ SAMPLE ]</button>
-                <button class="btn-recipe" data-code="table.pivot('Region', 'Dept')">[ PIVOT ]</button>
+                <button class="btn-recipe" data-code="table.groupby('Region', 'Dept').rollup({ Avg_Salary: d => op.mean(d.Salary) })">[ PIVOT ]</button>
             </div>
             
             <div class="terminal-container">
+                <div class="history-dropdown" id="history-dropdown"></div>
+                <button class="history-btn" id="history-toggle" title="Command History">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8"></path><path d="M3 3v5h5"></path><path d="M12 7v5l4 2"></path></svg>
+                </button>
                 <span class="prompt">&gt;</span>
                 <input type="text" id="query-terminal" placeholder="table.groupby('Dept').count()" autocomplete="off" spellcheck="false">
                 <button class="run-btn" id="run-terminal">RUN</button>
@@ -387,7 +474,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
 
         <!-- RIGHT PANEL: RESULT -->
         <section class="panel panel-right">
-            <h2 class="panel-title">ANALYSIS RESULT <span>// ARQUERO</span></h2>
+            <h2 class="panel-title">ANALYSIS RESULT</h2>
             <div class="preview-box">
                 <table id="result-table"></table>
             </div>
@@ -452,27 +539,23 @@ Ari Stone,Growth Hacker,Marketing,125000,4,APAC\`;
 
                 renderTable(table, sourceTable);
                 
-                // Update Badges
                 recordCount.innerText = table.numRows() + ' RECORDS';
                 columnCount.innerText = table.numCols() + ' COLUMNS';
                 const sizeKb = (new Blob([text]).size / 1024).toFixed(1);
                 dataSizeBadge.innerText = sizeKb + ' KB';
                 
-                resultTable.innerHTML = ''; // Clear result
+                resultTable.innerHTML = ''; 
             } catch (err) {
                 console.error("Forge Failed:", err);
             }
         };
 
-        // AUTO-LOAD STARTUP
         window.onload = () => loadData(mockCSV);
 
-        // Terminal Execution
         const terminal = document.getElementById('query-terminal');
         const runBtn = document.getElementById('run-terminal');
         const termContainer = document.querySelector('.terminal-container');
 
-        // ODIN Tactical Helpers
         const profile = (dt) => {
             if (!dt) return null;
             const cols = dt.columnNames();
@@ -498,10 +581,18 @@ Ari Stone,Growth Hacker,Marketing,125000,4,APAC\`;
             const cmd = terminal.value.trim();
             if (!cmd) return;
 
+            const forbidden = ['fetch', 'document', 'window', 'eval', 'XMLHttpRequest', 'cookie', 'localStorage', 'sessionStorage', 'location', 'script'];
+            const isMalicious = forbidden.some(word => cmd.toLowerCase().includes(word.toLowerCase()));
+            
+            if (isMalicious) {
+                termContainer.classList.add('error');
+                document.querySelector('.prompt').innerText = 'SEC>';
+                return;
+            }
+
             try {
-                // Inject profile helper and aq into the execution scope
-                const fn = new Function('table', 'aq', 'profile', \`return \${cmd}\`);
-                const result = fn(table, aq, profile);
+                const fn = new Function('table', 'aq', 'op', 'profile', 'window', 'document', 'fetch', \`return \${cmd}\`);
+                const result = fn(table, aq, aq.op, profile, null, null, null);
                 
                 if (result && typeof result.numRows === 'function') {
                     renderTable(result, resultTable);
@@ -513,23 +604,60 @@ Ari Stone,Growth Hacker,Marketing,125000,4,APAC\`;
             } catch (err) {
                 termContainer.classList.add('error');
                 document.querySelector('.prompt').innerText = 'ERR>';
-                console.error("ODIN Terminal Error:", err);
             }
         };
 
-        terminal.addEventListener('keydown', (e) => { if (e.key === 'Enter') executeQuery(); });
-        runBtn.onclick = executeQuery;
+        terminal.addEventListener('keydown', (e) => { if (e.key === 'Enter') window.executeQuery(); });
 
-        // Mission Arsenal Logic
         document.querySelectorAll('.btn-recipe').forEach(btn => {
             btn.onclick = () => {
                 terminal.value = btn.getAttribute('data-code');
                 terminal.focus();
-                // Visual feedback
                 btn.style.borderColor = 'var(--accent)';
-                setTimeout(() => btn.style.borderColor = 'rgba(34, 197, 94, 0.2)', 300);
+                setTimeout(() => btn.style.borderColor = 'rgba(255, 255, 255, 0.15)', 300);
             };
         });
+
+        let commandHistory = [];
+        const historyToggle = document.getElementById('history-toggle');
+        const historyDropdown = document.getElementById('history-dropdown');
+
+        const updateHistoryUI = () => {
+            historyDropdown.innerHTML = commandHistory.map(cmd => \`
+                <div class="history-item" title="\${cmd}">\${cmd}</div>
+            \`).join('');
+            
+            document.querySelectorAll('.history-item').forEach(item => {
+                item.onclick = () => {
+                    terminal.value = item.getAttribute('title');
+                    historyDropdown.classList.remove('show-history');
+                    terminal.focus();
+                };
+            });
+        };
+
+        historyToggle.onclick = (e) => {
+            e.stopPropagation();
+            if (commandHistory.length === 0) return alert("Command History Has No Records, Please Write Your First Query");
+            historyDropdown.classList.toggle('show-history');
+        };
+
+        window.onclick = () => historyDropdown.classList.remove('show-history');
+
+        const originalExecute = executeQuery;
+        window.executeQuery = () => {
+            const cmd = terminal.value.trim();
+            const prevResult = resultTable.innerHTML;
+            
+            originalExecute();
+            
+            if (resultTable.innerHTML !== prevResult && !commandHistory.includes(cmd)) {
+                commandHistory.unshift(cmd);
+                if (commandHistory.length > 5) commandHistory.pop();
+                updateHistoryUI();
+            }
+        };
+        runBtn.onclick = window.executeQuery;
     </script>
 </body>
 </html>`;

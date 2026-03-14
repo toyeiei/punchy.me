@@ -339,6 +339,18 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         .fade-in-up {
             animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
+
+        /* Footer Credits */
+        .footer-credits {
+            margin-top: 4rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            font-family: var(--font-mono);
+            text-align: center;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            padding-bottom: 2rem;
+        }
     </style>
 </head>
 <body>
@@ -346,6 +358,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     <div class="scan-line"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
     <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
+    
     <div class="container">
         <div class="title-container">
             <h1>MUSASHI</h1>
@@ -376,6 +389,8 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                 </div>
             </div>
         </div>
+
+        <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
     </div>
 
     <script>
