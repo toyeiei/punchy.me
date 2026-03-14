@@ -73,53 +73,41 @@ export const HTML = `<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            height: 100vh;
+            overflow: hidden; /* Single-View HUD */
             position: relative;
             padding: 0;
             margin: 0;
         }
 
-        /* Responsive Viewport Locking (The Senior Strategy) */
-        @media (min-width: 900px) {
-            body {
-                height: 100vh;
-                overflow: hidden; /* Lock viewport on desktop */
-                justify-content: center;
-            }
-            .hero-section { min-height: auto; padding: 2rem 1.5rem 16px; } 
-            .feature-section { padding-bottom: 0; margin-top: 1.0rem; }
-        }
-
         .hero-section {
             width: 100%;
+            flex: 1;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            padding: 2rem 1.5rem;
-            min-height: 100vh;
-            min-height: 100svh;
+            padding: 2rem 1.5rem 0;
             z-index: 10;
         }
 
         .container {
             width: 90%;
-            max-width: 800px; /* Keep punch box narrow and focused */
+            max-width: 800px;
             text-align: center;
             position: relative;
         }
 
         .feature-section {
             width: 100%;
-            max-width: 1200px; /* Expanded cards area for 4-column layout */
-            padding: 0 1.5rem 4rem;
+            max-width: 1200px;
+            padding: 0 1.5rem 3rem;
             z-index: 10;
         }
 
-        @media (min-width: 640px) {
-            .hero-section { min-height: auto; padding-top: 8rem; padding-bottom: 2rem; }
-            .feature-section { padding-top: 0; }
+        @media (max-width: 640px) {
+            body { height: auto; overflow-y: auto; } /* Allow mobile scroll */
+            .hero-section { min-height: 100svh; }
         }
 
         .pixel-bg {

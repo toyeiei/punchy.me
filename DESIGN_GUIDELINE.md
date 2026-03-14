@@ -1,5 +1,18 @@
 # PUNCHY.ME | Brand & Design Guideline (v1.0)
 
+## 0. Tactical Terminology
+To ensure mission-critical clarity, we use the following standard terms:
+
+- **HOME PAGE / LANDING PAGE**: Refers exclusively to the primary `PUNCHY.ME` root index.
+- **PROFESSIONAL TOOLS**: Refers to our main analytical and career-focused pages:
+    - **BAZUKA**: Digital Identity & Business Cards.
+    - **ANAKIN**: AI-Powered Resume Forge.
+    - **MUSASHI**: Cold Attack Engine (Job Intel).
+    - **ODIN**: Tactical Data Command (Edge Analytics).
+    - **LOKI**: Tactical Support & Timeline (*In Development*).
+
+---
+
 ## 1. Visual Foundation (Design Tokens)
 Our foundation is built on high-contrast, technical surfaces that evoke an "Elite Command Center" aesthetic.
 

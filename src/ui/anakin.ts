@@ -28,9 +28,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
     <style>
         :root {
             --bg: #000000;
-            --card-bg: #111111;
+            --card-bg: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
             --accent: #22c55e;
-            --accent-hover: #16a34a;
+            --accent-hover: #4ade80;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --font-brand: 'Bitcount Prop Double', cursive;
@@ -83,7 +83,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            z-index: 1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -95,6 +95,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
+            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
@@ -155,10 +156,10 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         @keyframes main-glitch {
-            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
-            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
-            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
-            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; }
+            81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg); text-shadow: none; }
         }
 
         h1::before, h1::after {
@@ -200,11 +201,18 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         .input-group {
             background: var(--card-bg);
+            backdrop-filter: blur(10px); /* SHINOBI GLASS */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* SHINOBI GLASS */
             padding: 3rem;
             border-radius: 24px;
             box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: left;
+            transition: all 0.3s ease;
+        }
+        .input-group:hover {
+            transform: translateY(-5px); /* SHINOBI GLASS */
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         .form-grid {
@@ -712,7 +720,9 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .resume-card {
             z-index: 10;
-            background: #111111;
+            background: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
+            backdrop-filter: blur(10px); /* SHINOBI GLASS */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* SHINOBI GLASS */
             border-radius: 24px;
             max-width: 900px;
             width: 95%;
@@ -721,10 +731,14 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
             overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            transition: all 0.3s ease;
+        }
+        .resume-card:hover {
+            transform: translateY(-5px); /* SHINOBI GLASS */
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
-        /* HUD Accents */
         .hud-corner {
             position: absolute;
             width: 20px;

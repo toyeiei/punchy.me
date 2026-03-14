@@ -15,9 +15,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <style>
         :root {
             --bg: #000000;
-            --card-bg: #111111;
+            --card-bg: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
             --accent: #22c55e;
-            --accent-hover: #16a34a;
+            --accent-hover: #4ade80;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --font-brand: 'Bitcount Prop Double', cursive;
@@ -45,7 +45,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1; /* Elevate above background */
+            z-index: 1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -82,7 +82,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             border: 1px solid rgba(34, 197, 94, 0.2);
             background: rgba(0,0,0,0.5);
             z-index: 100;
+            transition: all 0.3s ease;
         }
+        .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         .container {
             width: 100%;
@@ -133,13 +135,20 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         .input-group {
             background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 20px;
+            backdrop-filter: blur(10px); /* SHINOBI GLASS */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* SHINOBI GLASS */
+            padding: 2.5rem;
+            border-radius: 24px;
             display: flex;
             flex-direction: column;
             gap: 1.2rem;
-            border: 1px solid rgba(255, 255, 255, 0.05);
             text-align: left;
+            transition: all 0.3s ease;
+        }
+        .input-group:hover {
+            transform: translateY(-5px); /* SHINOBI GLASS */
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         input {
@@ -151,7 +160,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             outline: none;
             width: 100%;
+            transition: all 0.2s;
         }
+        input:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
 
         button#bazuka-btn {
             background: var(--accent);
@@ -164,6 +175,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             font-family: var(--font-mono);
             transition: all 0.3s;
+            margin-top: 0.5rem;
         }
 
         button#bazuka-btn:hover { background: var(--accent-hover); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
@@ -179,17 +191,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             opacity: 0.5;
             margin-top: auto;
             z-index: 1;
-        }
-
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
         }
     </style>
 </head>
@@ -270,7 +271,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1; /* Elevate above background */
+            z-index: 1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -299,18 +300,25 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             z-index: 10;
         }
         .card {
-            background: rgba(17, 17, 17, 0.85);
-            backdrop-filter: blur(15px);
+            background: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
+            backdrop-filter: blur(10px); /* SHINOBI GLASS */
+            border: 1px solid rgba(255, 255, 255, 0.08); /* SHINOBI GLASS */
             border-radius: 24px;
-            padding: 3rem;
+            padding: 3.5rem;
             max-width: 480px;
             width: 100%;
-            border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
+            transition: all 0.3s ease;
+        }
+        .card:hover {
+            transform: translateY(-5px); /* SHINOBI GLASS */
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
         .nickname { font-family: var(--font-brand); font-size: 3rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; }
         .job { font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; }
-        .contact-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); text-decoration: none; margin-bottom: 0.5rem; }
+        .contact-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+        .contact-item:hover { color: var(--accent); }
         .footer-credits {
             width: 100%;
             padding: 2rem;
