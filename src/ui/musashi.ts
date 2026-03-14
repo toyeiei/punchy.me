@@ -531,32 +531,32 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             };
 
             if (data.intel) {
-                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>📡</span> Target Summary</div>';
-                html += '<div class=\"intel-content\">' + data.intel + '</div></div>';
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>📡</span> Target Summary</div>';
+                html += '<div class="intel-content">' + data.intel + '</div></div>';
             }
 
             if (data.skills && Array.isArray(data.skills)) {
-                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>⚡</span> CORE SKILLS</div>';
-                html += '<div class=\"skills-container\">';
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>⚡</span> CORE SKILLS</div>';
+                html += '<div class="skills-container">';
                 data.skills.forEach(skill => {
-                    html += '<span class=\"skill-badge\">' + skill + '</span>';
+                    html += '<span class="skill-badge">' + skill + '</span>';
                 });
                 html += '</div></div>';
             }
             
             if (data.projects) {
-                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>🎯</span> PORTFOLIO PROJECTS</div>';
-                html += '<div class=\"intel-content\">' + formatList(data.projects) + '</div></div>';
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>🎯</span> PORTFOLIO PROJECTS</div>';
+                html += '<div class="intel-content">' + formatList(data.projects) + '</div></div>';
             }
 
             if (data.salary) {
-                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>💰</span> Market Intel</div>';
-                html += '<div class=\"intel-content\"><strong>ESTIMATED RANGE:</strong> ' + data.salary + '</div></div>';
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>💰</span> Market Intel</div>';
+                html += '<div class="intel-content"><strong>ESTIMATED RANGE:</strong> ' + data.salary + '</div></div>';
             }
 
             if (data.questions) {
-                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>⚔️</span> KEY INTERVIEW QUESTIONS</div>';
-                html += '<div class=\"intel-content\">' + formatList(data.questions) + '</div></div>';
+                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>⚔️</span> KEY INTERVIEW QUESTIONS</div>';
+                html += '<div class="intel-content">' + formatList(data.questions) + '</div></div>';
             }
 
             container.innerHTML = html;
