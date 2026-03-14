@@ -62,6 +62,66 @@ export const ODIN_HTML = `<!DOCTYPE html>
             100% { transform: translateY(100vh) translateZ(0); }
         }
 
+        /* ECOSYSTEM PORTAL (Fast-Switcher) */
+        .punchy-portal {
+            position: fixed;
+            bottom: 1.5rem;
+            left: 1.5rem;
+            display: flex;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem;
+            gap: 0;
+            overflow: hidden;
+            width: 44px;
+            height: 44px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .punchy-portal:hover {
+            width: 280px;
+            gap: 1rem;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+        .portal-trigger {
+            font-size: 1.2rem;
+            min-width: 28px;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .portal-brand {
+            color: var(--accent);
+            font-weight: 700;
+            font-size: 0.8rem;
+            white-space: nowrap;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            font-family: var(--font-mono);
+        }
+        .punchy-portal:hover .portal-brand { opacity: 1; }
+        .portal-tools {
+            display: flex;
+            gap: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+        .punchy-portal:hover .portal-tools { opacity: 1; }
+        .portal-tool-link {
+            text-decoration: none;
+            font-size: 1.1rem;
+            transition: transform 0.2s ease;
+            filter: grayscale(1);
+        }
+        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
+
         /* UNIFIED TACTICAL HEADER */
         .global-header {
             position: sticky;
@@ -123,23 +183,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             letter-spacing: 1px;
             min-width: 110px;
             text-align: center;
-        }
-
-        .punchy-badge {
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 8px;
-            transition: all 0.3s ease;
-        }
-        .punchy-badge:hover {
-            border-color: var(--accent);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
-            transform: translateY(-2px);
         }
 
         .container { 
@@ -420,6 +463,13 @@ export const ODIN_HTML = `<!DOCTYPE html>
             .panel-right {
                 margin-top: 1rem;
             }
+            .punchy-portal {
+                bottom: 1rem;
+                left: 1rem;
+            }
+            .punchy-portal:hover {
+                width: 44px; /* Disable expansion on mobile hover to avoid UX clutter */
+            }
         }
 
     </style>
@@ -428,6 +478,17 @@ export const ODIN_HTML = `<!DOCTYPE html>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     
+    <a href="/" class="punchy-portal">
+        <div class="portal-trigger">⚡</div>
+        <div class="portal-brand">PUNCHY.ME</div>
+        <div class="portal-tools">
+            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
+            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
+            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
+            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+        </div>
+    </a>
+
     <header class="global-header">
         <div class="brand-block">
             <div class="odin-brand">ODIN</div>
@@ -437,7 +498,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             <div class="badge" id="record-count">0 RECORDS</div>
             <div class="badge" id="column-count">0 COLUMNS</div>
             <div class="badge" id="data-size">0.0 KB</div>
-            <a href="/" class="punchy-badge">[ ⚡ PUNCHY.ME ]</a>
         </div>
     </header>
 

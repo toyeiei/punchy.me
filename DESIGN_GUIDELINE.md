@@ -104,4 +104,16 @@ Every new professional tool must be initialized with these 3 tactical pillars:
 3.  **Center-Point Branding**: The tool name must be positioned in the center of the page, **BIG and BOLD** (`font-size: 5rem+`), accompanied by a neon-green **"BETA"** pulse badge.
 
 ---
+
+## 7. Ecosystem Portal (The Fast-Switcher)
+The standard back-link is replaced by an interactive portal that allows rapid movement between professional tools.
+
+- **Trigger**: A compact `44x44px` glass square with the brand `⚡` icon.
+- **Position**: `fixed`, `bottom: 1.5rem`, `left: 1.5rem`.
+- **Interaction**:
+    - **Hover**: Expands horizontally to reveal the `PUNCHY.ME` brand name and a row of tool icons (`👤` BAZUKA, `⚡` ANAKIN, `⚔️` MUSASHI, `🐦‍⬛` ODIN).
+    - **Visuals**: SHINOBI GLASS background, 12px radius, neon-green border shift.
+- **Mobile Profile**: Stays compact (icon-only) or expands on tap to ensure touch targets remain clean.
+
+---
 *Protocol strictly enforced by Gemini CLI for all future PUNCHY.ME missions.*
