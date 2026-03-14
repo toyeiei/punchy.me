@@ -632,7 +632,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: -1;
+            z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
@@ -644,6 +644,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
+            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
@@ -698,12 +699,11 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             border: 1px solid rgba(255, 255, 255, 0.08); /* SHINOBI GLASS */
             border-radius: 24px;
             max-width: 900px;
-            width: 95%;
-            margin: 4rem auto 2rem;
-            padding: 4rem;
+            width: 92%;
+            margin: 2rem auto 4rem;
+            padding: clamp(1.5rem, 5vw, 4rem);
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
-            overflow: hidden;
             transition: all 0.3s ease;
         }
         .resume-card:hover {
@@ -757,9 +757,10 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             text-transform: uppercase;
             line-height: 1;
             margin-bottom: 0.5rem;
+            font-weight: 400;
         }
 
-        .job-title { font-size: 1.5rem; color: var(--accent); font-weight: 700; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.5rem; }
+        .job-title { font-size: 1.5rem; color: var(--accent); font-weight: 400; letter-spacing: 2px; text-transform: uppercase; margin-bottom: 1.5rem; }
 
         .contact-bar {
             display: flex;
@@ -772,7 +773,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         .contact-item { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; color: inherit; transition: color 0.2s; }
         .contact-item:hover { color: var(--accent); }
-        .contact-label { color: var(--accent); font-weight: 700; text-transform: uppercase; font-size: 0.7rem; }
+        .contact-label { color: var(--accent); font-weight: 400; text-transform: uppercase; font-size: 0.7rem; }
 
         .expertise-tags {
             margin-top: 1rem;
@@ -792,7 +793,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 1px;
             font-size: 0.7rem;
-            font-weight: 700;
+            font-weight: 400;
         }
 
         .section { margin-bottom: 1rem; position: relative; }
@@ -805,6 +806,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             display: flex; 
             align-items: center; 
             gap: 1rem; 
+            font-weight: 400;
         }
         .section-title::after { content: ""; flex: 1; height: 1px; background: rgba(34, 197, 94, 0.2); }
 

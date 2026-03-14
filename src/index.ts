@@ -84,7 +84,7 @@ class AnakinHandler {
 		if (id === 'res-name') element.setInnerContent(this.data.name);
 		if (id === 'res-job') element.setInnerContent(this.data.job);
 		if (id === 'res-email') element.setInnerContent(this.data.email);
-		if (id === 'res-website') element.setInnerContent("PORTFOLIO");
+		if (id === 'res-website') element.setInnerContent(escapeHTML(this.data.website));
 
 		if (id === 'res-email-link') element.setAttribute('href', `mailto:${this.data.email}`);
 		if (id === 'res-website-link') element.setAttribute('href', escapeHTML(this.data.website));
