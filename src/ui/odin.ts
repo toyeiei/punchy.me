@@ -3,7 +3,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ODIN | Tactical Data Analysis | PUNCHY.ME</title>
+    <title>ODIN | Tactical Terminal Data | PUNCHY.ME</title>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/arquero@latest"></script>
     <style>
@@ -21,7 +21,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             background-color: var(--bg);
             color: var(--text-main);
             font-family: var(--font-mono);
-            display: flex;
             height: 100vh;
             overflow: hidden;
             position: relative;
@@ -38,81 +37,156 @@ export const ODIN_HTML = `<!DOCTYPE html>
             z-index: 1;
         }
 
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.08), transparent);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+            z-index: 2;
+            animation: scan 6s linear infinite;
+            pointer-events: none;
+            will-change: transform;
+            transform: translateZ(0);
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100px) translateZ(0); }
+            100% { transform: translateY(100vh) translateZ(0); }
+        }
+
+        /* ODIN BRANDING (Massive) */
+        .odin-brand-container {
+            position: fixed;
+            top: 1.5rem;
+            left: 1.5rem;
+            z-index: 100;
+            pointer-events: none;
+        }
+        .odin-brand {
+            font-family: var(--font-brand);
+            font-size: 4.5rem;
+            color: var(--text-main);
+            line-height: 0.8;
+            letter-spacing: -3px;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        .odin-desc {
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-top: 0.5rem;
+            font-weight: bold;
+        }
+
+        /* Tactical Header (Top Right) */
+        .tactical-header {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            z-index: 100;
+        }
+        .badge {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 0.7rem;
+            color: var(--accent);
+            font-weight: bold;
+            letter-spacing: 1px;
+            min-width: 120px; /* Prevent header shift */
+            text-align: center;
+        }
+        
+        @keyframes neon-glow {
+            0% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
+            100% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); }
+        }
+
+        .btn-demo {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-family: var(--font-mono);
+            font-size: 0.7rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .btn-demo:hover {
+            background: rgba(255, 255, 255, 0.1);
+            color: var(--text-main);
+            transform: translateY(-2px);
+        }
+
+        .punchy-badge {
+            text-decoration: none;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-weight: bold;
+            font-size: 0.8rem;
+            background: rgba(0,0,0,0.5);
+            padding: 8px 12px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+            backdrop-filter: blur(5px);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .punchy-badge:hover {
+            border-color: var(--accent);
+            color: var(--accent);
+            transform: translateY(-2px);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.3);
+            background: rgba(34, 197, 94, 0.05);
+        }
+
         .container { 
             display: flex; 
             width: 100%; 
             height: 100vh; 
             z-index: 10; 
             position: relative; 
+            padding-top: 8rem; /* Space for large header */
         }
 
-        /* Left Sidebar: 15% */
-        .sidebar {
-            width: 15%;
-            min-width: 180px;
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border-right: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 2rem 1rem;
+        /* Panel Structure: 50/50 */
+        .panel {
+            width: 50%;
+            height: 100%;
             display: flex;
             flex-direction: column;
+            padding: 1rem 1.5rem 2rem 1.5rem;
             gap: 1rem;
-        }
-
-        /* Right Panel: 85% */
-        .main-panel {
-            width: 85%;
-            padding: 2rem;
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
             overflow: hidden;
         }
+        .panel-left { border-right: 1px solid rgba(255, 255, 255, 0.05); }
 
-        .title {
-            font-family: var(--font-brand);
-            font-size: 3.8rem;
-            color: var(--text-main);
-            margin-bottom: 2rem;
-            text-align: center;
-            line-height: 1;
-            letter-spacing: -2px;
-        }
-
-        .btn-odin {
-            background: rgba(0, 0, 0, 0.5);
+        .panel-title {
+            font-size: 0.7rem;
             color: var(--text-dim);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0.8rem;
-            border-radius: 8px;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            text-align: left;
-            width: 100%;
+            letter-spacing: 2px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        .btn-odin:hover {
-            border-color: var(--accent);
-            color: var(--accent);
-            transform: translateX(5px);
-            box-shadow: -5px 0 15px rgba(34, 197, 94, 0.2);
-        }
-        .btn-odin.active {
-            background: var(--accent);
-            color: #000;
-            font-weight: 700;
-            border-color: var(--accent);
-        }
+        .panel-title span { color: var(--accent); font-weight: bold; }
 
-        /* Preview Box */
         .preview-box {
             flex-grow: 1;
-            background: rgba(0, 0, 0, 0.6);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 12px;
             overflow: auto;
             position: relative;
         }
@@ -120,73 +194,62 @@ export const ODIN_HTML = `<!DOCTYPE html>
         table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 0.8rem;
+            font-size: 0.75rem;
             color: var(--text-dim);
         }
         th {
-            background: rgba(34, 197, 94, 0.1);
+            background: rgba(34, 197, 94, 0.05);
             color: var(--accent);
             text-align: left;
-            padding: 12px;
-            border-bottom: 1px solid rgba(34, 197, 94, 0.3);
+            padding: 10px;
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
             position: sticky;
             top: 0;
             z-index: 5;
+            backdrop-filter: blur(5px);
         }
         td {
-            padding: 10px 12px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 8px 10px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.03);
         }
         tr:hover td {
             color: var(--text-main);
             background: rgba(255, 255, 255, 0.02);
         }
 
-        .hidden { display: none !important; }
-        
-        .upload-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            background: rgba(0, 0, 0, 0.8);
-            z-index: 20;
-        }
-        
-        .file-input { display: none; }
-        .upload-label {
-            padding: 2rem 4rem;
-            border: 2px dashed rgba(34, 197, 94, 0.4);
-            border-radius: 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        .upload-label:hover {
-            border-color: var(--accent);
-            background: rgba(34, 197, 94, 0.05);
-        }
-
-        .back-home {
-            position: fixed; bottom: 1.5rem; left: 1.5rem;
-            color: var(--accent); text-decoration: none; font-size: 0.8rem; font-weight: 700;
-            padding: 8px 12px; background: rgba(0,0,0,0.5); border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 8px; backdrop-filter: blur(5px); z-index: 100;
-        }
-
-        .status-bar {
-            padding: 0.5rem 1rem;
-            background: rgba(255, 255, 255, 0.03);
-            border-radius: 8px;
-            font-size: 0.7rem;
-            color: var(--accent);
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 4rem; /* Clear the [PUNCHY.ME] badge */
-        }
-
         /* Terminal UI */
+        .recipes-container {
+            display: flex;
+            gap: 10px;
+            overflow-x: auto;
+            padding: 5px 0;
+            scrollbar-width: none;
+        }
+        .recipes-container::-webkit-scrollbar { display: none; }
+        
+        .btn-recipe {
+            background: rgba(255, 255, 255, 0.02);
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.65rem;
+            font-family: var(--font-mono);
+            font-weight: 600;
+            white-space: nowrap;
+            cursor: pointer;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .btn-recipe:hover {
+            background: rgba(34, 197, 94, 0.1);
+            color: var(--accent);
+            border-color: rgba(34, 197, 94, 0.3);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.1);
+            transform: translateY(-1px);
+        }
+
         .terminal-container {
             background: rgba(0, 0, 0, 0.8);
             border: 1px solid rgba(34, 197, 94, 0.4);
@@ -212,66 +275,128 @@ export const ODIN_HTML = `<!DOCTYPE html>
             font-size: 0.9rem;
             width: 100%;
             outline: none;
-            margin: 0;
-            padding: 0;
         }
+        .run-btn {
+            background: var(--accent);
+            color: #000;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            animation: neon-glow 2.5s infinite ease-in-out;
+        }
+        .run-btn:hover {
+            background: var(--accent-hover);
+            box-shadow: 0 0 25px rgba(34, 197, 94, 0.7);
+            transform: scale(1.05);
+        }
+
+        .upload-overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 20;
+        }
+        .file-input { display: none; }
+        .upload-label {
+            padding: 2.5rem;
+            border: 1px dashed rgba(34, 197, 94, 0.3);
+            border-radius: 12px;
+            cursor: pointer;
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        .upload-label:hover {
+            border-color: var(--accent);
+            background: rgba(34, 197, 94, 0.05);
+        }
+        .hidden { display: none !important; }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: rgba(34, 197, 94, 0.2);
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: var(--accent);
+        }
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: rgba(34, 197, 94, 0.2) rgba(0, 0, 0, 0.2);
+        }
+
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
-    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
+    <div class="scan-line"></div>
+    
+    <div class="odin-brand-container">
+        <div class="odin-brand">ODIN</div>
+        <div class="odin-desc">SUPREME DATA COMMAND // CRUNCH INTEL AT THE EDGE</div>
+    </div>
+
+    <header class="tactical-header">
+        <div class="badge" id="record-count">0 RECORDS</div>
+        <button class="btn-demo" id="btn-demo">DEMO INTEL</button>
+        <button class="btn-demo" id="btn-clear">CLEAR</button>
+        <a href="/" class="punchy-badge">[ ⚡ PUNCHY.ME ]</a>
+    </header>
 
     <div class="container">
-        <aside class="sidebar">
-            <h1 class="title">ODIN</h1>
-            <button class="btn-odin" id="btn-demo" style="border-color: rgba(34, 197, 94, 0.5); color: var(--text-main);">Demo Intel</button>
-            <button class="btn-odin" id="btn-profile">Profile</button>
-            <button class="btn-odin" id="btn-dimension">Dimension</button>
-            <button class="btn-odin" id="btn-aggregate">Aggregate</button>
-            
-            <div style="margin: 1.5rem 0; height: 1px; background: rgba(34, 197, 94, 0.2); display: none;"></div>
-            <button class="btn-odin hidden" id="btn-ai" style="color: var(--accent); border-color: var(--accent); font-weight: bold; text-align: center;">[ AI INTEL ]</button>
-            
-            <div style="flex-grow: 1;"></div>
-            
-            <div class="status-bar" id="status-bar">
-                <span>READY</span>
-                <span id="record-count">0 RECORDS</span>
-            </div>
-        </aside>
-
-        <main class="main-panel">
-            <div class="preview-box" id="preview-box">
+        <!-- LEFT PANEL: SOURCE -->
+        <section class="panel panel-left">
+            <h2 class="panel-title">SOURCE INTEL <span>// CSV</span></h2>
+            <div class="preview-box">
                 <div class="upload-overlay" id="upload-overlay">
                     <label for="csv-file" class="upload-label">
-                        <span style="color: var(--accent); font-size: 1.2rem;">DROP MISSION INTEL (CSV)</span>
-                        <p style="color: var(--text-dim); margin-top: 1rem; font-size: 0.8rem;">Max 1000 Records | Tactical Analysis</p>
+                        <span style="color: var(--accent); font-weight: bold; letter-spacing: 1px;">UPLOAD MISSION DATA</span>
+                        <p style="color: var(--text-dim); font-size: 0.6rem; margin-top: 0.8rem;">MAX 300KB | 1000 ROWS | 10 COLS</p>
                     </label>
                     <input type="file" id="csv-file" class="file-input" accept=".csv">
                 </div>
-                <table id="data-table">
-                    <!-- Data will be injected here -->
-                </table>
+                <table id="source-table"></table>
             </div>
 
+            <div class="recipes-container">
+                <button class="btn-recipe" data-code="table.summary()">[ PROFILE ]</button>
+                <button class="btn-recipe" data-code="table.select('Job', 'Salary')">[ SELECT ]</button>
+                <button class="btn-recipe" data-code="table.filter(d => d.Salary > 100000)">[ FILTER ]</button>
+                <button class="btn-recipe" data-code="table.orderby(aq.desc('Salary')).slice(0, 10)">[ TOP 10 ]</button>
+                <button class="btn-recipe" data-code="table.groupby('Dept').count()">[ GROUP BY ]</button>
+                <button class="btn-recipe" data-code="table.dedupe()">[ DEDUPE ]</button>
+                <button class="btn-recipe" data-code="table.sample(5)">[ SAMPLE ]</button>
+            </div>
+            
             <div class="terminal-container">
                 <span class="prompt">&gt;</span>
                 <input type="text" id="query-terminal" placeholder="table.groupby('Dept').count()" autocomplete="off" spellcheck="false">
+                <button class="run-btn" id="run-terminal">RUN</button>
             </div>
-        </main>
-    </div>
+        </section>
 
-    <!-- AI Intel Overlay -->
-    <div id="ai-modal" class="hidden" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 100; display: flex; align-items: center; justify-content: center; backdrop-filter: blur(5px);">
-        <div style="background: rgba(17,17,17,0.9); border: 1px solid var(--accent); padding: 2rem; border-radius: 12px; width: 80%; max-width: 800px; box-shadow: 0 0 30px rgba(34,197,94,0.2);">
-            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; border-bottom: 1px solid rgba(34,197,94,0.3); padding-bottom: 1rem;">
-                <h2 style="color: var(--accent); font-family: var(--font-brand); font-size: 1.5rem; text-transform: uppercase;">[ STRATEGIC ANALYSIS ]</h2>
-                <button id="close-ai" style="background: transparent; color: var(--text-dim); border: none; cursor: pointer; font-size: 2rem; line-height: 1;">&times;</button>
+        <!-- RIGHT PANEL: RESULT -->
+        <section class="panel panel-right">
+            <h2 class="panel-title">ANALYSIS RESULT <span>// ARQUERO</span></h2>
+            <div class="preview-box">
+                <table id="result-table"></table>
             </div>
-            <div id="ai-content" style="color: var(--text-main); font-size: 0.9rem; line-height: 1.6; max-height: 60vh; overflow-y: auto; font-family: var(--font-mono);">
-                <div style="text-align: center; padding: 2rem;"><span class="prompt">FORGING INTEL...</span></div>
-            </div>
-        </div>
+        </section>
     </div>
 
     <script>
@@ -279,9 +404,9 @@ export const ODIN_HTML = `<!DOCTYPE html>
 
         const csvInput = document.getElementById('csv-file');
         const uploadOverlay = document.getElementById('upload-overlay');
-        const dataTable = document.getElementById('data-table');
+        const sourceTable = document.getElementById('source-table');
+        const resultTable = document.getElementById('result-table');
         const recordCount = document.getElementById('record-count');
-        const statusBar = document.getElementById('status-bar');
 
         const mockCSV = \`Job,Dept,Salary,Years,Region
 Data Analyst,Engineering,120000,3,APAC
@@ -293,54 +418,25 @@ VP Engineering,Engineering,250000,10,NA
 Marketing Exec,Marketing,85000,3,APAC
 Data Analyst,Engineering,115000,2,EMEA
 Director HR,HR,160000,8,NA
-Product Manager,Product,130000,5,APAC\`;
+Product Manager,Product,130000,5,APAC
+UX Designer,Product,110000,4,EMEA
+Sales Lead,Sales,95000,6,NA
+DevOps Engineer,Engineering,145000,5,APAC
+Content Strategist,Marketing,75000,2,EMEA
+Financial Analyst,Finance,105000,3,NA
+CTO,Engineering,300000,15,NA
+Support Hero,Support,60000,1,APAC
+QA Tester,Engineering,85000,2,EMEA
+Legal Counsel,Legal,180000,7,NA
+Growth Hacker,Marketing,125000,4,APAC\`;
 
-        document.getElementById('btn-demo').onclick = () => {
-            try {
-                table = aq.fromCSV(mockCSV);
-                renderTable(table);
-                uploadOverlay.classList.add('hidden');
-                recordCount.innerText = table.numRows() + ' RECORDS';
-                setActive('btn-demo');
-                statusBar.children[0].innerText = 'DEMO LOADED';
-                statusBar.style.color = 'var(--accent)';
-            } catch (err) {
-                alert("Demo Forge Failed: " + err);
-            }
-        };
-
-        // 1. Upload & Parse
-        csvInput.onchange = async (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = (event) => {
-                const text = event.target.result;
-                try {
-                    table = aq.fromCSV(text);
-                    if (table.numRows() > 1000) {
-                        alert("Tactical limit exceeded (1000 records max). Slicing...");
-                        table = table.slice(0, 1000);
-                    }
-                    renderTable(table);
-                    uploadOverlay.classList.add('hidden');
-                    recordCount.innerText = table.numRows() + ' RECORDS';
-                    statusBar.children[0].innerText = 'DATA LOADED';
-                } catch (err) {
-                    alert("Forge Failed: Invalid CSV format.");
-                }
-            };
-            reader.readAsText(file);
-        };
-
-        function renderTable(dt) {
+        const renderTable = (dt, target) => {
+            if (!dt) return;
             let html = '<thead><tr>';
             const columns = dt.columnNames();
             columns.forEach(col => html += '<th>' + col + '</th>');
             html += '</tr></thead><tbody>';
 
-            // Show first 100 rows for preview
             const preview = dt.slice(0, 100);
             preview.scan((row, data) => {
                 html += '<tr>';
@@ -350,135 +446,85 @@ Product Manager,Product,130000,5,APAC\`;
                 html += '</tr>';
             });
             html += '</tbody>';
-            dataTable.innerHTML = html;
-        }
-
-        // 2. Profile Action
-        document.getElementById('btn-profile').onclick = () => {
-            if (!table) return alert("No intel uploaded.");
-            const summary = table.summary();
-            renderTable(summary);
-            setActive('btn-profile');
+            target.innerHTML = html;
         };
 
-        // 3. Dimension (Sort by first column)
-        document.getElementById('btn-dimension').onclick = () => {
-            if (!table) return alert("No intel uploaded.");
-            const firstCol = table.columnNames()[0];
-            const sorted = table.orderby(firstCol);
-            renderTable(sorted);
-            setActive('btn-dimension');
+        const loadData = (text) => {
+            try {
+                table = aq.fromCSV(text);
+                if (table.numRows() > 1000) table = table.slice(0, 1000);
+                if (table.numCols() > 10) table = table.select(table.columnNames().slice(0, 10));
+
+                renderTable(table, sourceTable);
+                uploadOverlay.classList.add('hidden');
+                recordCount.innerText = table.numRows() + ' RECORDS';
+                resultTable.innerHTML = ''; // Clear result
+            } catch (err) {
+                alert("Forge Failed: Invalid CSV format.");
+            }
         };
 
-        // 4. Aggregate (Count by first column)
-        document.getElementById('btn-aggregate').onclick = () => {
-            if (!table) return alert("No intel uploaded.");
-            const firstCol = table.columnNames()[0];
-            const agg = table.groupby(firstCol).count();
-            renderTable(agg);
-            setActive('btn-aggregate');
-        };
+        document.getElementById('btn-demo').onclick = () => loadData(mockCSV);
 
-        // Upload Button helper
-        document.getElementById('btn-upload').onclick = () => {
+        document.getElementById('btn-clear').onclick = () => {
+            table = null;
+            sourceTable.innerHTML = '';
+            resultTable.innerHTML = '';
             uploadOverlay.classList.remove('hidden');
-            setActive('btn-upload');
+            recordCount.innerText = '0 RECORDS';
+            terminal.value = '';
+            termContainer.classList.remove('error');
+            document.querySelector('.prompt').innerText = '>';
         };
 
-        function setActive(id) {
-            document.querySelectorAll('.btn-odin').forEach(b => b.classList.remove('active'));
-            if(id) document.getElementById(id).classList.add('active');
-        }
+        csvInput.onchange = (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            if (file.size > 300 * 1024) return alert("Tactical limit: 300KB.");
+            const reader = new FileReader();
+            reader.onload = (event) => loadData(event.target.result);
+            reader.readAsText(file);
+        };
 
-        // Terminal Query Engine
+        // Terminal Execution
         const terminal = document.getElementById('query-terminal');
+        const runBtn = document.getElementById('run-terminal');
         const termContainer = document.querySelector('.terminal-container');
 
-        terminal.addEventListener('keydown', function(e) {
-            if (e.key === 'Enter') {
-                if (!table) {
-                    alert("No intel uploaded to query.");
-                    return;
-                }
-                const cmd = terminal.value.trim();
-                if (!cmd) return;
-                
-                try {
-                    // Safe evaluation context for Arquero on the client
-                    const fn = new Function('table', 'aq', \`return \${cmd}\`);
-                    const result = fn(table, aq);
-                    
-                    if (result && typeof result.numRows === 'function') {
-                        renderTable(result);
-                        termContainer.classList.remove('error');
-                        document.querySelector('.prompt').innerText = '>';
-                        setActive(''); // Clear active buttons since state is custom
-                    } else {
-                        throw new Error("Result is not a valid Arquero table.");
-                    }
-                } catch (err) {
-                    termContainer.classList.add('error');
-                    document.querySelector('.prompt').innerText = 'ERR>';
-                    console.error("Query Error:", err);
-                }
-            }
-        });
+        const executeQuery = () => {
+            if (!table) return alert("No source data.");
+            const cmd = terminal.value.trim();
+            if (!cmd) return;
 
-        // AI Intel Logic
-        const aiModal = document.getElementById('ai-modal');
-        const aiContent = document.getElementById('ai-content');
-        
-        document.getElementById('close-ai').onclick = () => aiModal.classList.add('hidden');
-        
-        document.getElementById('btn-ai').onclick = async () => {
-            if (!table) return alert("No intel uploaded to analyze.");
-            
-            aiModal.classList.remove('hidden');
-            aiContent.innerHTML = '<div style="text-align: center; padding: 2rem; color: var(--accent);"><span class="prompt">SYNCHRONIZING WITH LLAMA 3...</span></div>';
-            
             try {
-                // Generate a lightweight sample
-                const columns = table.columnNames();
-                const numRows = table.numRows();
-                let sample = [];
-                table.slice(0, 5).scan((row, data) => {
-                    let r = {};
-                    columns.forEach(c => r[c] = data[c][row]);
-                    sample.push(r);
-                });
-                
-                const payload = { columns, numRows, sample };
-                
-                const res = await fetch('/odin/analyze', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                
-                if (res.ok) {
-                    const data = await res.json();
-                    aiContent.innerHTML = \`
-                        <div style="margin-bottom: 1.5rem;">
-                            <h3 style="color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-size: 1rem;">// Strategic Overview</h3>
-                            <p>\${data.strategic_overview || 'No overview available.'}</p>
-                        </div>
-                        <div style="margin-bottom: 1.5rem;">
-                            <h3 style="color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-size: 1rem;">// Detected Anomalies</h3>
-                            <p>\${data.anomalies_detected || 'No anomalies detected.'}</p>
-                        </div>
-                        <div>
-                            <h3 style="color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; font-size: 1rem;">// Tactical Recommendations</h3>
-                            <p>\${data.tactical_recommendations || 'No recommendations.'}</p>
-                        </div>
-                    \`;
+                const fn = new Function('table', 'aq', \`return \${cmd}\`);
+                const result = fn(table, aq);
+                if (result && typeof result.numRows === 'function') {
+                    renderTable(result, resultTable);
+                    termContainer.classList.remove('error');
+                    document.querySelector('.prompt').innerText = '>';
                 } else {
-                    const err = await res.json();
-                    aiContent.innerHTML = \`<div style="color: #ef4444;">Forge Failed: \${err.error || 'Unknown Error'}</div>\`;
+                    throw new Error("Invalid Table result.");
                 }
-            } catch (e) {
-                aiContent.innerHTML = \`<div style="color: #ef4444;">Connection Failed.</div>\`;
+            } catch (err) {
+                termContainer.classList.add('error');
+                document.querySelector('.prompt').innerText = 'ERR>';
             }
         };
+
+        terminal.addEventListener('keydown', (e) => { if (e.key === 'Enter') executeQuery(); });
+        runBtn.onclick = executeQuery;
+
+        // Mission Arsenal Logic
+        document.querySelectorAll('.btn-recipe').forEach(btn => {
+            btn.onclick = () => {
+                terminal.value = btn.getAttribute('data-code');
+                terminal.focus();
+                // Visual feedback
+                btn.style.borderColor = 'var(--accent)';
+                setTimeout(() => btn.style.borderColor = 'rgba(34, 197, 94, 0.2)', 300);
+            };
+        });
     </script>
 </body>
 </html>`;
