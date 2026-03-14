@@ -135,7 +135,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             background: var(--accent);
             color: #000;
             font-size: 0.8rem;
-            font-weight: 900; /* already heavy */
+            font-weight: 900;
             padding: 4px 12px;
             border-radius: 6px;
             font-family: var(--font-mono);
@@ -209,7 +209,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
 
         .intel-block { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem; }
-        .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; /* already heavy */ margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
+        .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
         .intel-content { color: var(--text-main); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         
         .skills-container {
@@ -294,7 +294,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             border: none;
             padding: 1rem;
             border-radius: 12px;
-            font-weight: 900; /* already heavy */
+            font-weight: 900;
             width: 100%;
             cursor: pointer;
             text-transform: uppercase;
@@ -313,24 +313,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             cursor: not-allowed;
             transform: none;
         }
-
-        .back-home {
-            position: fixed;
-            top: 1.5rem;
-            left: 1.5rem;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 8px 12px;
-            background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            z-index: 100;
-            transition: all 0.3s;
-        }
-        .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         .pixel-bg {
             position: fixed;
@@ -362,16 +344,15 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
-    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
 
     <a href="/" class="punchy-portal">
         <div class="portal-trigger">⚡</div>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
+            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
         </div>
     </a>
     

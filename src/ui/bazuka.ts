@@ -15,7 +15,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <style>
         :root {
             --bg: #000000;
-            --card-bg: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
+            --card-bg: rgba(255, 255, 255, 0.03);
             --accent: #22c55e;
             --accent-hover: #4ade80;
             --text-main: #f8fafc;
@@ -205,10 +205,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         <div class="portal-trigger">⚡</div>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
+            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
         </div>
     </a>
 
@@ -378,10 +378,10 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         <div class="portal-trigger">⚡</div>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
+            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
         </div>
     </a>
 

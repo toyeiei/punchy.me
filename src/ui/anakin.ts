@@ -169,10 +169,10 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         @keyframes main-glitch {
-            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; }
-            81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }
-            82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
-            83% { transform: skew(0deg); text-shadow: none; }
+            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
         }
 
         h1::before, h1::after {
@@ -331,81 +331,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
-
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal {
-            background: #000000;
-            padding: 3rem 2rem;
-            border-radius: 32px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform: scale(0.8);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        #modal-overlay.show { opacity: 1; }
-        #modal-overlay.show .modal { transform: scale(1); }
-
-        .result-container {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            margin: 1.5rem 0;
-            display: flex;
-            align-items: stretch;
-            min-height: 56px;
-            text-align: left;
-            overflow: hidden;
-        }
-
-        .result-link {
-            flex: 1;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 700;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-family: var(--font-mono);
-        }
-
-        .copy-btn {
-            background: #1e293b;
-            border: none;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0;
-            cursor: pointer;
-            color: var(--text-main);
-            transition: all 0.2s;
-            font-family: var(--font-mono);
-            width: 80px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .copy-btn:hover { background: #334155; }
-        .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1.5rem; font-size: 0.9rem; }
-        .create-another:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -415,10 +340,10 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         <div class="portal-trigger">⚡</div>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
+            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
         </div>
     </a>
 
@@ -987,10 +912,10 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         <div class="portal-trigger">⚡</div>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
+            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
         </div>
     </a>
     
