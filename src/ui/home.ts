@@ -543,18 +543,24 @@ export const HTML = `<!DOCTYPE html>
             </a>
             <a href="/musashi" class="feature-card">
                 <span class="feature-icon">⚔️</span>
-                <div class="feature-title">MUSASHI</div>
-                <div class="feature-tagline">The Way is in training. Mastery is found in relentless discipline.</div>
+                <div class="feature-title">
+                    MUSASHI
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
+                <div class="feature-tagline">Cold Attack Engine. AI-powered extraction of job intel and interview strike-paths.</div>
             </a>
             <a href="/odin" class="feature-card">
-                <span class="feature-icon">👁️</span>
-                <div class="feature-title">ODIN</div>
+                <span class="feature-icon">🐦‍⬛</span>
+                <div class="feature-title">
+                    ODIN
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
                 <div class="feature-tagline">Tactical Data Command. Supreme edge-native analytics HUD.</div>
             </a>
         </div>
     </section>
 
-    <div class="footer">
+    <div class="footer-credits" style="margin-top: 4rem; margin-bottom: 2rem; font-size: 0.7rem; color: var(--text-dim); font-family: var(--font-mono); text-align: center; letter-spacing: 1px; opacity: 0.5; width: 100%; z-index: 1;">
         Built with ⚡ by Toy & Gemini CLI
     </div>
 
