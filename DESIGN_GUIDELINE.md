@@ -26,7 +26,7 @@ Our foundation is built on high-contrast, technical surfaces that evoke an "Elit
 - **Error/Security**: `#ef4444` (Vibrant Red)
 
 ### 1.2 Typography (The Technical Voice)
-- **Brand Titles**: `'Bitcount Prop Double'`, cursive. (Always Uppercase, -2px to -3px tracking).
+- **Brand Titles**: `'Bitcount Prop Double'`, cursive. (Always Uppercase, -2px to -3px tracking). **Note: Use native heavy weight for supreme authority.**
 - **Instructional/Code**: `'JetBrains Mono'`, monospace. (Weights: 400, 700).
 - **Metadata/Labels**: `'JetBrains Mono'`, 0.7rem to 0.8rem, 700 weight, 1px to 2px tracking.
 

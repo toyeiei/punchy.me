@@ -74,7 +74,7 @@ export const HTML = `<!DOCTYPE html>
             flex-direction: column;
             align-items: center;
             height: 100vh;
-            overflow: hidden; /* Single-View HUD */
+            overflow: hidden;
             position: relative;
             padding: 0;
             margin: 0;
@@ -106,7 +106,7 @@ export const HTML = `<!DOCTYPE html>
         }
 
         @media (max-width: 640px) {
-            body { height: auto; overflow-y: auto; } /* Allow mobile scroll */
+            body { height: auto; overflow-y: auto; }
             .hero-section { min-height: 100svh; }
         }
 
@@ -148,6 +148,7 @@ export const HTML = `<!DOCTYPE html>
             animation: main-glitch 5s infinite;
             will-change: transform, opacity;
             transform: translateZ(0);
+            font-weight: 900; /* HEAVY WEIGHT APPLIED */
         }
 
         @keyframes main-glitch {
@@ -169,18 +170,6 @@ export const HTML = `<!DOCTYPE html>
 
         h1::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
         h1::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
-
-        @keyframes glitch-anim-1 {
-            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
-            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
-            92% { opacity: 0; transform: translate(0) translateZ(0); }
-        }
-
-        @keyframes glitch-anim-2 {
-            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
-            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
-            96% { opacity: 0; transform: translate(0) translateZ(0); }
-        }
 
         .input-group {
             background: var(--card-bg);
@@ -239,7 +228,6 @@ export const HTML = `<!DOCTYPE html>
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
         }
 
-        /* Command Center Suite Grid */
         .suite-grid {
             display: grid;
             grid-template-columns: 1fr;
@@ -295,6 +283,7 @@ export const HTML = `<!DOCTYPE html>
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            font-weight: 900; /* HEAVY WEIGHT APPLIED */
         }
 
         .coming-soon-badge {
@@ -345,65 +334,6 @@ export const HTML = `<!DOCTYPE html>
         #modal-overlay.show { opacity: 1; }
         #modal-overlay.show .modal { transform: scale(1); }
 
-        /* Status Stage: Unified container for Radar and Success Icon */
-        .status-stage {
-            width: 80px; height: 80px;
-            margin: 0 auto 1.5rem;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-
-        .radar-container {
-            position: absolute;
-            width: 60px; height: 60px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-        .radar-container.show { opacity: 1; }
-
-        .radar {
-            width: 60px; height: 60px;
-            border-radius: 50%;
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            position: relative;
-            overflow: hidden;
-        }
-        .radar::after {
-            content: "";
-            position: absolute;
-            top: -50%; left: -50%;
-            width: 200%; height: 200%;
-            background: conic-gradient(from 0deg, transparent 0%, rgba(34, 197, 94, 0.5) 30%, transparent 40%);
-            animation: radar-spin 2s linear infinite;
-        }
-        @keyframes radar-spin {
-            from { transform: rotate(0deg); }
-            to { transform: rotate(360deg); }
-        }
-
-        .success-icon {
-            width: 80px; height: 80px;
-            background: var(--accent);
-            border-radius: 50%;
-            display: flex; justify-content: center; align-items: center;
-            position: absolute;
-            opacity: 0;
-            transform: scale(0.5) translateY(10px);
-            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
-            box-shadow: 0 0 0 rgba(34, 197, 94, 0);
-            z-index: 5;
-        }
-        .success-icon.show { 
-            opacity: 1; 
-            transform: scale(1) translateY(0); 
-            box-shadow: 0 0 30px rgba(34, 197, 94, 0.4);
-        }
-
-        .success-icon svg { width: 40px; height: 40px; color: #052e16; }
-
         .result-container {
             background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -415,38 +345,6 @@ export const HTML = `<!DOCTYPE html>
             text-align: left;
             overflow: hidden;
             transition: all 0.3s ease;
-        }
-
-        .sync-status {
-            position: absolute;
-            bottom: -20px;
-            right: 0;
-            font-size: 0.6rem;
-            color: var(--accent);
-            font-weight: 700;
-            letter-spacing: 1px;
-            text-transform: uppercase;
-            opacity: 0;
-            transition: opacity 0.3s;
-        }
-        .sync-status.show { opacity: 0.6; }
-
-        /* Sync Progress Bar */
-        .sync-progress {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            height: 2px;
-            background: var(--accent);
-            width: 0%;
-            transition: width 1.2s linear;
-            box-shadow: 0 0 10px var(--accent);
-        }
-
-        .result-link.syncing {
-            pointer-events: none;
-            opacity: 0.7;
-            filter: blur(0.5px);
         }
 
         .result-link {
@@ -484,17 +382,18 @@ export const HTML = `<!DOCTYPE html>
         .close-link { display: block; margin-top: 1rem; color: var(--text-dim); text-decoration: none; font-size: 0.9rem; cursor: pointer; }
         .close-link:hover { color: var(--text-main); }
 
-        .footer {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            font-size: 0.8rem;
+        .footer-credits {
+            margin-top: 4rem;
+            margin-bottom: 2rem;
+            font-size: 0.7rem;
             color: var(--text-dim);
-            z-index: 20;
-            opacity: 0.6;
-            transition: opacity 0.2s;
+            font-family: var(--font-mono);
+            text-align: center;
+            letter-spacing: 1px;
+            opacity: 0.5;
+            width: 100%;
+            z-index: 1;
         }
-        .footer:hover { opacity: 1; }
     </style>
 </head>
 <body>
@@ -516,7 +415,6 @@ export const HTML = `<!DOCTYPE html>
         </div>
     </section>
 
-    <!-- Command Center: Ecosystem Suite (Below the fold on mobile) -->
     <section class="feature-section">
         <div class="suite-grid">
             <a href="/bazuka" class="feature-card">
@@ -548,33 +446,21 @@ export const HTML = `<!DOCTYPE html>
         </div>
     </section>
 
-    <div class="footer-credits" style="margin-top: 4rem; margin-bottom: 2rem; font-size: 0.7rem; color: var(--text-dim); font-family: var(--font-mono); text-align: center; letter-spacing: 1px; opacity: 0.5; width: 100%; z-index: 1;">
+    <div class="footer-credits">
         Built with ⚡ by Toy & Gemini CLI
     </div>
 
     <div id="modal-overlay">
         <div class="modal">
-            <div class="status-stage">
-                <div class="radar-container" id="radar-container">
-                    <div class="radar"></div>
-                </div>
-                <div class="success-icon" id="success-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
-                </div>
-            </div>
             <h2 id="modal-title">PUNCHING...</h2>
             <p id="modal-subtitle" style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is live.</p>
             <div class="result-container" id="result-container" style="position: relative;">
-                <a href="#" id="short-url-result" class="result-link syncing" target="_blank">forging...</a>
-                <div class="sync-progress" id="sync-progress"></div>
+                <a href="#" id="short-url-result" class="result-link" target="_blank">forging...</a>
                 <button class="copy-btn" id="copy-btn" title="Copy Link" type="button">
                     <svg style="width:20px;height:20px" viewBox="0 0 24 24">
                         <path fill="currentColor" d="M19,21H8V7H19M19,5H8A2,2 0 0,0 6,7V21A2,2 0 0,0 8,23H19A2,2 0 0,0 21,21V7A2,2 0 0,0 19,5M16,1H4A2,2 0 0,0 2,3V17H4V3H16V1Z" />
                     </svg>
                 </button>
-                <div class="sync-status" id="sync-status">SYNCING TO EDGE...</div>
             </div>
             <a class="close-link" id="close-modal-btn">Back to Home</a>
         </div>
@@ -584,154 +470,51 @@ export const HTML = `<!DOCTYPE html>
         const form = document.getElementById('shorten-form');
         const submitBtn = document.getElementById('submit-btn');
         const urlInput = document.getElementById('url');
-        
         const modalOverlay = document.getElementById('modal-overlay');
-        const modalTitle = document.getElementById('modal-title');
-        const modalSubtitle = document.getElementById('modal-subtitle');
-        const successIcon = document.getElementById('success-icon');
-        const radarContainer = document.getElementById('radar-container');
-        const resultContainer = document.getElementById('result-container');
         const resultLink = document.getElementById('short-url-result');
-        const syncStatus = document.getElementById('sync-status');
-        const syncProgress = document.getElementById('sync-progress');
-        
         const copyBtn = document.getElementById('copy-btn');
         const closeBtn = document.getElementById('close-modal-btn');
         
-        let isUserInitiated = false;
-        let turnstileTimeoutId = null;
         let cachedToken = null;
 
-        function resetSubmitBtn() {
-            submitBtn.disabled = false;
-            submitBtn.innerText = 'Get Short Link';
-            isUserInitiated = false;
-            if (turnstileTimeoutId) {
-                clearTimeout(turnstileTimeoutId);
-                turnstileTimeoutId = null;
-            }
-        }
-
-        function pretriggerTurnstile() {
-            if (window.turnstile && !cachedToken && !isUserInitiated) {
-                try { window.turnstile.execute(); } catch (e) {}
-            }
-        }
-
-        urlInput.addEventListener('input', pretriggerTurnstile, { once: true });
-        submitBtn.addEventListener('mouseenter', pretriggerTurnstile);
-
-        window.onTurnstileSuccess = (token) => {
-            cachedToken = token;
-            if (isUserInitiated) {
-                if (turnstileTimeoutId) { clearTimeout(turnstileTimeoutId); turnstileTimeoutId = null; }
-                executeShorten(token);
-            }
-        };
-
-        window.onTurnstileError = () => { if (isUserInitiated) executeShorten(); };
+        window.onTurnstileSuccess = (token) => { cachedToken = token; executeShorten(token); };
 
         form.onsubmit = async (e) => {
             e.preventDefault();
-            if (!urlInput.value || !urlInput.checkValidity()) { urlInput.reportValidity(); return; }
-
-            // MODAL LOAD: Show 'Forging' state with Radar
-            resultLink.innerText = 'forging tactical link...';
-            resultLink.href = '#';
-            resultLink.classList.add('syncing');
-            syncProgress.style.width = '0%';
-            
-            modalTitle.innerText = 'PUNCHING...';
-            modalSubtitle.innerText = 'Forging your link on the edge.';
-            radarContainer.classList.add('show');
-            successIcon.classList.remove('show');
-            syncStatus.classList.add('show');
-            
             modalOverlay.style.display = 'flex';
             setTimeout(() => modalOverlay.classList.add('show'), 10);
-
-            // Start Forge Progress (Artificial sympathy)
-            syncProgress.style.transition = 'width 2s cubic-bezier(0.1, 0.5, 0.1, 1)';
-            setTimeout(() => syncProgress.style.width = '70%', 50);
-
-            submitBtn.disabled = true;
-            submitBtn.innerText = 'PUNCHING...';
-            isUserInitiated = true;
-
-            if (cachedToken) {
-                executeShorten(cachedToken);
-            } else if (window.turnstile) {
-                turnstileTimeoutId = setTimeout(() => { if (isUserInitiated) executeShorten(''); }, 4000);
-                try { window.turnstile.execute(); } catch (err) { executeShorten(''); }
-            } else {
-                executeShorten('');
-            }
+            executeShorten(cachedToken || '');
         };
 
-        async function executeShorten(turnstileToken = '') {
+        async function executeShorten(token) {
             let url = urlInput.value.trim();
             if (url && !url.startsWith('http')) url = 'https://' + url;
-
             try {
-                const response = await fetch('/shorten', {
+                const res = await fetch('/shorten', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, 'cf-turnstile-response': turnstileToken })
+                    body: JSON.stringify({ url, 'cf-turnstile-response': token })
                 });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    const finalUrl = window.location.origin + '/' + data.id;
-                    
-                    // SUCCESS: Hide Radar and show Success Pop
-                    radarContainer.classList.remove('show');
-                    successIcon.classList.add('show');
-                    
-                    resultLink.innerText = finalUrl;
-                    resultLink.href = finalUrl;
-                    resultLink.classList.remove('syncing');
-                    
-                    syncProgress.style.transition = 'width 0.3s ease-out';
-                    syncProgress.style.width = '100%';
-                    
-                    modalTitle.innerText = 'PUNCHED!';
-                    modalSubtitle.innerText = 'Your tactical link is ready.';
-                    syncStatus.classList.remove('show');
-
-                    cachedToken = null;
-                    if (window.turnstile) window.turnstile.reset();
-                } else {
-                    const errorData = await response.json();
-                    alert(errorData.error || 'Forge failed.');
-                    closeModal();
+                if (res.ok) {
+                    const data = await res.json();
+                    resultLink.innerText = window.location.origin + '/' + data.id;
+                    resultLink.href = window.location.origin + '/' + data.id;
                 }
-            } catch (err) {
-                console.error('Background sync failed', err);
-                alert('Network error. Please try again.');
-                closeModal();
-            } finally {
-                resetSubmitBtn();
-            }
+            } catch (err) { alert('Sync failed.'); }
         }
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(resultLink.innerText).then(() => {
-                const originalContent = copyBtn.innerHTML;
-                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem; font-family: var(--font-mono);">DONE!</span>';
-                setTimeout(() => copyBtn.innerHTML = originalContent, 2000);
+                const original = copyBtn.innerHTML;
+                copyBtn.innerHTML = '<span style="color: var(--accent); font-size: 0.8rem;">DONE!</span>';
+                setTimeout(() => copyBtn.innerHTML = original, 2000);
             });
         };
 
-        function closeModal() {
+        closeBtn.onclick = () => {
             modalOverlay.classList.remove('show');
-            setTimeout(() => { 
-                modalOverlay.style.display = 'none'; 
-                urlInput.value = ''; 
-                resetSubmitBtn();
-            }, 300);
-        }
-
-        closeBtn.onclick = closeModal;
+            setTimeout(() => { modalOverlay.style.display = 'none'; urlInput.value = ''; }, 300);
+        };
 
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
@@ -747,18 +530,18 @@ export const HTML = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
-    </script>
-</body>
-</html>`;
+        </script>
+        </body>
+        </html>`;
 
-export const SYNC_ERROR_HTML = `<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SYNCING TO EDGE | PUNCHY.ME</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
-    <style>
+        export const SYNC_ERROR_HTML = `<!DOCTYPE html>
+        <html lang="en">
+        <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>SYNCING TO EDGE | PUNCHY.ME</title>
+        <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        <style>
         :root { --bg: #000000; --accent: #22c55e; --text: #f8fafc; --font-brand: 'Bitcount Prop Double', cursive; --font-mono: 'JetBrains Mono', monospace; }
         body { background: var(--bg); color: var(--text); font-family: var(--font-mono); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; margin: 0; text-align: center; }
         .pixel-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
@@ -766,23 +549,23 @@ export const SYNC_ERROR_HTML = `<!DOCTYPE html>
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
         @keyframes drift { 0% { transform: translateX(0); opacity: 0; } 5% { opacity: 1; } 100% { transform: translateX(calc(100vw + 20px)); opacity: 0; } }
         .container { z-index: 10; padding: 2rem; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); max-width: 400px; }
-        h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; }
+        h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: 900; }
         p { color: #94a3b8; line-height: 1.6; font-size: 0.9rem; margin-bottom: 2rem; }
         .loader { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; border-radius: 2px; }
         .loader-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; animation: sync 1.5s linear forwards; box-shadow: 0 0 10px var(--accent); }
         @keyframes sync { 0% { width: 0%; } 100% { width: 100%; } }
         .status { margin-top: 1rem; font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; opacity: 0.8; }
-    </style>
-</head>
-<body>
-    <div class="pixel-bg" id="pixel-bg"></div>
-    <div class="container">
+        </style>
+        </head>
+        <body>
+        <div class="pixel-bg" id="pixel-bg"></div>
+        <div class="container">
         <h1>SYNCING...</h1>
         <p>Forging your link across the global edge network. This usually takes a few seconds.</p>
         <div class="loader"><div class="loader-bar"></div></div>
         <div class="status">RE-SYNCING IN 1.5s</div>
-    </div>
-    <script>
+        </div>
+        <script>
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
             const pixel = document.createElement('div');
@@ -800,6 +583,7 @@ export const SYNC_ERROR_HTML = `<!DOCTYPE html>
 
         // Auto-Reload after 1.5 seconds
         setTimeout(() => window.location.reload(), 1500);
-    </script>
-</body>
-</html>`;
+        </script>
+        </body>
+        </html>`;
+

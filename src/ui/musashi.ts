@@ -116,8 +116,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand);
-            font-size: clamp(3rem, 12vw, 100px);
+            font-family: var(--font-brand); font-size: clamp(3rem, 12vw, 100px); font-weight: 900;
             color: var(--text-main);
             letter-spacing: -2px;
             text-transform: uppercase;
@@ -136,7 +135,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             background: var(--accent);
             color: #000;
             font-size: 0.8rem;
-            font-weight: 900;
+            font-weight: 900; /* already heavy */
             padding: 4px 12px;
             border-radius: 6px;
             font-family: var(--font-mono);
@@ -210,7 +209,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
 
         .intel-block { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem; }
-        .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
+        .intel-title { color: var(--accent); font-size: 0.8rem; font-weight: 900; /* already heavy */ margin-bottom: 0.75rem; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 0.5rem; }
         .intel-content { color: var(--text-main); font-size: 0.95rem; line-height: 1.6; white-space: pre-wrap; }
         
         .skills-container {
@@ -295,7 +294,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             border: none;
             padding: 1rem;
             border-radius: 12px;
-            font-weight: 900;
+            font-weight: 900; /* already heavy */
             width: 100%;
             cursor: pointer;
             text-transform: uppercase;

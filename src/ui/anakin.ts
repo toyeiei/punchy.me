@@ -58,28 +58,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             -webkit-overflow-scrolling: touch;
         }
 
-        .back-home {
-            position: fixed;
-            top: 1.5rem;
-            left: 1.5rem;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-            letter-spacing: 1px;
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            transition: all 0.3s ease;
-            z-index: 100;
-            background: rgba(0,0,0,0.5);
-            padding: 8px 12px;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-        }
-        .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
-
         /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
         .punchy-portal {
             position: fixed;
@@ -162,8 +140,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand);
-            font-size: clamp(3rem, 10vw, 80px);
+            font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 80px); font-weight: 900;
             line-height: 1;
             color: var(--text-main);
             letter-spacing: -2px;
@@ -354,11 +331,85 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
+
+        #modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .modal {
+            background: #000000;
+            padding: 3rem 2rem;
+            border-radius: 32px;
+            width: 90%;
+            max-width: 500px;
+            text-align: center;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            transform: scale(0.8);
+            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        #modal-overlay.show { opacity: 1; }
+        #modal-overlay.show .modal { transform: scale(1); }
+
+        .result-container {
+            background: #0f172a;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            margin: 1.5rem 0;
+            display: flex;
+            align-items: stretch;
+            min-height: 56px;
+            text-align: left;
+            overflow: hidden;
+        }
+
+        .result-link {
+            flex: 1;
+            color: var(--accent);
+            text-decoration: none;
+            font-size: 1.1rem;
+            font-weight: 700;
+            padding: 1rem;
+            display: flex;
+            align-items: center;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            font-family: var(--font-mono);
+        }
+
+        .copy-btn {
+            background: #1e293b;
+            border: none;
+            border-left: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 0;
+            cursor: pointer;
+            color: var(--text-main);
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+            width: 80px;
+            flex-shrink: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .copy-btn:hover { background: #334155; }
+        .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1.5rem; font-size: 0.9rem; }
+        .create-another:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
-    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
 
     <a href="/" class="punchy-portal">
         <div class="portal-trigger">⚡</div>

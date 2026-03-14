@@ -15,9 +15,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <style>
         :root {
             --bg: #000000;
-            --card-bg: rgba(255, 255, 255, 0.03);
+            --card-bg: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
             --accent: #22c55e;
-            --accent-hover: #16a34a;
+            --accent-hover: #4ade80;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --font-brand: 'Bitcount Prop Double', cursive;
@@ -67,24 +67,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             95% { opacity: 1; }
             100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
         }
-
-        .back-home {
-            position: fixed;
-            top: 1.5rem;
-            left: 1.5rem;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 0.8rem;
-            font-weight: 700;
-            padding: 8px 12px;
-            border-radius: 8px;
-            backdrop-filter: blur(5px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            background: rgba(0,0,0,0.5);
-            z-index: 100;
-            transition: all 0.3s ease;
-        }
-        .back-home:hover { opacity: 1; transform: scale(1.05); border-color: var(--accent); box-shadow: 0 0 15px rgba(34, 197, 94, 0.3); }
 
         /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
         .punchy-portal {
@@ -144,8 +126,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand);
-            font-size: clamp(3rem, 10vw, 80px);
+            font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 80px); font-weight: 900;
             line-height: 1;
             color: var(--text-main);
             letter-spacing: -2px;
@@ -219,7 +200,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 </head>
 <body>
     <div class="pixel-bg" id="pixel-bg"></div>
-    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
 
     <a href="/" class="punchy-portal">
         <div class="portal-trigger">⚡</div>
