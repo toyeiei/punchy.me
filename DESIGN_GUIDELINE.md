@@ -77,9 +77,8 @@ Every page must feature the high-performance background layer.
 - **Pixel Drift**: Subtle white and green particles moving left-to-right (z-index: 1 or below content).
 
 ### 4.2 Footer Credits (The Watermark)
-- **Position**: **Content-Bottom**. Never fixed to the screen. It must sit at the absolute end of the scrollable content.
-- **Opacity**: `0.5`.
-- **Text**: "Built with ⚡ by Toy & Gemini CLI".
+- **Landing Page Exclusive**: The "Built with ⚡ by Toy & Gemini CLI" credits must only appear at the bottom of the root Landing Page.
+- **Professional Tools**: Must remain 100% clean. No global watermark footers.
 
 ---
 

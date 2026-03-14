@@ -61,6 +61,42 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             0% { transform: translateY(-100px); }
             100% { transform: translateY(100vh); }
         }
+
+        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
+        .punchy-portal {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem;
+            gap: 0;
+            overflow: hidden;
+            width: 44px;
+            height: 44px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .punchy-portal:hover {
+            width: 280px;
+            gap: 1rem;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+        .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
+        .punchy-portal:hover .portal-brand { opacity: 1; }
+        .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
+        .punchy-portal:hover .portal-tools { opacity: 1; }
+        .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
+        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
         
         .container { 
             z-index: 10; 
@@ -279,7 +315,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             transform: none;
         }
 
-        .punchy-portal { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: row-reverse; align-items: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 0.5rem; gap: 0; overflow: hidden; width: 44px; height: 44px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; cursor: pointer; text-decoration: none; } .punchy-portal:hover { width: 280px; gap: 1rem; border-color: var(--accent); box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); } .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; } .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); } .punchy-portal:hover .portal-brand { opacity: 1; } .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; } .punchy-portal:hover .portal-tools { opacity: 1; } .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); } .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); } .back-home {
+        .back-home {
             position: fixed;
             top: 1.5rem;
             left: 1.5rem;
@@ -321,27 +357,24 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         .fade-in-up {
             animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
         }
-
-        /* Footer Credits */
-        .footer-credits {
-            width: 100%;
-            padding: 2rem;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            font-family: var(--font-mono);
-            text-align: center;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-top: auto;
-            z-index: 1;
-        }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
-    <a href=\"/\" class=\"punchy-portal\"><div class=\"portal-trigger\">?</div><div class=\"portal-brand\">PUNCHY.ME</div><div class=\"portal-tools\"><object><a href=\"/bazuka\" class=\"portal-tool-link\" title=\"BAZUKA\">??</a></object><object><a href=\"/anakin\" class=\"portal-tool-link\" title=\"ANAKIN\">?</a></object><object><a href=\"/musashi\" class=\"portal-tool-link\" title=\"MUSASHI\">??</a></object><object><a href=\"/odin\" class=\"portal-tool-link\" title=\"ODIN\">????</a></object></div></a>
+    <a href="/" class="back-home">[ ⚡ PUNCHY.ME ]</a>
+
+    <a href="/" class="punchy-portal">
+        <div class="portal-trigger">⚡</div>
+        <div class="portal-brand">PUNCHY.ME</div>
+        <div class="portal-tools">
+            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
+            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
+            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
+            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+        </div>
+    </a>
     
     <div class="container">
         <div class="title-container">
@@ -374,8 +407,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             </div>
         </div>
     </div>
-
-    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         let lastForgedData = null;
@@ -516,32 +547,32 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             };
 
             if (data.intel) {
-                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>📡</span> Target Summary</div>';
-                html += '<div class="intel-content">' + data.intel + '</div></div>';
+                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>📡</span> Target Summary</div>';
+                html += '<div class=\"intel-content\">' + data.intel + '</div></div>';
             }
 
             if (data.skills && Array.isArray(data.skills)) {
-                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>⚡</span> CORE SKILLS</div>';
-                html += '<div class="skills-container">';
+                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>⚡</span> CORE SKILLS</div>';
+                html += '<div class=\"skills-container\">';
                 data.skills.forEach(skill => {
-                    html += '<span class="skill-badge">' + skill + '</span>';
+                    html += '<span class=\"skill-badge\">' + skill + '</span>';
                 });
                 html += '</div></div>';
             }
             
             if (data.projects) {
-                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>🎯</span> PORTFOLIO PROJECTS</div>';
-                html += '<div class="intel-content">' + formatList(data.projects) + '</div></div>';
+                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>🎯</span> PORTFOLIO PROJECTS</div>';
+                html += '<div class=\"intel-content\">' + formatList(data.projects) + '</div></div>';
             }
 
             if (data.salary) {
-                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>💰</span> Market Intel</div>';
-                html += '<div class="intel-content"><strong>ESTIMATED RANGE:</strong> ' + data.salary + '</div></div>';
+                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>💰</span> Market Intel</div>';
+                html += '<div class=\"intel-content\"><strong>ESTIMATED RANGE:</strong> ' + data.salary + '</div></div>';
             }
 
             if (data.questions) {
-                html += '<div class="intel-block" style="text-align: left;"><div class="intel-title"><span>⚔️</span> KEY INTERVIEW QUESTIONS</div>';
-                html += '<div class="intel-content">' + formatList(data.questions) + '</div></div>';
+                html += '<div class=\"intel-block\" style=\"text-align: left;\"><div class=\"intel-title\"><span>⚔️</span> KEY INTERVIEW QUESTIONS</div>';
+                html += '<div class=\"intel-content\">' + formatList(data.questions) + '</div></div>';
             }
 
             container.innerHTML = html;

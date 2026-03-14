@@ -407,21 +407,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             scrollbar-color: rgba(34, 197, 94, 0.2) rgba(0, 0, 0, 0.2);
         }
 
-        /* Footer Credits - Standardized */
-        .footer-credits {
-            width: 100%;
-            padding: 3rem 2rem;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            font-family: var(--font-mono);
-            text-align: center;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-top: auto;
-            position: relative;
-            z-index: 1;
-        }
-
         /* World-Class Mobile HUD */
         @media (max-width: 1024px) {
             .global-header {
@@ -538,8 +523,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             </div>
         </section>
     </div>
-
-    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         let table = null;

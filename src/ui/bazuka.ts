@@ -215,19 +215,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
 
         button#bazuka-btn:hover { background: var(--accent-hover); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
-
-        .footer-credits {
-            width: 100%;
-            padding: 2rem;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            font-family: var(--font-mono);
-            text-align: center;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-top: auto;
-            z-index: 1;
-        }
     </style>
 </head>
 <body>
@@ -263,8 +250,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             </div>
         </form>
     </div>
-
-    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         const bg = document.getElementById('pixel-bg');
@@ -404,16 +389,6 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         .job { font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; }
         .contact-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
         .contact-item:hover { color: var(--accent); }
-        .footer-credits {
-            width: 100%;
-            padding: 2rem;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            text-align: center;
-            opacity: 0.5;
-            letter-spacing: 1px;
-            margin-top: auto;
-        }
     </style>
 </head>
 <body>
@@ -440,7 +415,6 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             </div>
         </div>
     </div>
-    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
     <script>
         const bg = document.getElementById('pixel-bg');
         function createPixel() {

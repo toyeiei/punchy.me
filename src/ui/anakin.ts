@@ -354,94 +354,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
-
-        .footer-credits {
-            width: 100%;
-            padding: 2rem;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            font-family: var(--font-mono);
-            text-align: center;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-top: auto;
-            z-index: 1;
-        }
-
-        #modal-overlay {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.95);
-            backdrop-filter: blur(10px);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal {
-            background: #000000;
-            padding: 3rem 2rem;
-            border-radius: 32px;
-            width: 90%;
-            max-width: 500px;
-            text-align: center;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            transform: scale(0.8);
-            transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
-        }
-
-        #modal-overlay.show { opacity: 1; }
-        #modal-overlay.show .modal { transform: scale(1); }
-
-        .result-container {
-            background: #0f172a;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            margin: 1.5rem 0;
-            display: flex;
-            align-items: stretch;
-            min-height: 56px;
-            text-align: left;
-            overflow: hidden;
-        }
-
-        .result-link {
-            flex: 1;
-            color: var(--accent);
-            text-decoration: none;
-            font-size: 1.1rem;
-            font-weight: 700;
-            padding: 1rem;
-            display: flex;
-            align-items: center;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            font-family: var(--font-mono);
-        }
-
-        .copy-btn {
-            background: #1e293b;
-            border: none;
-            border-left: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 0;
-            cursor: pointer;
-            color: var(--text-main);
-            transition: all 0.2s;
-            font-family: var(--font-mono);
-            width: 80px;
-            flex-shrink: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        .copy-btn:hover { background: #334155; }
-        .create-another { font-family: var(--font-mono); color: var(--text-dim); background: transparent; border: none; cursor: pointer; margin-top: 1.5rem; font-size: 0.9rem; }
-        .create-another:hover { color: var(--text-main); }
     </style>
 </head>
 <body>
@@ -537,8 +449,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             </div>
         </form>
     </div>
-
-    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         const form = document.getElementById('anakin-form');
@@ -965,25 +875,12 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         #res-experience li { margin-bottom: 1.25rem; }
         #res-experience li:last-child { margin-bottom: 0; }
 
-        .footer-credits {
-            width: 100%;
-            padding: 2rem;
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            font-family: var(--font-mono);
-            text-align: center;
-            letter-spacing: 1px;
-            opacity: 0.5;
-            margin-top: auto;
-            z-index: 1;
-        }
-
         .print-footer { display: none; }
 
         @media print {
             @page { size: letter; margin: 10mm; }
             body { background: white !important; color: black !important; padding: 0; margin: 0; display: block !important; }
-            .pixel-bg, .hud-corner, .utility-bar, .footer-credits, .punchy-portal { display: none !important; }
+            .pixel-bg, .hud-corner, .utility-bar, .punchy-portal { display: none !important; }
             .resume-card { background: white !important; color: black !important; box-shadow: none !important; border: none !important; padding: 0 !important; max-width: 100% !important; page-break-inside: avoid !important; height: auto !important; display: block !important; }
             .name { color: black !important; }
             .job-title, .section-title { color: #16a34a !important; }
@@ -1105,10 +1002,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         <div class="print-footer">
             FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI • Expires in 3 days
         </div>
-    </div>
-
-    <div class="footer-credits">
-        FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI • Expires in 3 days
     </div>
 
     <script type="application/ld+json" id="schema-block"></script>
