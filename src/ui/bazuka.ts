@@ -357,7 +357,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
             turnstileTimeoutId = setTimeout(() => {
                 if (isUserInitiated) createBazuka('');
-            }, 6000);
+            }, 2500);
 
             if (window.turnstile) {
                 try {
@@ -393,6 +393,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                     resultLink.href = fullUrl;
                     modal.classList.add('show');
                     resetSubmitBtn();
+                    form.reset();
                 } else {
                     alert('Forge failed. Please try again.');
                     resetSubmitBtn();
@@ -449,7 +450,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+            z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
@@ -460,6 +461,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
+            z-index: 1;
         }
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
         @keyframes drift {
@@ -515,7 +517,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             z-index: 10;
         }
         .card {
-            background: rgba(255, 255, 255, 0.03);
+            background: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
             backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 24px;
@@ -524,16 +526,50 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             width: 100%;
             position: relative;
             transition: all 0.3s ease;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
         }
         .card:hover {
             transform: translateY(-5px);
             border-color: var(--accent);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
-        .nickname { font-family: var(--font-brand); font-size: 3rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; }
-        .job { font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; }
-        .contact-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); text-decoration: none; margin-bottom: 0.5rem; transition: color 0.2s; }
+        
+        .hud-corner {
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            border: 2px solid var(--accent);
+            opacity: 0.5;
+        }
+        .top-left { top: 20px; left: 20px; border-right: none; border-bottom: none; }
+        .top-right { top: 20px; right: 20px; border-left: none; border-bottom: none; }
+        .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
+        .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
+
+        .nickname { font-family: var(--font-brand); font-size: 3rem; font-weight: 400; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; }
+        .job { font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; letter-spacing: 1px; }
+        
+        .contact-bar {
+            display: flex;
+            flex-direction: column;
+            gap: 0.8rem;
+        }
+        .contact-item { display: flex; align-items: center; gap: 0.8rem; color: var(--text-dim); text-decoration: none; transition: color 0.2s; font-size: 0.9rem; }
         .contact-item:hover { color: var(--accent); }
+        .contact-item svg { width: 16px; height: 16px; }
+
+        .expiration-note {
+            position: absolute;
+            bottom: -30px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            opacity: 0.6;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
     </style>
 </head>
 <body>
@@ -552,12 +588,23 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
 
     <div class="card-container">
         <div class="card">
+            <div class="hud-corner top-left"></div>
+            <div class="hud-corner top-right"></div>
+            <div class="hud-corner bottom-left"></div>
+            <div class="hud-corner bottom-right"></div>
             <h1 class="nickname" id="card-nickname">NAME</h1>
             <div class="job" id="card-job">JOB TITLE</div>
             <div class="contact-bar">
-                <a href="#" class="contact-item" id="card-email-link"><span id="card-email">email@example.com</span></a>
-                <a href="#" class="contact-item" id="card-website-link" target="_blank"><span id="card-website">PORTFOLIO</span></a>
+                <a href="#" class="contact-item" id="card-email-link">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+                    <span id="card-email">email@example.com</span>
+                </a>
+                <a href="#" class="contact-item" id="card-website-link" target="_blank">
+                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>
+                    <span id="card-website">website.com</span>
+                </a>
             </div>
+            <div class="expiration-note">FORGED BY BAZUKA • EXPIRES IN 3 DAYS</div>
         </div>
     </div>
     <script>

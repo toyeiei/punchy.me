@@ -57,7 +57,7 @@ class BazukaHandler {
 		}
 		if (id === 'card-job') element.setInnerContent(this.data.job);
 		if (id === 'card-email') element.setInnerContent(this.data.email);
-		if (id === 'card-website') element.setInnerContent("PORTFOLIO");
+		if (id === 'card-website') element.setInnerContent(escapeHTML(this.data.website));
 		
 		if (id === 'card-email-link') element.setAttribute('href', `mailto:${this.data.email}`);
 		if (id === 'card-website-link') element.setAttribute('href', escapeHTML(this.data.website));
