@@ -92,4 +92,16 @@ The HUD must remain 100% operational on smaller screens.
 - **Panel Locking**: On mobile, data tables should have a fixed `max-height` (e.g., 300px to 500px) so the user doesn't have to scroll "forever" through a single table.
 
 ---
+
+## 6. Preferred Layout & Starter Template
+The **Single-View HUD** is the mandatory baseline for all PUNCHY.ME professional surfaces. Users must experience the full power of the tool without vertical scrolling.
+
+### 6.1 The Starter Template
+Every new professional tool must be initialized with these 3 tactical pillars:
+
+1.  **Single-View HUD**: The layout must fit exactly within `100vh`. Set `body { overflow: hidden; }` on desktop.
+2.  **Tactical Atmosphere**: Implement the **GRID + SCAN LINE** background animation layer immediately to establish brand continuity.
+3.  **Center-Point Branding**: The tool name must be positioned in the center of the page, **BIG and BOLD** (`font-size: 5rem+`), accompanied by a neon-green **"BETA"** pulse badge.
+
+---
 *Protocol strictly enforced by Gemini CLI for all future PUNCHY.ME missions.*
