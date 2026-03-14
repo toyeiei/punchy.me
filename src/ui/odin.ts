@@ -71,10 +71,12 @@ export const ODIN_HTML = `<!DOCTYPE html>
 
         .title {
             font-family: var(--font-brand);
-            font-size: 2.5rem;
+            font-size: 3.8rem;
             color: var(--text-main);
             margin-bottom: 2rem;
             text-align: center;
+            line-height: 1;
+            letter-spacing: -2px;
         }
 
         .btn-odin {
@@ -181,6 +183,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             color: var(--accent);
             display: flex;
             justify-content: space-between;
+            margin-bottom: 4rem; /* Clear the [PUNCHY.ME] badge */
         }
 
         /* Terminal UI */
@@ -222,13 +225,12 @@ export const ODIN_HTML = `<!DOCTYPE html>
         <aside class="sidebar">
             <h1 class="title">ODIN</h1>
             <button class="btn-odin" id="btn-demo" style="border-color: rgba(34, 197, 94, 0.5); color: var(--text-main);">Demo Intel</button>
-            <button class="btn-odin" id="btn-upload">Upload Data</button>
             <button class="btn-odin" id="btn-profile">Profile</button>
             <button class="btn-odin" id="btn-dimension">Dimension</button>
             <button class="btn-odin" id="btn-aggregate">Aggregate</button>
             
-            <div style="margin: 1.5rem 0; height: 1px; background: rgba(34, 197, 94, 0.2);"></div>
-            <button class="btn-odin" id="btn-ai" style="color: var(--accent); border-color: var(--accent); font-weight: bold; text-align: center;">[ AI INTEL ]</button>
+            <div style="margin: 1.5rem 0; height: 1px; background: rgba(34, 197, 94, 0.2); display: none;"></div>
+            <button class="btn-odin hidden" id="btn-ai" style="color: var(--accent); border-color: var(--accent); font-weight: bold; text-align: center;">[ AI INTEL ]</button>
             
             <div style="flex-grow: 1;"></div>
             
