@@ -45,7 +45,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+            z-index: 0;
             pointer-events: none;
             overflow: hidden;
         }
@@ -57,6 +57,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
+            z-index: 1;
         }
 
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
@@ -315,21 +316,61 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         for(let i=0; i<20; i++) createPixel();
 
         const form = document.getElementById('bazuka-form');
+        const submitBtn = document.getElementById('bazuka-btn');
         const modal = document.getElementById('modal-overlay');
         const resultLink = document.getElementById('result-link');
         const copyBtn = document.getElementById('copy-btn');
         const closeBtn = document.getElementById('close-modal');
 
-        form.onsubmit = (e) => {
-            e.preventDefault();
-            if (window.turnstile) {
-                turnstile.execute();
-            } else {
-                onTurnstileSuccess(''); // Fallback if Turnstile fails to load
+        function resetSubmitBtn() {
+            submitBtn.disabled = false;
+            submitBtn.innerText = 'GENERATE DIGITAL CARD';
+            isUserInitiated = false;
+            if (turnstileTimeoutId) {
+                clearTimeout(turnstileTimeoutId);
+                turnstileTimeoutId = null;
+            }
+        }
+
+        let isUserInitiated = false;
+        let turnstileTimeoutId = null;
+
+        window.onTurnstileSuccess = (token) => {
+            if (isUserInitiated) {
+                if (turnstileTimeoutId) {
+                    clearTimeout(turnstileTimeoutId);
+                    turnstileTimeoutId = null;
+                }
+                createBazuka(token);
             }
         };
 
-        window.onTurnstileSuccess = async (token) => {
+        window.onTurnstileError = () => {
+            if (isUserInitiated) createBazuka(''); 
+        };
+
+        form.onsubmit = async (e) => {
+            e.preventDefault();
+            submitBtn.disabled = true;
+            submitBtn.innerText = 'FORGING...';
+            isUserInitiated = true;
+
+            turnstileTimeoutId = setTimeout(() => {
+                if (isUserInitiated) createBazuka('');
+            }, 6000);
+
+            if (window.turnstile) {
+                try {
+                    window.turnstile.execute();
+                } catch (err) {
+                    createBazuka('');
+                }
+            } else {
+                createBazuka('');
+            }
+        };
+
+        async function createBazuka(token = '') {
             const formData = {
                 nickname: document.getElementById('nickname').value,
                 job: document.getElementById('job').value,
@@ -351,11 +392,16 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                     resultLink.innerText = fullUrl;
                     resultLink.href = fullUrl;
                     modal.classList.add('show');
+                    resetSubmitBtn();
+                } else {
+                    alert('Forge failed. Please try again.');
+                    resetSubmitBtn();
                 }
             } catch (err) {
-                alert('Forge failed. Please try again.');
+                alert('Network error. Please try again.');
+                resetSubmitBtn();
             }
-        };
+        }
 
         copyBtn.onclick = () => {
             navigator.clipboard.writeText(resultLink.innerText);
