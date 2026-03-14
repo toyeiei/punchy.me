@@ -160,6 +160,29 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(html).toContain("Toy");
       expect(html).toContain("Data Analyst");
     });
+
+    it("verifies the BAZUKA forge button logic and field validation", async () => {
+      // Test 1: Rejects missing fields
+      const incompleteData = { nickname: "Toy" };
+      const failRes = await SELF.fetch("http://localhost/bazuka", {
+        method: "POST",
+        body: JSON.stringify(incompleteData),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(failRes.status).toBe(400);
+
+      // Test 2: Successful forge with all fields
+      const fullData = { nickname: "Musashi", job: "Strategist", email: "ronin@edge.io", website: "https://punchy.me" };
+      const successRes = await SELF.fetch("http://localhost/bazuka", {
+        method: "POST",
+        body: JSON.stringify(fullData),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(successRes.status).toBe(200);
+      const { id } = await successRes.json() as { id: string };
+      expect(id).toBeDefined();
+      expect(id.length).toBe(6);
+    });
   });
 
   describe("ANAKIN Feature (Portal Strategy)", () => {

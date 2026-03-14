@@ -234,6 +234,70 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         </form>
     </div>
 
+    <div id="modal-overlay">
+        <div class="modal">
+            <div class="status-stage">
+                <div class="success-icon" id="modal-success-icon" style="display: flex;">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+            </div>
+            <h2>CARD FORGED!</h2>
+            <p style="color: var(--text-dim); margin-top: 0.5rem;">Your high-impact identity is live.</p>
+            
+            <div class="result-container">
+                <a href="#" id="result-link" target="_blank">Generating...</a>
+                <button id="copy-btn">COPY</button>
+            </div>
+            <button id="close-modal">DONE</button>
+        </div>
+    </div>
+
+    <style>
+        #modal-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.9);
+            display: none; align-items: center; justify-content: center;
+            z-index: 2000; opacity: 0; transition: opacity 0.3s;
+        }
+        #modal-overlay.show { display: flex; opacity: 1; }
+        .modal {
+            background: #000; border: 1px solid var(--accent);
+            padding: 3rem; border-radius: 24px; text-align: center;
+            max-width: 450px; width: 90%; transform: scale(0.9); transition: transform 0.3s;
+            box-shadow: 0 0 50px rgba(34, 197, 94, 0.2);
+        }
+        #modal-overlay.show .modal { transform: scale(1); }
+        .status-stage { margin-bottom: 1.5rem; display: flex; justify-content: center; }
+        .success-icon {
+            width: 60px; height: 60px; background: var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            box-shadow: 0 0 30px var(--accent);
+            animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+        @keyframes success-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .success-icon svg { width: 30px; height: 30px; color: #000; }
+        
+        .result-container {
+            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 1rem; border-radius: 12px; margin: 2rem 0;
+            display: flex; align-items: center; gap: 1rem;
+        }
+        #result-link {
+            color: var(--accent); font-family: var(--font-mono); font-size: 0.9rem;
+            text-decoration: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        }
+        #copy-btn, #close-modal {
+            background: var(--accent); color: #000; border: none;
+            padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 700;
+            font-family: var(--font-mono); cursor: pointer; transition: all 0.2s;
+        }
+        #copy-btn:hover, #close-modal:hover { background: var(--accent-hover); transform: scale(1.05); }
+        #close-modal { width: 100%; margin-top: 1rem; background: transparent; color: var(--text-dim); border: 1px solid rgba(255, 255, 255, 0.1); }
+        #close-modal:hover { color: var(--text-main); border-color: var(--text-main); }
+    </style>
+
     <script>
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
@@ -249,6 +313,58 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
+
+        const form = document.getElementById('bazuka-form');
+        const modal = document.getElementById('modal-overlay');
+        const resultLink = document.getElementById('result-link');
+        const copyBtn = document.getElementById('copy-btn');
+        const closeBtn = document.getElementById('close-modal');
+
+        form.onsubmit = (e) => {
+            e.preventDefault();
+            if (window.turnstile) {
+                turnstile.execute();
+            } else {
+                onTurnstileSuccess(''); // Fallback if Turnstile fails to load
+            }
+        };
+
+        window.onTurnstileSuccess = async (token) => {
+            const formData = {
+                nickname: document.getElementById('nickname').value,
+                job: document.getElementById('job').value,
+                email: document.getElementById('email').value,
+                website: document.getElementById('website').value,
+                'cf-turnstile-response': token
+            };
+
+            try {
+                const res = await fetch('/bazuka', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(formData)
+                });
+                
+                if (res.ok) {
+                    const { id } = await res.json();
+                    const fullUrl = window.location.origin + '/' + id;
+                    resultLink.innerText = fullUrl;
+                    resultLink.href = fullUrl;
+                    modal.classList.add('show');
+                }
+            } catch (err) {
+                alert('Forge failed. Please try again.');
+            }
+        };
+
+        copyBtn.onclick = () => {
+            navigator.clipboard.writeText(resultLink.innerText);
+            const originalText = copyBtn.innerText;
+            copyBtn.innerText = 'DONE!';
+            setTimeout(() => copyBtn.innerText = originalText, 2000);
+        };
+
+        closeBtn.onclick = () => modal.classList.remove('show');
     </script>
 </body>
 </html>`;
