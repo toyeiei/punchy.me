@@ -3,8 +3,47 @@ export const ODIN_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ODIN | Tactical Terminal Data | PUNCHY.ME</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <title>ODIN | Tactical Terminal Data Command | PUNCHY.ME</title>
+    <meta name="description" content="ODIN Tactical Terminal: A high-performance, edge-native data command center for professional analysts. Crunch intel at the edge with supreme precision and style.">
+    <meta name="keywords" content="ODIN, tactical data, edge analytics, data command, terminal style, professional analytics, PUNCHY.ME">
+    <link rel="canonical" href="https://punchy.me/odin" />
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
+
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://punchy.me/odin">
+    <meta property="og:title" content="ODIN | Tactical Terminal Data Command">
+    <meta property="og:description" content="Crunch intel at the edge with ODIN. The supreme data command center for professional impact.">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://punchy.me/odin">
+    <meta property="twitter:title" content="ODIN | Tactical Terminal Data Command">
+    <meta property="twitter:description" content="Crunch intel at the edge with ODIN. The supreme data command center for professional impact.">
+    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Structured Data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ODIN",
+      "url": "https://punchy.me/odin",
+      "description": "Tactical Terminal Data Command center for edge-native analytics.",
+      "applicationCategory": "Analytics",
+      "operatingSystem": "Web",
+      "author": {
+        "@type": "Person",
+        "name": "Kasidis Satangmongkol",
+        "url": "https://datarockie.com"
+      }
+    }
+    </script>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/arquero@latest"></script>
     <style>
         :root {
