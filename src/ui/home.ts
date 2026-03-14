@@ -50,7 +50,7 @@ export const HTML = `<!DOCTYPE html>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         :root {
@@ -148,7 +148,10 @@ export const HTML = `<!DOCTYPE html>
             animation: main-glitch 5s infinite;
             will-change: transform, opacity;
             transform: translateZ(0);
-            font-weight: 900;
+            font-weight: 400;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         @keyframes main-glitch {
@@ -279,11 +282,13 @@ export const HTML = `<!DOCTYPE html>
             font-size: 1.75rem;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
-            letter-spacing: 1px;
+            letter-spacing: -3px;
             display: flex;
             align-items: center;
             gap: 0.75rem;
-            font-weight: 900; /* HEAVY WEIGHT APPLIED */
+            font-weight: 400;
+            line-height: 0.8;
+            text-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
         }
 
         .coming-soon-badge {
@@ -540,7 +545,7 @@ export const HTML = `<!DOCTYPE html>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>SYNCING TO EDGE | PUNCHY.ME</title>
-        <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+        <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
         <style>
         :root { --bg: #000000; --accent: #22c55e; --text: #f8fafc; --font-brand: 'Bitcount Prop Double', cursive; --font-mono: 'JetBrains Mono', monospace; }
         body { background: var(--bg); color: var(--text); font-family: var(--font-mono); display: flex; justify-content: center; align-items: center; min-height: 100vh; overflow: hidden; margin: 0; text-align: center; }

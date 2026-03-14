@@ -4,7 +4,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>MUSASHI | Cold Attack Engine | PUNCHY.ME</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
@@ -116,13 +116,16 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand); font-size: clamp(3rem, 12vw, 100px); font-weight: 900;
+            font-family: var(--font-brand); font-size: clamp(3rem, 12vw, 100px); font-weight: 400;
             line-height: 0.8;
             color: var(--text-main);
             letter-spacing: -3px;
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         @keyframes main-glitch {

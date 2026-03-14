@@ -190,6 +190,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             color: var(--text-main);
             line-height: 0.8;
             letter-spacing: -3px;
+            font-weight: 400;
             text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
             position: relative;
             animation: odin-glitch 5s infinite;

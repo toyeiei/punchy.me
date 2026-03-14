@@ -23,7 +23,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js" async defer></script>
     <style>
         :root {
@@ -140,7 +140,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 80px); font-weight: 900;
+            font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 80px); font-weight: 400;
             line-height: 0.8;
             color: var(--text-main);
             letter-spacing: -3px;
@@ -149,6 +149,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             animation: main-glitch 5s infinite;
             will-change: transform, opacity;
             transform: translateZ(0);
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
 
         .beta-badge {
@@ -598,7 +601,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
             --bg: #000000;
