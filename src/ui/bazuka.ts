@@ -26,8 +26,12 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
+        html, body {
+            height: 100%;
             background-color: var(--bg);
+        }
+
+        body {
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
@@ -35,13 +39,13 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             align-items: center;
             min-height: 100vh;
             position: relative;
-            padding: 4rem 1.5rem;
+            padding: 0;
             overflow-y: auto;
         }
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+            z-index: -1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -86,7 +90,11 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             text-align: center;
             z-index: 10;
             position: relative;
+            padding: 8rem 1.5rem 2rem;
             flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
         }
 
         .title-container {
@@ -161,15 +169,16 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         button#bazuka-btn:hover { background: var(--accent-hover); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
 
         .footer-credits {
-            margin-top: 4rem;
+            width: 100%;
+            padding: 2rem;
             font-size: 0.7rem;
             color: var(--text-dim);
             font-family: var(--font-mono);
             text-align: center;
             letter-spacing: 1px;
             opacity: 0.5;
-            padding-bottom: 2rem;
-            z-index: 10;
+            margin-top: auto;
+            z-index: 1;
         }
 
         #modal-overlay {
@@ -243,18 +252,28 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        html, body { height: 100%; background-color: var(--bg); }
+
         body {
-            background-color: var(--bg);
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
             flex-direction: column;
-            justify-content: center;
             align-items: center;
             min-height: 100vh;
             position: relative;
-            padding: 2rem;
+            padding: 0;
             overflow-y: auto;
+        }
+        .card-container {
+            flex-grow: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 2rem;
+            z-index: 10;
         }
         .card {
             background: rgba(17, 17, 17, 0.85);
@@ -265,27 +284,31 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             width: 100%;
             border: 1px solid rgba(255, 255, 255, 0.05);
             position: relative;
-            z-index: 10;
         }
         .nickname { font-family: var(--font-brand); font-size: 3rem; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; }
         .job { font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; }
         .contact-item { display: flex; align-items: center; gap: 0.5rem; color: var(--text-dim); text-decoration: none; margin-bottom: 0.5rem; }
         .footer-credits {
-            margin-top: 3rem;
+            width: 100%;
+            padding: 2rem;
             font-size: 0.7rem;
             color: var(--text-dim);
+            text-align: center;
             opacity: 0.5;
             letter-spacing: 1px;
+            margin-top: auto;
         }
     </style>
 </head>
 <body>
-    <div class="card">
-        <h1 class="nickname" id="card-nickname">NAME</h1>
-        <div class="job" id="card-job">JOB TITLE</div>
-        <div class="contact-bar">
-            <a href="#" class="contact-item" id="card-email-link"><span id="card-email">email@example.com</span></a>
-            <a href="#" class="contact-item" id="card-website-link" target="_blank"><span id="card-website">PORTFOLIO</span></a>
+    <div class="card-container">
+        <div class="card">
+            <h1 class="nickname" id="card-nickname">NAME</h1>
+            <div class="job" id="card-job">JOB TITLE</div>
+            <div class="contact-bar">
+                <a href="#" class="contact-item" id="card-email-link"><span id="card-email">email@example.com</span></a>
+                <a href="#" class="contact-item" id="card-website-link" target="_blank"><span id="card-website">PORTFOLIO</span></a>
+            </div>
         </div>
     </div>
     <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>

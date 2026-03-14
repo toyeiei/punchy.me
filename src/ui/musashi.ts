@@ -9,26 +9,31 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         :root {
             --bg: #000000;
             --accent: #22c55e;
-            --accent-hover: #4ade80; /* Brighter green for hover */
+            --accent-hover: #4ade80;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --font-brand: 'Bitcount Prop Double', cursive;
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        
+        html, body {
+            height: 100%;
             background-color: var(--bg);
+        }
+
+        body {
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
-            justify-content: center;
-            align-items: flex-start; /* Changed from center to allow scrolling */
+            flex-direction: column;
+            align-items: center;
             min-height: 100vh;
-            overflow-y: auto; /* Enable vertical scroll */
+            overflow-y: auto;
             overflow-x: hidden;
             text-align: center;
             position: relative;
-            padding: 4rem 0; /* Add top/bottom buffer */
+            padding: 0;
         }
 
         /* Pulse Grid Background */
@@ -39,7 +44,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                 linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
             background-size: 40px 40px;
-            z-index: 1;
+            z-index: -1;
         }
 
         .scan-line {
@@ -47,7 +52,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             top: 0; left: 0; width: 100%; height: 100px;
             background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.1), transparent);
             border-bottom: 1px solid rgba(34, 197, 94, 0.2);
-            z-index: 2;
+            z-index: 0;
             animation: scan 4s linear infinite;
             pointer-events: none;
         }
@@ -57,7 +62,14 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             100% { transform: translateY(100vh); }
         }
         
-        .container { z-index: 10; padding: 2rem; position: relative; max-width: 1100px; }
+        .container { 
+            z-index: 10; 
+            padding: 6rem 2rem 2rem; 
+            position: relative; 
+            max-width: 1100px; 
+            width: 100%;
+            flex-grow: 1;
+        }
         
         .title-container {
             display: flex;
@@ -75,40 +87,13 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             position: relative;
             animation: main-glitch 5s infinite;
-            will-change: transform;
-            transform: translateZ(0);
         }
 
         @keyframes main-glitch {
-            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
-            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
-            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
-            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
-        }
-
-        h1::before, h1::after {
-            content: "MUSASHI";
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: var(--bg);
-            opacity: 0;
-            will-change: transform, opacity;
-            transform: translateZ(0);
-        }
-
-        h1::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
-        h1::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
-
-        @keyframes glitch-anim-1 {
-            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
-            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
-            92% { opacity: 0; transform: translate(0) translateZ(0); }
-        }
-
-        @keyframes glitch-anim-2 {
-            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
-            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
-            96% { opacity: 0; transform: translate(0) translateZ(0); }
+            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; }
+            81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg); text-shadow: none; }
         }
 
         .status-badge {
@@ -148,11 +133,9 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             letter-spacing: 2px;
         }
 
-        /* SHINOBI GLASS Design System */
         .panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
             border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 2.5rem;
             border-radius: 24px;
@@ -202,7 +185,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         }
         .skill-badge {
             background: rgba(34, 197, 94, 0.1);
-            color: #ffffff; /* White font for better readability */
+            color: #ffffff;
             border: 1px solid var(--accent);
             padding: 4px 12px;
             border-radius: 20px;
@@ -247,7 +230,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 1px;
             transition: all 0.2s;
-            font-family: var(--font-mono); /* Applied JetBrains Mono */
+            font-family: var(--font-mono);
         }
         .toggle-btn.active {
             background: var(--accent);
@@ -317,7 +300,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
+            z-index: -1;
             pointer-events: none;
             overflow: hidden;
         }
@@ -329,7 +312,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
             animation: drift var(--duration) linear infinite;
             top: var(--top); left: -10px;
-            z-index: 1;
         }
 
         @keyframes fadeInUp {
@@ -342,14 +324,16 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 
         /* Footer Credits */
         .footer-credits {
-            margin-top: 4rem;
+            width: 100%;
+            padding: 2rem;
             font-size: 0.7rem;
             color: var(--text-dim);
             font-family: var(--font-mono);
             text-align: center;
             letter-spacing: 1px;
             opacity: 0.5;
-            padding-bottom: 2rem;
+            margin-top: auto;
+            z-index: 1;
         }
     </style>
 </head>
@@ -389,9 +373,9 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                 </div>
             </div>
         </div>
-
-        <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
     </div>
+
+    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         let lastForgedData = null;
@@ -404,14 +388,12 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             const charCounter = document.getElementById('char-counter');
             const bg = document.getElementById('pixel-bg');
 
-            // 1. Character Counter
             jobInput.addEventListener('input', () => {
                 const count = jobInput.value.length;
                 charCounter.innerText = count.toLocaleString() + ' / 1000';
                 charCounter.style.color = count > 800 ? '#ff4444' : 'var(--text-dim)';
             });
 
-            // 2. Forge Action
             forgeBtn.onclick = async () => {
                 const description = jobInput.value.trim();
                 if (description.length < 50) {
@@ -422,7 +404,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                 forgeBtn.innerText = 'FORGING ATTACK PATH...';
                 forgeBtn.disabled = true;
                 
-                // Show Terminal Animation
                 intelOutput.style.paddingTop = '0';
                 intelOutput.innerHTML = '<div class="terminal-log"></div>';
                 const log = intelOutput.querySelector('.terminal-log');
@@ -477,7 +458,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                 }
             };
 
-            // 3. Pixel Animation
             function createPixel() {
                 const pixel = document.createElement('div');
                 pixel.className = 'pixel';
@@ -515,10 +495,9 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         function renderIntelligence(data, container) {
             container.style.paddingTop = '0';
             container.classList.remove('fade-in-up');
-            void container.offsetWidth; // Trigger reflow
+            void container.offsetWidth; 
             container.classList.add('fade-in-up');
             
-            // Build Toggle Header
             let html = '<div class="view-toggle">';
             html += '<button class="toggle-btn ' + (currentViewMode === 'tactical' ? 'active' : '') + '" onclick="switchView(\\'tactical\\')">Musashi\\'s Analysis</button>';
             html += '<button class="toggle-btn ' + (currentViewMode === 'raw' ? 'active' : '') + '" onclick="switchView(\\'raw\\')">Raw JSON</button>';
@@ -533,7 +512,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             
             const formatList = (arr) => {
                 if (!Array.isArray(arr)) return arr;
-                // Double line break between bullets for elite readability
                 return arr.map(item => '• ' + item).join('<br><br>');
             };
 

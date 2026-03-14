@@ -17,18 +17,21 @@ export const ODIN_HTML = `<!DOCTYPE html>
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
+        
+        html, body {
+            height: 100%;
             background-color: var(--bg);
             color: var(--text-main);
             font-family: var(--font-mono);
-            height: 100vh;
-            overflow: hidden;
-            position: relative;
         }
 
-        /* Responsive Body Scroll */
-        @media (max-width: 1024px) {
-            body { height: auto; overflow-y: auto; }
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+            position: relative;
         }
 
         /* Pulse Grid Background */
@@ -39,7 +42,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
                 linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
             background-size: 40px 40px;
-            z-index: 1;
+            z-index: -1;
         }
 
         .scan-line {
@@ -47,7 +50,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             top: 0; left: 0; width: 100%; height: 100px;
             background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.08), transparent);
             border-bottom: 1px solid rgba(34, 197, 94, 0.15);
-            z-index: 2;
+            z-index: 0;
             animation: scan 6s linear infinite;
             pointer-events: none;
             will-change: transform;
@@ -61,7 +64,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
 
         /* UNIFIED TACTICAL HEADER */
         .global-header {
-            position: fixed;
+            position: sticky;
             top: 0;
             left: 0;
             width: 100%;
@@ -70,8 +73,9 @@ export const ODIN_HTML = `<!DOCTYPE html>
             align-items: center;
             justify-content: space-between;
             z-index: 100;
-            background: linear-gradient(to bottom, rgba(0,0,0,0.8), transparent);
-            backdrop-filter: blur(5px);
+            background: rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
         }
 
         .brand-block {
@@ -141,10 +145,10 @@ export const ODIN_HTML = `<!DOCTYPE html>
         .container { 
             display: flex; 
             width: 100%; 
-            height: 100vh; 
+            height: calc(100vh - 120px); 
             z-index: 10; 
             position: relative; 
-            padding-top: 8rem; 
+            flex-shrink: 0;
         }
 
         /* Panel Structure: 60/40 */
@@ -152,7 +156,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             height: 100%;
             display: flex;
             flex-direction: column;
-            padding: 1rem 1.5rem 2rem 1.5rem;
+            padding: 1.5rem;
             gap: 1rem;
             overflow: hidden;
         }
@@ -212,7 +216,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             background: rgba(255, 255, 255, 0.02);
         }
 
-        /* Terminal UI */
         .recipes-container {
             display: flex;
             gap: 10px;
@@ -360,48 +363,45 @@ export const ODIN_HTML = `<!DOCTYPE html>
             scrollbar-color: rgba(34, 197, 94, 0.2) rgba(0, 0, 0, 0.2);
         }
 
-        /* Footer Credits */
+        /* Footer Credits - Standardized */
         .footer-credits {
-            margin-top: 4rem;
+            width: 100%;
+            padding: 3rem 2rem;
             font-size: 0.7rem;
             color: var(--text-dim);
             font-family: var(--font-mono);
-            text-align: right;
-            padding: 0 2rem 2rem 0;
+            text-align: center;
             letter-spacing: 1px;
             opacity: 0.5;
-            width: 100%;
+            margin-top: auto;
+            position: relative;
             z-index: 1;
         }
 
         /* World-Class Mobile HUD */
         @media (max-width: 1024px) {
-            .footer-credits {
-                text-align: center;
-                padding: 2rem 0;
-            }
             .global-header {
-                padding: 1rem;
+                position: relative; 
+                padding: 1.5rem;
                 background: rgba(0,0,0,0.9);
             }
             .tactical-badges {
-                display: none; /* Stealth Mode: Hide badges on mobile */
+                display: none; 
             }
-            .odin-brand { font-size: 3.5rem; } /* Scaled up from 2.5rem */
+            .odin-brand { font-size: 4.5rem; } 
             .odin-desc { 
                 border-left: 1px solid rgba(255, 255, 255, 0.2);
                 border-right: none;
                 padding-left: 1rem;
                 padding-right: 0;
-                font-size: 0.8rem; /* Scaled up from 0.6rem */
+                font-size: 0.8rem; 
                 white-space: normal;
-                max-width: 280px; /* Expanded from 180px */
+                max-width: 280px; 
             }
             .container {
                 flex-direction: column;
                 height: auto;
-                overflow-y: auto;
-                padding-top: 6rem; /* Reduced for mobile */
+                padding-top: 0; 
             }
             .panel {
                 width: 100% !important;
@@ -414,12 +414,11 @@ export const ODIN_HTML = `<!DOCTYPE html>
                 border-bottom: 1px solid rgba(255, 255, 255, 0.1);
             }
             .preview-box {
-                height: 300px; /* Fixed height for data scroll on mobile */
+                height: 300px;
                 flex-grow: 0;
             }
             .panel-right {
                 margin-top: 1rem;
-                padding-bottom: 4rem;
             }
         }
 
@@ -441,8 +440,6 @@ export const ODIN_HTML = `<!DOCTYPE html>
             <a href="/" class="punchy-badge">[ ⚡ PUNCHY.ME ]</a>
         </div>
     </header>
-
-    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <div class="container">
         <!-- LEFT PANEL: SOURCE -->
@@ -480,6 +477,8 @@ export const ODIN_HTML = `<!DOCTYPE html>
             </div>
         </section>
     </div>
+
+    <div class="footer-credits">Built with ⚡ by Toy & Gemini CLI</div>
 
     <script>
         let table = null;
