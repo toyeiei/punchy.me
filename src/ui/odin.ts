@@ -353,34 +353,26 @@ export const ODIN_HTML = `<!DOCTYPE html>
 
     <header class="tactical-header">
         <div class="badge" id="record-count">0 RECORDS</div>
-        <button class="btn-demo" id="btn-demo">DEMO INTEL</button>
-        <button class="btn-demo" id="btn-clear">CLEAR</button>
+        <div class="badge" id="column-count">0 COLUMNS</div>
+        <div class="badge" id="data-size">0.0 KB</div>
         <a href="/" class="punchy-badge">[ ⚡ PUNCHY.ME ]</a>
     </header>
 
     <div class="container">
         <!-- LEFT PANEL: SOURCE -->
         <section class="panel panel-left">
-            <h2 class="panel-title">SOURCE INTEL <span>// CSV</span></h2>
+            <h2 class="panel-title">SOURCE INTEL <span>// DEMO PAYLOAD</span></h2>
             <div class="preview-box">
-                <div class="upload-overlay" id="upload-overlay">
-                    <label for="csv-file" class="upload-label">
-                        <span style="color: var(--accent); font-weight: bold; letter-spacing: 1px;">UPLOAD MISSION DATA</span>
-                        <p style="color: var(--text-dim); font-size: 0.6rem; margin-top: 0.8rem;">MAX 300KB | 1000 ROWS | 10 COLS</p>
-                    </label>
-                    <input type="file" id="csv-file" class="file-input" accept=".csv">
-                </div>
                 <table id="source-table"></table>
             </div>
 
             <div class="recipes-container">
-                <button class="btn-recipe" data-code="table.summary()">[ PROFILE ]</button>
                 <button class="btn-recipe" data-code="table.select('Job', 'Salary')">[ SELECT ]</button>
                 <button class="btn-recipe" data-code="table.filter(d => d.Salary > 100000)">[ FILTER ]</button>
                 <button class="btn-recipe" data-code="table.orderby(aq.desc('Salary')).slice(0, 10)">[ TOP 10 ]</button>
                 <button class="btn-recipe" data-code="table.groupby('Dept').count()">[ GROUP BY ]</button>
-                <button class="btn-recipe" data-code="table.dedupe()">[ DEDUPE ]</button>
                 <button class="btn-recipe" data-code="table.sample(5)">[ SAMPLE ]</button>
+                <button class="btn-recipe" data-code="table.pivot('Region', 'Dept')">[ PIVOT ]</button>
             </div>
             
             <div class="terminal-container">
@@ -402,11 +394,11 @@ export const ODIN_HTML = `<!DOCTYPE html>
     <script>
         let table = null;
 
-        const csvInput = document.getElementById('csv-file');
-        const uploadOverlay = document.getElementById('upload-overlay');
         const sourceTable = document.getElementById('source-table');
         const resultTable = document.getElementById('result-table');
         const recordCount = document.getElementById('record-count');
+        const columnCount = document.getElementById('column-count');
+        const dataSizeBadge = document.getElementById('data-size');
 
         const mockCSV = \`Job,Dept,Salary,Years,Region
 Data Analyst,Engineering,120000,3,APAC
@@ -456,40 +448,47 @@ Growth Hacker,Marketing,125000,4,APAC\`;
                 if (table.numCols() > 10) table = table.select(table.columnNames().slice(0, 10));
 
                 renderTable(table, sourceTable);
-                uploadOverlay.classList.add('hidden');
+                
+                // Update Badges
                 recordCount.innerText = table.numRows() + ' RECORDS';
+                columnCount.innerText = table.numCols() + ' COLUMNS';
+                const sizeKb = (new Blob([text]).size / 1024).toFixed(1);
+                dataSizeBadge.innerText = sizeKb + ' KB';
+                
                 resultTable.innerHTML = ''; // Clear result
             } catch (err) {
-                alert("Forge Failed: Invalid CSV format.");
+                console.error("Forge Failed:", err);
             }
         };
 
-        document.getElementById('btn-demo').onclick = () => loadData(mockCSV);
-
-        document.getElementById('btn-clear').onclick = () => {
-            table = null;
-            sourceTable.innerHTML = '';
-            resultTable.innerHTML = '';
-            uploadOverlay.classList.remove('hidden');
-            recordCount.innerText = '0 RECORDS';
-            terminal.value = '';
-            termContainer.classList.remove('error');
-            document.querySelector('.prompt').innerText = '>';
-        };
-
-        csvInput.onchange = (e) => {
-            const file = e.target.files[0];
-            if (!file) return;
-            if (file.size > 300 * 1024) return alert("Tactical limit: 300KB.");
-            const reader = new FileReader();
-            reader.onload = (event) => loadData(event.target.result);
-            reader.readAsText(file);
-        };
+        // AUTO-LOAD STARTUP
+        window.onload = () => loadData(mockCSV);
 
         // Terminal Execution
         const terminal = document.getElementById('query-terminal');
         const runBtn = document.getElementById('run-terminal');
         const termContainer = document.querySelector('.terminal-container');
+
+        // ODIN Tactical Helpers
+        const profile = (dt) => {
+            if (!dt) return null;
+            const cols = dt.columnNames();
+            const summaryData = cols.map(name => {
+                const col = dt.column(name);
+                let type = 'unknown';
+                const firstVal = col.get(0);
+                if (firstVal !== undefined && firstVal !== null) {
+                    type = typeof firstVal;
+                }
+                return {
+                    column: name,
+                    type: type,
+                    sample: firstVal,
+                    unique: dt.groupby(name).count().numRows()
+                };
+            });
+            return aq.table(summaryData);
+        };
 
         const executeQuery = () => {
             if (!table) return alert("No source data.");
@@ -497,8 +496,10 @@ Growth Hacker,Marketing,125000,4,APAC\`;
             if (!cmd) return;
 
             try {
-                const fn = new Function('table', 'aq', \`return \${cmd}\`);
-                const result = fn(table, aq);
+                // Inject profile helper and aq into the execution scope
+                const fn = new Function('table', 'aq', 'profile', \`return \${cmd}\`);
+                const result = fn(table, aq, profile);
+                
                 if (result && typeof result.numRows === 'function') {
                     renderTable(result, resultTable);
                     termContainer.classList.remove('error');
@@ -509,6 +510,7 @@ Growth Hacker,Marketing,125000,4,APAC\`;
             } catch (err) {
                 termContainer.classList.add('error');
                 document.querySelector('.prompt').innerText = 'ERR>';
+                console.error("ODIN Terminal Error:", err);
             }
         };
 
