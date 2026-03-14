@@ -349,10 +349,10 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         <div class="portal-trigger">⚡</div>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
-            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
-            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
-            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
+            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
+            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
+            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
+            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
         </div>
     </a>
     
