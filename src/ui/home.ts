@@ -174,6 +174,18 @@ export const HTML = `<!DOCTYPE html>
         h1::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
         h1::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
 
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
         .input-group {
             background: var(--card-bg);
             padding: 1rem;
@@ -339,6 +351,62 @@ export const HTML = `<!DOCTYPE html>
         #modal-overlay.show { opacity: 1; }
         #modal-overlay.show .modal { transform: scale(1); }
 
+        .status-stage {
+            width: 80px; height: 80px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .radar {
+            position: absolute;
+            width: 100%; height: 100%;
+            border: 2px solid var(--accent);
+            border-radius: 50%;
+            opacity: 0.3;
+            animation: radar-scan 2s linear infinite;
+        }
+
+        .radar::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 50%; height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            transform-origin: left;
+            animation: radar-sweep 2s linear infinite;
+        }
+
+        @keyframes radar-scan {
+            0% { transform: scale(0.8); opacity: 0.5; }
+            100% { transform: scale(1.2); opacity: 0; }
+        }
+
+        @keyframes radar-sweep {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-icon {
+            width: 60px; height: 60px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 0 30px var(--accent);
+            animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        @keyframes success-pop {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        .success-icon svg { width: 30px; height: 30px; color: #000; }
+
         .result-container {
             background: #0f172a;
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -457,6 +525,14 @@ export const HTML = `<!DOCTYPE html>
 
     <div id="modal-overlay">
         <div class="modal">
+            <div class="status-stage">
+                <div class="radar" id="modal-radar"></div>
+                <div class="success-icon" id="modal-success-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                    </svg>
+                </div>
+            </div>
             <h2 id="modal-title">PUNCHING...</h2>
             <p id="modal-subtitle" style="color: var(--text-dim); margin-top: 0.5rem;">Your short link is live.</p>
             <div class="result-container" id="result-container" style="position: relative;">
@@ -494,6 +570,15 @@ export const HTML = `<!DOCTYPE html>
         async function executeShorten(token) {
             let url = urlInput.value.trim();
             if (url && !url.startsWith('http')) url = 'https://' + url;
+            
+            const radar = document.getElementById('modal-radar');
+            const successIcon = document.getElementById('modal-success-icon');
+            const modalTitle = document.getElementById('modal-title');
+
+            radar.style.display = 'block';
+            successIcon.style.display = 'none';
+            modalTitle.innerText = 'PUNCHING...';
+
             try {
                 const res = await fetch('/shorten', {
                     method: 'POST',
@@ -502,8 +587,16 @@ export const HTML = `<!DOCTYPE html>
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    resultLink.innerText = window.location.origin + '/' + data.id;
-                    resultLink.href = window.location.origin + '/' + data.id;
+                    
+                    // Artificial delay for animation impact
+                    setTimeout(() => {
+                        resultLink.innerText = window.location.origin + '/' + data.id;
+                        resultLink.href = window.location.origin + '/' + data.id;
+                        
+                        radar.style.display = 'none';
+                        successIcon.style.display = 'flex';
+                        modalTitle.innerText = 'PUNCHED!';
+                    }, 800);
                 }
             } catch (err) { alert('Sync failed.'); }
         }
