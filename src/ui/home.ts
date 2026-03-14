@@ -282,7 +282,7 @@ export const HTML = `<!DOCTYPE html>
             font-size: 1.75rem;
             margin-bottom: 0.5rem;
             text-transform: uppercase;
-            letter-spacing: -3px;
+            letter-spacing: 1px;
             display: flex;
             align-items: center;
             gap: 0.75rem;
