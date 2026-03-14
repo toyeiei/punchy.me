@@ -148,28 +148,42 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             letter-spacing: 1px;
         }
 
+        .punchy-desc {
+            font-family: var(--font-mono);
+            color: var(--text-dim);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 1.5rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         .quote-box {
-            margin-top: 1rem;
+            margin-top: 0.5rem;
             border-left: 2px solid var(--accent);
-            padding: 1rem 2rem;
+            padding: 0.75rem 1.5rem;
             text-align: left;
             background: rgba(34, 197, 94, 0.03);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
         }
 
         .quote-text {
             color: var(--text-main);
-            font-size: 1.25rem;
+            font-size: 0.95rem;
             font-style: italic;
-            line-height: 1.6;
-            margin-bottom: 1rem;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
         }
 
         .quote-author {
             color: var(--accent);
             font-weight: 700;
             text-transform: uppercase;
-            font-size: 0.8rem;
-            letter-spacing: 2px;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
         }
 
         .panel {
@@ -366,6 +380,8 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             <span class="status-badge">BETA</span>
         </div>
         
+        <p class="punchy-desc">Cold Attack Engine. AI-powered extraction of job intel and interview strike-paths.</p>
+
         <div class="quote-box">
             <p class="quote-text">"You must reach the point where you have no specialized equipment and depend on nothing outside yourself."</p>
             <p class="quote-author">— MIYAMOTO MUSASHI, The Book of Five Rings</p>
