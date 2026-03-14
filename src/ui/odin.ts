@@ -196,6 +196,26 @@ export const ODIN_HTML = `<!DOCTYPE html>
             animation: odin-glitch 5s infinite;
         }
 
+        .mvp-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            align-self: flex-start;
+            margin-top: 0.5rem;
+            letter-spacing: 1px;
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
+
         @keyframes odin-glitch {
             0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
             81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
@@ -552,6 +572,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
     <header class="global-header">
         <div class="brand-block">
             <div class="odin-brand" data-text="ODIN">ODIN</div>
+            <div class="mvp-badge">MVP</div>
             <div class="odin-desc">SUPREME DATA COMMAND // CRUNCH INTEL AT THE EDGE</div>
         </div>
         <div class="tactical-badges">
