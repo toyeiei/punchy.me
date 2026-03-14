@@ -77,13 +77,13 @@ export const ODIN_HTML = `<!DOCTYPE html>
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
+            background-image:
+                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
             background-size: 40px 40px;
-            z-index: -1;
+            z-index: 0;
+            pointer-events: none;
         }
-
         .scan-line {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100px;

@@ -102,6 +102,32 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             overflow: hidden;
         }
 
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.08), transparent);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.15);
+            z-index: 1;
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+
         .pixel {
             position: absolute;
             width: 3px; height: 3px;
@@ -337,6 +363,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
 
     <a href="/" class="punchy-portal">
@@ -552,14 +579,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             }
         }
 
-        const formInputs = form.querySelectorAll('input, textarea');
-        formInputs.forEach(input => {
-            input.addEventListener('focus', () => {
-                setTimeout(() => {
-                    input.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                }, 300);
-            });
-        });
+
 
         const bg = document.getElementById('pixel-bg');
         function createPixel() {
@@ -911,6 +931,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
 
     <a href="/" class="punchy-portal">

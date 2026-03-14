@@ -45,9 +45,18 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
+            z-index: 1;
             pointer-events: none;
             overflow: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .pixel {
@@ -172,6 +181,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
+        /* SHINOBI INPUTS */
         input {
             background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
@@ -183,7 +193,11 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             width: 100%;
             transition: all 0.2s;
         }
-        input:focus { border-color: var(--accent); background: rgba(255, 255, 255, 0.08); }
+        input:focus { 
+            border-color: var(--accent); 
+            background: rgba(255, 255, 255, 0.08); 
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.1);
+        }
 
         button#bazuka-btn {
             background: var(--accent);
@@ -200,9 +214,27 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         }
 
         button#bazuka-btn:hover { background: var(--accent-hover); box-shadow: 0 0 20px rgba(34, 197, 94, 0.4); }
+
+        .beta-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
+        }
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
 
     <a href="/" class="punchy-portal">
@@ -217,12 +249,14 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     </a>
 
     <div class="container">
-        <div class="title-container">
+        <div class="title-container" style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
             <h1>BAZUKA</h1>
+            <span class="beta-badge">BETA</span>
         </div>
         <p class="punchy-desc">Forging high-impact digital presence in seconds.</p>
         <form id="bazuka-form">
             <div class="input-group">
+                <input type="text" id="hp_field" style="display: none;" tabindex="-1" autocomplete="off">
                 <input type="text" id="nickname" placeholder="👤 Nickname" required>
                 <input type="text" id="job" placeholder="💼 Job Title" required>
                 <input type="email" id="email" placeholder="📧 Email Address" required>
@@ -234,70 +268,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             </div>
         </form>
     </div>
-
-    <div id="modal-overlay">
-        <div class="modal">
-            <div class="status-stage">
-                <div class="success-icon" id="modal-success-icon" style="display: flex;">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
-                    </svg>
-                </div>
-            </div>
-            <h2>CARD FORGED!</h2>
-            <p style="color: var(--text-dim); margin-top: 0.5rem;">Your high-impact identity is live.</p>
-            
-            <div class="result-container">
-                <a href="#" id="result-link" target="_blank">Generating...</a>
-                <button id="copy-btn">COPY</button>
-            </div>
-            <button id="close-modal">DONE</button>
-        </div>
-    </div>
-
-    <style>
-        #modal-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
-            display: none; align-items: center; justify-content: center;
-            z-index: 2000; opacity: 0; transition: opacity 0.3s;
-        }
-        #modal-overlay.show { display: flex; opacity: 1; }
-        .modal {
-            background: #000; border: 1px solid var(--accent);
-            padding: 3rem; border-radius: 24px; text-align: center;
-            max-width: 450px; width: 90%; transform: scale(0.9); transition: transform 0.3s;
-            box-shadow: 0 0 50px rgba(34, 197, 94, 0.2);
-        }
-        #modal-overlay.show .modal { transform: scale(1); }
-        .status-stage { margin-bottom: 1.5rem; display: flex; justify-content: center; }
-        .success-icon {
-            width: 60px; height: 60px; background: var(--accent); border-radius: 50%;
-            display: flex; align-items: center; justify-content: center;
-            box-shadow: 0 0 30px var(--accent);
-            animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
-        }
-        @keyframes success-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
-        .success-icon svg { width: 30px; height: 30px; color: #000; }
-        
-        .result-container {
-            background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem; border-radius: 12px; margin: 2rem 0;
-            display: flex; align-items: center; gap: 1rem;
-        }
-        #result-link {
-            color: var(--accent); font-family: var(--font-mono); font-size: 0.9rem;
-            text-decoration: none; flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
-        }
-        #copy-btn, #close-modal {
-            background: var(--accent); color: #000; border: none;
-            padding: 0.8rem 1.5rem; border-radius: 8px; font-weight: 700;
-            font-family: var(--font-mono); cursor: pointer; transition: all 0.2s;
-        }
-        #copy-btn:hover, #close-modal:hover { background: var(--accent-hover); transform: scale(1.05); }
-        #close-modal { width: 100%; margin-top: 1rem; background: transparent; color: var(--text-dim); border: 1px solid rgba(255, 255, 255, 0.1); }
-        #close-modal:hover { color: var(--text-main); border-color: var(--text-main); }
-    </style>
 
     <script>
         const bg = document.getElementById('pixel-bg');
@@ -317,10 +287,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         const form = document.getElementById('bazuka-form');
         const submitBtn = document.getElementById('bazuka-btn');
-        const modal = document.getElementById('modal-overlay');
-        const resultLink = document.getElementById('result-link');
-        const copyBtn = document.getElementById('copy-btn');
-        const closeBtn = document.getElementById('close-modal');
 
         function resetSubmitBtn() {
             submitBtn.disabled = false;
@@ -355,9 +321,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             submitBtn.innerText = 'FORGING...';
             isUserInitiated = true;
 
+            // ULTRA-FAST HANDSHAKE: 1s timeout for Turnstile
             turnstileTimeoutId = setTimeout(() => {
                 if (isUserInitiated) createBazuka('');
-            }, 2500);
+            }, 1000);
 
             if (window.turnstile) {
                 try {
@@ -371,7 +338,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         };
 
         async function createBazuka(token = '') {
+            const suggestedId = Math.random().toString(36).substring(2, 8);
             const formData = {
+                suggestedId,
+                hp_field: document.getElementById('hp_field').value,
                 nickname: document.getElementById('nickname').value,
                 job: document.getElementById('job').value,
                 email: document.getElementById('email').value,
@@ -387,13 +357,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 });
                 
                 if (res.ok) {
-                    const { id } = await res.json();
-                    const fullUrl = window.location.origin + '/' + id;
-                    resultLink.innerText = fullUrl;
-                    resultLink.href = fullUrl;
-                    modal.classList.add('show');
-                    resetSubmitBtn();
-                    form.reset();
+                    // ELITE REDIRECT: Bypass modal for instant impact
+                    window.location.href = '/' + suggestedId;
                 } else {
                     alert('Forge failed. Please try again.');
                     resetSubmitBtn();
@@ -403,15 +368,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 resetSubmitBtn();
             }
         }
-
-        copyBtn.onclick = () => {
-            navigator.clipboard.writeText(resultLink.innerText);
-            const originalText = copyBtn.innerText;
-            copyBtn.innerText = 'DONE!';
-            setTimeout(() => copyBtn.innerText = originalText, 2000);
-        };
-
-        closeBtn.onclick = () => modal.classList.remove('show');
     </script>
 </body>
 </html>`;
@@ -573,6 +529,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
 
     <a href="/" class="punchy-portal">

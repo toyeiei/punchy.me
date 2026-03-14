@@ -358,9 +358,11 @@ export default {
 			if (request.method === 'GET') return new Response(BAZUKA_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
 			if (request.method === 'POST') {
 				try {
-					const data = await request.json() as BazukaData;
+					const data = await request.json() as BazukaData & { suggestedId?: string, hp_field?: string };
+					if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
 					if (!data.nickname || !data.job) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
-					const id = Math.random().toString(36).substring(2, 8);
+					
+					const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
 					await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'bazuka' }), { expirationTtl: 259200 }); // 3 days
 					return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
 				} catch (_e) {
@@ -374,13 +376,14 @@ export default {
 			if (request.method === 'GET') return new Response(ANAKIN_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
 			if (request.method === 'POST') {
 				try {
-					const data = await request.json() as AnakinData;
+					const data = await request.json() as AnakinData & { suggestedId?: string, hp_field?: string };
+					if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
 					if (!data.name || !data.experience || !data.skills) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
 					if ((data.education && data.education.length > 500) || (data.skills && data.skills.length > 500) || (data.experience && data.experience.length > 500)) {
 						return new Response(JSON.stringify({ error: 'Input fields must be under 500 characters each.' }), { status: 400 });
 					}
 					
-					const id = Math.random().toString(36).substring(2, 8);
+					const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
 					await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: 259200 });
 					return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
 				} catch (_e) {

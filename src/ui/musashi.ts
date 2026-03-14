@@ -41,10 +41,11 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
+                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
             background-size: 40px 40px;
-            z-index: -1;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .scan-line {
@@ -135,17 +136,23 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             83% { transform: skew(0deg); text-shadow: none; }
         }
 
-        .status-badge {
+        .beta-badge {
             background: var(--accent);
             color: #000;
             font-size: 0.8rem;
             font-weight: 900;
-            padding: 4px 12px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-family: var(--font-mono);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.6);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            animation: pulse 2s infinite alternate;
             text-transform: uppercase;
             letter-spacing: 1px;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
         }
 
         .punchy-desc {
@@ -214,9 +221,9 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 
         label { color: var(--text-dim); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; letter-spacing: 1px; margin-bottom: 0.75rem; display: block; }
         textarea {
-            background: #000000;
+            background: rgba(255, 255, 255, 0.05);
             border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1.2rem;
+            padding: 1rem 1.2rem;
             border-radius: 12px;
             color: var(--text-main);
             font-family: var(--font-mono);
@@ -224,6 +231,12 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             min-height: 200px;
             outline: none;
             resize: vertical;
+            transition: all 0.2s;
+        }
+        textarea:focus {
+            border-color: var(--accent);
+            background: rgba(255, 255, 255, 0.08);
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.1);
         }
 
         .intel-block { margin-bottom: 2rem; border-bottom: 1px solid rgba(255,255,255,0.05); padding-bottom: 1.5rem; }
@@ -375,9 +388,9 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     </a>
     
     <div class="container">
-        <div class="title-container">
+        <div class="title-container" style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
             <h1>MUSASHI</h1>
-            <span class="status-badge">BETA</span>
+            <span class="beta-badge">BETA</span>
         </div>
         
         <p class="punchy-desc">Cold Attack Engine. AI-powered extraction of job intel and interview strike-paths.</p>

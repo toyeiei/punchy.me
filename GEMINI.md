@@ -65,11 +65,18 @@ We maintain senior-level engineering standards regardless of project scale.
 ### 1. Strict Template Integrity
 We have identified a recurring high-impact bug: **Unterminated Template Literals** in UI files (e.g., `src/ui/anakin.ts`).
 - **Symptom:** `HTMLRewriter` returns an empty response (`''`), causing tests to fail with messages like `expected '' to contain 'Anakin Skywalker'`.
-- **Root Cause:** Malformed template exports or erroneous backslashes (e.g., `\`;`) at the end of template strings.
+- **Root Cause:** Malformed template exports or erroneous backslashes (e.g., \`;) at the end of template strings.
 - **Mandate:** After modifying any UI template in `src/ui/`, engineers **MUST** surgically verify the transition points between exported template constants. Use `read_file` or `grep` to confirm that all template literals are properly terminated with a simple backtick (`) and semicolon (;).
 - **Validation:** A task is not complete until `npm test` confirms that `HTMLRewriter` is successfully injecting content into the relevant template.
 
-### 2. Consistency Mitigation (KV Resilience)
+### 2. Strategic Integrity Protocols (Zero-Regression)
+To eliminate unpredictable behavior and secondary bugs, the following protocols are MANDATORY:
+- **Mandatory Pre-Validation Hook:** After ANY `write_file` or `replace` operation, immediately run a syntax check (`npx tsc --noEmit` or `npm run lint`). Errors MUST be resolved before proceeding.
+- **Double-Read Template Integrity:** When modifying UI files, explicitly read the lines *following* the change to verify that termination points and subsequent exports are intact.
+- **Full-Suite Regression Mandate:** Any change touching `src/ui/` or `src/index.ts` requires a full test suite execution (`npm test`). Isolated tests are insufficient for global UI integrity.
+- **Local Log First:** When the app breaks during local development, the terminal log from `localhost` (Wrangler/Miniflare) is the PRIMARY source of truth. Always check and analyze these logs before attempting a fix.
+
+### 3. Consistency Mitigation (KV Resilience)
 Cloudflare KV is eventually consistent. To maintain an "Instant" feel without broken links, we employ a triple-tier strategy:
 - **Smart Wait (Frontend):** The result link is "locked" for 1.2s with a visual progress bar. This prevents users from clicking before the data has likely propagated.
 - **True Synchronization:** The frontend waits for final ID confirmation from the server and restarts the propagation timer if the ID changed, eliminating race conditions.

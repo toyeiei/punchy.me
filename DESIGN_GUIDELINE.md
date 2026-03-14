@@ -72,7 +72,7 @@ Every professional tool (ODIN, BAZUKA, etc.) must use a single, unified header.
 
 ### 4.1 The Pulse Grid Background
 Every page must feature the high-performance background layer.
-- **Grid**: Pure CSS linear-gradient (40px cells).
+- **Grid**: Pure CSS linear-gradient (40px cells, `rgba(34, 197, 94, 0.08)`).
 - **Scan Line**: GPU-accelerated (`translateZ(0)`) moving line with 6s duration.
 - **Pixel Drift**: Subtle white and green particles moving left-to-right (z-index: 1 or below content).
 
@@ -113,6 +113,49 @@ The standard back-link is replaced by an interactive portal that allows rapid mo
     - **Hover**: Expands horizontally (to the left) to reveal the `PUNCHY.ME` brand name and a row of tool icons.
     - **Visuals**: SHINOBI GLASS background, 12px radius, neon-green border shift.
 - **Mobile Profile**: Stays compact (icon-only) or expands on tap to ensure touch targets remain clean.
+
+---
+
+## 8. Tactical Input Protocol (SHINOBI INPUTS)
+To maintain the "Elite Command Center" aesthetic, all form inputs (text, textarea, select) must follow these tactical specs:
+
+- **Base State**:
+    - **Background**: `rgba(255, 255, 255, 0.05)` (Subtle semi-transparent layer)
+    - **Border**: `1px solid rgba(255, 255, 255, 0.1)`
+    - **Border Radius**: `12px`
+    - **Padding**: `1rem 1.2rem`
+    - **Typography**: `var(--font-mono)`, `var(--text-main)`
+- **Focus/Active State**:
+    - **Border Color**: `var(--accent)` (Neon Green)
+    - **Background**: `rgba(255, 255, 255, 0.08)`
+    - **Shadow**: `0 0 10px rgba(34, 197, 94, 0.1)`
+- **Validation Feedback**:
+    - **Valid**: Border `var(--accent)`, optional `✓` indicator.
+    - **Invalid**: Border `#ef4444` (Vibrant Red).
+
+---
+
+## 9. Neon Tactical Badges (BETA Status)
+To identify features in development while maintaining an elite aesthetic, use the standardized "BETA" badge:
+
+- **Visuals**:
+    - **Background**: `var(--accent)` (Neon Green)
+    - **Text Color**: `#000000` (Pure Black)
+    - **Typography**: `var(--font-mono)`, `0.8rem`, `900` weight.
+    - **Shape**: `6px` radius capsule.
+    - **Padding**: `4px 10px`
+    - **Effect**: `box-shadow: 0 0 15px rgba(34, 197, 94, 0.6)`
+    - **Animation**: `pulse 2s infinite alternate` (scale 1.0 to 1.05).
+- **Positioning**: Place immediately after the Title with a `1.5rem` gap in a flex container (`align-items: center`).
+
+---
+
+## 10. The Synchronization Mandate
+**Synchronization is KEY.** To maintain an elite, cohesive ecosystem, every professional tool must be a perfect reflection of the PUNCHY.ME brand.
+
+- **Unified Aesthetics**: New features or design patterns (e.g., badges, inputs, animations) must be rolled out globally across all tools simultaneously. No tool should be left behind with legacy styles.
+- **Structural Integrity**: Layout patterns (Single-View HUD, Tactical Headers, Ecosystem Portals) must remain identical in behavior and positioning to ensure zero cognitive friction for the user.
+- **Tactical Feedback**: Loading states, success transitions, and validation signals must use the same timing (`0.2s` to `0.3s`) and neon-green accents project-wide.
 
 ---
 *Protocol strictly enforced by Gemini CLI for all future PUNCHY.ME missions.*

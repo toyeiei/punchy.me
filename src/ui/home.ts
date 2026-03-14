@@ -73,8 +73,9 @@ export const HTML = `<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             align-items: center;
-            height: 100vh;
-            overflow: hidden;
+            min-height: 100svh;
+            overflow-x: hidden;
+            overflow-y: auto;
             position: relative;
             padding: 0;
             margin: 0;
@@ -101,7 +102,7 @@ export const HTML = `<!DOCTYPE html>
         .feature-section {
             width: 100%;
             max-width: 1200px;
-            padding: 0 1.5rem 3rem;
+            padding: 0 1.5rem clamp(1.5rem, 4vh, 3rem);
             z-index: 10;
         }
 
@@ -116,6 +117,17 @@ export const HTML = `<!DOCTYPE html>
             z-index: 1;
             pointer-events: none;
             overflow: hidden;
+        }
+
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
         }
 
         .pixel {
@@ -247,7 +259,7 @@ export const HTML = `<!DOCTYPE html>
             display: grid;
             grid-template-columns: 1fr;
             gap: 1.5rem;
-            margin-top: 2rem;
+            margin-top: clamp(2rem, 6vh, 4rem);
         }
 
         @media (min-width: 640px) {
@@ -456,25 +468,25 @@ export const HTML = `<!DOCTYPE html>
         .close-link:hover { color: var(--text-main); }
 
         .footer-credits {
-            margin-top: 4rem;
-            margin-bottom: 2rem;
+            padding-bottom: clamp(1.5rem, 4vh, 3rem);
+            width: 100%;
             font-size: 0.7rem;
             color: var(--text-dim);
             font-family: var(--font-mono);
             text-align: center;
             letter-spacing: 1px;
             opacity: 0.5;
-            width: 100%;
-            z-index: 1;
+            z-index: 10;
         }
     </style>
 </head>
 <body>
+    <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
     
     <section class="hero-section">
         <div class="container">
-            <h1>PUNCHY.ME</h1>
+            <h1 style="margin-top: clamp(1rem, 5vh, 4rem);">PUNCHY.ME</h1>
             <form id="shorten-form">
                 <div class="input-group">
                     <input type="text" name="hp_field" id="hp_field" style="display:none !important;" tabindex="-1" autocomplete="off">
@@ -492,12 +504,18 @@ export const HTML = `<!DOCTYPE html>
         <div class="suite-grid">
             <a href="/bazuka" class="feature-card">
                 <span class="feature-icon">👤</span>
-                <div class="feature-title">BAZUKA</div>
+                <div class="feature-title">
+                    BAZUKA
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
                 <div class="feature-tagline">Instant Digital Identity. Professional cards that explode with style.</div>
             </a>
             <a href="/anakin" class="feature-card">
                 <span class="feature-icon">⚡</span>
-                <div class="feature-title">ANAKIN</div>
+                <div class="feature-title">
+                    ANAKIN
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
                 <div class="feature-tagline">Elite AI Resumes. Forged by Llama 3 for career-winning impact.</div>
             </a>
             <a href="/musashi" class="feature-card">
@@ -645,6 +663,7 @@ export const HTML = `<!DOCTYPE html>
         .pixel-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 1; pointer-events: none; }
         .pixel { position: absolute; width: 3px; height: 3px; background: rgba(255, 255, 255, 0.4); animation: drift var(--duration) linear infinite; top: var(--top); left: -10px; }
         .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); }
+        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; pointer-events: none; }
         @keyframes drift { 0% { transform: translateX(0); opacity: 0; } 5% { opacity: 1; } 100% { transform: translateX(calc(100vw + 20px)); opacity: 0; } }
         .container { z-index: 10; padding: 2rem; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); max-width: 400px; }
         h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: 900; }
@@ -656,6 +675,7 @@ export const HTML = `<!DOCTYPE html>
         </style>
         </head>
         <body>
+        <div class="grid-bg"></div>
         <div class="pixel-bg" id="pixel-bg"></div>
         <div class="container">
         <h1>SYNCING...</h1>
