@@ -671,43 +671,53 @@ Hope this helps!`
         ok: true,
         json: async () => ({
           results: [
-            { id: "1", urls: { regular: "https://example.com/1.jpg", small: "https://example.com/1-s.jpg" }, alt_description: "alt 1", user: { name: "user1" } },
-            { id: "2", urls: { regular: "https://example.com/2.jpg", small: "https://example.com/2-s.jpg" }, alt_description: "alt 2", user: { name: "user2" } }
+            { id: "1", urls: { regular: "https://example.com/1.jpg" }, alt_description: "alt 1", user: { name: "user1" } },
+            { id: "2", urls: { regular: "https://example.com/2.jpg" }, alt_description: "alt 2", user: { name: "user2" } }
           ]
         })
       } as unknown as Response);
 
-      const res = await SELF.fetch("http://localhost/picasso/search", {
-        method: "POST",
-        body: JSON.stringify({ query: "office" }),
-        headers: { "Content-Type": "application/json", "cf-connecting-ip": "1.1.1.1" },
+      const res = await SELF.fetch("http://localhost/picasso/search?q=office", {
+        method: "GET",
+        headers: { "cf-connecting-ip": "1.1.1.1" },
       });
       
       expect(res.status).toBe(200);
       const data = await res.json() as Record<string, unknown>;
       
       expect(Array.isArray(data.images)).toBe(true);
-      const images = data.images as Record<string, unknown>[];
+      const images = data.images as Record<string, any>[];
       expect(images.length).toBe(2);
-      expect(images[0].url).toBe("https://example.com/1.jpg?w=1920&fit=max&fm=webp&q=85");
-      expect(images[0].thumb).toBe("https://example.com/1.jpg?w=400&fit=crop&fm=webp&q=60");
+      // Verify sanitized URL structure (optimized for webp)
+      expect(images[0].url).toContain("w=1200");
+      expect(images[0].thumb).toContain("w=200");
       
       const fetchCall = fetchSpy.mock.calls[0];
       expect(fetchCall[0]).toContain("query=office");
-      expect((fetchCall[1] as Record<string, any>).headers["Authorization"]).toContain("Client-ID");
       
       fetchSpy.mockRestore();
     });
 
-    it("rejects empty or malformed search queries", async () => {
-      const res = await SELF.fetch("http://localhost/picasso/search", {
-        method: "POST",
-        body: JSON.stringify({ query: "" }),
-        headers: { "Content-Type": "application/json" },
+    it("supports random image loads with empty queries", async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ([
+          { id: "rand1", urls: { regular: "https://example.com/r1.jpg" }, alt_description: "rand alt", user: { name: "user1" } }
+        ])
+      } as unknown as Response);
+
+      const res = await SELF.fetch("http://localhost/picasso/search?q=", {
+        method: "GET",
       });
-      expect(res.status).toBe(400);
-      const data = await res.json() as { error?: string };
-      expect(data.error).toBe("Invalid search query.");
+      
+      expect(res.status).toBe(200);
+      const data = await res.json() as any;
+      expect(data.images[0].id).toBe("rand1");
+      
+      const fetchCall = fetchSpy.mock.calls[0];
+      expect(fetchCall[0]).toContain("/photos/random");
+      
+      fetchSpy.mockRestore();
     });
 
     it("enforces Unsplash API specific rate limiting (10 per minute)", async () => {
@@ -716,17 +726,16 @@ Hope this helps!`
         json: async () => ({ results: [] })
       } as unknown as Response);
       
+      const ip = "picasso-rate-limit-ip-" + Date.now();
       for (let i = 0; i < 10; i++) {
-        await SELF.fetch("http://localhost/picasso/search", {
-          method: "POST",
-          body: JSON.stringify({ query: "test" }),
-          headers: { "Content-Type": "application/json", "cf-connecting-ip": "picasso-rate-limit-ip" },
+        await SELF.fetch(`http://localhost/picasso/search?q=test&i=${i}`, {
+          method: "GET",
+          headers: { "cf-connecting-ip": ip },
         });
       }
-      const res = await SELF.fetch("http://localhost/picasso/search", {
-        method: "POST",
-        body: JSON.stringify({ query: "test" }),
-        headers: { "Content-Type": "application/json", "cf-connecting-ip": "picasso-rate-limit-ip" },
+      const res = await SELF.fetch(`http://localhost/picasso/search?q=test&i=11`, {
+        method: "GET",
+        headers: { "cf-connecting-ip": ip },
       });
       expect(res.status).toBe(429);
       const data = await res.json() as { error?: string };

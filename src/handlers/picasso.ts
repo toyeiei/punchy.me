@@ -11,23 +11,29 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 		const url = new URL(request.url);
 		const query = url.searchParams.get('q');
 		const page = url.searchParams.get('p') || '1';
+		const isSearch = query && query.trim() !== '';
 
-		if (!query || query.trim() === '') {
-			return new Response(JSON.stringify({ error: 'Invalid search query.' }), { status: 400 });
+		// Determine Unsplash Endpoint
+		let unsplashUrl;
+		if (isSearch) {
+			unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=10&page=${page}`;
+		} else {
+			// Random mode for initial page load
+			unsplashUrl = `https://api.unsplash.com/photos/random?count=10`;
 		}
 
-		// Edge Cache Implementation
+		// Edge Cache Implementation (only for search, not for random to keep it fresh)
 		const cache = caches.default;
 		const cacheKey = new Request(url.toString(), request);
-		let cachedResponse = await cache.match(cacheKey);
-		if (cachedResponse) return cachedResponse;
+		if (isSearch) {
+			let cachedResponse = await cache.match(cacheKey);
+			if (cachedResponse) return cachedResponse;
+		}
 
 		const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
 		if (!(await checkRateLimit(env, `rl:unsplash:${ip}`, 10))) {
 			return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 10 searches per minute.' }), { status: 429 });
 		}
-
-		const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=10&page=${page}`;
 		
 		const res = await fetch(unsplashUrl, {
 			headers: {
@@ -40,18 +46,20 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 			return new Response(JSON.stringify({ error: 'Failed to fetch from Unsplash.' }), { status: 500 });
 		}
 
-		const data = await res.json() as { results?: Array<{ id: string, urls: { raw: string, regular: string, small: string }, alt_description: string, user?: { name: string } }> };
+		const rawData = await res.json();
+		// Unsplash returns results in .results for search, but as a top-level array for random
+		const results = (isSearch ? rawData.results : rawData) || [];
 		
-		const sanitizedImages = (data.results || []).map((img) => {
+		const sanitizedImages = results.map((img: any) => {
 			const baseUrl = img.urls.raw || img.urls.regular;
 			const joiner = baseUrl.includes('?') ? '&' : '?';
-			
+
 			return {
 				id: img.id,
-				url: `${baseUrl}${joiner}w=1400&fit=max&fm=webp&q=70`,
+				url: `${baseUrl}${joiner}w=1200&fit=max&fm=webp&q=70`, // Optimized for Social Media (1200px)
 				preview: `${baseUrl}${joiner}w=800&fit=max&fm=webp&q=40`,
 				tiny: `${baseUrl}${joiner}w=200&fit=max&fm=webp&q=20`, // Tier 0
-				thumb: `${baseUrl}${joiner}w=400&fit=crop&fm=webp&q=60`,
+				thumb: `${baseUrl}${joiner}w=200&fit=crop&fm=webp&q=45`, // Ultra-tiny grid thumb
 				alt: img.alt_description,
 				author: img.user?.name || 'Unknown'
 			};
@@ -60,12 +68,12 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 		const response = new Response(JSON.stringify({ images: sanitizedImages }), { 
 			headers: { 
 				'Content-Type': 'application/json',
-				'Cache-Control': 'public, max-age=600' // Cache for 10 minutes
+				'Cache-Control': isSearch ? 'public, max-age=600' : 'no-cache'
 			} 
 		});
 
-		// Store in Edge Cache
-		ctx.waitUntil(cache.put(cacheKey, response.clone()));
+		// Store in Edge Cache only for queries
+		if (isSearch) ctx.waitUntil(cache.put(cacheKey, response.clone()));
 
 		return response;
 	} catch (e) {
