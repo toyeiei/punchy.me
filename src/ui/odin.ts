@@ -114,7 +114,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             text-decoration: none;
         }
         .punchy-portal:hover {
-            width: 280px;
+            width: 320px;
             gap: 1rem;
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
@@ -399,8 +399,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             .panel-left { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
             .preview-box { height: 300px; flex-grow: 0; }
             .panel-right { margin-top: 1rem; }
-            .punchy-portal { bottom: 1rem; right: 1rem; }
-            .punchy-portal:hover { width: 44px; }
+            .punchy-portal { display: none !important; }
         }
     </style>
 </head>

@@ -674,7 +674,7 @@ export const HTML = `<!DOCTYPE html>
         .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; pointer-events: none; }
         @keyframes drift { 0% { transform: translateX(0); opacity: 0; } 5% { opacity: 1; } 100% { transform: translateX(calc(100vw + 20px)); opacity: 0; } }
         .container { z-index: 10; padding: 2rem; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); max-width: 400px; }
-        h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: 900; }
+        h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: 400; }
         p { color: #94a3b8; line-height: 1.6; font-size: 0.9rem; margin-bottom: 2rem; }
         .loader { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; border-radius: 2px; }
         .loader-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; animation: sync 1.5s linear forwards; box-shadow: 0 0 10px var(--accent); }

@@ -202,7 +202,7 @@ describe("PUNCHY.ME URL Shortener", () => {
 
       const hydrateRes = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`);
       expect(hydrateRes.status).toBe(200);
-      const hydratedData = await hydrateRes.json() as any;
+      const hydratedData = await hydrateRes.json() as Record<string, unknown>;
       expect(hydratedData.aiHydrated).toBe(true);
       expect(hydratedData.aiSummary).toContain("Force user");
 
@@ -218,7 +218,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       const id = "existing-anakin";
       await env.SHORT_LINKS.put(id, JSON.stringify({ type: 'anakin', aiHydrated: true, name: "Ani", aiSummary: "Already Hydrated" }));
       const res = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`);
-      const data = await res.json() as any;
+      const data = await res.json() as Record<string, unknown>;
       expect(data.aiSummary).toBe("Already Hydrated");
     });
 
@@ -303,7 +303,7 @@ describe("PUNCHY.ME URL Shortener", () => {
 
       const renderRes = await SELF.fetch(`http://localhost/y/${id}`);
       const html = await renderRes.text();
-      expect(html).toContain("Encrypted Note");
+      expect(html).toContain("Zero-Knowledge Storage");
       expect(html).toContain("Hello YAIBA");
     });
 
@@ -347,7 +347,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       });
 
       expect(response.status).toBe(200);
-      const data = await response.json() as any;
+      const data = await response.json() as Record<string, unknown>;
       expect(data.intel).toContain("Samsung");
       expect(data.skills).toHaveLength(5);
       expect(data.salary).toContain("THB");
@@ -443,7 +443,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       });
 
       expect(res.status).toBe(200);
-      const data = await res.json() as any;
+      const data = await res.json() as Record<string, unknown>;
       expect(data.skills).toHaveLength(5);
       expect(data.skills[0]).toBe("TypeScript");
       
@@ -540,7 +540,7 @@ describe("PUNCHY.ME URL Shortener", () => {
         headers: { "Content-Type": "application/json" },
       });
       expect(res.status).toBe(403);
-      const data = await res.json() as any;
+      const data = await res.json() as Record<string, unknown>;
       expect(data.error).toContain("Security handshake required");
     });
 
@@ -565,7 +565,7 @@ describe("PUNCHY.ME URL Shortener", () => {
       });
 
       expect(res.status).toBe(200);
-      const data = await res.json() as any;
+      const data = await res.json() as Record<string, unknown>;
       expect(data.strategic_overview).toBe("Battle ready.");
       aiSpy.mockRestore();
     });
@@ -586,7 +586,7 @@ describe("PUNCHY.ME URL Shortener", () => {
 
       const res = await makeRequest();
       expect(res.status).toBe(429);
-      const data = await res.json() as any;
+      const data = await res.json() as Record<string, unknown>;
       expect(data.error).toContain("Tactical cooling");
     }, 20000); 
 
@@ -597,7 +597,7 @@ describe("PUNCHY.ME URL Shortener", () => {
         headers: { "Content-Type": "application/json" },
       });
       expect(res.status).toBe(200);
-      const data = await res.json() as any;
+      const data = await res.json() as Record<string, unknown>;
       expect(data.id).toBeDefined();
     });
   });

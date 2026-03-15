@@ -81,7 +81,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             text-decoration: none;
         }
         .punchy-portal:hover {
-            width: 280px;
+            width: 320px;
             gap: 1rem;
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
@@ -360,6 +360,9 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
+        @media (max-width: 768px) {
+            .punchy-portal { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -374,6 +377,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
         </div>
     </a>
 
@@ -700,7 +704,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             text-decoration: none;
         }
         .punchy-portal:hover {
-            width: 280px;
+            width: 320px;
             gap: 1rem;
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
@@ -932,6 +936,9 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             }
             .print-footer { display: block !important; text-align: center; margin-top: 20pt; font-size: 8pt; color: #666; border-top: 0.5pt solid #ddd; padding-top: 10pt; font-weight: bold; }
         }
+        @media (max-width: 768px) {
+            .punchy-portal { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -946,6 +953,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
         </div>
     </a>
     

@@ -26,7 +26,7 @@ Our foundation is built on high-contrast, technical surfaces that evoke an "Elit
 - **Error/Security**: `#ef4444` (Vibrant Red)
 
 ### 1.2 Typography (The Technical Voice)
-- **Brand Titles**: `'Bitcount Prop Double'`, cursive. (Always Uppercase, -2px to -3px tracking). **Note: Use native heavy weight for supreme authority.**
+- **Brand Titles**: `'Bitcount Prop Double'`, cursive. (Always Uppercase, -2px to -3px tracking). **Note: Use REGULAR weight (`font-weight: 400`) ONLY for elite, high-precision minimalism. Never use bold or heavy variants.**
 - **Instructional/Code**: `'JetBrains Mono'`, monospace. (Weights: 400, 700).
 - **Metadata/Labels**: `'JetBrains Mono'`, 0.7rem to 0.8rem, 700 weight, 1px to 2px tracking.
 
@@ -167,6 +167,16 @@ To ensure high-impact content feels like a centerpiece rather than a document, w
     - **Body Padding**: Set `padding: 10vh 0;` on the `body` to create a dynamic, responsive vertical buffer.
     - **Natural Growth**: Remove `height: 100%;` from `html` and `body` to allow the content to expand and ensure the bottom gutter remains accessible via scroll.
 - **Visual Result**: The content appears perfectly balanced and centered ("Museum Gallery" effect) regardless of screen ratio (16:9, 16:10, etc.) or zoom levels.
+
+---
+
+## 12. Design Preservation (Golden Rule)
+Testing and linting operations are strictly functional. Do not modify established UI layouts, CSS optimizations, or animation logic during validation cycles. Aesthetic changes must only be performed under explicit 'Design' or 'Refactor' directives.
+
+---
+
+## 13. The Matte Black Baseline (Zero-Distraction Mandate)
+To maintain maximum focus and a "Clean Room" tactical environment, every new professional tool and page must initialize with a pure matte black background (`#000000`) and **zero** background animations (no grids, no scan lines, no pixel drifts). Atmospheric effects are strictly reserved for the Landing Page only.
 
 ---
 *Protocol strictly enforced by Gemini CLI for all future PUNCHY.ME missions.*

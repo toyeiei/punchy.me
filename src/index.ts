@@ -242,8 +242,8 @@ export default {
 						{ role: 'system', content: 'You are MUSASHI, Elite Strategist. Output ONLY JSON. Be extremely brief.' },
 						{ role: 'user', content: `Job: ${description}\n\nReturn JSON strictly matching this schema:\n{\n  "intel": "1-sentence summary",\n  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],\n  "projects": ["P1", "P2", "Project 3 description"],\n  "salary": "THB/USD range",\n  "questions": ["Q1", "Q2", "Q3"]\n}` }
 					]
-				}) as { response: any };
-				let result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+				}) as { response: string | Record<string, unknown> };
+				const result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
 				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
 			} catch (_e) { return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 }); }
 		}
@@ -272,8 +272,8 @@ export default {
 						{ role: 'system', content: 'You are ODIN, Elite Data Strategist. Output ONLY JSON. Be concise. Schema: {"strategic_overview":"string","anomalies_detected":"string","tactical_recommendations":"string"}' },
 						{ role: 'user', content: `Dataset: ${columns.join(', ')}\nRows: ${numRows}\nSample: ${JSON.stringify(sample)}` }
 					]
-				}) as { response: any };
-				let result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+				}) as { response: string | Record<string, unknown> };
+				const result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
 				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
 			} catch (_e) { return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 }); }
 		}
@@ -358,7 +358,7 @@ export default {
 							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-email-link', handler).on('#res-website-link', handler).on('#res-summary', handler).on('#res-experience', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#twitter-title', handler).on('#og-description', handler).on('#twitter-description', handler).transform(new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
 						}
 						if (data.type === 'yaiba') {
-							return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value || ''); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
+							return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value || '', { html: true }); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
 						}
 					} catch (_e) {
 						// Malformed JSON fallback

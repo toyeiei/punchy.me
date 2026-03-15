@@ -4,73 +4,46 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YAIBA | Zen Markdown Editor | PUNCHY.ME</title>
+    <meta name="description" content="YAIBA Zen Editor: High-performance, client-side encrypted Markdown editor. Secure, focused, and edge-native.">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
+    <!-- Strategic Dependencies -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <style>
         :root {
             --bg: #000000;
+            --ronin: #121212;
             --accent: #22c55e;
+            --accent-hover: #4ade80;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
             --font-brand: 'Bitcount Prop Double', cursive;
             --font-mono: 'JetBrains Mono', monospace;
+            --header-h: 120px;
         }
-
         * { margin: 0; padding: 0; box-sizing: border-box; }
-
-        html, body {
-            height: 100%;
-            background-color: var(--bg);
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            overflow: hidden;
-        }
-
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.2); border-radius: 4px; border: 1px solid rgba(34, 197, 94, 0.1); }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.4); }
-
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .scan-line {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 4px;
-            background: linear-gradient(to bottom, transparent, var(--accent), transparent);
-            opacity: 0.1;
-            z-index: 1;
-            pointer-events: none;
-            animation: scan 6s linear infinite;
-        }
-        @keyframes scan { from { transform: translateY(-100px); } to { transform: translateY(100vh); } }
-
-        .tactical-header {
-            position: fixed;
-            top: 0; left: 0; width: 100%;
-            padding: 1.5rem 2rem;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            background: rgba(0,0,0,0.8);
-            backdrop-filter: blur(10px);
-            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
-            z-index: 100;
-        }
-
-        .brand-block { display: flex; align-items: center; gap: 1.5rem; }
-        .brand-text-wrapper { display: flex; flex-direction: column; gap: 4px; }
         
-        .title-row { display: flex; align-items: center; gap: 1rem; }
+        html, body { height: 100%; background-color: var(--bg); color: var(--text-main); font-family: var(--font-mono); overflow: hidden; }
+
+        /* CUSTOM SCROLLBAR: White Glow */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; transition: all 0.3s; }
+        ::-webkit-scrollbar-thumb:hover { background: #ffffff; box-shadow: 0 0 15px #ffffff; }
+        * { scrollbar-width: thin; scrollbar-color: rgba(255, 255, 255, 0.3) rgba(0, 0, 0, 0.2); }
+
+        .tactical-header { height: var(--header-h); padding: 0 2.5rem; display: flex; align-items: center; justify-content: space-between; border-bottom: 1px solid rgba(255, 255, 255, 0.05); background: rgba(0,0,0,0.8); backdrop-filter: blur(10px); position: relative; z-index: 200; }
+        
+        .brand-text-wrapper { display: flex; flex-direction: column; gap: 4px; }
+        .title-row { display: flex; align-items: center; gap: 1.5rem; }
         .brand {
             font-family: var(--font-brand);
             font-size: 4.5rem;
@@ -81,159 +54,79 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             line-height: 0.8;
             position: relative;
             animation: yaiba-glitch 5s infinite;
+            font-weight: 400;
         }
         .tagline { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
-
-        .beta-badge {
-            background: var(--accent);
-            color: #000;
-            font-size: 0.8rem;
-            font-weight: 900;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-family: var(--font-mono);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
-            letter-spacing: 1px;
-            animation: pulse 2s infinite alternate;
-            margin-top: -10px;
-        }
+        
+        .beta-badge { background: var(--accent); color: #000; font-size: 0.8rem; font-weight: 900; padding: 4px 10px; border-radius: 6px; font-family: var(--font-mono); box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); animation: pulse 2s infinite alternate; letter-spacing: 1px; margin-top: -10px; }
         @keyframes pulse { from { transform: scale(1); opacity: 0.8; } to { transform: scale(1.05); opacity: 1; } }
 
-        .brand::before, .brand::after {
-            content: attr(data-text);
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            opacity: 0;
-            will-change: transform, opacity;
-            transform: translateZ(0);
-        }
-        .brand::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
-        .brand::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
-
         @keyframes yaiba-glitch {
-            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
-            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
-            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
-            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; } 
+            81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }  
+            82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg); text-shadow: none; }
         }
-        @keyframes glitch-anim-1 { 0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); } 91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); } 92% { opacity: 0; transform: translate(0) translateZ(0); } }
-        @keyframes glitch-anim-2 { 0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); } 95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); } 96% { opacity: 0; transform: translate(0) translateZ(0); } }
 
-        .header-controls { display: flex; align-items: center; gap: 1.5rem; }
-        .encryption-status { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; opacity: 0.6; }
-        .encryption-status span { width: 6px; height: 6px; background: var(--text-dim); border-radius: 50%; display: inline-block; }
-
+        .header-controls { display: flex; gap: 1.5rem; align-items: center; }
+        .encryption-status { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 8px; opacity: 0.6; }
+        .status-dot { width: 6px; height: 6px; border-radius: 50%; background: var(--text-dim); }
+        
         .action-group { display: flex; align-items: center; gap: 0.8rem; }
-
         .publish-btn { background: #ffffff; color: #000000; border: none; padding: 10px 24px; border-radius: 6px; font-weight: 700; cursor: pointer; font-family: var(--font-mono); text-transform: uppercase; transition: all 0.3s ease; }
         .publish-btn:hover { background: #e2e8f0; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1); }
         .publish-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
-
+        
         .print-btn { background: transparent; color: #ffffff; border: 1px solid rgba(255, 255, 255, 0.3); padding: 8px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; font-family: var(--font-mono); text-transform: uppercase; transition: all 0.2s; }
         .print-btn:hover { background: rgba(255, 255, 255, 0.05); border-color: #ffffff; }
 
-        @media print {
-            .grid-bg, .scan-line, .tactical-header, .resizer, .editor-pane, .cursor-pulse, .char-counter { display: none !important; }
-            html, body { background: #fff !important; color: #000 !important; height: auto !important; min-height: auto !important; overflow: visible !important; position: static !important; }
-            .workspace { margin: 0 !important; padding: 0 !important; height: auto !important; display: block !important; }
-            .preview-pane { background: #fff !important; padding: 0 !important; width: 100% !important; display: block !important; position: static !important; overflow: visible !important; backdrop-filter: none !important; }
-            #preview-content { max-width: 100%; color: #000 !important; }
-            #preview-content h1:first-child, #preview-content p:first-child { margin-top: 0 !important; }
-            #preview-content h1, #preview-content h2, #preview-content h3 { color: #000 !important; border-bottom: 2px solid #000; margin-top: 1.5rem; page-break-after: avoid; }
-            #preview-content p, #preview-content pre { page-break-inside: avoid; }
-            .print-only { display: block !important; font-family: var(--font-mono); text-transform: uppercase; }
-            .print-header { color: #999 !important; font-size: 8pt; margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
-            .print-footer { color: #666 !important; font-size: 9pt; margin-top: 4rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-weight: 700; letter-spacing: 1px; }
-            #preview-content a { color: #000 !important; border-bottom: 1px solid #000; }
-            #preview-content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #000 !important; white-space: pre-wrap !important; }
-            #preview-content code { background: #eee !important; color: #000 !important; }
-            #preview-content input[type="checkbox"] { border: 1px solid #000 !important; }
-            #preview-content input[type="checkbox"]:checked { background: #000 !important; }
-        }
-        .print-only { display: none; }
-
-        .workspace { display: flex; height: calc(100vh - 100px); margin-top: 100px; position: relative; z-index: 10; }
-        .pane { height: 100%; display: flex; flex-direction: column; overflow: hidden; position: relative; will-change: flex; }
-        body.resizing .preview-pane { pointer-events: none; }
+        .workspace { display: flex; height: calc(100vh - var(--header-h)); position: relative; }
+        .pane { height: 100%; overflow: hidden; position: relative; will-change: flex; }
+        .editor-pane { flex: 1 1 50%; border-right: 1px solid rgba(255, 255, 255, 0.05); background: var(--ronin); position: relative; }
+        .preview-pane { flex: 1 1 50%; background: var(--ronin); padding: 3rem; overflow-y: auto; line-height: 1.6; }
+        
+        /* POINTER ISOLATION */
+        body.resizing .preview-pane, body.resizing .editor-pane { pointer-events: none; user-select: none; }
         body.resizing * { cursor: col-resize !important; }
 
-        .editor-pane { flex: 1 1 50%; background: #121212; border-right: 1px solid rgba(255, 255, 255, 0.05); }
-        .preview-pane { flex: 1 1 50%; background: #121212; padding: 2.5rem; overflow-y: auto; }
+        textarea#editor { width: 100%; height: 100%; background: transparent; border: none; color: #ffffff; font-family: var(--font-mono); font-size: 1.1rem; padding: 3rem; outline: none; resize: none; line-height: 1.8; }
+        
+        .preview-content { max-width: 800px; margin: 0 auto; color: var(--text-main); font-size: 1.1rem; }
+        .preview-content h1, .preview-content h2, .preview-content h3 { font-family: var(--font-brand); color: var(--text-main); margin: 2rem 0 1rem; line-height: 1.2; padding-bottom: 0.5rem; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; border: none; }
+        .preview-content h1 { font-size: 3rem; }
+        .preview-content p { margin-bottom: 1.5rem; opacity: 0.9; }
+        .preview-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: all 0.2s; }
+        .preview-content a:hover { border-bottom-color: var(--accent); }
+        
+        .preview-content img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin: 1rem 0; }
+        .preview-content ul { list-style: none; padding-left: 1.5rem; }
+        .preview-content li { position: relative; margin-bottom: 0.5rem; }
+        .preview-content li::before { content: "•"; color: #ffffff; position: absolute; left: -1.2rem; font-weight: bold; opacity: 0.5; }
+        .preview-content li:has(input[type="checkbox"])::before { content: none !important; }
+        .preview-content input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 1.2rem; height: 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; cursor: pointer; vertical-align: middle; margin-right: 10px; position: relative; transition: all 0.2s ease; margin-left: -1.2rem; }
+        .preview-content input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; }
+        .preview-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 0.8rem; font-weight: 900; }
 
-        .resizer { width: 4px; height: 100%; background: rgba(0, 0, 0, 0.3); cursor: col-resize; transition: background 0.2s; position: relative; z-index: 20; }
-        .resizer:hover, .resizer.dragging { background: #ffffff; box-shadow: 0 0 10px #ffffff; }
-        .resizer::after { content: ''; position: absolute; top: 0; left: -10px; right: -10px; bottom: 0; }
+        .preview-content table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        .preview-content th, .preview-content td { padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+        .preview-content th { background: rgba(255, 255, 255, 0.03); font-weight: 700; text-transform: uppercase; color: var(--text-dim); }
 
-        textarea#editor { width: 100%; height: 100%; background: transparent; border: none; color: var(--text-main); font-family: var(--font-mono); font-size: 1.1rem; line-height: 1.8; padding: 2.5rem; resize: none; outline: none; transition: background 0.3s ease; }
-        textarea#editor:focus { background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.02) 0%, transparent 50%); }
+        .preview-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+        .preview-content pre { background: rgba(0,0,0,0.8); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.1); }
+        .preview-content pre code { background: transparent; padding: 0; font-size: 1rem; }
+        .preview-content blockquote { border-left: 4px solid #fff; padding-left: 1.5rem; margin-bottom: 1.5rem; font-style: italic; color: var(--text-dim); }
+        
+        /* RESIZER HARDENING: touch-action: none is mandatory for Pointer API stability */
+        .resizer { width: 6px; flex-shrink: 0; cursor: col-resize; background: rgba(255, 255, 255, 0.03); transition: background 0.2s; z-index: 300; touch-action: none; }
+        .resizer:hover, .resizer.dragging { background: #ffffff; box-shadow: 0 0 15px #ffffff; }
 
-        .cursor-pulse { position: absolute; pointer-events: none; width: 20px; height: 20px; background: #ffffff; filter: blur(10px); border-radius: 50%; opacity: 0; z-index: 5; transition: transform 0.1s linear; }
+        .char-counter { position: absolute; bottom: 1.5rem; right: 1.5rem; background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 6px 12px; border-radius: 4px; font-size: 0.7rem; color: var(--text-dim); font-family: var(--font-mono); z-index: 400; transition: all 0.2s ease; }
 
-        .char-counter { position: absolute; bottom: 15px; right: 20px; font-size: 0.75rem; color: #ffffff; background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); pointer-events: auto; transition: all 0.2s ease; cursor: help; }
-        .char-counter.valid { color: var(--accent); border-color: var(--accent); }
-        .char-counter.limit { color: #ef4444; border-color: #ef4444; }
-        .char-counter::after { content: "YAIBA REQUIRES MIN 100 CHARS TO FORGE"; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px; background: #ffffff; color: #000; font-weight: 700; font-size: 0.6rem; padding: 4px 8px; border-radius: 4px; white-space: nowrap; opacity: 0; pointer-events: none; transition: all 0.2s ease; transform: translateY(5px); }
-        .char-counter:hover::after { opacity: 1; transform: translateY(0); }
-        .char-counter.valid:hover::after { content: "MASTER WORK READY"; color: var(--accent); background: #000; border: 1px solid var(--accent); }
-
-        #preview-content h1, #preview-content h2, #preview-content h3 { font-family: var(--font-brand); color: var(--text-main); text-transform: uppercase; margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 400; }
-        #preview-content p { margin-bottom: 1em; line-height: 1.7; }
-        #preview-content a { color: #ffffff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
-        #preview-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 1rem; }
-        #preview-content pre { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1em; }
-        #preview-content pre code { background: transparent; padding: 0; font-size: 1rem; }
-        #preview-content img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin: 1rem 0; }
-        #preview-content blockquote { border-left: 4px solid #ffffff; padding-left: 1rem; color: var(--text-dim); margin-bottom: 1em; font-style: italic; }
-        #preview-content ul, #preview-content ol { margin-bottom: 1em; padding-left: 1.5rem; list-style: none !important; }
-        #preview-content li { position: relative; line-height: 1.8; }
-        #preview-content li::before { content: "•"; color: #ffffff; position: absolute; left: -1.2rem; font-weight: bold; opacity: 0.5; }
-        #preview-content li:has(input[type="checkbox"])::before, #preview-content li.task-list-item::before { content: none !important; }
-        #preview-content input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 1.2rem; height: 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; cursor: pointer; vertical-align: middle; margin-right: 10px; position: relative; transition: all 0.2s ease; margin-left: -1.2rem; }
-        #preview-content input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
-        #preview-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 0.8rem; font-weight: 900; }
-
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.95); backdrop-filter: blur(15px); display: none; justify-content: center; align-items: center; z-index: 1000; opacity: 0; transition: opacity 0.4s ease; }
-        .modal-overlay.show { display: flex; opacity: 1; }
-        .modal-content { background: rgba(255, 255, 255, 0.03); border: 1px solid rgba(255, 255, 255, 0.1); padding: 4rem 3rem; border-radius: 24px; text-align: center; max-width: 550px; width: 90%; box-shadow: 0 40px 100px rgba(0,0,0,0.8); transform: scale(0.8) translateY(30px); opacity: 0; transition: all 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; z-index: 1001; }
-        .modal-overlay.show .modal-content { transform: scale(1) translateY(0); opacity: 1; box-shadow: 0 0 60px rgba(255, 255, 255, 0.1); animation: success-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1); }
-        @keyframes success-pop { 0% { transform: scale(0.8) translateY(30px); opacity: 0; } 100% { transform: scale(1) translateY(0); opacity: 1; } }
-        .modal-title { color: var(--text-main); font-family: var(--font-brand); font-size: 3rem; margin-bottom: 1.5rem; text-transform: uppercase; font-weight: 400; letter-spacing: 4px; }
-        .modal-desc { color: var(--text-dim); margin-bottom: 2.5rem; font-size: 1rem; line-height: 1.8; font-family: var(--font-mono); }
-        .link-box { background: rgba(0,0,0,0.5); border: 1px solid rgba(255, 255, 255, 0.1); padding: 0.8rem 1.2rem; border-radius: 12px; display: flex; align-items: center; justify-content: space-between; margin-bottom: 2rem; gap: 1rem; height: 60px; }
-        .link-text { color: #ffffff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; font-family: var(--font-mono); flex: 1; text-align: left; }
-        .link-text:hover { border-bottom-color: #ffffff; }
-        .copy-btn { background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid #ffffff; padding: 0 20px; height: 36px; border-radius: 6px; cursor: pointer; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
-        .copy-btn:hover { background: #ffffff; color: #000; box-shadow: 0 0 15px #ffffff; }
-
-        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
+        /* ECOSYSTEM PORTAL */
         .punchy-portal {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            display: flex;
-            flex-direction: row-reverse;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 12px;
-            padding: 0.5rem;
-            gap: 0;
-            overflow: hidden;
-            width: 44px;
-            height: 44px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            cursor: pointer;
-            text-decoration: none;
+            position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: row-reverse; align-items: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 0.5rem; gap: 0; overflow: hidden; width: 44px; height: 44px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; cursor: pointer; text-decoration: none;
         }
-        .punchy-portal:hover {
-            width: 280px;
-            gap: 1rem;
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-        }
+        .punchy-portal:hover { width: 320px; gap: 1rem; border-color: var(--accent); box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
         .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
         .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
         .punchy-portal:hover .portal-brand { opacity: 1; }
@@ -242,25 +135,61 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
         .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
 
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.95); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; z-index: 1000; opacity: 0; transition: opacity 0.4s ease; }
+        .modal-overlay.show { display: flex; opacity: 1; }
+        .modal { background: #000; border: 1px solid rgba(255, 255, 255, 0.1); padding: 4rem; border-radius: 24px; text-align: center; max-width: 600px; width: 95%; transform: scale(0.9) translateY(30px); transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; box-shadow: 0 0 100px rgba(255, 255, 255, 0.1); overflow: hidden; }
+        .modal-overlay.show .modal { transform: scale(1) translateY(0); }
+
+        .success-icon {
+            width: 80px; height: 80px; background: var(--accent); border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 0 30px var(--accent);
+            animation: success-pop 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+            position: relative; z-index: 10;
+        }
+        @keyframes success-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
+        .success-icon svg { width: 40px; height: 40px; color: #000; }
+        .modal-content-wrapper { position: relative; z-index: 10; }
+
         @media (max-width: 768px) {
-            .tactical-header { height: auto; padding: 1.2rem; flex-direction: column; gap: 1.2rem; align-items: flex-start; }
-            .brand { font-size: 3rem; } /* 20% increase for mobile */
-            .tagline { font-size: 0.55rem; letter-spacing: 1px; }
-            .workspace { flex-direction: column; height: calc(100vh - 140px); margin-top: 140px; }
+            .tactical-header { height: auto; padding: 1.5rem; flex-direction: column; gap: 1.2rem; align-items: flex-start; }
+            .brand { font-size: 3rem; }
+            .workspace { flex-direction: column; height: calc(100vh - 160px); margin-top: 0; }
             .pane { flex: 1 1 50% !important; height: 50% !important; }
-            .editor-pane { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
-            .header-controls { width: 100%; justify-content: space-between; flex-direction: row; }
-            .publish-btn, .print-btn { padding: 8px 16px; font-size: 0.75rem; }
+            .editor-pane { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.05); }
             textarea#editor { padding: 1.5rem; font-size: 1rem; }
             .preview-pane { padding: 1.5rem; }
             .resizer { display: none; }
+            .char-counter { bottom: 1rem; right: 1rem; font-size: 0.6rem; padding: 4px 8px; }
+            .punchy-portal { display: none !important; }
         }
+
+        /* PDF PRINT OPTIMIZATION (Clean Room Mandate) */
+        @media print {
+            * { -webkit-print-color-adjust: exact !important; print-color-adjust: exact !important; }
+            .tactical-header, .resizer, .editor-pane, .punchy-portal, .char-counter, .cursor-pulse { display: none !important; }
+            html, body { background: #fff !important; color: #000 !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; position: static !important; }
+            .workspace { display: block !important; height: auto !important; margin: 0 !important; overflow: visible !important; }
+            .preview-pane { display: block !important; width: 100% !important; height: auto !important; padding: 0 !important; background: #fff !important; color: #000 !important; overflow: visible !important; position: static !important; }
+            .preview-content { max-width: 100% !important; margin: 0 !important; padding: 0 !important; display: block !important; color: #000 !important; }
+            .preview-content h1, .preview-content h2, .preview-content h3 { color: #000 !important; border: none !important; margin-top: 1.5rem !important; font-weight: 400 !important; page-break-after: avoid; }
+            .preview-content p, .preview-content pre, .preview-content blockquote { page-break-inside: avoid; color: #000 !important; opacity: 1 !important; }
+            .preview-content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #000 !important; }
+            .preview-content pre code { color: #000 !important; }
+            .preview-content th, .preview-content td { border: 1px solid #ccc !important; color: #000 !important; }
+            .preview-content th { background: #eee !important; }
+            .print-only { display: block !important; font-family: var(--font-mono); text-transform: uppercase; font-size: 8pt; color: #999 !important; margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+            .print-footer { display: block !important; color: #666 !important; font-size: 9pt; margin-top: 4rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-weight: 700; letter-spacing: 1px; }
+            .preview-content input[type="checkbox"] { border: 1px solid #000 !important; background: #fff !important; }
+            .preview-content input[type="checkbox"]:checked { background: #000 !important; border-color: #000 !important; }
+            .preview-content input[type="checkbox"]:checked::after { color: #fff !important; }
+            }
+            .print-only { display: none; }
     </style>
 </head>
 <body>
-    <div class="grid-bg"></div>
-    <div class="scan-line"></div>
-    <div id="cursor-glow" class="cursor-pulse"></div>
+    <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
 
     <a href="/" class="punchy-portal">
         <div class="portal-trigger">⚡</div>
@@ -281,128 +210,189 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
                     <a href="/" class="brand" data-text="YAIBA">YAIBA</a>
                     <div class="beta-badge">BETA</div>
                 </div>
-                <div class="tagline">THE LIGHTWEIGHT ZEN EDITOR FOR MODERN WRITERS</div>
+                <div class="tagline">The Lightweight Zen Editor for Modern Writers</div>
             </div>
         </div>
+        
         <div class="header-controls">
-            <div class="encryption-status"><span></span> E2E ENCRYPTED</div>
+            <div class="encryption-status"><div class="status-dot"></div> E2E ENCRYPTED</div>
             <div class="action-group">
-                <button id="print-btn" class="print-btn">PRINT</button>
-                <button id="publish-btn" class="publish-btn">PUBLISH</button>
+                <button class="print-btn" onclick="window.print()">Print</button>
+                <button class="publish-btn" id="publish-btn">Publish</button>
             </div>
         </div>
     </header>
 
-    <div class="workspace">
-        <div class="pane editor-pane" id="editor-pane">
-            <textarea id="editor" placeholder="Start writing... (Markdown supported)" maxlength="1800"></textarea>
+    <div class="workspace" id="workspace">
+        <section class="pane editor-pane" id="editor-pane">
+            <textarea id="editor" spellcheck="false" placeholder="# Start your Zen journey... (Min 100 chars)
+
+Use Markdown to craft elite documents. 
+Your work is encrypted locally before being stored."></textarea>
             <div id="char-counter" class="char-counter">0 / 1800</div>
-        </div>
+        </section>
+        
         <div class="resizer" id="resizer"></div>
-        <div class="pane preview-pane" id="preview-pane">
-            <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
-            <div id="preview-content"></div>
-            <div class="print-only print-footer">YAIBA: FORGING FOCUS. SIMPLE. SECURE. SUPREME. [ PUNCHY.ME ]</div>
-        </div>
+        
+        <section class="pane preview-pane" id="preview-pane">
+            <div class="preview-content" id="preview"></div>
+            <div class="print-only print-footer">FORGED AT THE EDGE BY PUNCHY.ME</div>
+        </section>
     </div>
 
-    <div id="success-modal" class="modal-overlay">
-        <div class="grid-bg"></div>
-        <div class="scan-line"></div>
-        <div class="modal-content">
-            <h2 class="modal-title">A MASTER WORK</h2>
-            <p class="modal-desc">Your note has been refined into a craft. Encrypted client-side and forged onto the global edge. Respect the silence.</p>
-            <div class="link-box">
-                <a id="final-link" class="link-text" href="#" target="_blank">https://punchy.me/...</a>
-                <button id="modal-copy-btn" class="copy-btn">Copy</button>
+    <div id="modal-overlay" class="modal-overlay">
+        <div class="modal">
+            <div class="success-icon">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
+                </svg>
             </div>
-            <button onclick="window.location.href='/yaiba'" class="publish-btn" style="width: 100%;">NEW YAIBA NOTE</button>
+            <h2 style="font-family: var(--font-brand); font-weight: 400; font-size: 2.5rem; margin-bottom: 1rem;">A MASTER WORK</h2>
+            <p style="color: var(--text-dim); margin-bottom: 2.5rem; font-size: 0.95rem;">Encrypted client-side and deployed to the edge. Key fragment is not stored on our servers.</p>
+            
+            <div style="background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 1.2rem; margin-bottom: 2rem; display: flex; align-items: center; gap: 1rem;">
+                <a id="success-url" href="#" target="_blank" style="flex: 1; color: #ffffff; font-family: var(--font-mono); font-size: 0.9rem; text-align: left; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; border-bottom: 1px solid transparent;">https://punchy.me/y/abcdef...</a>
+                <button id="copy-btn" style="background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid #ffffff; padding: 0 20px; height: 36px; border-radius: 6px; cursor: pointer; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700;">Copy</button>
+            </div>
+            
+            <button class="publish-btn" onclick="location.reload()" style="width: 100%;">NEW YAIBA NOTE</button>
         </div>
     </div>
 
     <script>
         const editor = document.getElementById('editor');
-        const preview = document.getElementById('preview-content');
+        const preview = document.getElementById('preview');
         const charCounter = document.getElementById('char-counter');
         const publishBtn = document.getElementById('publish-btn');
-        const printBtn = document.getElementById('print-btn');
-        const cursorGlow = document.getElementById('cursor-glow');
         const resizer = document.getElementById('resizer');
+        const workspace = document.getElementById('workspace');
         const editorPane = document.getElementById('editor-pane');
         const previewPane = document.getElementById('preview-pane');
 
-        printBtn.onclick = () => window.print();
-
-        let isResizing = false;
-        let animationFrameId = null;
-        resizer.addEventListener('mousedown', (e) => { isResizing = true; resizer.classList.add('dragging'); document.body.classList.add('resizing'); document.body.style.userSelect = 'none'; });
-        document.addEventListener('mousemove', (e) => {
-            if (!isResizing) return;
-            if (animationFrameId) cancelAnimationFrame(animationFrameId);
-            animationFrameId = requestAnimationFrame(() => {
-                const workspaceRect = resizer.parentElement.getBoundingClientRect();
-                const mouseX = e.clientX - workspaceRect.left;
-                let leftWidthPercent = (mouseX / workspaceRect.width) * 100;
-                if (leftWidthPercent < 35) leftWidthPercent = 35;
-                if (leftWidthPercent > 65) leftWidthPercent = 65;
-                editorPane.style.flex = \`0 0 \${leftWidthPercent}%\`;
-                previewPane.style.flex = \`0 0 \${100 - leftWidthPercent}%\`;
-            });
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-'
         });
-        document.addEventListener('mouseup', () => { if (!isResizing) return; isResizing = false; resizer.classList.remove('dragging'); document.body.classList.remove('resizing'); document.body.style.userSelect = ''; if (animationFrameId) cancelAnimationFrame(animationFrameId); });
 
-        async function encryptContent(text) {
-            const key = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
-            const iv = window.crypto.getRandomValues(new Uint8Array(12));
-            const encoded = new TextEncoder().encode(text);
-            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, encoded);
-            const exportedKey = await window.crypto.subtle.exportKey("raw", key);
-            const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
-            const ivBase64 = btoa(String.fromCharCode(...iv));
-            const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-            return { data: encryptedBase64 + "." + ivBase64, key: keyBase64.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '') };
-        }
-
-        marked.setOptions({ highlight: function(code, lang) { const language = hljs.getLanguage(lang) ? lang : 'plaintext'; return hljs.highlight(code, { language }).value; }, langPrefix: 'hljs language-' });
-
+        let renderTimeout;
         function renderPreview() {
-            const rawMarkdown = editor.value;
-            const rawHtml = marked.parse(rawMarkdown || '_Start your Zen journey... (Min 100 chars)_');
-            preview.innerHTML = DOMPurify.sanitize(rawHtml);
-            preview.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+            if (renderTimeout) clearTimeout(renderTimeout);
+            renderTimeout = setTimeout(() => {
+                const rawHtml = marked.parse(editor.value || '');
+                preview.innerHTML = DOMPurify.sanitize(rawHtml);
+                preview.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+            }, 50);
         }
 
         function updateCounter() {
             const len = editor.value.length;
-            charCounter.innerText = \`\${len} / 1800\`;
-            charCounter.classList.remove('valid', 'limit');
-            if (len >= 100 && len <= 1800) charCounter.classList.add('valid');
-            if (len >= 1750) charCounter.classList.add('limit');
+            charCounter.innerText = len + ' / 1800';
+            publishBtn.disabled = len < 100 || len > 1800;
         }
 
-        editor.addEventListener('input', () => { renderPreview(); updateCounter(); cursorGlow.style.opacity = '0.4'; setTimeout(() => cursorGlow.style.opacity = '0', 100); });
-        editor.addEventListener('mousemove', (e) => { const rect = editor.getBoundingClientRect(); editor.style.setProperty('--x', (e.clientX - rect.left) + 'px'); editor.style.setProperty('--y', (e.clientY - rect.top) + 'px'); cursorGlow.style.left = e.clientX + 'px'; cursorGlow.style.top = e.clientY + 'px'; });
+        editor.addEventListener('input', () => { renderPreview(); updateCounter(); });
 
-        publishBtn.addEventListener('click', async () => {
-            const content = editor.value.trim();
-            if (content.length < 100) return alert('YAIBA requires at least 100 characters to forge a Master Work.');
-            publishBtn.disabled = true; publishBtn.innerText = 'FORGING...';
-            try {
-                const { data, key } = await encryptContent(content);
-                const response = await fetch('/yaiba/publish', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: data }) });
-                if (response.ok) { const result = await response.json(); showSuccessModal(result.id, key); }
-                else { publishBtn.disabled = false; publishBtn.innerText = 'PUBLISH'; }
-            } catch (err) { publishBtn.disabled = false; publishBtn.innerText = 'PUBLISH'; }
+        // Frame-Throttled Resizer (Bulletproof Standard)
+        let isResizing = false;
+        let animationFrameId = null;
+
+        const onMouseMove = (e) => {
+            if (!isResizing) return;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            
+            animationFrameId = requestAnimationFrame(() => {
+                const workspaceRect = workspace.getBoundingClientRect();
+                const mouseX = e.clientX - workspaceRect.left;
+                let percentage = (mouseX / workspaceRect.width) * 100;
+                
+                if (percentage > 15 && percentage < 85) {
+                    editorPane.style.flex = '1 1 ' + percentage + '%';
+                    previewPane.style.flex = '1 1 ' + (100 - percentage) + '%';
+                }
+                animationFrameId = null;
+            });
+        };
+
+        const onMouseUp = () => {
+            if (!isResizing) return;
+            isResizing = false;
+            document.body.classList.remove('resizing');
+            resizer.classList.remove('dragging');
+            document.removeEventListener('mousemove', onMouseMove);
+            document.removeEventListener('mouseup', onMouseUp);
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+                animationFrameId = null;
+            }
+        };
+
+        resizer.addEventListener('mousedown', (e) => {
+            e.preventDefault();
+            isResizing = true;
+            document.body.classList.add('resizing');
+            resizer.classList.add('dragging');
+            document.addEventListener('mousemove', onMouseMove);
+            document.addEventListener('mouseup', onMouseUp);
         });
 
-        function showSuccessModal(id, key) {
-            const url = window.location.origin + '/y/' + id + '#' + key;
-            const linkEl = document.getElementById('final-link');
-            linkEl.innerText = url; linkEl.href = url;
-            document.getElementById('success-modal').classList.add('show');
-            const copyBtn = document.getElementById('modal-copy-btn');
-            copyBtn.onclick = () => { navigator.clipboard.writeText(url); copyBtn.innerText = 'COPIED!'; setTimeout(() => copyBtn.innerText = 'COPY', 2000); };
+        async function generateKey() {
+            return await crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
         }
+
+        async function encrypt(text, key) {
+            const iv = crypto.getRandomValues(new Uint8Array(12));
+            const encoded = new TextEncoder().encode(text);
+            const ciphertext = await crypto.subtle.encrypt({ name: "AES-GCM", iv }, key, encoded);
+            return { ciphertext: btoa(String.fromCharCode(...new Uint8Array(ciphertext))), iv: btoa(String.fromCharCode(...iv)) };
+        }
+
+        async function exportKey(key) {
+            const exported = await crypto.subtle.exportKey("raw", key);
+            return btoa(String.fromCharCode(...new Uint8Array(exported))).replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '');
+        }
+
+        publishBtn.onclick = async () => {
+            const content = editor.value;
+            publishBtn.innerText = 'FORGING...';
+            publishBtn.disabled = true;
+
+            try {
+                const key = await generateKey();
+                const { ciphertext, iv } = await encrypt(content, key);
+                const exportedKey = await exportKey(key);
+                const payload = JSON.stringify({ c: ciphertext, i: iv });
+
+                const res = await fetch('/yaiba/publish', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ content: payload })
+                });
+
+                if (res.ok) {
+                    const { id } = await res.json();
+                    const finalUrl = window.location.origin + '/y/' + id + '#' + exportedKey;
+                    const urlEl = document.getElementById('success-url');
+                    urlEl.innerText = finalUrl;
+                    urlEl.href = finalUrl;
+                    document.getElementById('modal-overlay').classList.add('show');
+
+                    document.getElementById('copy-btn').onclick = () => {
+                        navigator.clipboard.writeText(finalUrl);
+                        document.getElementById('copy-btn').innerText = 'COPIED';
+                        setTimeout(() => document.getElementById('copy-btn').innerText = 'Copy', 2000);
+                    };
+                }
+            } catch (err) {
+                console.error(err);
+            } finally {
+                publishBtn.innerText = 'Publish';
+                publishBtn.disabled = false;
+            }
+        };
+
         renderPreview();
     </script>
 </body>
@@ -413,15 +403,22 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Encrypted Note | PUNCHY.ME</title>
+    <title>SECURE NOTE | YAIBA | PUNCHY.ME</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+
     <style>
         :root {
             --bg: #000000;
+            --ronin: #121212;
             --accent: #22c55e;
             --text-main: #f8fafc;
             --text-dim: #94a3b8;
@@ -429,94 +426,81 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { background-color: var(--bg); color: var(--text-main); font-family: var(--font-mono); min-height: 100vh; display: flex; flex-direction: column; align-items: center; padding: 10vh 1.5rem; position: relative; }
+        
+        html, body { height: 100%; min-height: 100vh; background-color: var(--ronin); color: var(--text-main); font-family: var(--font-mono); line-height: 1.6; }
+
+        /* CUSTOM SCROLLBAR: White Glow */
         ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
-        ::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.2); border-radius: 4px; border: 1px solid rgba(34, 197, 94, 0.1); }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.4); }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(255, 255, 255, 0.3); border-radius: 10px; transition: all 0.3s; }
+        ::-webkit-scrollbar-thumb:hover { background: #ffffff; box-shadow: 0 0 15px #ffffff; }
+
+        .container { max-width: 800px; margin: 1rem auto; padding: 6rem 2rem; position: relative; min-height: 100%; background: var(--ronin); border: none; border-radius: 0; }
         
-        /* PURE ZEN VIEW: No Grid */
+        .header { margin-bottom: 4rem; text-align: left; }
+        .secure-lock { color: #fff; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; display: flex; align-items: center; gap: 8px; margin-bottom: 1rem; }
+        .lock-dot { width: 8px; height: 8px; background: #fff; border-radius: 50%; box-shadow: 0 0 10px #fff; }
+        .timestamp { color: var(--text-dim); font-size: 0.65rem; text-transform: uppercase; letter-spacing: 1px; }
         
-        .container { width: 100%; max-width: 800px; z-index: 10; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 3rem clamp(1.5rem, 5vw, 4rem); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
-        .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        .meta-info { display: flex; flex-direction: column; gap: 0.5rem; }
-        .timestamp { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
-        .status-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .expiry-badge { background: rgba(255, 255, 255, 0.05); color: var(--text-dim); border: 1px solid rgba(255, 255, 255, 0.1); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
-        .secure-lock { font-size: 0.65rem; color: #ffffff; text-transform: uppercase; display: flex; align-items: center; gap: 4px; } /* Pure White */
+        .expiry-badge { position: absolute; top: 2rem; right: 2rem; background: rgba(255, 255, 255, 0.05); border: 1px solid rgba(255, 255, 255, 0.1); padding: 6px 12px; border-radius: 6px; font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; font-weight: 700; }
+
+        #content { font-size: 1.1rem; }
+        #content h1, #content h2, #content h3 { font-family: var(--font-brand); color: var(--text-main); margin: 2.5rem 0 1.25rem; line-height: 1.2; text-transform: uppercase; letter-spacing: 1px; font-weight: 400; border: none; }
+        #content h1 { font-size: 3.5rem; padding-bottom: 0.5rem; }
+        #content p { margin-bottom: 1.5rem; }
+        #content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid transparent; transition: all 0.2s; }
+        #content a:hover { border-bottom-color: var(--accent); }
         
-        #content { font-size: 1.1rem; line-height: 1.7; }
-        #content h1, #content h2, #content h3 { font-family: var(--font-brand); color: var(--text-main); text-transform: uppercase; margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 400; }
-        #content p { margin-bottom: 1em; }
-        #content a { color: #ffffff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
-        #content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 1rem; }
-        #content pre { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1em; }
-        #content pre code { background: transparent; padding: 0; font-size: 1rem; }
         #content img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin: 1rem 0; }
-        #content blockquote { border-left: 4px solid #ffffff; padding-left: 1rem; color: var(--text-dim); margin-bottom: 1em; font-style: italic; }
-        #content ul, #content ol { margin-bottom: 1em; padding-left: 1.5rem; list-style: none !important; }
+        #content ul { list-style: none; padding-left: 1.5rem; }
         #content li { position: relative; line-height: 1.8; }
         #content li::before { content: "•"; color: #ffffff; position: absolute; left: -1.2rem; font-weight: bold; opacity: 0.5; }
-        #content li:has(input[type="checkbox"])::before, #content li.task-list-item::before { content: none !important; }
+        #content li:has(input[type="checkbox"])::before { content: none !important; }
         #content input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 1.2rem; height: 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; cursor: pointer; vertical-align: middle; margin-right: 10px; position: relative; transition: all 0.2s ease; margin-left: -1.2rem; }
-        #content input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
+        #content input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; }
         #content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 0.8rem; font-weight: 900; }
-        
-        .footer { margin-top: 3rem; text-align: center; }
+
+        #content table { width: 100%; border-collapse: collapse; margin-bottom: 1.5rem; font-size: 0.95rem; }
+        #content th, #content td { padding: 12px; border: 1px solid rgba(255, 255, 255, 0.1); text-align: left; }
+        #content th { background: rgba(255, 255, 255, 0.03); font-weight: 700; text-transform: uppercase; color: var(--text-dim); }
+
+        #content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 0.95em; }
+        #content pre { background: rgba(0,0,0,0.8); padding: 1.5rem; border-radius: 12px; margin-bottom: 1.5rem; overflow-x: auto; border: 1px solid rgba(255, 255, 255, 0.1); }
+        #content blockquote { border-left: 4px solid #fff; padding-left: 1.5rem; margin-bottom: 1.5rem; font-style: italic; color: var(--text-dim); }
+
+        .footer { margin-top: 3rem; text-align: center; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 2rem; }
         .footer a { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
         .footer a:hover { color: var(--accent); }
 
-        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
+        /* ECOSYSTEM PORTAL */
         .punchy-portal {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            display: flex;
-            flex-direction: row-reverse;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 12px;
-            padding: 0.5rem;
-            gap: 0;
-            overflow: hidden;
-            width: 44px;
-            height: 44px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            cursor: pointer;
-            text-decoration: none;
+            position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: row-reverse; align-items: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 0.5rem; gap: 0; overflow: hidden; width: 44px; height: 44px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; cursor: pointer; text-decoration: none;
         }
-        .punchy-portal:hover {
-            width: 280px;
-            gap: 1rem;
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-        }
+        .punchy-portal:hover { width: 320px; gap: 1rem; border-color: var(--accent); box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
         .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
         .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
         .punchy-portal:hover .portal-brand { opacity: 1; }
         .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
         .punchy-portal:hover .portal-tools { opacity: 1; }
         .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
-        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
+        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }     
 
         @media print {
-            .grid-bg, .footer, .secure-lock, .expiry-badge, .punchy-portal { display: none !important; }
+            .footer, .secure-lock, .expiry-badge, .punchy-portal { display: none !important; }
             html, body { background: #fff !important; color: #000 !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; position: static !important; }
             .container { background: #fff !important; border: none !important; box-shadow: none !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; position: static !important; display: block !important; backdrop-filter: none !important; }
             #content { color: #000 !important; font-size: 12pt !important; overflow: visible !important; display: block !important; position: static !important; }
             #content h1:first-child, #content p:first-child { margin-top: 0 !important; }
-            #content h1, #content h2, #content h3 { color: #000 !important; border-bottom: 2px solid #000; margin-top: 1.5rem; page-break-after: avoid; }
-            #content p, #content pre { page-break-inside: avoid; }
+            #content h1, #content h2, #content h3 { color: #000 !important; border: none !important; margin-top: 1.5rem; page-break-after: avoid; font-weight: 400 !important; }
+            #content p, #content pre, #content blockquote { page-break-inside: avoid; color: #000 !important; }
             .print-only { display: block !important; font-family: var(--font-mono); text-transform: uppercase; }
             .print-header { color: #999 !important; font-size: 8pt; margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
             .print-footer { color: #666 !important; font-size: 9pt; margin-top: 4rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-weight: 700; letter-spacing: 1px; }
             #content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #000 !important; white-space: pre-wrap !important; }
-            #content input[type="checkbox"]:checked { background: #000 !important; }
-        }
-        .print-only { display: none; }
+            #content input[type="checkbox"] { border: 1px solid #000 !important; background: #fff !important; }
+            #content input[type="checkbox"]:checked { background: #000 !important; border-color: #000 !important; }
+            #content input[type="checkbox"]:checked::after { color: #fff !important; }
+            }        .print-only { display: none; }
         #raw-data { display: none; }
     </style>
 </head>
@@ -536,48 +520,63 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
         <div class="header">
             <div class="meta-info"><div class="timestamp" id="ts-display">Published: ...</div></div>
-            <div class="status-badge"><div class="expiry-badge">Expires in 3 Days</div><div class="secure-lock">🔒 Zero-Knowledge Storage</div></div>
+            <div class="status-badge"><div class="expiry-badge">Expires in 3 days</div><div class="secure-lock">🔒 Zero-Knowledge Storage</div></div>
         </div>
-        <div id="content">Decrypting Shadow Node...</div>
-        <div class="print-only print-footer">YAIBA: FORGING FOCUS. SIMPLE. SECURE. SUPREME. [ PUNCHY.ME ]</div>
+
+        <div id="content">Decrypting master work...</div>
+        
+        <div class="print-only print-footer">FORGED AT THE EDGE BY PUNCHY.ME</div>
+        
         <div class="footer">
-            <div style="margin-bottom: 1rem;"><button onclick="window.print()" style="background:transparent; color:var(--accent); border:1px solid var(--accent); padding:4px 12px; border-radius:4px; font-family:var(--font-mono); font-size:0.7rem; cursor:pointer; text-transform:uppercase;">[ Print / Save PDF ]</button></div>
-            <a href="/yaiba">[ Forged via YAIBA ]</a>
+            <div style="margin-bottom: 1rem;"><button onclick="window.print()" style="background:#ffffff; color:#000000; border:none; padding:6px 16px; border-radius:6px; font-family:var(--font-mono); font-size:0.75rem; font-weight:700; cursor:pointer; text-transform:uppercase; box-shadow:0 4px 15px rgba(255,255,255,0.1); transition:all 0.2s;">[ Print / Save PDF ]</button></div>
+            <a href="/yaiba">Forge Your Own at PUNCHY.ME</a>
         </div>
     </div>
+
     <div id="raw-data"></div>
+
     <script>
-        async function decryptContent(encryptedData, keyBase64) {
-            try {
-                const parts = encryptedData.split('.');
-                const encrypted = Uint8Array.from(atob(parts[0]), c => c.charCodeAt(0));
-                const iv = Uint8Array.from(atob(parts[1]), c => c.charCodeAt(0));
-                const normalizedKey = keyBase64.replace(/-/g, '+').replace(/_/g, '/');
-                const keyRaw = Uint8Array.from(atob(normalizedKey), c => c.charCodeAt(0));
-                const key = await window.crypto.subtle.importKey("raw", keyRaw, { name: "AES-GCM" }, false, ["decrypt"]);
-                const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, encrypted);
-                return new TextDecoder().decode(decrypted);
-            } catch (e) { console.error(e); return null; }
+        async function decrypt(ciphertext, iv, keyBase64) {
+            const normalizedKey = keyBase64.replace(/-/g, '+').replace(/_/g, '/');
+            const keyData = Uint8Array.from(atob(normalizedKey), c => c.charCodeAt(0));
+            const key = await crypto.subtle.importKey("raw", keyData, "AES-GCM", true, ["decrypt"]);
+            const ivData = Uint8Array.from(atob(iv), c => c.charCodeAt(0));
+            const cipherData = Uint8Array.from(atob(ciphertext), c => c.charCodeAt(0));
+            const decrypted = await crypto.subtle.decrypt({ name: "AES-GCM", iv: ivData }, key, cipherData);
+            return new TextDecoder().decode(decrypted);
         }
-        document.addEventListener('DOMContentLoaded', async () => {
-            const rawDataEl = document.getElementById('raw-data');
+
+        window.addEventListener('load', async () => {
             const hash = window.location.hash.substring(1);
-            if (!hash) { document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption key missing from URL. This note cannot be read without the fragment key.</div>'; return; }
+            const rawDataEl = document.getElementById('raw-data');
+            
+            if (!hash) {
+                document.getElementById('content').innerHTML = '<div style="color: #ef4444; font-weight: bold;">[ ACCESS DENIED ] Decryption key missing from URL fragment.</div>';
+                return;
+            }
+
             if (rawDataEl && rawDataEl.textContent) {
                 try {
                     const data = JSON.parse(rawDataEl.textContent);
-                    if (data.createdAt) { const date = new Date(data.createdAt); document.getElementById('ts-display').innerText = 'Published: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString(); }
-                    const decrypted = await decryptContent(data.content, hash);
-                    if (decrypted) {
-                        const rawHtml = marked.parse(decrypted);
-                        const cleanHtml = DOMPurify.sanitize(rawHtml);
-                        const contentEl = document.getElementById('content');
-                        contentEl.innerHTML = cleanHtml;
-                        contentEl.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
-                    } else { document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption failed. The key in your link may be incorrect or corrupted.</div>'; }
-                } catch (e) { document.getElementById('content').innerText = 'Error loading note data.'; }
+                    if (data.createdAt) {
+                        const date = new Date(data.createdAt);
+                        document.getElementById('ts-display').innerText = 'Published: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
+                    }
+                    const payload = typeof data.content === 'string' ? JSON.parse(data.content) : data.content;
+                    const decrypted = await decrypt(payload.c, payload.i, hash);
+                    const rawHtml = marked.parse(decrypted);
+                    document.getElementById('content').innerHTML = DOMPurify.sanitize(rawHtml);
+                    document.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+                    if (decrypted.length > 0) {
+                        const firstLine = decrypted.split('\\n')[0].replace(/[#*_\`]/g, '').trim();
+                        if (firstLine) document.title = \`\${firstLine} | YAIBA\`;
+                    }
+                } catch (e) {
+                    console.error(e);
+                    document.getElementById('content').innerHTML = '<div style="color: #ef4444; font-weight: bold;">[ DECRYPTION FAILED ] The key in your link may be incorrect or corrupted.</div>';
+                }
             }
         });
-    </script>
-</body>
-</html>`;
+        </script>
+        </body>
+        </html>`;

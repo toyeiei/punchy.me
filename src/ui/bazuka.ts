@@ -101,7 +101,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             text-decoration: none;
         }
         .punchy-portal:hover {
-            width: 280px;
+            width: 320px;
             gap: 1rem;
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
@@ -295,6 +295,9 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             transform: scale(1.05);
             background: var(--accent-hover);
         }
+        @media (max-width: 768px) {
+            .punchy-portal { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -322,6 +325,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
         </div>
     </a>
 
@@ -537,7 +541,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             text-decoration: none;
         }
         .punchy-portal:hover {
-            width: 280px;
+            width: 320px;
             gap: 1rem;
             border-color: var(--accent);
             box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
@@ -648,6 +652,9 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             letter-spacing: 1px;
             text-transform: uppercase;
         }
+        @media (max-width: 768px) {
+            .punchy-portal { display: none !important; }
+        }
     </style>
 </head>
 <body>
@@ -662,6 +669,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
         </div>
     </a>
 

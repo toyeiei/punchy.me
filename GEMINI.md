@@ -139,7 +139,10 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 - Overhauled AI engine with role-aligned context blocks and strict token/temperature standards.
 - Integrated comprehensive SEO metadata and client-side hydrated JSON-LD schemas.
 
-### 4. AI Engine Standards (ANAKIN)
+### 4. Design Revamp Prohibition (The Golden Rule)
+When executing 'test' or 'lint' directives, engineers MUST focus exclusively on behavioral verification and code quality (syntax, types). Revamping UI design, layout, or aesthetic optimizations during these phases is STRICTLY PROHIBITED to prevent regressions in UX performance and brand integrity. Validation cycles are for testing, not for unsolicited "cleanups" of design logic.
+
+### 5. AI Engine Standards (ANAKIN)
 To ensure consistent and high-quality professional narratives, the ANAKIN engine MUST adhere to these standard parameters:
 - **Model:** `@cf/meta/llama-3-8b-instruct`
 - **Max Tokens:** 250 (Ensures sufficient length for summary and 3 bullets)
