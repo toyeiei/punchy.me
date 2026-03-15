@@ -18,7 +18,7 @@ export async function handleAnakinPost(request: Request, env: Env): Promise<Resp
 }
 
 export async function handleAnakinHydrate(request: Request, env: Env, path: string): Promise<Response> {
-	if (request.method !== 'GET') return new Response('Method Not Allowed', { status: 405 });
+	if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 	const id = path.split('/').pop();
 	if (!id) return new Response(JSON.stringify({ error: 'Invalid ID' }), { status: 400 });
 	const value = await env.SHORT_LINKS.get(id);

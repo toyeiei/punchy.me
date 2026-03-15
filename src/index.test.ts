@@ -200,7 +200,7 @@ describe("PUNCHY.ME URL Shortener", () => {
         response: "[SUMMARY] A powerful Force user with expert engineering skills. [/SUMMARY] [EXPERIENCE] - Mastered lightsaber combat techniques.\n- Piloted starfighters in critical missions.\n- Engineered custom droids. [/EXPERIENCE]"
       });
 
-      const hydrateRes = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`);
+      const hydrateRes = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`, { method: 'POST' });
       expect(hydrateRes.status).toBe(200);
       const hydratedData = await hydrateRes.json() as Record<string, unknown>;
       expect(hydratedData.aiHydrated).toBe(true);
@@ -217,19 +217,19 @@ describe("PUNCHY.ME URL Shortener", () => {
     it("ensuring hydration is idempotent", async () => {
       const id = "existing-anakin";
       await env.SHORT_LINKS.put(id, JSON.stringify({ type: 'anakin', aiHydrated: true, name: "Ani", aiSummary: "Already Hydrated" }));
-      const res = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`);
+      const res = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`, { method: 'POST' });
       const data = await res.json() as Record<string, unknown>;
       expect(data.aiSummary).toBe("Already Hydrated");
     });
 
     it("rejects hydration for non-existent IDs", async () => {
-      const res = await SELF.fetch("http://localhost/anakin/hydrate/ghost");
+      const res = await SELF.fetch("http://localhost/anakin/hydrate/ghost", { method: 'POST' });
       expect(res.status).toBe(404);
     });
 
     it("rejects hydration for non-Anakin types", async () => {
       await env.SHORT_LINKS.put("not-anakin", "https://google.com");
-      const res = await SELF.fetch("http://localhost/anakin/hydrate/not-anakin");
+      const res = await SELF.fetch("http://localhost/anakin/hydrate/not-anakin", { method: 'POST' });
       expect(res.status).toBe(400);
     });
 

@@ -52,7 +52,7 @@ export default {
 		// 4. POST APIs & Dynamic Routes
 		if (path === '/bazuka' && request.method === 'POST') return handleBazukaPost(request, env);
 		if (path === '/anakin' && request.method === 'POST') return handleAnakinPost(request, env);
-		if (path.startsWith('/anakin/hydrate/')) return handleAnakinHydrate(request, env, path);
+		if (path.startsWith('/anakin/hydrate/') && request.method === 'POST') return handleAnakinHydrate(request, env, path);
 		if (path === '/musashi/forge' && request.method === 'POST') return handleMusashiForge(request, env);
 		if (path === '/yaiba/publish' && request.method === 'POST') return handleYaibaPublish(request, env);
 		if (path === '/loki/timeline' && request.method === 'GET') return handleLokiTimeline(request, env);
