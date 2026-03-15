@@ -1,4 +1,4 @@
-import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_HTML, LOKI_HTML, ODIN_HTML } from './ui';
+import { HTML, BAZUKA_FORM_HTML, BAZUKA_CARD_TEMPLATE, ANAKIN_FORM_HTML, ANAKIN_RESUME_TEMPLATE, SYNC_ERROR_HTML, MUSASHI_FORM_HTML, YAIBA_EDITOR_HTML, YAIBA_VIEW_HTML, LOKI_HTML, ODIN_HTML } from './ui';
 
 interface BazukaData {
 	type?: string;
@@ -20,6 +20,13 @@ interface AnakinData {
 	aiSummary?: string;
 	aiExperience?: string;
 	aiHydrated?: boolean;
+}
+
+interface YaibaData {
+	type: 'yaiba';
+	content: string;
+	tags: string[];
+	createdAt: number;
 }
 
 export interface Env {
@@ -204,7 +211,23 @@ export default {
 		}
 
 		if (path === '/yaiba') {
-			return new Response(YAIBA_HTML, { headers: { 'Content-Type': 'text/html' } });
+			return new Response(YAIBA_EDITOR_HTML, { headers: { 'Content-Type': 'text/html' } });
+		}
+
+		if (path === '/yaiba/publish' && request.method === 'POST') {
+			try {
+				const { content, tags } = await request.json() as { content: string, tags: string[] };
+				if (!content || content.length > 1800) return new Response(JSON.stringify({ error: 'Invalid content size.' }), { status: 400 });
+				
+				const id = Math.random().toString(36).substring(2, 8);
+				const yaibaData: YaibaData = { type: 'yaiba', content, tags: tags || [], createdAt: Date.now() };
+				
+				// Expiry 3 days (259200 seconds)
+				await env.SHORT_LINKS.put(id, JSON.stringify(yaibaData), { expirationTtl: 259200 });
+				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) {
+				return new Response(JSON.stringify({ error: 'Publish failed' }), { status: 500 });
+			}
 		}
 
 		if (path === '/loki') {
@@ -516,6 +539,15 @@ export default {
 								.on('#og-description', handler)
 								.on('#twitter-description', handler)
 								.transform(res);
+						}
+						if (data.type === 'yaiba') {
+							return new HTMLRewriter()
+								.on('#raw-data', {
+									element(element: Element) {
+										element.setInnerContent(value);
+									}
+								})
+								.transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
 						}
 					} catch (_e) {
 						// Malformed JSON fallback

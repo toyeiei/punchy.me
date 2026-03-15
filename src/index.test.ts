@@ -280,13 +280,43 @@ describe("PUNCHY.ME URL Shortener", () => {
     });
   });
 
-  describe("YAIBA Teaser", () => {
-    it("serves the YAIBA mysterious teaser page", async () => {
+  describe("YAIBA Feature (Zen Editor)", () => {
+    it("serves the YAIBA editor page", async () => {
       const res = await SELF.fetch("http://localhost/yaiba");
       expect(res.status).toBe(200);
       const html = await res.text();
       expect(html).toContain("YAIBA");
-      expect(html).toContain("mysterious feature");
+      expect(html).toContain("textarea id=\"editor\"");
+    });
+
+    it("publishes a note and renders it correctly", async () => {
+      const noteContent = "## Hello YAIBA\nThis is a test note.";
+      const publishRes = await SELF.fetch("http://localhost/yaiba/publish", {
+        method: "POST",
+        body: JSON.stringify({ content: noteContent, tags: ["test", "zen"] }),
+        headers: { "Content-Type": "application/json" },
+      });
+      
+      expect(publishRes.status).toBe(200);
+      const { id } = await publishRes.json() as { id: string };
+      expect(id).toBeDefined();
+
+      const renderRes = await SELF.fetch(`http://localhost/${id}`);
+      const html = await renderRes.text();
+      expect(html).toContain("Encrypted Note");
+      expect(html).toContain("Hello YAIBA");
+      expect(html).toContain("test note");
+      expect(html).toContain("zen");
+    });
+
+    it("rejects notes exceeding 1800 characters", async () => {
+      const longNote = "a".repeat(1801);
+      const res = await SELF.fetch("http://localhost/yaiba/publish", {
+        method: "POST",
+        body: JSON.stringify({ content: longNote, tags: [] }),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(res.status).toBe(400);
     });
   });
 
