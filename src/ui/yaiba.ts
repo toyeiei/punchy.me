@@ -5,9 +5,12 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>YAIBA | Zen Markdown Editor | PUNCHY.ME</title>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Marked.js for fast Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+    <!-- DOMPurify to prevent XSS in preview -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <style>
         :root {
@@ -110,13 +113,17 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         @keyframes glitch-anim-1 { 0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); } 91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); } 92% { opacity: 0; transform: translate(0) translateZ(0); } }
         @keyframes glitch-anim-2 { 0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); } 95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); } 96% { opacity: 0; transform: translate(0) translateZ(0); } }
 
-        .header-controls { display: flex; align-items: center; gap: 1rem; }
-        .encryption-status { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; letter-spacing: 1px; margin-right: 1rem; display: flex; align-items: center; gap: 5px; opacity: 0.8; }
-        .encryption-status span { width: 6px; height: 6px; background: var(--accent); border-radius: 50%; display: inline-block; box-shadow: 0 0 8px var(--accent); }
+        .header-controls { display: flex; align-items: center; gap: 1.5rem; }
+        .encryption-status { font-size: 0.65rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 5px; opacity: 0.6; }
+        .encryption-status span { width: 6px; height: 6px; background: var(--text-dim); border-radius: 50%; display: inline-block; }
 
+        /* Action Group: Stay together on mobile */
+        .action-group { display: flex; align-items: center; gap: 0.8rem; }
+
+        /* ZEN BUTTONS: Monochrome Elite */
         .publish-btn {
-            background: var(--accent);
-            color: #000;
+            background: #ffffff;
+            color: #000000;
             border: none;
             padding: 10px 24px;
             border-radius: 6px;
@@ -125,15 +132,23 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             text-transform: uppercase;
             transition: all 0.3s ease;
-            animation: slow-glow 3s infinite ease-in-out;
         }
-        .publish-btn:hover { background: #4ade80; transform: translateY(-1px); box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
-        .publish-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; animation: none; }
+        .publish-btn:hover { background: #e2e8f0; transform: translateY(-1px); box-shadow: 0 4px 15px rgba(255, 255, 255, 0.1); }
+        .publish-btn:disabled { opacity: 0.3; cursor: not-allowed; transform: none; }
 
-        .print-btn { background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 8px 20px; border-radius: 6px; font-weight: 700; cursor: pointer; font-family: var(--font-mono); text-transform: uppercase; transition: all 0.2s; }
-        .print-btn:hover { background: rgba(34, 197, 94, 0.1); transform: translateY(-1px); }
-
-        @keyframes slow-glow { 0%, 100% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); } 50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); } }
+        .print-btn {
+            background: transparent;
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 8px 20px;
+            border-radius: 6px;
+            font-weight: 700;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            transition: all 0.2s;
+        }
+        .print-btn:hover { background: rgba(255, 255, 255, 0.05); border-color: #ffffff; }
 
         @media print {
             .grid-bg, .scan-line, .tactical-header, .resizer, .editor-pane, .cursor-pulse, .char-counter { display: none !important; }
@@ -164,63 +179,48 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .preview-pane { flex: 1 1 50%; background: #121212; padding: 2.5rem; overflow-y: auto; }
 
         .resizer { width: 4px; height: 100%; background: rgba(0, 0, 0, 0.3); cursor: col-resize; transition: background 0.2s; position: relative; z-index: 20; }
-        .resizer:hover, .resizer.dragging { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .resizer:hover, .resizer.dragging { background: #ffffff; box-shadow: 0 0 10px #ffffff; }
         .resizer::after { content: ''; position: absolute; top: 0; left: -10px; right: -10px; bottom: 0; }
 
         textarea#editor { width: 100%; height: 100%; background: transparent; border: none; color: var(--text-main); font-family: var(--font-mono); font-size: 1.1rem; line-height: 1.8; padding: 2.5rem; resize: none; outline: none; transition: background 0.3s ease; }
-        textarea#editor:focus { background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(34, 197, 94, 0.03) 0%, transparent 50%); }
+        textarea#editor:focus { background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(255, 255, 255, 0.02) 0%, transparent 50%); }
 
-        .cursor-pulse { position: absolute; pointer-events: none; width: 20px; height: 20px; background: var(--accent); filter: blur(10px); border-radius: 50%; opacity: 0; z-index: 5; transition: transform 0.1s linear; }
+        .cursor-pulse { position: absolute; pointer-events: none; width: 20px; height: 20px; background: #ffffff; filter: blur(10px); border-radius: 50%; opacity: 0; z-index: 5; transition: transform 0.1s linear; }
 
-        .char-counter { position: absolute; bottom: 15px; right: 20px; font-size: 0.75rem; color: var(--text-dim); background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); pointer-events: none; transition: all 0.2s ease; }
-        .char-counter.invalid { color: #f59e0b; border-color: #f59e0b; opacity: 0.8; }
+        .char-counter { 
+            position: absolute; bottom: 15px; right: 20px; font-size: 0.75rem; color: #ffffff; 
+            background: rgba(0,0,0,0.8); padding: 4px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); 
+            pointer-events: auto; transition: all 0.2s ease; cursor: help; 
+        }
         .char-counter.valid { color: var(--accent); border-color: var(--accent); }
         .char-counter.limit { color: #ef4444; border-color: #ef4444; }
 
+        /* Tactical Tooltip */
+        .char-counter::after {
+            content: "YAIBA REQUIRES MIN 100 CHARS TO FORGE";
+            position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;
+            background: #ffffff; color: #000; font-weight: 700; font-size: 0.6rem;
+            padding: 4px 8px; border-radius: 4px; white-space: nowrap;
+            opacity: 0; pointer-events: none; transition: all 0.2s ease;
+            transform: translateY(5px);
+        }
+        .char-counter:hover::after { opacity: 1; transform: translateY(0); }
+        .char-counter.valid:hover::after { content: "MASTER WORK READY"; color: var(--accent); background: #000; border: 1px solid var(--accent); }
+
         #preview-content h1, #preview-content h2, #preview-content h3 { font-family: var(--font-brand); color: var(--text-main); text-transform: uppercase; margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 400; }
         #preview-content p { margin-bottom: 1em; line-height: 1.7; }
-        #preview-content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(34,197,94,0.3); }
+        #preview-content a { color: #ffffff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
         #preview-content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 1rem; }
         #preview-content pre { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1em; }
         #preview-content pre code { background: transparent; padding: 0; font-size: 1rem; }
         #preview-content img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin: 1rem 0; }
-        #preview-content blockquote { border-left: 4px solid var(--accent); padding-left: 1rem; color: var(--text-dim); margin-bottom: 1em; font-style: italic; }
+        #preview-content blockquote { border-left: 4px solid #ffffff; padding-left: 1rem; color: var(--text-dim); margin-bottom: 1em; font-style: italic; }
         #preview-content ul, #preview-content ol { margin-bottom: 1em; padding-left: 1.5rem; list-style: none !important; }
-        
         #preview-content li { position: relative; line-height: 1.8; }
-        
-        /* Custom tactical bullet for standard lists (suppressed for tasks) */
-        #preview-content li::before {
-            content: "•";
-            color: var(--accent);
-            position: absolute;
-            left: -1.2rem;
-            font-weight: bold;
-            opacity: 0.8;
-        }
-        
-        /* Tactical Task Lists: Suppress the custom bullet when a checkbox is present */
-        #preview-content li:has(input[type="checkbox"])::before,
-        #preview-content li.task-list-item::before { 
-            content: none !important; 
-        }
-
-        #preview-content input[type="checkbox"] {
-            -webkit-appearance: none;
-            appearance: none;
-            width: 1.2rem;
-            height: 1.2rem;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.2);
-            border-radius: 4px;
-            cursor: pointer;
-            vertical-align: middle;
-            margin-right: 10px;
-            position: relative;
-            transition: all 0.2s ease;
-            margin-left: -1.2rem; /* Pull back into bullet area */
-        }
-        #preview-content input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+        #preview-content li::before { content: "•"; color: #ffffff; position: absolute; left: -1.2rem; font-weight: bold; opacity: 0.5; }
+        #preview-content li:has(input[type="checkbox"])::before, #preview-content li.task-list-item::before { content: none !important; }
+        #preview-content input[type="checkbox"] { -webkit-appearance: none; appearance: none; width: 1.2rem; height: 1.2rem; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.2); border-radius: 4px; cursor: pointer; vertical-align: middle; margin-right: 10px; position: relative; transition: all 0.2s ease; margin-left: -1.2rem; }
+        #preview-content input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
         #preview-content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 0.8rem; font-weight: 900; }
 
         .modal-overlay {
@@ -239,7 +239,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         
         .modal-content {
             background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 4rem 3rem;
             border-radius: 24px;
             text-align: center;
@@ -255,7 +255,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .modal-overlay.show .modal-content { 
             transform: scale(1) translateY(0); 
             opacity: 1;
-            box-shadow: 0 0 60px rgba(34, 197, 94, 0.2);
+            box-shadow: 0 0 60px rgba(255, 255, 255, 0.1);
             animation: success-pop 0.6s cubic-bezier(0.34, 1.56, 0.64, 1);
         }
 
@@ -269,7 +269,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         
         .link-box {
             background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(34, 197, 94, 0.3);
+            border: 1px solid rgba(255, 255, 255, 0.1);
             padding: 0.8rem 1.2rem;
             border-radius: 12px;
             display: flex;
@@ -279,12 +279,12 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             gap: 1rem;
             height: 60px;
         }
-        .link-text { color: var(--accent); font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; font-family: var(--font-mono); flex: 1; text-align: left; }
-        .link-text:hover { border-bottom-color: var(--accent); }
+        .link-text { color: #ffffff; font-size: 0.95rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; text-decoration: none; border-bottom: 1px solid transparent; transition: border-color 0.2s; font-family: var(--font-mono); flex: 1; text-align: left; }
+        .link-text:hover { border-bottom-color: #ffffff; }
         .copy-btn {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent);
-            border: 1px solid var(--accent);
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid #ffffff;
             padding: 0 20px;
             height: 36px;
             border-radius: 6px;
@@ -299,17 +299,17 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             justify-content: center;
             white-space: nowrap;
         }
-        .copy-btn:hover { background: var(--accent); color: #000; box-shadow: 0 0 15px var(--accent); }
+        .copy-btn:hover { background: #ffffff; color: #000; box-shadow: 0 0 15px #ffffff; }
 
         @media (max-width: 768px) {
-            .tactical-header { height: auto; padding: 1rem; flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .tactical-header { height: auto; padding: 1.2rem; flex-direction: column; gap: 1.2rem; align-items: flex-start; }
             .brand { font-size: 2.5rem; }
             .tagline { font-size: 0.55rem; letter-spacing: 1px; }
-            .workspace { flex-direction: column; height: calc(100vh - 120px); margin-top: 120px; }
+            .workspace { flex-direction: column; height: calc(100vh - 140px); margin-top: 140px; }
             .pane { flex: 1 1 50% !important; height: 50% !important; }
-            .editor-pane { border-right: none; border-bottom: 1px solid rgba(34, 197, 94, 0.2); }
-            .header-controls { width: 100%; justify-content: space-between; gap: 0.5rem; }
-            .publish-btn, .print-btn { padding: 6px 12px; font-size: 0.7rem; }
+            .editor-pane { border-right: none; border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+            .header-controls { width: 100%; justify-content: space-between; flex-direction: row; }
+            .publish-btn, .print-btn { padding: 8px 16px; font-size: 0.75rem; }
             textarea#editor { padding: 1.5rem; font-size: 1rem; }
             .preview-pane { padding: 1.5rem; }
             .resizer { display: none; }
@@ -330,8 +330,10 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         </div>
         <div class="header-controls">
             <div class="encryption-status"><span></span> E2E ENCRYPTED</div>
-            <button id="print-btn" class="print-btn">PRINT</button>
-            <button id="publish-btn" class="publish-btn">PUBLISH</button>
+            <div class="action-group">
+                <button id="print-btn" class="print-btn">PRINT</button>
+                <button id="publish-btn" class="publish-btn">PUBLISH</button>
+            </div>
         </div>
     </header>
 
@@ -417,9 +419,10 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         function updateCounter() {
             const len = editor.value.length;
             charCounter.innerText = \`\${len} / 1800\`;
-            charCounter.classList.remove('invalid', 'valid', 'limit');
-            if (len > 0 && len < 100) charCounter.classList.add('invalid');
-            else if (len >= 100 && len <= 1800) charCounter.classList.add('valid');
+            charCounter.classList.remove('valid', 'limit');
+            if (len >= 100 && len <= 1800) {
+                charCounter.classList.add('valid');
+            }
             if (len >= 1750) charCounter.classList.add('limit');
         }
 
@@ -477,34 +480,43 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
         ::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.2); border-radius: 4px; border: 1px solid rgba(34, 197, 94, 0.1); }
         ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.4); }
-        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; pointer-events: none; }
+        .grid-bg { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(rgba(34, 197, 94, 0.12) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.12) 1px, transparent 1px); background-size: 40px 40px; z-index: 0; pointer-events: none; }
         .container { width: 100%; max-width: 800px; z-index: 10; background: rgba(255, 255, 255, 0.02); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.08); border-radius: 16px; padding: 3rem clamp(1.5rem, 5vw, 4rem); box-shadow: 0 20px 50px rgba(0,0,0,0.5); }
         .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .meta-info { display: flex; flex-direction: column; gap: 0.5rem; }
         .timestamp { font-size: 0.8rem; color: var(--text-dim); text-transform: uppercase; }
         .status-badge { display: flex; flex-direction: column; align-items: flex-end; gap: 5px; }
-        .expiry-badge { background: rgba(239, 68, 68, 0.1); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); padding: 4px 10px; border-radius: 6px; font-size: 0.7rem; font-weight: 700; text-transform: uppercase; }
+        .expiry-badge {
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-dim);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
         .secure-lock { font-size: 0.65rem; color: var(--accent); text-transform: uppercase; display: flex; align-items: center; gap: 4px; }
         #content { font-size: 1.1rem; line-height: 1.7; }
         #content h1, #content h2, #content h3 { font-family: var(--font-brand); color: var(--text-main); text-transform: uppercase; margin-top: 1.5em; margin-bottom: 0.5em; font-weight: 400; }
         #content p { margin-bottom: 1em; }
-        #content a { color: var(--accent); text-decoration: none; border-bottom: 1px solid rgba(34,197,94,0.3); }
+        #content a { color: #ffffff; text-decoration: none; border-bottom: 1px solid rgba(255,255,255,0.3); }
         #content code { background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 4px; font-size: 1rem; }
         #content pre { background: rgba(0,0,0,0.8); border: 1px solid rgba(255,255,255,0.1); padding: 1rem; border-radius: 8px; overflow-x: auto; margin-bottom: 1em; }
         #content pre code { background: transparent; padding: 0; font-size: 1rem; }
         #content img { max-width: 100%; height: auto; border-radius: 8px; border: 1px solid rgba(255,255,255,0.1); margin: 1rem 0; }
-        #content blockquote { border-left: 4px solid var(--accent); padding-left: 1rem; color: var(--text-dim); margin-bottom: 1em; font-style: italic; }
+        #content blockquote { border-left: 4px solid #ffffff; padding-left: 1rem; color: var(--text-dim); margin-bottom: 1em; font-style: italic; }
         #content ul, #content ol { margin-bottom: 1em; padding-left: 1.5rem; list-style: none !important; }
         
         #content li { position: relative; line-height: 1.8; }
         
         #content li::before {
             content: "•";
-            color: var(--accent);
+            color: #ffffff;
             position: absolute;
             left: -1.2rem;
             font-weight: bold;
-            opacity: 0.8;
+            opacity: 0.5;
         }
         
         #content li:has(input[type="checkbox"])::before,
@@ -527,7 +539,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             transition: all 0.2s ease;
             margin-left: -1.2rem;
         }
-        #content input[type="checkbox"]:checked { background: var(--accent); border-color: var(--accent); box-shadow: 0 0 8px rgba(34, 197, 94, 0.4); }
+        #content input[type="checkbox"]:checked { background: #ffffff; border-color: #ffffff; box-shadow: 0 0 8px rgba(255, 255, 255, 0.4); }
         #content input[type="checkbox"]:checked::after { content: '✓'; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: #000; font-size: 0.8rem; font-weight: 900; }
         .footer { margin-top: 3rem; text-align: center; }
         .footer a { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
@@ -590,8 +602,9 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
                     const decrypted = await decryptContent(data.content, hash);
                     if (decrypted) {
                         const rawHtml = marked.parse(decrypted);
+                        const cleanHtml = DOMPurify.sanitize(rawHtml);
                         const contentEl = document.getElementById('content');
-                        contentEl.innerHTML = DOMPurify.sanitize(rawHtml);
+                        contentEl.innerHTML = cleanHtml;
                         contentEl.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
                     } else { document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption failed. The key in your link may be incorrect or corrupted.</div>'; }
                 } catch (e) { document.getElementById('content').innerText = 'Error loading note data.'; }

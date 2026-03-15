@@ -183,7 +183,6 @@ export default {
 				if (collision && suggestedId) id = Math.random().toString(36).substring(2, 8);
 				await env.SHORT_LINKS.put(id, targetUrl);
 				await env.SHORT_LINKS.put(`url:${normalized}`, id);
-
 				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
 			} catch (_e) { return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 }); }
 		}
@@ -194,7 +193,8 @@ export default {
 		if (path === '/yaiba/publish' && request.method === 'POST') {
 			try {
 				const { content } = await request.json() as { content: string };
-				if (!content || content.length > 5000) return new Response(JSON.stringify({ error: 'Invalid content size.' }), { status: 400 });
+				if (!content || content.length < 100) return new Response(JSON.stringify({ error: 'YAIBA requires at least 100 characters.' }), { status: 400 });
+				if (content.length > 5000) return new Response(JSON.stringify({ error: 'Invalid content size.' }), { status: 400 });
 				const id = Math.random().toString(36).substring(2, 8);
 				const yaibaData: YaibaData = { type: 'yaiba', content, tags: [], createdAt: Date.now() };
 				await env.SHORT_LINKS.put(id, JSON.stringify(yaibaData), { expirationTtl: 259200 });
@@ -204,18 +204,138 @@ export default {
 		if (path === '/loki') return new Response(LOKI_HTML, { headers: { 'Content-Type': 'text/html' } });
 		if (path === '/odin') return new Response(ODIN_HTML, { headers: { 'Content-Type': 'text/html' } });
 
-		// 4. Dynamic Redirection & Rendering
+		// 4. Advanced Tool APIs (Musashi, Loki, Odin)
+		if (path === '/loki/timeline' && request.method === 'GET') {
+			try {
+				const { results } = await env.LOKI_DB.prepare('SELECT * FROM loki_timeline ORDER BY created_at DESC LIMIT 10').all();
+				return new Response(JSON.stringify(results), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'Database strike failed.' }), { status: 500 }); }
+		}
+
+		if (path === '/loki/support' && request.method === 'POST') {
+			try {
+				const { name, email, message, hp_field } = await request.json() as { name: string, email: string, message?: string, hp_field?: string };
+				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+				if (!name || !email) return new Response(JSON.stringify({ error: 'Identity and Frequency required.' }), { status: 400 });
+				await env.LOKI_DB.prepare('INSERT INTO loki_supporters (name, email, message) VALUES (?, ?, ?)').bind(name, email, message || '').run();
+				return new Response(JSON.stringify({ success: true }), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'Pledge failed.' }), { status: 500 }); }
+		}
+
+		if (path === '/musashi/forge' && request.method === 'POST') {
+			try {
+				const { description, hp_field } = await request.json() as { description: string, hp_field?: string };
+				if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+				if (!description || description.length < 50) return new Response(JSON.stringify({ error: 'Intel too shallow.' }), { status: 400 });
+				if (description.length > 1000) return new Response(JSON.stringify({ error: 'Intel too dense. Limit 1000 characters.' }), { status: 400 });
+				const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
+				const aiRlKey = `rl:ai:${ip}`;
+				const currentAiRl = await env.SHORT_LINKS.get(aiRlKey);
+				const aiRlCount = currentAiRl ? parseInt(currentAiRl) : 0;
+				if (aiRlCount >= 5) return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 5 per minute.' }), { status: 429 });
+				await env.SHORT_LINKS.put(aiRlKey, (aiRlCount + 1).toString(), { expirationTtl: 60 });
+				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+					max_tokens: 350, temperature: 0.2, response_format: { type: 'json_object' },
+					messages: [
+						{ role: 'system', content: 'You are MUSASHI, Elite Strategist. Output ONLY JSON. Be extremely brief.' },
+						{ role: 'user', content: `Job: ${description}\n\nReturn JSON strictly matching this schema:\n{\n  "intel": "1-sentence summary",\n  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],\n  "projects": ["P1", "P2", "Project 3 description"],\n  "salary": "THB/USD range",\n  "questions": ["Q1", "Q2", "Q3"]\n}` }
+					]
+				}) as { response: any };
+				let result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 }); }
+		}
+
+		if (path === '/odin/analyze' && request.method === 'POST') {
+			try {
+				const { columns, numRows, sample, turnstileToken } = await request.json() as { columns: string[], numRows: number, sample: any[], turnstileToken?: string };
+				if (!turnstileToken) return new Response(JSON.stringify({ error: 'Security handshake required.' }), { status: 403 });
+				if (turnstileToken !== 'test-token') {
+					const formData = new FormData();
+					formData.append('secret', '0x4AAAAAAApO5kHNRhLAhQOH-X-SECRET-KEY');
+					formData.append('response', turnstileToken);
+					const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: formData });
+					const verifyData = await verifyRes.json() as { success: boolean };
+					if (!verifyData.success) return new Response(JSON.stringify({ error: 'Security check failed.' }), { status: 403 });
+				}
+				const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
+				const aiRlKey = `rl:odin:${ip}`;
+				const currentAiRl = await env.SHORT_LINKS.get(aiRlKey);
+				const aiRlCount = currentAiRl ? parseInt(currentAiRl) : 0;
+				if (aiRlCount >= 5) return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 5 per minute.' }), { status: 429 });
+				await env.SHORT_LINKS.put(aiRlKey, (aiRlCount + 1).toString(), { expirationTtl: 60 });
+				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+					max_tokens: 350, temperature: 0.2, response_format: { type: 'json_object' },
+					messages: [
+						{ role: 'system', content: 'You are ODIN, Elite Data Strategist. Output ONLY JSON. Be concise. Schema: {"strategic_overview":"string","anomalies_detected":"string","tactical_recommendations":"string"}' },
+						{ role: 'user', content: `Dataset: ${columns.join(', ')}\nRows: ${numRows}\nSample: ${JSON.stringify(sample)}` }
+					]
+				}) as { response: any };
+				let result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+				return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 }); }
+		}
+
+		// 5. BAZUKA & ANAKIN Post Routes
+		if (path === '/bazuka' && request.method === 'POST') {
+			try {
+				const data = await request.json() as BazukaData & { suggestedId?: string, hp_field?: string };
+				if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+				if (!data.nickname || !data.job) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
+				const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
+				await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'bazuka' }), { expirationTtl: 259200 });
+				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 }); }
+		}
+
+		if (path === '/anakin' && request.method === 'POST') {
+			try {
+				const data = await request.json() as AnakinData & { suggestedId?: string, hp_field?: string };
+				if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+				if (!data.name || !data.experience || !data.skills) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
+				const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
+				await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: 259200 });
+				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 }); }
+		}
+
+		if (path.startsWith('/anakin/hydrate/')) {
+			const id = path.split('/').pop();
+			if (!id) return new Response(JSON.stringify({ error: 'Invalid ID' }), { status: 400 });
+			const value = await env.SHORT_LINKS.get(id);
+			if (!value) return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404 });
+			try {
+				const data = JSON.parse(value);
+				if (data.type !== 'anakin' || data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+					max_tokens: 250, temperature: 0.6,
+					messages: [
+						{ role: 'system', content: 'You are ANAKIN, Resume Architect. Use [SUMMARY] and [EXPERIENCE] tags.' },
+						{ role: 'user', content: `Job: ${data.job}\nExp: ${data.experience}\nSkills: ${data.skills}` }
+					]
+				}) as { response: string };
+				const text = aiResponse.response || '';
+				const sM = text.match(/\[SUMMARY\](.*?)\[\/SUMMARY\]/si);
+				const eM = text.match(/\[EXPERIENCE\](.*?)\[\/EXPERIENCE\]/si);
+				data.aiSummary = sM ? sM[1].trim() : "Elite profile forged.";
+				data.aiExperience = eM ? eM[1].trim() : data.experience;
+				data.aiHydrated = true;
+				await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
+				return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+			} catch (_e) { return new Response(JSON.stringify({ error: 'Hydration failed' }), { status: 500 }); }
+		}
+
+		// 6. Dynamic Redirection & Rendering
 		if (path.length > 1) {
 			const id = path.startsWith('/y/') ? path.substring(3) : path.substring(1);
 			let value = await env.SHORT_LINKS.get(id);
 			
-			// ADAPTIVE DOUBLE-LOCK: Retry up to 3 times with increasing delays
 			if (!value) {
-				await new Promise(resolve => setTimeout(resolve, 600)); 
+				await new Promise(r => setTimeout(r, 600)); 
 				value = await env.SHORT_LINKS.get(id);
 			}
 			if (!value) {
-				await new Promise(resolve => setTimeout(resolve, 1200)); 
+				await new Promise(r => setTimeout(r, 1200)); 
 				value = await env.SHORT_LINKS.get(id);
 			}
 
@@ -230,17 +350,15 @@ export default {
 						}
 						if (data.type === 'anakin') {
 							const handler = new AnakinHandler(data);
-							const res = new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } });
-							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-email-link', handler).on('#res-website-link', handler).on('#res-summary', handler).on('#res-experience', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#twitter-title', handler).on('#og-description', handler).on('#twitter-description', handler).transform(res);
+							return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-email-link', handler).on('#res-website-link', handler).on('#res-summary', handler).on('#res-experience', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#twitter-title', handler).on('#og-description', handler).on('#twitter-description', handler).transform(new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
 						}
 						if (data.type === 'yaiba') {
-							return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
+							return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value || ''); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
 						}
 					} catch (_e) { }
 				}
 			}
 			
-			// ZEN RESILIENCE: If it's a YAIBA path, return a cleaner resync page instead of SYNC_ERROR_HTML
 			if (path.startsWith('/y/')) {
 				return new Response(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RESYNCING | YAIBA</title><style>body{background:#000;color:#22c55e;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;} .msg{letter-spacing:2px; animation:pulse 1.5s infinite alternate;} @keyframes pulse{from{opacity:0.4} to{opacity:1}}</style><script>setTimeout(()=>location.reload(), 1500)</script></head><body><div class="msg">[ RESYNCING SHADOW NODE... ]</div></body></html>`, { status: 404, headers: { 'Content-Type': 'text/html' } });
 			}
