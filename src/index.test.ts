@@ -245,6 +245,60 @@ describe("PUNCHY.ME URL Shortener", () => {
       });
       expect(res.status).toBe(400);
     });
+
+    it("correctly parses AI response with experience as an array", async () => {
+      const id = "array-experience";
+      await env.SHORT_LINKS.put(id, JSON.stringify({ type: 'anakin', aiHydrated: false, name: "Ani", job: "Jedi", experience: "x", skills: "y" }));
+
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({
+          summary: "A highly skilled Jedi with engineering prowess.",
+          experience: [
+            "Won the Boonta Eve Classic.",
+            "Built C-3PO.",
+            "Destroyed the Trade Federation Droid Control Ship."
+          ]
+        })
+      });
+
+      const res = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`, { method: 'POST' });
+      expect(res.status).toBe(200);
+      const data = await res.json() as Record<string, unknown>;
+      
+      expect(data.aiSummary).toBe("A highly skilled Jedi with engineering prowess.");
+      expect(data.aiExperience).toContain("• Won the Boonta Eve Classic.");
+      expect(data.aiExperience).toContain("• Built C-3PO.");
+
+      aiSpy.mockRestore();
+    });
+
+    it("correctly parses AI response with embedded JSON fallback", async () => {
+      const id = "embedded-json";
+      await env.SHORT_LINKS.put(id, JSON.stringify({ type: 'anakin', aiHydrated: false, name: "Ani", job: "Jedi", experience: "x", skills: "y" }));
+
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: `Here is the JSON you requested:
+{
+  "summary": "A highly skilled Jedi with engineering prowess.",
+  "experience": [
+    "Won the Boonta Eve Classic.",
+    "Built C-3PO.",
+    "Destroyed the Trade Federation Droid Control Ship."
+  ]
+}
+Hope this helps!`
+      });
+
+      const res = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`, { method: 'POST' });
+      expect(res.status).toBe(200);
+      const data = await res.json() as Record<string, unknown>;
+      
+      expect(data.aiSummary).toBe("A highly skilled Jedi with engineering prowess.");
+      expect(data.aiExperience).toContain("• Won the Boonta Eve Classic.");
+      expect(data.aiExperience).toContain("• Built C-3PO.");
+
+      aiSpy.mockRestore();
+    });
   });
 
   describe("Mobile UX & Accessibility", () => {

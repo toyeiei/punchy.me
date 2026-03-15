@@ -23,7 +23,28 @@ export async function handleMusashiForge(request: Request, env: Env): Promise<Re
 				{ role: 'user', content: `Job: ${description}\n\nReturn JSON strictly matching this schema:\n{\n  "intel": "1-sentence summary",\n  "skills": ["Skill 1", "Skill 2", "Skill 3", "Skill 4", "Skill 5"],\n  "projects": ["P1", "P2", "Project 3 description"],\n  "salary": "THB/USD range",\n  "questions": ["Q1", "Q2", "Q3"]\n}` }
 			]
 		}) as { response: string | Record<string, unknown> };
-		const result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+		
+		let result: Record<string, unknown> = {};
+		if (typeof aiResponse.response === 'string') {
+			try {
+				const jsonMatch = aiResponse.response.match(/\{[\s\S]*\}/);
+				if (jsonMatch) {
+					result = JSON.parse(jsonMatch[0]);
+				} else {
+					result = JSON.parse(aiResponse.response);
+				}
+			} catch (_e) {
+				console.error("MUSASHI: Final JSON Parse Failure on:", aiResponse.response);
+				return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 });
+			}
+		} else {
+			result = aiResponse.response || {};
+		}
+		
+		console.log('\n--- MUSASHI AI RAW OUTPUT ---');
+		console.log(typeof aiResponse.response === 'string' ? aiResponse.response : JSON.stringify(result, null, 2));
+		console.log('----------------------------\n');
+
 		return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
 	} catch (_e) { return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 }); }
 }
