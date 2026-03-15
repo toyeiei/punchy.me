@@ -517,7 +517,7 @@ describe("PUNCHY.ME URL Shortener", () => {
 
       const res = await SELF.fetch("http://localhost/loki/timeline");
       expect(res.status).toBe(200);
-      const data = await res.json() as any[];
+      const data = await res.json() as Record<string, unknown>[];
       expect(data.some(e => e.content === "Test Strategic Update")).toBe(true);
     });
   });

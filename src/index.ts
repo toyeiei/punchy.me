@@ -139,6 +139,14 @@ export default {
 		const url = new URL(request.url);
 		const path = url.pathname;
 
+		// 0. Global Security Hardening: Payload Size Limit (1MB)
+		if (request.method === 'POST') {
+			const contentLength = request.headers.get('content-length');
+			if (contentLength && parseInt(contentLength, 10) > 1048576) {
+				return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), { status: 413, headers: { 'Content-Type': 'application/json' } });
+			}
+		}
+
 		// 1. Static Routes
 		if (path === '/' && request.method === 'GET') return new Response(HTML, { headers: { 'Content-Type': 'text/html', 'Link': '<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect, <https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap>; rel=preload; as=style' } });
 		if (path === '/favicon.ico' || path === '/favicon.svg') return new Response(`<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#000000" /><g transform="rotate(15, 50, 50)"><path d="M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80" stroke="#22c55e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" /><path d="M45 45 H55" stroke="#22c55e" stroke-width="10" stroke-linecap="round" fill="none" /></g></svg>`, { headers: { 'Content-Type': 'image/svg+xml' } });
@@ -250,7 +258,7 @@ export default {
 
 		if (path === '/odin/analyze' && request.method === 'POST') {
 			try {
-				const { columns, numRows, sample, turnstileToken } = await request.json() as { columns: string[], numRows: number, sample: any[], turnstileToken?: string };
+				const { columns, numRows, sample, turnstileToken } = await request.json() as { columns: string[], numRows: number, sample: Record<string, unknown>[], turnstileToken?: string };
 				if (!turnstileToken) return new Response(JSON.stringify({ error: 'Security handshake required.' }), { status: 403 });
 				if (turnstileToken !== 'test-token') {
 					const formData = new FormData();
@@ -303,6 +311,7 @@ export default {
 		}
 
 		if (path.startsWith('/anakin/hydrate/')) {
+			if (request.method !== 'GET') return new Response('Method Not Allowed', { status: 405 });
 			const id = path.split('/').pop();
 			if (!id) return new Response(JSON.stringify({ error: 'Invalid ID' }), { status: 400 });
 			const value = await env.SHORT_LINKS.get(id);
@@ -332,6 +341,7 @@ export default {
 
 		// 6. Dynamic Redirection & Rendering
 		if (path.length > 1) {
+			if (request.method !== 'GET') return new Response('Method Not Allowed', { status: 405 });
 			const id = path.startsWith('/y/') ? path.substring(3) : path.substring(1);
 			let value = await env.SHORT_LINKS.get(id);
 
