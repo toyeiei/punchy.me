@@ -9,6 +9,7 @@ import { handleMusashiGet, handleMusashiForge } from './handlers/musashi';
 import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
 import { handleLokiGet, handleLokiTimeline, handleLokiSupport } from './handlers/loki';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
+import { handlePicassoGet, handlePicassoSearch } from './handlers/picasso';
 import { handleRender } from './handlers/render';
 
 export default {
@@ -37,6 +38,7 @@ export default {
 	<url><loc>https://punchy.me/musashi</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 	<url><loc>https://punchy.me/odin</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 	<url><loc>https://punchy.me/yaiba</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+	<url><loc>https://punchy.me/picasso</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>`.trim();
 			return new Response(sitemap, { headers: { 'Content-Type': 'application/xml' } });
 		}
@@ -51,6 +53,7 @@ export default {
 		if (path === '/yaiba' && request.method === 'GET') return handleYaibaGet();
 		if (path === '/loki' && request.method === 'GET') return handleLokiGet();
 		if (path === '/odin' && request.method === 'GET') return handleOdinGet();
+		if (path === '/picasso' && request.method === 'GET') return handlePicassoGet();
 
 		// 4. POST APIs & Dynamic Routes
 		if (path === '/bazuka' && request.method === 'POST') return handleBazukaPost(request, env);
@@ -61,6 +64,7 @@ export default {
 		if (path === '/loki/timeline' && request.method === 'GET') return handleLokiTimeline(request, env);
 		if (path === '/loki/support' && request.method === 'POST') return handleLokiSupport(request, env);
 		if (path === '/odin/analyze' && request.method === 'POST') return handleOdinAnalyze(request, env);
+		if (path === '/picasso/search' && request.method === 'POST') return handlePicassoSearch(request, env);
 
 		// 5. Dynamic Redirection & Rendering
 		if (path.length > 1) return handleRender(request, env, path);

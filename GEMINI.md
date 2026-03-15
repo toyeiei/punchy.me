@@ -53,7 +53,8 @@ A task is only considered complete when:
 1.  **Code Quality**: `npm run lint` and `npx tsc --noEmit` return zero errors.
 2.  **Verification**: All related tests in `npm test` pass with 100% reliability.
 3.  **Documentation**: `GEMINI.md` and `IMPLEMENTATION_LOG.md` are updated.
-4.  **Deployment**: Production state is synchronized and verified.
+4.  **SEO Readiness**: Every new page must have complete metadata (Open Graph, Twitter Cards), JSON-LD Schema, and be explicitly included in the `sitemap.xml` before deployment.
+5.  **Deployment**: Production state is synchronized and verified.
 
 ### 3. Architectural Decision Records (ADR)
 Before implementing complex roadmap items (e.g., MUSASHI blades), demand **Technical Trade-offs**:

@@ -542,6 +542,14 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
             </a>
+            <a href="/picasso" class="feature-card">
+                <span class="feature-icon">🎨</span>
+                <div class="feature-title">
+                    PICASSO
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
+                <div class="feature-tagline">Ultra-Fast Image Editor. Edge-native Unsplash integration.</div>
+            </a>
         </div>
     </section>
 

@@ -659,11 +659,88 @@ Hope this helps!`
     });
   });
 
+  describe("PICASSO Feature (Image Editor)", () => {
+    it("serves the PICASSO HUD page", async () => {
+      const res = await SELF.fetch("http://localhost/picasso");
+      expect(res.status).toBe(200);
+      expect(await res.text()).toContain("PICASSO");
+    });
+
+    it("proxies Unsplash API searches securely and returns sanitized JSON", async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          results: [
+            { id: "1", urls: { regular: "https://example.com/1.jpg", small: "https://example.com/1-s.jpg" }, alt_description: "alt 1", user: { name: "user1" } },
+            { id: "2", urls: { regular: "https://example.com/2.jpg", small: "https://example.com/2-s.jpg" }, alt_description: "alt 2", user: { name: "user2" } }
+          ]
+        })
+      } as unknown as Response);
+
+      const res = await SELF.fetch("http://localhost/picasso/search", {
+        method: "POST",
+        body: JSON.stringify({ query: "office" }),
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": "1.1.1.1" },
+      });
+      
+      expect(res.status).toBe(200);
+      const data = await res.json() as Record<string, unknown>;
+      
+      expect(Array.isArray(data.images)).toBe(true);
+      const images = data.images as Record<string, unknown>[];
+      expect(images.length).toBe(2);
+      expect(images[0].url).toBe("https://example.com/1.jpg");
+      expect(images[0].thumb).toBe("https://example.com/1-s.jpg");
+      
+      const fetchCall = fetchSpy.mock.calls[0];
+      expect(fetchCall[0]).toContain("query=office");
+      expect((fetchCall[1] as Record<string, any>).headers["Authorization"]).toContain("Client-ID");
+      
+      fetchSpy.mockRestore();
+    });
+
+    it("rejects empty or malformed search queries", async () => {
+      const res = await SELF.fetch("http://localhost/picasso/search", {
+        method: "POST",
+        body: JSON.stringify({ query: "" }),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(res.status).toBe(400);
+      const data = await res.json() as { error?: string };
+      expect(data.error).toBe("Invalid search query.");
+    });
+
+    it("enforces Unsplash API specific rate limiting (10 per minute)", async () => {
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
+        ok: true,
+        json: async () => ({ results: [] })
+      } as unknown as Response);
+      
+      for (let i = 0; i < 10; i++) {
+        await SELF.fetch("http://localhost/picasso/search", {
+          method: "POST",
+          body: JSON.stringify({ query: "test" }),
+          headers: { "Content-Type": "application/json", "cf-connecting-ip": "picasso-rate-limit-ip" },
+        });
+      }
+      const res = await SELF.fetch("http://localhost/picasso/search", {
+        method: "POST",
+        body: JSON.stringify({ query: "test" }),
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": "picasso-rate-limit-ip" },
+      });
+      expect(res.status).toBe(429);
+      const data = await res.json() as { error?: string };
+      expect(data.error).toContain("Tactical cooling in progress.");
+      
+      fetchSpy.mockRestore();
+    });
+  });
+
   describe("Master Ecosystem Integration (Zero-Break)", () => {
     it("verifies all professional tools are reachable from the homepage", async () => {
       const res = await SELF.fetch("http://localhost/");
       const html = await res.text();
-      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba"];
+      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/picasso"];
       for (const tool of tools) {
         expect(html).toContain(`href="${tool}"`);
       }
