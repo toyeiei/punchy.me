@@ -31,8 +31,8 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 			max_tokens: 250, temperature: 0.6,
 			messages: [
-				{ role: 'system', content: 'You are ANAKIN, Resume Architect. Use [SUMMARY] and [EXPERIENCE] tags.' },
-				{ role: 'user', content: `Job: ${data.job}\nExp: ${data.experience}\nSkills: ${data.skills}` }
+				{ role: 'system', content: 'You are ANAKIN, Resume Architect. You craft elite, action-oriented professional narratives.\n\n[DIRECTIVE]\n1. Write a Professional Summary (20-28 words).\n2. Write exactly 3 Experience Bullets (15-20 words per bullet).\n\n[OUTPUT FORMAT]\n[SUMMARY]\n...\n[/SUMMARY]\n[EXPERIENCE]\n- ...\n- ...\n- ...\n[/EXPERIENCE]' },
+				{ role: 'user', content: `[CONTEXT]\nJob: ${data.job}\nExp: ${data.experience}\nSkills: ${data.skills}` }
 			]
 		}) as { response: string };
 		const text = aiResponse.response || '';
