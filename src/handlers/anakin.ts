@@ -29,20 +29,20 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 		if (data.type !== 'anakin') return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
 		if (data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
 		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-			max_tokens: 350, temperature: 0.4,
+			max_tokens: 350, temperature: 0.4, response_format: { type: 'json_object' },
 			messages: [
-				{ role: 'system', content: 'You are ANAKIN, Resume Architect. You craft elite, action-oriented professional narratives. DO NOT hallucinate. You MUST USE ONLY the provided [CONTEXT]. Do not invent new skills or experiences.\n\n[DIRECTIVE]\n1. Write a high-impact Professional Summary (20-28 words) that clearly positions the candidate for their target role.\n2. Write exactly 3 Experience Bullets (15-20 words per bullet). Use strong action verbs and highlight achievements from the [CONTEXT] that match the target role.\n\n[OUTPUT FORMAT]\n[SUMMARY]\n...\n[/SUMMARY]\n[EXPERIENCE]\n- ...\n- ...\n- ...\n[/EXPERIENCE]' },
-				{ role: 'user', content: `[CONTEXT]\nTarget Role: ${data.job}\nCandidate Experience: ${data.experience}\nCandidate Skills: ${data.skills}\n\nAnalyze this [CONTEXT] and forge the resume to maximize interview chances for the Target Role.` }
+				{ role: 'system', content: 'You are ANAKIN, Resume Architect. You craft elite, action-oriented professional narratives. DO NOT hallucinate. You MUST USE ONLY the provided CONTEXT. Do not invent new skills or experiences. Output ONLY JSON.' },
+				{ role: 'user', content: `CONTEXT:\nTarget Role: ${data.job}\nCandidate Experience: ${data.experience}\nCandidate Skills: ${data.skills}\n\nAnalyze this CONTEXT and forge the resume to maximize interview chances for the Target Role.\n\nReturn JSON strictly matching this schema:\n{\n  "summary": "High-impact Professional Summary (20-28 words)",\n  "experience": "Exactly 3 Experience Bullets (15-20 words per bullet), separated by newlines, each starting with '- '"\n}` }
 			]
-		}) as { response: string };
-		const text = aiResponse.response || '';
+		}) as { response: string | Record<string, unknown> };
+		const result = typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+
 		console.log('\\n--- ANAKIN AI RAW OUTPUT ---');
-		console.log(text);
+		console.log(JSON.stringify(result, null, 2));
 		console.log('----------------------------\\n');
-		const sM = text.match(/\[SUMMARY\]([\s\S]*?)\[\/SUMMARY\]/i);
-		const eM = text.match(/\[EXPERIENCE\]([\s\S]*?)\[\/EXPERIENCE\]/i);
-		data.aiSummary = sM ? sM[1].trim() : "Elite profile forged.";
-		data.aiExperience = eM ? eM[1].trim().replace(/^- /gm, '• ') : data.experience;
+
+		data.aiSummary = result.summary ? String(result.summary).trim() : "Elite profile forged.";
+		data.aiExperience = result.experience ? String(result.experience).trim().replace(/^- /gm, '• ') : data.experience;
 		data.aiHydrated = true;
 		await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
 		return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });

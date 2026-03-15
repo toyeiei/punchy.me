@@ -197,7 +197,10 @@ describe("PUNCHY.ME URL Shortener", () => {
 
       // Spy on AI
       const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
-        response: "[SUMMARY] A powerful Force user with expert engineering skills. [/SUMMARY] [EXPERIENCE] - Mastered lightsaber combat techniques.\n- Piloted starfighters in critical missions.\n- Engineered custom droids. [/EXPERIENCE]"
+        response: JSON.stringify({
+          summary: "A powerful Force user with expert engineering skills.",
+          experience: "- Mastered lightsaber combat techniques.\n- Piloted starfighters in critical missions.\n- Engineered custom droids."
+        })
       });
 
       const hydrateRes = await SELF.fetch(`http://localhost/anakin/hydrate/${id}`, { method: 'POST' });
