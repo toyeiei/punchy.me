@@ -65,10 +65,10 @@ class BazukaHandler {
 		if (id === 'card-job') element.setInnerContent(this.data.job);
 		if (id === 'card-email') element.setInnerContent(this.data.email);
 		if (id === 'card-website') element.setInnerContent(escapeHTML(this.data.website));
-		
+
 		if (id === 'card-email-link') element.setAttribute('href', `mailto:${this.data.email}`);
 		if (id === 'card-website-link') element.setAttribute('href', escapeHTML(this.data.website));
-		
+
 		// SEO Injection
 		if (id === 'title-tag') element.setInnerContent(`${this.data.nickname} | Digital Business Card | PUNCHY.ME`);
 		if (id === 'og-title' || id === 'twitter-title') {
@@ -118,7 +118,7 @@ class AnakinHandler {
 			const tags = this.data.skills.split(',').map(s => `<span class="expertise-tag">${escapeHTML(s.trim())}</span>`).join('');
 			element.setInnerContent(tags, { html: true });
 		}
-		
+
 		// SEO Injection
 		if (id === 'title-tag') element.setInnerContent(`${this.data.name} | Professional Resume | PUNCHY.ME`);
 		if (id === 'og-title' || id === 'twitter-title') {
@@ -140,7 +140,7 @@ export default {
 		const path = url.pathname;
 
 		// 1. Static Routes
-		if (path === '/') return new Response(HTML, { headers: { 'Content-Type': 'text/html', 'Link': '<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect, <https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap>; rel=preload; as=style' } });
+		if (path === '/' && request.method === 'GET') return new Response(HTML, { headers: { 'Content-Type': 'text/html', 'Link': '<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect, <https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double&family=JetBrains+Mono:wght@400;700&display=swap>; rel=preload; as=style' } });
 		if (path === '/favicon.ico' || path === '/favicon.svg') return new Response(`<?xml version="1.0" encoding="UTF-8"?><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="48" fill="#000000" /><g transform="rotate(15, 50, 50)"><path d="M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80" stroke="#22c55e" stroke-width="10" stroke-linecap="round" stroke-linejoin="round" fill="none" /><path d="M45 45 H55" stroke="#22c55e" stroke-width="10" stroke-linecap="round" fill="none" /></g></svg>`, { headers: { 'Content-Type': 'image/svg+xml' } });
 		if (path === '/robots.txt') return new Response('User-agent: *\nAllow: /\nSitemap: https://punchy.me/sitemap.xml');
 		if (path === '/sitemap.xml') {
@@ -188,8 +188,10 @@ export default {
 		}
 
 		// 3. Tool Routes
-		if (path === '/musashi') return new Response(MUSASHI_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
-		if (path === '/yaiba') return new Response(YAIBA_EDITOR_HTML, { headers: { 'Content-Type': 'text/html' } });
+		if (path === '/bazuka' && request.method === 'GET') return new Response(BAZUKA_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
+		if (path === '/anakin' && request.method === 'GET') return new Response(ANAKIN_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
+		if (path === '/musashi' && request.method === 'GET') return new Response(MUSASHI_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
+		if (path === '/yaiba' && request.method === 'GET') return new Response(YAIBA_EDITOR_HTML, { headers: { 'Content-Type': 'text/html' } });
 		if (path === '/yaiba/publish' && request.method === 'POST') {
 			try {
 				const { content } = await request.json() as { content: string };
@@ -201,8 +203,8 @@ export default {
 				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
 			} catch (_e) { return new Response(JSON.stringify({ error: 'Publish failed' }), { status: 500 }); }
 		}
-		if (path === '/loki') return new Response(LOKI_HTML, { headers: { 'Content-Type': 'text/html' } });
-		if (path === '/odin') return new Response(ODIN_HTML, { headers: { 'Content-Type': 'text/html' } });
+		if (path === '/loki' && request.method === 'GET') return new Response(LOKI_HTML, { headers: { 'Content-Type': 'text/html' } });
+		if (path === '/odin' && request.method === 'GET') return new Response(ODIN_HTML, { headers: { 'Content-Type': 'text/html' } });
 
 		// 4. Advanced Tool APIs (Musashi, Loki, Odin)
 		if (path === '/loki/timeline' && request.method === 'GET') {
@@ -292,7 +294,8 @@ export default {
 			try {
 				const data = await request.json() as AnakinData & { suggestedId?: string, hp_field?: string };
 				if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
-				if (!data.name || !data.experience || !data.skills) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
+				if (!data.name || !data.experience || !data.skills) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });      
+				if (data.experience.length > 500) return new Response(JSON.stringify({ error: 'Experience too dense. Limit 500 characters.' }), { status: 400 });
 				const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
 				await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: 259200 });
 				return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
@@ -305,8 +308,10 @@ export default {
 			const value = await env.SHORT_LINKS.get(id);
 			if (!value) return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404 });
 			try {
+				if (!value.startsWith('{')) return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
 				const data = JSON.parse(value);
-				if (data.type !== 'anakin' || data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+				if (data.type !== 'anakin') return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
+				if (data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
 				const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 					max_tokens: 250, temperature: 0.6,
 					messages: [
@@ -329,7 +334,7 @@ export default {
 		if (path.length > 1) {
 			const id = path.startsWith('/y/') ? path.substring(3) : path.substring(1);
 			let value = await env.SHORT_LINKS.get(id);
-			
+
 			if (!value) {
 				await new Promise(r => setTimeout(r, 600)); 
 				value = await env.SHORT_LINKS.get(id);
@@ -355,10 +360,12 @@ export default {
 						if (data.type === 'yaiba') {
 							return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value || ''); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
 						}
-					} catch (_e) { }
+					} catch (_e) {
+						// Malformed JSON fallback
+					}
 				}
 			}
-			
+
 			if (path.startsWith('/y/')) {
 				return new Response(`<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RESYNCING | YAIBA</title><style>body{background:#000;color:#22c55e;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;} .msg{letter-spacing:2px; animation:pulse 1.5s infinite alternate;} @keyframes pulse{from{opacity:0.4} to{opacity:1}}</style><script>setTimeout(()=>location.reload(), 1500)</script></head><body><div class="msg">[ RESYNCING SHADOW NODE... ]</div></body></html>`, { status: 404, headers: { 'Content-Type': 'text/html' } });
 			}

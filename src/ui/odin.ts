@@ -124,8 +124,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             min-width: 28px;
             text-align: center;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            align-items: center; justify-content: center;
         }
         .portal-brand {
             color: var(--accent);
@@ -345,203 +344,64 @@ export const ODIN_HTML = `<!DOCTYPE html>
         }
 
         .recipes-container {
-            display: flex;
-            gap: 10px;
-            overflow-x: auto;
-            padding: 10px 0;
-            scrollbar-width: none;
+            display: flex; gap: 10px; overflow-x: auto; padding: 10px 0; scrollbar-width: none;
         }
         .recipes-container::-webkit-scrollbar { display: none; }
         
         .btn-recipe {
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-main);
-            border: 1px solid rgba(255, 255, 255, 0.15);
-            padding: 12px 16px;
-            border-radius: 8px;
-            font-size: 0.7rem;
-            font-family: var(--font-mono);
-            font-weight: 700;
-            line-height: 1; 
-            white-space: nowrap;
-            cursor: pointer;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            text-transform: uppercase;
-            letter-spacing: 1.5px;
-            flex-shrink: 0;
+            display: inline-flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.05); color: var(--text-main); border: 1px solid rgba(255, 255, 255, 0.15); padding: 12px 16px; border-radius: 8px; font-size: 0.7rem; font-family: var(--font-mono); font-weight: 700; line-height: 1; white-space: nowrap; cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); text-transform: uppercase; letter-spacing: 1.5px; flex-shrink: 0;
         }
         .btn-recipe:hover {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent);
-            border-color: var(--accent);
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.25);
-            transform: translateY(-2px);
+            background: rgba(34, 197, 94, 0.1); color: var(--accent); border-color: var(--accent); box-shadow: 0 0 25px rgba(34, 197, 94, 0.25); transform: translateY(-2px);
         }
 
         .terminal-container {
-            background: rgba(0, 0, 0, 0.8);
-            border: 1px solid rgba(34, 197, 94, 0.4);
-            border-radius: 8px;
-            padding: 0.8rem 1rem;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-family: var(--font-mono);
-            box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.1);
-            position: relative;
+            background: rgba(0, 0, 0, 0.8); border: 1px solid rgba(34, 197, 94, 0.4); border-radius: 8px; padding: 0.8rem 1rem; display: flex; align-items: center; gap: 10px; font-family: var(--font-mono); box-shadow: inset 0 0 10px rgba(34, 197, 94, 0.1); position: relative;
         }
         
         .history-btn {
-            background: transparent;
-            color: var(--text-dim);
-            border: none;
-            cursor: pointer;
-            font-size: 1rem;
-            display: flex;
-            align-items: center;
-            transition: color 0.2s ease;
+            background: transparent; color: var(--text-dim); border: none; cursor: pointer; font-size: 1rem; display: flex; align-items: center; transition: color 0.2s ease;
         }
         .history-btn:hover { color: var(--accent); }
 
         .history-dropdown {
-            position: absolute;
-            bottom: 100%;
-            left: 0;
-            width: 100%;
-            background: rgba(17, 17, 17, 0.95);
-            border: 1px solid rgba(34, 197, 94, 0.3);
-            border-bottom: none;
-            border-radius: 8px 8px 0 0;
-            display: none;
-            flex-direction: column;
-            z-index: 50;
-            backdrop-filter: blur(10px);
-            overflow: hidden;
+            position: absolute; bottom: 100%; left: 0; width: 100%; background: rgba(17, 17, 17, 0.95); border: 1px solid rgba(34, 197, 94, 0.3); border-bottom: none; border-radius: 8px 8px 0 0; display: none; flex-direction: column; z-index: 50; backdrop-filter: blur(10px); overflow: hidden;
         }
         .history-item {
-            padding: 10px 15px;
-            font-size: 0.75rem;
-            color: var(--text-dim);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-            cursor: pointer;
-            transition: all 0.2s ease;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
+            padding: 10px 15px; font-size: 0.75rem; color: var(--text-dim); border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: all 0.2s ease; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
         }
-        .history-item:hover {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent);
-        }
+        .history-item:hover { background: rgba(34, 197, 94, 0.1); color: var(--accent); }
         .show-history { display: flex; }
-        .terminal-container.error {
-            border-color: #ef4444;
-            box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.1);
-        }
+        .terminal-container.error { border-color: #ef4444; box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.1); }
         .prompt { color: var(--accent); font-weight: bold; }
         .terminal-container.error .prompt { color: #ef4444; }
-        #query-terminal {
-            background: transparent;
-            border: none;
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            font-size: 0.9rem;
-            width: 100%;
-            outline: none;
-        }
+        #query-terminal { background: transparent; border: none; color: var(--text-main); font-family: var(--font-mono); font-size: 0.9rem; width: 100%; outline: none; }
         .run-btn {
-            background: var(--accent);
-            color: #000;
-            border: none;
-            padding: 6px 15px;
-            border-radius: 6px;
-            font-family: var(--font-mono);
-            font-size: 0.75rem;
-            font-weight: 700;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            animation: neon-glow 2.5s infinite ease-in-out;
+            background: var(--accent); color: #000; border: none; padding: 6px 15px; border-radius: 6px; font-family: var(--font-mono); font-size: 0.75rem; font-weight: 700; cursor: pointer; transition: all 0.3s ease; animation: neon-glow 2.5s infinite ease-in-out;
         }
-        .run-btn:hover {
-            background: var(--accent-hover);
-            box-shadow: 0 0 25px rgba(34, 197, 94, 0.7);
-            transform: scale(1.05);
-        }
+        .run-btn:hover { background: var(--accent-hover); box-shadow: 0 0 25px rgba(34, 197, 94, 0.7); transform: scale(1.05); }
 
         /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 6px;
-            height: 6px;
-        }
-        ::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-        ::-webkit-scrollbar-thumb {
-            background: rgba(34, 197, 94, 0.2);
-            border-radius: 10px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: var(--accent);
-        }
-        * {
-            scrollbar-width: thin;
-            scrollbar-color: rgba(34, 197, 94, 0.2) rgba(0, 0, 0, 0.2);
-        }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: rgba(0, 0, 0, 0.2); }
+        ::-webkit-scrollbar-thumb { background: rgba(34, 197, 94, 0.2); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--accent); }
+        * { scrollbar-width: thin; scrollbar-color: rgba(34, 197, 94, 0.2) rgba(0, 0, 0, 0.2); }
 
         /* World-Class Mobile HUD */
         @media (max-width: 1024px) {
-            .global-header {
-                position: relative; 
-                padding: 1.5rem;
-                background: rgba(0,0,0,0.9);
-            }
-            .tactical-badges {
-                display: none; 
-            }
+            .global-header { position: relative; padding: 1.5rem; background: rgba(0,0,0,0.9); }
+            .tactical-badges { display: none; }
             .odin-brand { font-size: 4.5rem; } 
-            .odin-desc { 
-                border-left: 1px solid rgba(255, 255, 255, 0.2);
-                border-right: none;
-                padding-left: 1rem;
-                padding-right: 0;
-                font-size: 0.8rem; 
-                white-space: normal;
-                max-width: 280px; 
-            }
-            .container {
-                flex-direction: column;
-                height: auto;
-                padding-top: 0; 
-            }
-            .panel {
-                width: 100% !important;
-                height: auto;
-                min-height: 350px;
-                border-right: none;
-                padding: 1rem;
-            }
-            .panel-left {
-                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            }
-            .preview-box {
-                height: 300px;
-                flex-grow: 0;
-            }
-            .panel-right {
-                margin-top: 1rem;
-            }
-            .punchy-portal {
-                bottom: 1rem;
-                right: 1rem;
-            }
-            .punchy-portal:hover {
-                width: 44px; 
-            }
+            .odin-desc { border-left: 1px solid rgba(255, 255, 255, 0.2); border-right: none; padding-left: 1rem; padding-right: 0; font-size: 0.8rem; white-space: normal; max-width: 280px; }
+            .container { flex-direction: column; height: auto; padding-top: 0; }
+            .panel { width: 100% !important; height: auto; min-height: 350px; border-right: none; padding: 1rem; }
+            .panel-left { border-bottom: 1px solid rgba(255, 255, 255, 0.1); }
+            .preview-box { height: 300px; flex-grow: 0; }
+            .panel-right { margin-top: 1rem; }
+            .punchy-portal { bottom: 1rem; right: 1rem; }
+            .punchy-portal:hover { width: 44px; }
         }
-
     </style>
 </head>
 <body>
@@ -555,6 +415,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
             <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
         </div>
     </a>
 

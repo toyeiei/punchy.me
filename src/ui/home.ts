@@ -534,6 +534,14 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Tactical Data Command. Supreme edge-native analytics HUD.</div>
             </a>
+            <a href="/yaiba" class="feature-card">
+                <span class="feature-icon">✒️</span>
+                <div class="feature-title">
+                    YAIBA
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
+                <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
+            </a>
         </div>
     </section>
 

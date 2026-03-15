@@ -206,6 +206,42 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .copy-btn { background: rgba(255, 255, 255, 0.1); color: #ffffff; border: 1px solid #ffffff; padding: 0 20px; height: 36px; border-radius: 6px; cursor: pointer; font-family: var(--font-mono); font-size: 0.75rem; text-transform: uppercase; font-weight: 700; transition: all 0.2s; display: flex; align-items: center; justify-content: center; white-space: nowrap; }
         .copy-btn:hover { background: #ffffff; color: #000; box-shadow: 0 0 15px #ffffff; }
 
+        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
+        .punchy-portal {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem;
+            gap: 0;
+            overflow: hidden;
+            width: 44px;
+            height: 44px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .punchy-portal:hover {
+            width: 280px;
+            gap: 1rem;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+        .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
+        .punchy-portal:hover .portal-brand { opacity: 1; }
+        .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
+        .punchy-portal:hover .portal-tools { opacity: 1; }
+        .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
+        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
+
         @media (max-width: 768px) {
             .tactical-header { height: auto; padding: 1.2rem; flex-direction: column; gap: 1.2rem; align-items: flex-start; }
             .brand { font-size: 3rem; } /* 20% increase for mobile */
@@ -225,6 +261,18 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     <div id="cursor-glow" class="cursor-pulse"></div>
+
+    <a href="/" class="punchy-portal">
+        <div class="portal-trigger">⚡</div>
+        <div class="portal-brand">PUNCHY.ME</div>
+        <div class="portal-tools">
+            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
+            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
+            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
+            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
+        </div>
+    </a>
 
     <header class="tactical-header">
         <div class="brand-block">
@@ -417,8 +465,45 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         .footer { margin-top: 3rem; text-align: center; }
         .footer a { color: var(--text-dim); text-decoration: none; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; transition: color 0.2s; }
         .footer a:hover { color: var(--accent); }
+
+        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
+        .punchy-portal {
+            position: fixed;
+            bottom: 1.5rem;
+            right: 1.5rem;
+            display: flex;
+            flex-direction: row-reverse;
+            align-items: center;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 12px;
+            padding: 0.5rem;
+            gap: 0;
+            overflow: hidden;
+            width: 44px;
+            height: 44px;
+            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: 1000;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .punchy-portal:hover {
+            width: 280px;
+            gap: 1rem;
+            border-color: var(--accent);
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
+        }
+        .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
+        .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
+        .punchy-portal:hover .portal-brand { opacity: 1; }
+        .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
+        .punchy-portal:hover .portal-tools { opacity: 1; }
+        .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
+        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
+
         @media print {
-            .grid-bg, .footer, .secure-lock, .expiry-badge { display: none !important; }
+            .grid-bg, .footer, .secure-lock, .expiry-badge, .punchy-portal { display: none !important; }
             html, body { background: #fff !important; color: #000 !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; position: static !important; }
             .container { background: #fff !important; border: none !important; box-shadow: none !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; position: static !important; display: block !important; backdrop-filter: none !important; }
             #content { color: #000 !important; font-size: 12pt !important; overflow: visible !important; display: block !important; position: static !important; }
@@ -436,6 +521,17 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <a href="/" class="punchy-portal">
+        <div class="portal-trigger">⚡</div>
+        <div class="portal-brand">PUNCHY.ME</div>
+        <div class="portal-tools">
+            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
+            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
+            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
+            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
+            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
+        </div>
+    </a>
     <div class="container">
         <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
         <div class="header">

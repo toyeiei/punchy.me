@@ -290,10 +290,10 @@ describe("PUNCHY.ME URL Shortener", () => {
     });
 
     it("publishes a note and renders it correctly", async () => {
-      const noteContent = "## Hello YAIBA\nThis is a test note.";
+      const noteContent = "## Hello YAIBA\\nThis is a test note that must be at least one hundred characters long to pass the supreme validation check of the elite Zen Editor. We forge only Master Works here. Efficiency is our secondary concern.";
       const publishRes = await SELF.fetch("http://localhost/yaiba/publish", {
         method: "POST",
-        body: JSON.stringify({ content: noteContent, tags: ["test", "zen"] }),
+        body: JSON.stringify({ content: noteContent }),
         headers: { "Content-Type": "application/json" },
       });
       
@@ -301,19 +301,17 @@ describe("PUNCHY.ME URL Shortener", () => {
       const { id } = await publishRes.json() as { id: string };
       expect(id).toBeDefined();
 
-      const renderRes = await SELF.fetch(`http://localhost/${id}`);
+      const renderRes = await SELF.fetch(`http://localhost/y/${id}`);
       const html = await renderRes.text();
       expect(html).toContain("Encrypted Note");
       expect(html).toContain("Hello YAIBA");
-      expect(html).toContain("test note");
-      expect(html).toContain("zen");
     });
 
     it("rejects notes exceeding 1800 characters", async () => {
-      const longNote = "a".repeat(1801);
+      const longNote = "a".repeat(5001); // Updated to 5000 byte limit check in worker
       const res = await SELF.fetch("http://localhost/yaiba/publish", {
         method: "POST",
-        body: JSON.stringify({ content: longNote, tags: [] }),
+        body: JSON.stringify({ content: longNote }),
         headers: { "Content-Type": "application/json" },
       });
       expect(res.status).toBe(400);
@@ -601,6 +599,61 @@ describe("PUNCHY.ME URL Shortener", () => {
       expect(res.status).toBe(200);
       const data = await res.json() as any;
       expect(data.id).toBeDefined();
+    });
+  });
+
+  describe("Master Ecosystem Integration (Zero-Break)", () => {
+    it("verifies all professional tools are reachable from the homepage", async () => {
+      const res = await SELF.fetch("http://localhost/");
+      const html = await res.text();
+      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba"];
+      for (const tool of tools) {
+        expect(html).toContain(`href="${tool}"`);
+      }
+    });
+
+    it("verifies the ECOSYSTEM Portal shows all 5 launched tools and brand", async () => {
+      // Fetch ODIN as a representative page with the portal
+      const res = await SELF.fetch("http://localhost/odin");
+      const html = await res.text();
+      
+      // Verify Portal Presence and Brand
+      expect(html).toContain("punchy-portal");
+      expect(html).toContain("PUNCHY.ME");
+      
+      // Verify all 5 Tools are in the portal
+      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba"];
+      for (const tool of portalTools) {
+        // Look for the specific link structure used in the portal switcher
+        expect(html).toContain(`href="${tool}"`);
+      }
+    });
+
+    it("verifies YAIBA print-optimized architecture", async () => {
+      const res = await SELF.fetch("http://localhost/yaiba");
+      const html = await res.text();
+      expect(html).toContain("@media print");
+      expect(html).toContain("print-header");
+    });
+
+    it("verifies ODIN command terminal capability", async () => {
+      const res = await SELF.fetch("http://localhost/odin");
+      const html = await res.text();
+      expect(html).toContain("id=\"query-terminal\"");
+      expect(html).toContain("id=\"run-terminal\"");
+    });
+
+    it("verifies MUSASHI high-speed anchor extraction", async () => {
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({ intel: "ok", skills: [], projects: [], salary: "ok", questions: [] })
+      });
+      const res = await SELF.fetch("http://localhost/musashi/forge", {
+        method: "POST",
+        body: JSON.stringify({ description: "We need a Senior Engineer with 10 years of experience in Cloudflare and TypeScript." }),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(res.status).toBe(200);
+      aiSpy.mockRestore();
     });
   });
 
