@@ -8,25 +8,57 @@ To build a high-performance, visually striking, and reliable URL shortening serv
 - **MIYAMOTO MUSASHI Strategy**: One feature at a time. Total focus. We tackle one mission until it is perfected before moving to the next.
 - **Speed & Simplicity**: Speed is our priority, simplicity is in our blood. Elegant solutions are stronger than complex ones.
 - **Reliability & Strength**: We forge things that are strong and consistent. We build systems that aren't easily broken.
-- **TDD (Test-Driven Development)**: We build with confidence by writing tests before code.
+- **TDD (Test-Driven Development) First**: No code without a failing test case. We build with confidence by writing tests before code.
 - **Occam's Razor**: Simple is better than complex. We prioritize the simplest solution that reliably solves the problem.
 - **High Quality**: We never settle for "good enough." Every line of code must meet senior-level standards.
 - **Design Regression Integrity**: When forging new features, we perform rigorous regression tests. We ensure that not only is the logic functional, but the **UI Design and Brand Aesthetic** remain perfectly intact and unbroken across all tools.
 - **Continuous Validation**: We test, lint, and refactor relentlessly. Validation is the only path to finality.
 - **Surgical Precision**: We make targeted, clean updates to maintain system integrity and avoid technical debt.
+- **Mechanical Sympathy**: Design software that respects the physical and distributed constraints of the hardware (e.g., KV eventual consistency, mobile keyboards).
+- **Tool-First HUD**: Prioritize a clean, tactical interface that reduces cognitive load.
+
+## The PUNCHY.ME Edge Protocol (Zero Regression Workflow)
+To guarantee **Zero Regression Failure** while building high-velocity Edge applications, we adopt an elite, militaristic engineering workflow. Whenever we build a new feature (let's call it "Feature X"), we execute this exact sequence:
+
+1.  **Phase 1: The Blueprint (Strategic Alignment)**
+    *   State explicitly which files will be touched (e.g., `src/handlers/feature_x.ts`, `src/index.ts`).
+    *   Define the exact KV structure or AI prompt required.
+    *   Identify the potential impact on existing systems.
+    *   *We do not proceed until the blueprint is approved.*
+2.  **Phase 2: The Vanguard (Test-Driven Infrastructure)**
+    *   Write the complete test suite for Feature X in `src/index.test.ts` **first**.
+    *   Run the tests. The new tests *must fail*, but the **core tests MUST remain green**. This proves our baseline is untouched.
+3.  **Phase 3: The Isolated Forge (Implementation)**
+    *   Create `src/handlers/feature_x.ts` and build the core engine.
+    *   Build the UI in `src/ui/feature_x.ts` adhering strictly to our "Matte Black Baseline" and "SHINOBI GLASS" aesthetic.
+    *   Surgically wire the endpoint into the `src/index.ts` router.
+4.  **Phase 4: The Crucible (Exhaustive Validation)**
+    *   Execute the full test suite (`npm test`). We do not proceed unless it hits 100%.
+    *   Execute strict Type-Checking (`npx tsc --noEmit`) and Linting (`npm run lint`).
+    *   Execute `wrangler deploy --dry-run` to ensure the Edge bundle compiles perfectly.
+    *   Boot the local server (`npm run dev`) for manual UI verification.
+5.  **Phase 5: The Seal (Atomic Commits)**
+    *   Once validation is 100% clean, bundle the feature into a single, highly descriptive atomic commit.
 
 ## Core Principles
 
-### 1. TDD (Test-Driven Development)
-We strictly adhere to the **Test-First principle**. No new feature or bug fix is implemented without first writing a failing test case that defines the expected behavior.
-- **Workflow:** Red (Write failing test) -> Green (Make it pass) -> Refactor (Optimize code).
-- **Validation:** Every change is validated through automated tests before deployment.
+### 1. Communication Framework (The OCC Method)
+To ensure surgical precision and avoid scope creep, all major directives should follow the **Objective + Context + Constraint** framework:
+*   **Objective**: What is the ultimate goal? (e.g., "Implement Custom Slugs")
+*   **Context**: Where does this apply? (e.g., "Only for BAZUKA card generation")
+*   **Constraint**: What are the boundaries? (e.g., "Slugs must be alphanumeric, min 4 chars, and not break existing redirection logic")
 
-### 2. Code Quality & Standards
-We maintain senior-level engineering standards regardless of project scale.
-- **ESLint:** Strict linting rules are enforced to ensure code consistency and prevent common errors.
-- **TypeScript:** Strong typing is used throughout the project to catch errors at compile time.
-- **Idiomatic Code:** We follow Cloudflare Workers best practices and modern CSS standards.
+### 2. The "Definition of Done" (DoD)
+A task is only considered complete when:
+1.  **Code Quality**: `npm run lint` and `npx tsc --noEmit` return zero errors.
+2.  **Verification**: All related tests in `npm test` pass with 100% reliability.
+3.  **Documentation**: `GEMINI.md` and `IMPLEMENTATION_LOG.md` are updated.
+4.  **Deployment**: Production state is synchronized and verified.
+
+### 3. Architectural Decision Records (ADR)
+Before implementing complex roadmap items (e.g., MUSASHI blades), demand **Technical Trade-offs**:
+- Ask for 3 implementation paths.
+- Evaluate the Pros/Cons of each (Speed vs. Complexity vs. Cost).
 
 ## Approach
 - **Research:** Map the codebase and validate assumptions through empirical data.
@@ -59,37 +91,66 @@ We maintain senior-level engineering standards regardless of project scale.
 - **Cyber-Tactical Aesthetic**: We prioritize dark, high-contrast themes (Matte Black + Neon Green) to maintain brand cohesion and reduce visual strain. Digital surfaces should feel like a 'Tactical HUD'.
 - **Seamless Transitions**: While the digital experience is dark and immersive, the printed output must always be high-contrast black-on-white for recruiter accessibility.
 - **Ecosystem Discovery (Command Center)**: We avoid traditional navigation menus. Instead, we use 'Tactical Feature Cards' positioned directly below the primary tool to encourage exploration while maintaining a 'tool-first' interface.
+- **Design Language System (SHINOBI GLASS)**: Standardized card/panel effect for the PUNCHY.ME ecosystem:
+    *   **Base**: Semi-transparent background (`rgba(255, 255, 255, 0.03)`).
+    *   **Blur**: `backdrop-filter: blur(10px)` for glassmorphism.
+    *   **Border**: 1px thin stealth border (`rgba(255, 255, 255, 0.08)`).
+    *   **Hover**: Interactive `var(--accent)` border-glow (no vertical lift).
+- **Design Revamp Prohibition (The Golden Rule)**: When executing 'test' or 'lint' directives, engineers MUST focus exclusively on behavioral verification and code quality (syntax, types). Revamping UI design, layout, or aesthetic optimizations during these phases is STRICTLY PROHIBITED to prevent regressions in UX performance and brand integrity. Validation cycles are for testing, not for unsolicited "cleanups" of design logic.
 
 ## Architectural Safeguards
 
-### 1. Strict Template Integrity
+### 1. Tool-Specific Safety Protocols (Anti-Bug Mandates)
+To maintain world-class speed, we must bypass recurring tool limitations:
+- **Nested Template Literal Bug**: `write_file` and `replace` erroneously escape backticks (e.g., \`;) in nested templates. **NEVER** use nested backticks. Use single quotes and string concatenation (`' + var + '`) for inner HTML generation. After every UI file write, surgically verify the final 5 lines of the file for escaped backslashes.
+- **Context-Locking for Replacements**: Fuzzy matching applies changes to the wrong location. Always provide **3-5 lines of context** in `old_string`. Avoid replacing single lines or generic tags.
+- **Immediate Validation**: Small syntax errors compound into large system failures. Run `npm run lint` and `npx tsc --noEmit` immediately after any modification to a `src/ui/` file.
+
+### 2. Strict Template Integrity
 We have identified a recurring high-impact bug: **Unterminated Template Literals** in UI files (e.g., `src/ui/anakin.ts`).
 - **Symptom:** `HTMLRewriter` returns an empty response (`''`), causing tests to fail with messages like `expected '' to contain 'Anakin Skywalker'`.
 - **Root Cause:** Malformed template exports or erroneous backslashes (e.g., \`;) at the end of template strings.
 - **Mandate:** After modifying any UI template in `src/ui/`, engineers **MUST** surgically verify the transition points between exported template constants. Use `read_file` or `grep` to confirm that all template literals are properly terminated with a simple backtick (`) and semicolon (;).
 - **Validation:** A task is not complete until `npm test` confirms that `HTMLRewriter` is successfully injecting content into the relevant template.
 
-### 2. Strategic Integrity Protocols (Zero-Regression)
+### 3. Strategic Integrity Protocols (Zero-Regression)
 To eliminate unpredictable behavior and secondary bugs, the following protocols are MANDATORY:
 - **Mandatory Pre-Validation Hook:** After ANY `write_file` or `replace` operation, immediately run a syntax check (`npx tsc --noEmit` or `npm run lint`). Errors MUST be resolved before proceeding.
 - **Double-Read Template Integrity:** When modifying UI files, explicitly read the lines *following* the change to verify that termination points and subsequent exports are intact.
 - **Full-Suite Regression Mandate:** Any change touching `src/ui/` or `src/index.ts` requires a full test suite execution (`npm test`). Isolated tests are insufficient for global UI integrity.
 - **Local Log First:** When the app breaks during local development, the terminal log from `localhost` (Wrangler/Miniflare) is the PRIMARY source of truth. Always check and analyze these logs before attempting a fix.
 
-### 3. Consistency Mitigation (KV Resilience)
+### 4. Consistency Mitigation (KV Resilience)
 Cloudflare KV is eventually consistent. To maintain an "Instant" feel without broken links, we employ a triple-tier strategy:
 - **Smart Wait (Frontend):** The result link is "locked" for 1.2s with a visual progress bar. This prevents users from clicking before the data has likely propagated.
 - **True Synchronization:** The frontend waits for final ID confirmation from the server and restarts the propagation timer if the ID changed, eliminating race conditions.
 - **Double-Lock (Backend):** If a lookup fails, the Worker pauses for 500ms and retries the KV fetch before returning a 404.
 - **Optimistic UI:** We generate the short ID client-side to show the result at 0ms, while the actual persistence happens asynchronously in the background.
 
-### 3. Smart Rate Limiting
+### 5. Smart Rate Limiting
 To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is strategically positioned:
 - **Free Re-Punches:** Deduplication checks happen *after* normalization but *before* the rate limit is incremented. Shortening the same URL multiple times is "free."
 - **Strict Normalization:** All URLs are normalized (trailing slashes removed) before deduplication to ensure consistency.
 - **IP-Based Tracking:** Requests are tracked via the lowercase `cf-connecting-ip` header for reliable edge identification.
 
+### 6. AI Engine Standards (ANAKIN)
+To ensure consistent and high-quality professional narratives, the ANAKIN engine MUST adhere to these standard parameters:
+- **Model:** `@cf/meta/llama-3-8b-instruct`
+- **Max Tokens:** 250 (Ensures sufficient length for summary and 3 bullets)
+- **Temperature:** 0.6 (Balances professional structure with narrative variety)
+- **Prompt Structure:** Always use the `[CONTEXT]`, `[DIRECTIVE]`, and `[OUTPUT FORMAT]` blocks for precision.
+- **Narrative Constraints:**
+    - **Professional Summary:** 20-28 words.
+    - **Experience Bullets:** 15-20 words per bullet (Total 3 bullets).
+    - **Tone:** Senior-level, action-oriented, and result-focused.
+
 ## Progress & Architectural Milestones
+
+### Version 4.6.1 - World-Class Modularization (2026-03-15)
+- **Architecture**: Extracted all tool logic from index.ts into isolated domain handlers (`src/handlers/`).
+- **Core**: Created `src/core/types.ts` and `src/core/utils.ts` for shared interfaces and pure functions.
+- **Services**: Abstracted security (rate-limiting, Turnstile) into `src/services/security.ts`.
+- **Router**: Slimmed index.ts into a pure, lightweight edge routing switchboard.
 
 ### Version 4.6.0 - YAIBA Zen Markdown Forge (2026-03-15)
 - **YAIBA Zen Editor**: Launched the elite Markdown editor (`/yaiba`) with client-side E2E encryption.
@@ -97,7 +158,7 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 - **Dynamic HUD Resizing**: Implemented a high-performance, frame-throttled split-pane resizer for synchronous writing and previewing.
 - **Ecosystem Integration**: Standardized the 'Fast-Switcher' Ecosystem Portal across all professional tools for rapid tactical movement.
 - **Global Design Regression**: Hardened all GET routes to prevent method-mismatch interceptions and ensured design symmetry project-wide.
-- **Verification**: All 47 tests passing with 100% feature and security coverage.
+- **Verification**: All 52 tests passing with 100% feature and security coverage.
 
 ### Version 4.5.0 - ODIN Tactical Data Analysis & Global HUD Mastery (2026-03-14)
 - **ODIN Tactical Hub**: Launched the "All-Father" data analysis platform (`/odin`) with a 15/85 split-pane HUD.
@@ -105,18 +166,16 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 - **AI Tactical Analyst**: Integrated Cloudflare Workers AI (`@cf/meta/llama-3-8b-instruct`) for automated strategic insights and anomaly detection.
 - **Tactical Upload & DEMO**: Implemented a 1000-record CSV limit and a 1-click mock data loader for presentations.
 - **World-Class Symmetry**: Codified Design Principle #11 in `DESIGN_GUIDELINE.md`, enforcing a 10vh tactical gutter and body-level padding for balanced content presentation.
-- **HUD Synchronization**: 
+- **HUD Synchronization**:
     - **Anakin**: Implemented symmetrical vertical scrolling and removed generation animations for a cleaner experience.
     - **Musashi**: Added the mini 'AI' badge to Job Intel for tactical clarity.
     - **Odin**: Removed the pulse grid background for maximum focus on data analysis.
-- **Verification**: Reached 45/45 tests with 100% coverage across core, strategic, and security layers.
 
 ### Version 4.3.0 - MUSASHI Strategic Forge & Safety Protocols (2026-03-13)
 - **Strategic AI Forge**: Launched the fully functional Cold Attack Engine with high-speed anchor extraction.
 - **Model Selection Protocol**: Codified the rule to **avoid AWQ models for JSON Mode** or complex reasoning; full-precision models are mandatory for structural integrity.
 - **Immersive HUD**: Integrated the Tactical Decoder animation for real-time strategic briefings.
 - **Safety Hardening**: Codified Section 7 in `WORK_DOCS.md` to prevent recurring tool bugs and increase velocity.
-- **Verification**: Reached 29/29 tests with 100% core and strategic coverage.
 
 ### Version 4.1.0 - Server-First Flow & HUD Mastery (2026-03-13)
 - **Server-First Punching**: Revolutionized link generation UX by waiting for server confirmation before displaying the link, ensuring 100% propagation reliability.
@@ -133,25 +192,7 @@ To prevent abuse while remaining user-friendly, the rate limiter (10 req/min) is
 - **Tactical UX**: Branded 404 "Re-Sync" page with pixel drift and auto-reload logic.
 - **Anakin Forge v2.0**: Refactored resume layout (Tactical Header + SVG Icons + Expertise Tags) optimized for 1-page PDF exports.
 - **Smart Rate Limiting**: Moved rate limiting after deduplication to allow unlimited "Free Re-Punches."
-- **Verification**: Expanded core suite to 16/16 tests with 100% environment isolation.
 
 ### Version 2.9.9 - Elite AI & SEO (2026-03-13)
 - Overhauled AI engine with role-aligned context blocks and strict token/temperature standards.
 - Integrated comprehensive SEO metadata and client-side hydrated JSON-LD schemas.
-
-### 4. Design Revamp Prohibition (The Golden Rule)
-When executing 'test' or 'lint' directives, engineers MUST focus exclusively on behavioral verification and code quality (syntax, types). Revamping UI design, layout, or aesthetic optimizations during these phases is STRICTLY PROHIBITED to prevent regressions in UX performance and brand integrity. Validation cycles are for testing, not for unsolicited "cleanups" of design logic.
-
-### 5. AI Engine Standards (ANAKIN)
-To ensure consistent and high-quality professional narratives, the ANAKIN engine MUST adhere to these standard parameters:
-- **Model:** `@cf/meta/llama-3-8b-instruct`
-- **Max Tokens:** 250 (Ensures sufficient length for summary and 3 bullets)
-- **Temperature:** 0.6 (Balances professional structure with narrative variety)
-- **Prompt Structure:** Always use the `[CONTEXT]`, `[DIRECTIVE]`, and `[OUTPUT FORMAT]` blocks for precision.
-- **Narrative Constraints:** 
-    - **Professional Summary:** 20-28 words.
-    - **Experience Bullets:** 15-20 words per bullet (Total 3 bullets).
-    - **Tone:** Senior-level, action-oriented, and result-focused.
-
-### 5. Design Language System (Local Memory)
-- **SHINOBI GLASS**: Standardized card/panel effect consisting of `rgba(255, 255, 255, 0.03)` background, `backdrop-filter: blur(10px)`, `1px solid rgba(255, 255, 255, 0.08)` border, and a `translateY(-5px)` hover lift with `var(--accent)` border-glow. Apply this aesthetic to all new feature modules.
