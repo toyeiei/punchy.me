@@ -134,25 +134,6 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             96% { opacity: 0; transform: translate(0) translateZ(0); }
         }
 
-        .mvp-badge {
-            background: var(--accent);
-            color: #000;
-            font-size: 0.8rem;
-            font-weight: 900;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-family: var(--font-mono);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
-            letter-spacing: 1px;
-            animation: pulse 2s infinite alternate;
-            margin-top: 0.5rem;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.05); opacity: 1; }
-        }
-        
         .header-controls {
             display: flex;
             align-items: center;
@@ -178,26 +159,6 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             display: inline-block;
             box-shadow: 0 0 8px var(--accent);
         }
-
-        .tag-input-wrapper {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .tag-input {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: var(--text-main);
-            font-family: var(--font-mono);
-            padding: 6px 12px;
-            border-radius: 6px;
-            font-size: 0.8rem;
-            width: 200px;
-            outline: none;
-            transition: all 0.2s;
-        }
-        .tag-input:focus { border-color: var(--accent); }
 
         .publish-btn {
             background: var(--accent);
@@ -237,17 +198,62 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         /* PRINT OPTIMIZATION */
         @media print {
             .grid-bg, .tactical-header, .resizer, .editor-pane, .cursor-pulse, .char-counter, .punchy-portal { display: none !important; }
-            html, body { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; }
-            .workspace { margin: 0; height: auto !important; display: block !important; overflow: visible !important; }
-            .preview-pane { background: #fff !important; padding: 0; width: 100% !important; display: block !important; position: static !important; overflow: visible !important; }
-            #preview-content { max-width: 100%; color: #000 !important; overflow: visible !important; }
-            #preview-content h1, #preview-content h2, #preview-content h3 { color: #000 !important; border-bottom: 2px solid #000; }
+            html, body { 
+                background: #fff !important; 
+                color: #000 !important; 
+                height: auto !important; 
+                min-height: auto !important;
+                overflow: visible !important; 
+                position: static !important;
+            }
+            .workspace { 
+                margin: 0 !important; 
+                padding: 0 !important; 
+                height: auto !important; 
+                display: block !important; 
+                overflow: visible !important;
+                position: static !important;
+            }
+            .pane {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+                position: static !important;
+                backdrop-filter: none !important;
+                will-change: auto !important;
+            }
+            .preview-pane { 
+                background: #fff !important; 
+                padding: 0 !important; 
+                width: 100% !important; 
+                display: block !important; 
+                position: static !important; 
+                overflow: visible !important; 
+                backdrop-filter: none !important;
+            }
+            #preview-content { 
+                max-width: 100%; 
+                color: #000 !important; 
+                overflow: visible !important; 
+                display: block !important;
+                position: static !important;
+            }
+            #preview-content h1:first-child, #preview-content p:first-child { margin-top: 0 !important; }
+            #preview-content h1, #preview-content h2, #preview-content h3 { color: #000 !important; border-bottom: 2px solid #000; margin-top: 1.5rem; page-break-after: avoid; }
+            #preview-content p, #preview-content pre { page-break-inside: avoid; }
+            
+            .print-only { display: block !important; font-family: var(--font-mono); text-transform: uppercase; }
+            .print-header { color: #999 !important; font-size: 8pt; margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+            .print-footer { color: #666 !important; font-size: 9pt; margin-top: 4rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-weight: 700; letter-spacing: 1px; }
+            
             #preview-content a { color: #000 !important; border-bottom: 1px solid #000; }
             #preview-content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #000 !important; white-space: pre-wrap !important; }
             #preview-content code { background: #eee !important; color: #000 !important; }
             #preview-content input[type="checkbox"] { border: 1px solid #000 !important; }
             #preview-content input[type="checkbox"]:checked { background: #000 !important; }
         }
+
+        .print-only { display: none; }
 
         /* Split Pane Layout */
         .workspace {
@@ -264,7 +270,12 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             flex-direction: column;
             overflow: hidden;
             position: relative;
+            will-change: flex; /* GPU Optimization */
         }
+
+        /* POINTER ISOLATION: Zero-lag resizing */
+        body.resizing .preview-pane { pointer-events: none; }
+        body.resizing * { cursor: col-resize !important; }
 
         .editor-pane {
             flex: 1 1 50%;
@@ -339,7 +350,10 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             border-radius: 4px;
             border: 1px solid rgba(255,255,255,0.1);
             pointer-events: none;
+            transition: all 0.2s ease;
         }
+        .char-counter.invalid { color: #f59e0b; border-color: #f59e0b; opacity: 0.8; }
+        .char-counter.valid { color: var(--accent); border-color: var(--accent); }
         .char-counter.limit { color: #ef4444; border-color: #ef4444; }
 
         /* Markdown Preview Styling */
@@ -349,7 +363,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         }
         #preview-content h1, #preview-content h2, #preview-content h3 {
             font-family: var(--font-brand);
-            color: var(--text-main); /* Changed to white */
+            color: var(--text-main); /* White Headings */
             text-transform: uppercase;
             margin-top: 1.5em;
             margin-bottom: 0.5em;
@@ -362,7 +376,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             background: rgba(255,255,255,0.1);
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 1rem; /* Increased font size */
+            font-size: 1rem;
         }
         #preview-content pre {
             background: rgba(0,0,0,0.8);
@@ -372,9 +386,8 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             overflow-x: auto;
             margin-bottom: 1em;
         }
-        #preview-content pre code { background: transparent; padding: 0; font-size: 1rem; } /* Increased font size */
+        #preview-content pre code { background: transparent; padding: 0; font-size: 1rem; }
         
-        /* Tactical Fluid Images */
         #preview-content img {
             max-width: 100%;
             height: auto;
@@ -392,7 +405,6 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         }
         #preview-content ul, #preview-content ol { margin-bottom: 1em; padding-left: 2rem; }
         
-        /* Tactical Checkboxes */
         #preview-content input[type="checkbox"] {
             -webkit-appearance: none;
             appearance: none;
@@ -426,85 +438,105 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .modal-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.9);
-            backdrop-filter: blur(10px);
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(15px);
             display: none;
             justify-content: center;
             align-items: center;
             z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s ease;
+            transition: opacity 0.4s ease;
         }
         .modal-overlay.show { display: flex; opacity: 1; }
         
         .modal-content {
             background: rgba(255, 255, 255, 0.03);
             border: 1px solid rgba(34, 197, 94, 0.3);
-            padding: 3rem;
-            border-radius: 16px;
+            padding: 4rem 3rem;
+            border-radius: 24px;
             text-align: center;
-            max-width: 500px;
+            max-width: 550px;
             width: 90%;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            transform: translateY(20px);
-            transition: transform 0.3s ease;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            transform: scale(0.9) translateY(30px);
+            transition: all 0.5s cubic-bezier(0.34, 1.56, 0.64, 1);
+            position: relative;
+            z-index: 1001;
         }
-        .modal-overlay.show .modal-content { transform: translateY(0); }
+        .modal-overlay.show .modal-content { transform: scale(1) translateY(0); box-shadow: 0 0 50px rgba(34, 197, 94, 0.1); }
 
-        .modal-title { color: var(--accent); font-family: var(--font-brand); font-size: 2rem; margin-bottom: 1rem; text-transform: uppercase; }
-        .modal-desc { color: var(--text-dim); margin-bottom: 2rem; font-size: 0.9rem; }
+        .modal-title { 
+            color: var(--text-main); 
+            font-family: var(--font-brand); 
+            font-size: 2.5rem; 
+            margin-bottom: 1rem; 
+            text-transform: uppercase; 
+            font-weight: 400;
+            letter-spacing: 2px;
+        }
+        .modal-desc { color: var(--text-dim); margin-bottom: 2.5rem; font-size: 0.95rem; line-height: 1.6; }
         
         .link-box {
             background: rgba(0,0,0,0.5);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 1rem;
-            border-radius: 8px;
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            padding: 1.2rem;
+            border-radius: 12px;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1.5rem;
+            margin-bottom: 2rem;
+            gap: 1rem;
         }
-        .link-text { color: var(--text-main); font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .copy-btn {
-            background: rgba(34,197,94,0.1);
-            color: var(--accent);
-            border: 1px solid var(--accent);
-            padding: 4px 10px;
-            border-radius: 4px;
-            cursor: pointer;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            text-transform: uppercase;
+        .link-text { 
+            color: var(--accent); 
+            font-size: 0.9rem; 
+            white-space: nowrap; 
+            overflow: hidden; 
+            text-overflow: ellipsis; 
+            text-decoration: none;
+            border-bottom: 1px solid transparent;
+            transition: border-color 0.2s;
         }
-        .copy-btn:hover { background: var(--accent); color: #000; }
+        .link-text:hover { border-bottom-color: var(--accent); }
 
         @media (max-width: 768px) {
-            .workspace { flex-direction: column; height: auto; overflow: auto; }
-            .pane { flex: none; height: 50vh; }
+            .tactical-header { height: auto; padding: 1rem; flex-direction: column; gap: 1rem; align-items: flex-start; }
+            .brand { font-size: 2.5rem; }
+            .tagline { font-size: 0.55rem; letter-spacing: 1px; }
+            
+            .workspace { 
+                flex-direction: column; 
+                height: calc(100vh - 120px); /* Adjusted for stacked header */
+                margin-top: 120px; 
+            }
+            .pane { flex: 1 1 50% !important; height: 50% !important; }
             .editor-pane { border-right: none; border-bottom: 1px solid rgba(34, 197, 94, 0.2); }
-            .header-controls { flex-wrap: wrap; justify-content: flex-end; }
-            .tag-input { width: 120px; }
-            html, body { overflow: auto; }
+            .header-controls { width: 100%; justify-content: space-between; gap: 0.5rem; }
+            .tag-input { width: 100px; }
+            .publish-btn, .print-btn { padding: 6px 12px; font-size: 0.7rem; }
+            .encryption-status { font-size: 0.55rem; }
+            
+            textarea#editor { padding: 1.5rem; font-size: 1rem; }
+            .preview-pane { padding: 1.5rem; }
+            .resizer { display: none; } /* Hide resizer on mobile */
         }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div id="cursor-glow" class="cursor-pulse"></div>
-<header class="tactical-header">
-    <div class="brand-block">
-        <div class="brand-text-wrapper">
-            <div class="title-row">
-                <a href="/" class="brand" data-text="YAIBA">YAIBA</a>
+
+    <header class="tactical-header">
+        <div class="brand-block">
+            <div class="brand-text-wrapper">
+                <div class="title-row">
+                    <a href="/" class="brand" data-text="YAIBA">YAIBA</a>
+                </div>
+                <div class="tagline">THE LIGHTWEIGHT ZEN EDITOR FOR MODERN WRITERS</div>
             </div>
-            <div class="tagline">THE LIGHTWEIGHT ZEN EDITOR FOR MODERN WRITERS</div>
         </div>
-    </div>
         <div class="header-controls">
             <div class="encryption-status"><span></span> E2E ENCRYPTED</div>
-            <div class="tag-input-wrapper">
-                <input type="text" id="tags" class="tag-input" placeholder="Tags (comma separated)">
-            </div>
             <button id="print-btn" class="print-btn">PRINT</button>
             <button id="publish-btn" class="publish-btn">PUBLISH</button>
         </div>
@@ -517,20 +549,22 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         </div>
         <div class="resizer" id="resizer"></div>
         <div class="pane preview-pane" id="preview-pane">
+            <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
             <div id="preview-content"></div>
+            <div class="print-only print-footer">YAIBA: FORGING FOCUS. SIMPLE. SECURE. SUPREME. [ PUNCHY.ME ]</div>
         </div>
     </div>
 
     <!-- Success Modal -->
     <div id="success-modal" class="modal-overlay">
         <div class="modal-content">
-            <h2 class="modal-title">Shadow Node Forged</h2>
-            <p class="modal-desc">Note encrypted client-side. The link below contains the fragment key. We do not store this key on our servers.</p>
+            <h2 class="modal-title">A MASTER WORK</h2>
+            <p class="modal-desc">Note encrypted client-side and deployed to the edge. The link below contains the fragment key. We do not store this key.</p>
             <div class="link-box">
-                <span id="final-link" class="link-text">https://punchy.me/...</span>
+                <a id="final-link" class="link-text" href="#" target="_blank">https://punchy.me/...</a>
                 <button id="modal-copy-btn" class="copy-btn">Copy</button>
             </div>
-            <button onclick="window.location.href='/yaiba'" class="publish-btn" style="width: 100%;">New Session</button>
+            <button onclick="window.location.href='/yaiba'" class="publish-btn" style="width: 100%;">NEW YAIBA NOTE</button>
         </div>
     </div>
 
@@ -540,7 +574,6 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         const charCounter = document.getElementById('char-counter');
         const publishBtn = document.getElementById('publish-btn');
         const printBtn = document.getElementById('print-btn');
-        const tagsInput = document.getElementById('tags');
         const cursorGlow = document.getElementById('cursor-glow');
         const resizer = document.getElementById('resizer');
         const editorPane = document.getElementById('editor-pane');
@@ -550,150 +583,110 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
 
         /* RESIZE LOGIC: Tactical Split */
         let isResizing = false;
+        let animationFrameId = null;
 
         resizer.addEventListener('mousedown', (e) => {
             isResizing = true;
             resizer.classList.add('dragging');
-            document.body.style.cursor = 'col-resize';
+            document.body.classList.add('resizing');
             document.body.style.userSelect = 'none';
         });
 
         document.addEventListener('mousemove', (e) => {
             if (!isResizing) return;
-
-            const workspaceRect = resizer.parentElement.getBoundingClientRect();
-            const mouseX = e.clientX - workspaceRect.left;
-            
-            // Calculate percentages
-            let leftWidthPercent = (mouseX / workspaceRect.width) * 100;
-            
-            // Constraints: Min 35% each side
-            if (leftWidthPercent < 35) leftWidthPercent = 35;
-            if (leftWidthPercent > 65) leftWidthPercent = 65;
-
-            editorPane.style.flex = \`0 0 \${leftWidthPercent}%\`;
-            previewPane.style.flex = \`0 0 \${100 - leftWidthPercent}%\`;
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
+            animationFrameId = requestAnimationFrame(() => {
+                const workspaceRect = resizer.parentElement.getBoundingClientRect();
+                const mouseX = e.clientX - workspaceRect.left;
+                let leftWidthPercent = (mouseX / workspaceRect.width) * 100;
+                if (leftWidthPercent < 35) leftWidthPercent = 35;
+                if (leftWidthPercent > 65) leftWidthPercent = 65;
+                editorPane.style.flex = \`0 0 \${leftWidthPercent}%\`;
+                previewPane.style.flex = \`0 0 \${100 - leftWidthPercent}%\`;
+            });
         });
 
         document.addEventListener('mouseup', () => {
             if (!isResizing) return;
             isResizing = false;
             resizer.classList.remove('dragging');
-            document.body.style.cursor = '';
+            document.body.classList.remove('resizing');
             document.body.style.userSelect = '';
+            if (animationFrameId) cancelAnimationFrame(animationFrameId);
         });
 
         /* SHADOW PERSISTENCE: AES-GCM Encryption Core */
         async function encryptContent(text) {
-            const key = await window.crypto.subtle.generateKey(
-                { name: "AES-GCM", length: 256 },
-                true,
-                ["encrypt", "decrypt"]
-            );
+            const key = await window.crypto.subtle.generateKey({ name: "AES-GCM", length: 256 }, true, ["encrypt", "decrypt"]);
             const iv = window.crypto.getRandomValues(new Uint8Array(12));
             const encoded = new TextEncoder().encode(text);
-            const encrypted = await window.crypto.subtle.encrypt(
-                { name: "AES-GCM", iv: iv },
-                key,
-                encoded
-            );
-            
+            const encrypted = await window.crypto.subtle.encrypt({ name: "AES-GCM", iv: iv }, key, encoded);
             const exportedKey = await window.crypto.subtle.exportKey("raw", key);
             const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
             const ivBase64 = btoa(String.fromCharCode(...iv));
             const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
-            
-            return {
-                data: encryptedBase64 + "." + ivBase64,
-                key: keyBase64.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')
-            };
+            return { data: encryptedBase64 + "." + ivBase64, key: keyBase64.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '') };
         }
 
-        // Initial render
-        renderPreview();
-
-        editor.addEventListener('input', (e) => {
-            renderPreview();
-            updateCounter();
-            
-            // Ronin Pulse Effect
-            cursorGlow.style.opacity = '0.4';
-            setTimeout(() => cursorGlow.style.opacity = '0', 100);
-        });
-
-        // Mouse tracking for Ronin focus
-        editor.addEventListener('mousemove', (e) => {
-            const rect = editor.getBoundingClientRect();
-            editor.style.setProperty('--x', (e.clientX - rect.left) + 'px');
-            editor.style.setProperty('--y', (e.clientY - rect.top) + 'px');
-            
-            cursorGlow.style.left = e.clientX + 'px';
-            cursorGlow.style.top = e.clientY + 'px';
+        // Configure marked with highlight.js
+        marked.setOptions({
+            highlight: function(code, lang) {
+                const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+                return hljs.highlight(code, { language }).value;
+            },
+            langPrefix: 'hljs language-'
         });
 
         function renderPreview() {
             const rawMarkdown = editor.value;
-            const rawHtml = marked.parse(rawMarkdown || '_Start your Zen journey..._');
+            const rawHtml = marked.parse(rawMarkdown || '_Start your Zen journey... (Min 100 chars)_');
             const cleanHtml = DOMPurify.sanitize(rawHtml);
             preview.innerHTML = cleanHtml;
-            // High-fidelity syntax trigger
-            preview.querySelectorAll('pre code').forEach((el) => {
-                hljs.highlightElement(el);
-            });
+            preview.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
         }
 
         function updateCounter() {
             const len = editor.value.length;
             charCounter.innerText = \`\${len} / 1800\`;
-            charCounter.classList.toggle('limit', len >= 1750);
+            charCounter.classList.remove('invalid', 'valid', 'limit');
+            if (len > 0 && len < 100) {
+                charCounter.classList.add('invalid');
+            } else if (len >= 100 && len <= 1800) {
+                charCounter.classList.add('valid');
+            }
+            if (len >= 1750) charCounter.classList.add('limit');
         }
+
+        editor.addEventListener('input', () => { renderPreview(); updateCounter(); cursorGlow.style.opacity = '0.4'; setTimeout(() => cursorGlow.style.opacity = '0', 100); });
+        editor.addEventListener('mousemove', (e) => {
+            const rect = editor.getBoundingClientRect();
+            editor.style.setProperty('--x', (e.clientX - rect.left) + 'px');
+            editor.style.setProperty('--y', (e.clientY - rect.top) + 'px');
+            cursorGlow.style.left = e.clientX + 'px'; cursorGlow.style.top = e.clientY + 'px';
+        });
 
         publishBtn.addEventListener('click', async () => {
             const content = editor.value.trim();
-            if (!content) return;
-            
-            publishBtn.disabled = true;
-            publishBtn.innerText = 'ENCRYPTING...';
-
+            if (content.length < 100) return alert('YAIBA requires at least 100 characters to forge a Master Work.');
+            publishBtn.disabled = true; publishBtn.innerText = 'FORGING...';
             try {
-                // Client-side Encryption
                 const { data, key } = await encryptContent(content);
-                const tags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
-
-                const response = await fetch('/yaiba/publish', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content: data, tags })
-                });
-
-                if (response.ok) {
-                    const result = await response.json();
-                    showSuccessModal(result.id, key);
-                } else {
-                    const err = await response.json();
-                    alert(err.error || 'Publish failed');
-                    publishBtn.disabled = false;
-                    publishBtn.innerText = 'PUBLISH';
-                }
-            } catch (err) {
-                console.error(err);
-                publishBtn.disabled = false;
-                publishBtn.innerText = 'PUBLISH';
-            }
+                const response = await fetch('/yaiba/publish', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ content: data }) });
+                if (response.ok) { const result = await response.json(); showSuccessModal(result.id, key); }
+                else { publishBtn.disabled = false; publishBtn.innerText = 'PUBLISH'; }
+            } catch (err) { publishBtn.disabled = false; publishBtn.innerText = 'PUBLISH'; }
         });
 
         function showSuccessModal(id, key) {
             const url = window.location.origin + '/y/' + id + '#' + key;
-            document.getElementById('final-link').innerText = url;
+            const linkEl = document.getElementById('final-link');
+            linkEl.innerText = url; linkEl.href = url;
             document.getElementById('success-modal').classList.add('show');
-
             const copyBtn = document.getElementById('modal-copy-btn');
-            copyBtn.onclick = () => {
-                navigator.clipboard.writeText(url);
-                copyBtn.innerText = 'COPIED!';
-                setTimeout(() => copyBtn.innerText = 'COPY', 2000);
-            };
+            copyBtn.onclick = () => { navigator.clipboard.writeText(url); copyBtn.innerText = 'COPIED!'; setTimeout(() => copyBtn.innerText = 'COPY', 2000); };
         }
+
+        renderPreview();
     </script>
 </body>
 </html>`;
@@ -788,22 +781,6 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
         }
 
-        .tags {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 0.5rem;
-        }
-
-        .tag {
-            background: rgba(34, 197, 94, 0.1);
-            color: var(--accent);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            padding: 2px 8px;
-            border-radius: 4px;
-            font-size: 0.7rem;
-            text-transform: uppercase;
-        }
-
         .status-badge {
             display: flex;
             flex-direction: column;
@@ -838,7 +815,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         }
         #content h1, #content h2, #content h3 {
             font-family: var(--font-brand);
-            color: var(--text-main); /* Changed to white */
+            color: var(--text-main); /* White Headings */
             text-transform: uppercase;
             margin-top: 1.5em;
             margin-bottom: 0.5em;
@@ -851,7 +828,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             background: rgba(255,255,255,0.1);
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 1rem; /* Increased font size */
+            font-size: 1rem;
         }
         #content pre {
             background: rgba(0,0,0,0.8);
@@ -861,7 +838,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             overflow-x: auto;
             margin-bottom: 1em;
         }
-        #content pre code { background: transparent; padding: 0; font-size: 1rem; } /* Increased font size */
+        #content pre code { background: transparent; padding: 0; font-size: 1rem; }
 
         /* Tactical Fluid Images */
         #content img {
@@ -928,13 +905,46 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         /* PRINT OPTIMIZATION FOR VIEW PAGE */
         @media print {
             .grid-bg, .footer, .secure-lock, .expiry-badge { display: none !important; }
-            html, body { background: #fff !important; color: #000 !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
-            .container { background: #fff !important; border: none !important; box-shadow: none !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; position: static !important; }
-            #content { color: #000 !important; font-size: 12pt !important; overflow: visible !important; }
-            #content h1, #content h2, #content h3 { color: #000 !important; border-bottom: 2px solid #000; }
+            html, body { 
+                background: #fff !important; 
+                color: #000 !important; 
+                height: auto !important; 
+                min-height: auto !important;
+                overflow: visible !important; 
+                padding: 0 !important; 
+                position: static !important;
+            }
+            .container { 
+                background: #fff !important; 
+                border: none !important; 
+                box-shadow: none !important; 
+                max-width: 100% !important; 
+                padding: 0 !important; 
+                margin: 0 !important; 
+                position: static !important; 
+                display: block !important;
+                backdrop-filter: none !important;
+            }
+            #content { 
+                color: #000 !important; 
+                font-size: 12pt !important; 
+                overflow: visible !important; 
+                display: block !important;
+                position: static !important;
+            }
+            #content h1:first-child, #content p:first-child { margin-top: 0 !important; }
+            #content h1, #content h2, #content h3 { color: #000 !important; border-bottom: 2px solid #000; margin-top: 1.5rem; page-break-after: avoid; }
+            #content p, #content pre { page-break-inside: avoid; }
+            
+            .print-only { display: block !important; font-family: var(--font-mono); text-transform: uppercase; }
+            .print-header { color: #999 !important; font-size: 8pt; margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
+            .print-footer { color: #666 !important; font-size: 9pt; margin-top: 4rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-weight: 700; letter-spacing: 1px; }
+            
             #content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #000 !important; white-space: pre-wrap !important; }
             #content input[type="checkbox"]:checked { background: #000 !important; }
         }
+
+        .print-only { display: none; }
 
         /* Hidden data store for hydration */
         #raw-data { display: none; }
@@ -944,10 +954,10 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
     <div class="grid-bg"></div>
 
     <div class="container">
+        <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
         <div class="header">
             <div class="meta-info">
                 <div class="timestamp" id="ts-display">Published: ...</div>
-                <div class="tags" id="tags-container"></div>
             </div>
             <div class="status-badge">
                 <div class="expiry-badge">Expires in 3 Days</div>
@@ -956,6 +966,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         </div>
 
         <div id="content">Decrypting Shadow Node...</div>
+        <div class="print-only print-footer">YAIBA: FORGING FOCUS. SIMPLE. SECURE. SUPREME. [ PUNCHY.ME ]</div>
 
         <div class="footer">
             <div style="margin-bottom: 1rem;">
@@ -979,69 +990,29 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
                 const normalizedKey = keyBase64.replace(/-/g, '+').replace(/_/g, '/');
                 const keyRaw = Uint8Array.from(atob(normalizedKey), c => c.charCodeAt(0));
                 
-                const key = await window.crypto.subtle.importKey(
-                    "raw",
-                    keyRaw,
-                    { name: "AES-GCM" },
-                    false,
-                    ["decrypt"]
-                );
-
-                const decrypted = await window.crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: iv },
-                    key,
-                    encrypted
-                );
-
+                const key = await window.crypto.subtle.importKey("raw", keyRaw, { name: "AES-GCM" }, false, ["decrypt"]);
+                const decrypted = await window.crypto.subtle.decrypt({ name: "AES-GCM", iv: iv }, key, encrypted);
                 return new TextDecoder().decode(decrypted);
-            } catch (e) {
-                console.error(e);
-                return null;
-            }
+            } catch (e) { console.error(e); return null; }
         }
 
         document.addEventListener('DOMContentLoaded', async () => {
             const rawDataEl = document.getElementById('raw-data');
             const hash = window.location.hash.substring(1);
-            
-            if (!hash) {
-                document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption key missing from URL. This note cannot be read without the fragment key.</div>';
-                return;
-            }
-
+            if (!hash) { document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption key missing from URL. This note cannot be read without the fragment key.</div>'; return; }
             if (rawDataEl && rawDataEl.textContent) {
                 try {
                     const data = JSON.parse(rawDataEl.textContent);
-                    
-                    // Render Date
-                    if (data.createdAt) {
-                        const date = new Date(data.createdAt);
-                        document.getElementById('ts-display').innerText = 'Published: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString();
-                    }
-
-                    // Render Tags
-                    if (data.tags && data.tags.length > 0) {
-                        const tagsHtml = data.tags.map(t => \`<span class="tag">\${t.replace(/</g, '&lt;')}</span>\`).join('');
-                        document.getElementById('tags-container').innerHTML = tagsHtml;
-                    }
-
-                    // Decrypt Content
+                    if (data.createdAt) { const date = new Date(data.createdAt); document.getElementById('ts-display').innerText = 'Published: ' + date.toLocaleDateString() + ' ' + date.toLocaleTimeString(); }
                     const decrypted = await decryptContent(data.content, hash);
                     if (decrypted) {
                         const rawHtml = marked.parse(decrypted);
                         const cleanHtml = DOMPurify.sanitize(rawHtml);
                         const contentEl = document.getElementById('content');
                         contentEl.innerHTML = cleanHtml;
-                        // High-fidelity syntax trigger
-                        contentEl.querySelectorAll('pre code').forEach((el) => {
-                            hljs.highlightElement(el);
-                        });
-                    } else {
-                        document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption failed. The key in your link may be incorrect or corrupted.</div>';
-                    }
-                } catch (e) {
-                    document.getElementById('content').innerText = 'Error loading note data.';
-                }
+                        contentEl.querySelectorAll('pre code').forEach((el) => hljs.highlightElement(el));
+                    } else { document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption failed. The key in your link may be incorrect or corrupted.</div>'; }
+                } catch (e) { document.getElementById('content').innerText = 'Error loading note data.'; }
             }
         });
     </script>
