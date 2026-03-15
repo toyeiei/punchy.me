@@ -150,6 +150,18 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             letter-spacing: 1px;
         }
 
+        .ai-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.6rem;
+            font-weight: 900;
+            padding: 2px 6px;
+            border-radius: 4px;
+            margin-left: 8px;
+            vertical-align: middle;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
         @keyframes pulse {
             0% { transform: scale(1); opacity: 0.8; }
             100% { transform: scale(1.05); opacity: 1; }
@@ -402,7 +414,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 
         <div class="musashi-grid">
             <div class="panel">
-                <label>Target Job Intel</label>
+                <label>Target Job Intel <span class="ai-badge">AI</span></label>
                 <div style="display: none;"><input type="text" id="hp_field" tabindex="-1" autocomplete="off"></div>
                 <textarea id="job-description" placeholder="Paste full job description here to extract tactical data..." maxlength="1000"></textarea>
                 <div style="display: flex; justify-content: space-between; font-size: 0.7rem; color: var(--text-dim); margin-bottom: 1.5rem;">

@@ -158,4 +158,15 @@ To identify features in development while maintaining an elite aesthetic, use th
 - **Tactical Feedback**: Loading states, success transitions, and validation signals must use the same timing (`0.2s` to `0.3s`) and neon-green accents project-wide.
 
 ---
+
+## 11. World-Class Symmetry (The Tactical Gutter)
+To ensure high-impact content feels like a centerpiece rather than a document, we enforce strict vertical symmetry.
+
+- **The Symmetrical Mandate**: Content-heavy pages (Anakin, etc.) must maintain a luxurious "gutter" of negative space at the top and bottom of the viewport.
+- **Implementation**:
+    - **Body Padding**: Set `padding: 10vh 0;` on the `body` to create a dynamic, responsive vertical buffer.
+    - **Natural Growth**: Remove `height: 100%;` from `html` and `body` to allow the content to expand and ensure the bottom gutter remains accessible via scroll.
+- **Visual Result**: The content appears perfectly balanced and centered ("Museum Gallery" effect) regardless of screen ratio (16:9, 16:10, etc.) or zoom levels.
+
+---
 *Protocol strictly enforced by Gemini CLI for all future PUNCHY.ME missions.*

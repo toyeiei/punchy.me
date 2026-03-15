@@ -635,7 +635,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html, body { height: 100%; background-color: var(--bg); }
+        html, body { background-color: var(--bg); }
 
         body {
             color: var(--text-main);
@@ -644,7 +644,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             flex-direction: column;
             align-items: center;
             min-height: 100vh;
-            padding: 0;
+            padding: 10vh 0; /* Enhanced world-class vertical symmetry */
             line-height: 1.6;
             overflow-x: hidden;
             overflow-y: auto;
@@ -721,7 +721,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             border-radius: 24px;
             max-width: 900px;
             width: 92%;
-            margin: 3rem auto;
+            margin: 0 auto; /* Vertical margin handled by body padding */
             padding: clamp(1.5rem, 5vw, 4rem);
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
