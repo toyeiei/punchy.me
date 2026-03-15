@@ -7,6 +7,9 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <!-- Marked.js for fast Markdown parsing -->
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Highlight.js for Syntax Highlighting -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
     <!-- DOMPurify to prevent XSS in preview -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
     <style>
@@ -28,6 +31,16 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             overflow: hidden;
         }
+
+        /* CUSTOM SCROLLBAR: Tactical Neon */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: rgba(0,0,0,0.2); }
+        ::-webkit-scrollbar-thumb { 
+            background: rgba(34, 197, 94, 0.2); 
+            border-radius: 4px; 
+            border: 1px solid rgba(34, 197, 94, 0.1);
+        }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(34, 197, 94, 0.4); }
 
         /* Pulse Grid Background */
         .grid-bg {
@@ -201,7 +214,6 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         }
 
         .pane {
-            flex: 1;
             height: 100%;
             display: flex;
             flex-direction: column;
@@ -210,16 +222,33 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         }
 
         .editor-pane {
-            border-right: 1px solid rgba(34, 197, 94, 0.2);
+            flex: 1 1 50%;
             background: rgba(0,0,0,0.6);
             backdrop-filter: blur(5px);
         }
 
         .preview-pane {
+            flex: 1 1 50%;
             background: rgba(255,255,255,0.02);
             backdrop-filter: blur(5px);
             padding: 2.5rem;
             overflow-y: auto;
+        }
+
+        .resizer {
+            width: 4px;
+            height: 100%;
+            background: rgba(34, 197, 94, 0.1);
+            cursor: col-resize;
+            transition: background 0.2s;
+            position: relative;
+            z-index: 20;
+        }
+        .resizer:hover, .resizer.dragging { background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+        .resizer::after {
+            content: '';
+            position: absolute;
+            top: 0; left: -10px; right: -10px; bottom: 0;
         }
 
         textarea#editor {
@@ -289,7 +318,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             background: rgba(255,255,255,0.1);
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-size: 1rem; /* Increased font size */
         }
         #preview-content pre {
             background: rgba(0,0,0,0.8);
@@ -299,7 +328,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             overflow-x: auto;
             margin-bottom: 1em;
         }
-        #preview-content pre code { background: transparent; padding: 0; }
+        #preview-content pre code { background: transparent; padding: 0; font-size: 1rem; } /* Increased font size */
         #preview-content blockquote {
             border-left: 4px solid var(--accent);
             padding-left: 1rem;
@@ -394,11 +423,12 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     </header>
 
     <div class="workspace">
-        <div class="pane editor-pane">
+        <div class="pane editor-pane" id="editor-pane">
             <textarea id="editor" placeholder="Start writing... (Markdown supported)" maxlength="1800"></textarea>
             <div id="char-counter" class="char-counter">0 / 1800</div>
         </div>
-        <div class="pane preview-pane">
+        <div class="resizer" id="resizer"></div>
+        <div class="pane preview-pane" id="preview-pane">
             <div id="preview-content"></div>
         </div>
     </div>
@@ -423,6 +453,44 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         const publishBtn = document.getElementById('publish-btn');
         const tagsInput = document.getElementById('tags');
         const cursorGlow = document.getElementById('cursor-glow');
+        const resizer = document.getElementById('resizer');
+        const editorPane = document.getElementById('editor-pane');
+        const previewPane = document.getElementById('preview-pane');
+
+        /* RESIZE LOGIC: Tactical Split */
+        let isResizing = false;
+
+        resizer.addEventListener('mousedown', (e) => {
+            isResizing = true;
+            resizer.classList.add('dragging');
+            document.body.style.cursor = 'col-resize';
+            document.body.style.userSelect = 'none';
+        });
+
+        document.addEventListener('mousemove', (e) => {
+            if (!isResizing) return;
+
+            const workspaceRect = resizer.parentElement.getBoundingClientRect();
+            const mouseX = e.clientX - workspaceRect.left;
+            
+            // Calculate percentages
+            let leftWidthPercent = (mouseX / workspaceRect.width) * 100;
+            
+            // Constraints: Min 35% each side
+            if (leftWidthPercent < 35) leftWidthPercent = 35;
+            if (leftWidthPercent > 65) leftWidthPercent = 65;
+
+            editorPane.style.flex = \`0 0 \${leftWidthPercent}%\`;
+            previewPane.style.flex = \`0 0 \${100 - leftWidthPercent}%\`;
+        });
+
+        document.addEventListener('mouseup', () => {
+            if (!isResizing) return;
+            isResizing = false;
+            resizer.classList.remove('dragging');
+            document.body.style.cursor = '';
+            document.body.style.userSelect = '';
+        });
 
         /* SHADOW PERSISTENCE: AES-GCM Encryption Core */
         async function encryptContent(text) {
@@ -477,6 +545,10 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             const rawHtml = marked.parse(rawMarkdown || '_Start your Zen journey..._');
             const cleanHtml = DOMPurify.sanitize(rawHtml);
             preview.innerHTML = cleanHtml;
+            // High-fidelity syntax trigger
+            preview.querySelectorAll('pre code').forEach((el) => {
+                hljs.highlightElement(el);
+            });
         }
 
         function updateCounter() {
@@ -676,7 +748,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             background: rgba(255,255,255,0.1);
             padding: 2px 6px;
             border-radius: 4px;
-            font-size: 0.9em;
+            font-size: 1rem; /* Increased font size */
         }
         #content pre {
             background: rgba(0,0,0,0.8);
@@ -686,7 +758,7 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             overflow-x: auto;
             margin-bottom: 1em;
         }
-        #content pre code { background: transparent; padding: 0; }
+        #content pre code { background: transparent; padding: 0; font-size: 1rem; } /* Increased font size */
         #content blockquote {
             border-left: 4px solid var(--accent);
             padding-left: 1rem;
@@ -801,7 +873,12 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
                     if (decrypted) {
                         const rawHtml = marked.parse(decrypted);
                         const cleanHtml = DOMPurify.sanitize(rawHtml);
-                        document.getElementById('content').innerHTML = cleanHtml;
+                        const contentEl = document.getElementById('content');
+                        contentEl.innerHTML = cleanHtml;
+                        // High-fidelity syntax trigger
+                        contentEl.querySelectorAll('pre code').forEach((el) => {
+                            hljs.highlightElement(el);
+                        });
                     } else {
                         document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption failed. The key in your link may be incorrect or corrupted.</div>';
                     }
