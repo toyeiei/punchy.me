@@ -8,7 +8,7 @@ export async function handlePicassoGet(): Promise<Response> {
 
 export async function handlePicassoSearch(request: Request, env: Env): Promise<Response> {
 	try {
-		const { query } = await request.json() as { query: string };
+		const { query, page = 1 } = await request.json() as { query: string, page?: number };
 		if (!query || typeof query !== 'string' || query.trim() === '') {
 			return new Response(JSON.stringify({ error: 'Invalid search query.' }), { status: 400 });
 		}
@@ -18,7 +18,7 @@ export async function handlePicassoSearch(request: Request, env: Env): Promise<R
 			return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 10 searches per minute.' }), { status: 429 });
 		}
 
-		const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=12`;
+		const unsplashUrl = `https://api.unsplash.com/search/photos?query=${encodeURIComponent(query)}&per_page=10&page=${page}`;
 		
 		const res = await fetch(unsplashUrl, {
 			headers: {
@@ -31,16 +31,23 @@ export async function handlePicassoSearch(request: Request, env: Env): Promise<R
 			return new Response(JSON.stringify({ error: 'Failed to fetch from Unsplash.' }), { status: 500 });
 		}
 
-		const data = await res.json() as { results?: Array<{ id: string, urls: { regular: string, small: string }, alt_description: string, user?: { name: string } }> };
+		const data = await res.json() as { results?: Array<{ id: string, urls: { raw: string, regular: string, small: string }, alt_description: string, user?: { name: string } }> };
 		
 		// Sanitize response to only return what frontend needs (URL, ID, alt description, etc)
-		const sanitizedImages = (data.results || []).map((img) => ({
-			id: img.id,
-			url: img.urls.regular,
-			thumb: img.urls.small,
-			alt: img.alt_description,
-			author: img.user?.name || 'Unknown'
-		}));
+		// Optimize payload by directly requesting WEBP formats via Imgix parameters on the raw URL
+		// w=1400 is optimized for rapid edge-delivery while maintaining crisp text overlays
+		const sanitizedImages = (data.results || []).map((img) => {
+			const baseUrl = img.urls.raw || img.urls.regular;
+			const joiner = baseUrl.includes('?') ? '&' : '?';
+			
+			return {
+				id: img.id,
+				url: `${baseUrl}${joiner}w=1400&fit=max&fm=webp&q=70`,
+				thumb: `${baseUrl}${joiner}w=400&fit=crop&fm=webp&q=60`,
+				alt: img.alt_description,
+				author: img.user?.name || 'Unknown'
+			};
+		});
 
 		return new Response(JSON.stringify({ images: sanitizedImages }), { headers: { 'Content-Type': 'application/json' } });
 	} catch (e) {

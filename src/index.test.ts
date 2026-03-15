@@ -689,8 +689,8 @@ Hope this helps!`
       expect(Array.isArray(data.images)).toBe(true);
       const images = data.images as Record<string, unknown>[];
       expect(images.length).toBe(2);
-      expect(images[0].url).toBe("https://example.com/1.jpg");
-      expect(images[0].thumb).toBe("https://example.com/1-s.jpg");
+      expect(images[0].url).toBe("https://example.com/1.jpg?w=1920&fit=max&fm=webp&q=85");
+      expect(images[0].thumb).toBe("https://example.com/1.jpg?w=400&fit=crop&fm=webp&q=60");
       
       const fetchCall = fetchSpy.mock.calls[0];
       expect(fetchCall[0]).toContain("query=office");
