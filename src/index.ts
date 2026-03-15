@@ -34,6 +34,9 @@ export default {
 	<url><loc>https://punchy.me/</loc><changefreq>weekly</changefreq><priority>1.0</priority></url>
 	<url><loc>https://punchy.me/bazuka</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 	<url><loc>https://punchy.me/anakin</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+	<url><loc>https://punchy.me/musashi</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+	<url><loc>https://punchy.me/odin</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+	<url><loc>https://punchy.me/yaiba</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>`.trim();
 			return new Response(sitemap, { headers: { 'Content-Type': 'application/xml' } });
 		}
