@@ -45,33 +45,109 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .tactical-header {
             position: fixed;
             top: 0; left: 0; width: 100%;
-            height: 60px;
+            padding: 1.5rem 2rem;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 1.5rem;
             background: rgba(0,0,0,0.8);
             backdrop-filter: blur(10px);
             border-bottom: 1px solid rgba(34, 197, 94, 0.2);
             z-index: 100;
         }
 
-        .brand {
-            font-family: var(--font-brand);
-            font-size: 1.5rem;
-            color: var(--accent);
-            text-transform: uppercase;
-            text-decoration: none;
-            letter-spacing: -1px;
+        .brand-block {
             display: flex;
             align-items: center;
-            gap: 10px;
+            gap: 1.5rem;
+        }
+
+        .brand {
+            font-family: var(--font-brand);
+            font-size: 4.5rem;
+            color: var(--text-main);
+            text-transform: uppercase;
+            text-decoration: none;
+            letter-spacing: -3px;
+            line-height: 0.8;
+            position: relative;
+            animation: yaiba-glitch 5s infinite;
+        }
+
+        .brand::before, .brand::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: #000;
+            opacity: 0;
+            will-change: transform, opacity;
+            transform: translateZ(0);
+        }
+
+        .brand::before { left: 1px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
+        .brand::after { left: -1px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
+
+        @keyframes yaiba-glitch {
+            0%, 80%, 100% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+            81% { transform: skew(2deg) translateZ(0); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg) translateZ(0); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg) translateZ(0); text-shadow: none; }
+        }
+
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px) translateZ(0); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
+        @keyframes glitch-anim-2 {
+            0%, 94%, 100% { opacity: 0; transform: translate(0) translateZ(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px) translateZ(0); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0) translateZ(0); }
+        }
+
+        .mvp-badge {
+            background: var(--accent);
+            color: #000;
+            font-size: 0.8rem;
+            font-weight: 900;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-family: var(--font-mono);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            letter-spacing: 1px;
+            animation: pulse 2s infinite alternate;
+            margin-top: 0.5rem;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
         }
         
         .header-controls {
             display: flex;
             align-items: center;
             gap: 1rem;
+        }
+
+        .encryption-status {
+            font-size: 0.65rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-right: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            opacity: 0.8;
+        }
+        .encryption-status span {
+            width: 6px;
+            height: 6px;
+            background: var(--accent);
+            border-radius: 50%;
+            display: inline-block;
+            box-shadow: 0 0 8px var(--accent);
         }
 
         .tag-input-wrapper {
@@ -98,22 +174,28 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             background: var(--accent);
             color: #000;
             border: none;
-            padding: 6px 16px;
+            padding: 10px 24px;
             border-radius: 6px;
             font-weight: 700;
             cursor: pointer;
             font-family: var(--font-mono);
             text-transform: uppercase;
-            transition: all 0.2s;
+            transition: all 0.3s ease;
+            animation: slow-glow 3s infinite ease-in-out;
         }
-        .publish-btn:hover { background: #4ade80; transform: translateY(-1px); box-shadow: 0 4px 12px rgba(34, 197, 94, 0.3); }
-        .publish-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+        .publish-btn:hover { background: #4ade80; transform: translateY(-1px); box-shadow: 0 0 20px rgba(34, 197, 94, 0.6); }
+        .publish-btn:disabled { opacity: 0.5; cursor: not-allowed; transform: none; animation: none; }
+
+        @keyframes slow-glow {
+            0%, 100% { box-shadow: 0 0 5px rgba(34, 197, 94, 0.2); }
+            50% { box-shadow: 0 0 20px rgba(34, 197, 94, 0.5); }
+        }
 
         /* Split Pane Layout */
         .workspace {
             display: flex;
-            height: calc(100vh - 60px);
-            margin-top: 60px;
+            height: calc(100vh - 100px);
+            margin-top: 100px;
             position: relative;
             z-index: 10;
         }
@@ -136,7 +218,7 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         .preview-pane {
             background: rgba(255,255,255,0.02);
             backdrop-filter: blur(5px);
-            padding: 2rem;
+            padding: 2.5rem;
             overflow-y: auto;
         }
 
@@ -147,11 +229,30 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             border: none;
             color: var(--text-main);
             font-family: var(--font-mono);
-            font-size: 1rem;
-            line-height: 1.6;
-            padding: 2rem;
+            font-size: 1.1rem;
+            line-height: 1.8;
+            padding: 2.5rem;
             resize: none;
             outline: none;
+            transition: background 0.3s ease;
+        }
+
+        /* RONIN TYPEWRITER MODE: Subtle focus effect */
+        textarea#editor:focus {
+            background: radial-gradient(circle at var(--x, 50%) var(--y, 50%), rgba(34, 197, 94, 0.03) 0%, transparent 50%);
+        }
+
+        .cursor-pulse {
+            position: absolute;
+            pointer-events: none;
+            width: 20px;
+            height: 20px;
+            background: var(--accent);
+            filter: blur(10px);
+            border-radius: 50%;
+            opacity: 0;
+            z-index: 5;
+            transition: transform 0.1s linear;
         }
 
         .char-counter {
@@ -170,8 +271,8 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
 
         /* Markdown Preview Styling */
         #preview-content {
-            max-width: 800px;
-            margin: 0 auto;
+            max-width: 900px;
+            margin: 0;
         }
         #preview-content h1, #preview-content h2, #preview-content h3 {
             font-family: var(--font-brand);
@@ -276,10 +377,15 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
 </head>
 <body>
     <div class="grid-bg"></div>
+    <div id="cursor-glow" class="cursor-pulse"></div>
 
     <header class="tactical-header">
-        <a href="/" class="brand">YAIBA <span style="font-size: 0.8rem; background: var(--accent); color: #000; padding: 2px 6px; border-radius: 4px; font-family: var(--font-mono); vertical-align: middle;">ZEN</span></a>
+        <div class="brand-block">
+            <a href="/" class="brand" data-text="YAIBA">YAIBA</a>
+            <div class="mvp-badge">MVP</div>
+        </div>
         <div class="header-controls">
+            <div class="encryption-status"><span></span> E2E ENCRYPTED</div>
             <div class="tag-input-wrapper">
                 <input type="text" id="tags" class="tag-input" placeholder="Tags (comma separated)">
             </div>
@@ -300,13 +406,13 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     <!-- Success Modal -->
     <div id="success-modal" class="modal-overlay">
         <div class="modal-content">
-            <h2 class="modal-title">Note Published</h2>
-            <p class="modal-desc">Your note is live. The link will expire and self-destruct in 3 days.</p>
+            <h2 class="modal-title">Shadow Node Forged</h2>
+            <p class="modal-desc">Note encrypted client-side. The link below contains the fragment key. We do not store this key on our servers.</p>
             <div class="link-box">
                 <span id="final-link" class="link-text">https://punchy.me/...</span>
                 <button id="modal-copy-btn" class="copy-btn">Copy</button>
             </div>
-            <button onclick="window.location.href='/yaiba'" class="publish-btn" style="width: 100%;">Write Another</button>
+            <button onclick="window.location.href='/yaiba'" class="publish-btn" style="width: 100%;">New Session</button>
         </div>
     </div>
 
@@ -316,20 +422,59 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         const charCounter = document.getElementById('char-counter');
         const publishBtn = document.getElementById('publish-btn');
         const tagsInput = document.getElementById('tags');
+        const cursorGlow = document.getElementById('cursor-glow');
+
+        /* SHADOW PERSISTENCE: AES-GCM Encryption Core */
+        async function encryptContent(text) {
+            const key = await window.crypto.subtle.generateKey(
+                { name: "AES-GCM", length: 256 },
+                true,
+                ["encrypt", "decrypt"]
+            );
+            const iv = window.crypto.getRandomValues(new Uint8Array(12));
+            const encoded = new TextEncoder().encode(text);
+            const encrypted = await window.crypto.subtle.encrypt(
+                { name: "AES-GCM", iv: iv },
+                key,
+                encoded
+            );
+            
+            const exportedKey = await window.crypto.subtle.exportKey("raw", key);
+            const keyBase64 = btoa(String.fromCharCode(...new Uint8Array(exportedKey)));
+            const ivBase64 = btoa(String.fromCharCode(...iv));
+            const encryptedBase64 = btoa(String.fromCharCode(...new Uint8Array(encrypted)));
+            
+            return {
+                data: encryptedBase64 + "." + ivBase64,
+                key: keyBase64.replace(/\\+/g, '-').replace(/\\//g, '_').replace(/=+$/, '')
+            };
+        }
 
         // Initial render
         renderPreview();
 
-        editor.addEventListener('input', () => {
+        editor.addEventListener('input', (e) => {
             renderPreview();
             updateCounter();
+            
+            // Ronin Pulse Effect
+            cursorGlow.style.opacity = '0.4';
+            setTimeout(() => cursorGlow.style.opacity = '0', 100);
+        });
+
+        // Mouse tracking for Ronin focus
+        editor.addEventListener('mousemove', (e) => {
+            const rect = editor.getBoundingClientRect();
+            editor.style.setProperty('--x', (e.clientX - rect.left) + 'px');
+            editor.style.setProperty('--y', (e.clientY - rect.top) + 'px');
+            
+            cursorGlow.style.left = e.clientX + 'px';
+            cursorGlow.style.top = e.clientY + 'px';
         });
 
         function renderPreview() {
             const rawMarkdown = editor.value;
-            // Parse Markdown to HTML
-            const rawHtml = marked.parse(rawMarkdown || '_Empty note..._');
-            // Sanitize HTML to prevent XSS
+            const rawHtml = marked.parse(rawMarkdown || '_Start your Zen journey..._');
             const cleanHtml = DOMPurify.sanitize(rawHtml);
             preview.innerHTML = cleanHtml;
         }
@@ -337,62 +482,53 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
         function updateCounter() {
             const len = editor.value.length;
             charCounter.innerText = \`\${len} / 1800\`;
-            if (len >= 1750) {
-                charCounter.classList.add('limit');
-            } else {
-                charCounter.classList.remove('limit');
-            }
+            charCounter.classList.toggle('limit', len >= 1750);
         }
 
         publishBtn.addEventListener('click', async () => {
             const content = editor.value.trim();
-            if (!content) return alert('Cannot publish an empty note.');
+            if (!content) return;
             
             publishBtn.disabled = true;
-            publishBtn.innerText = 'PUBLISHING...';
-
-            const tags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+            publishBtn.innerText = 'ENCRYPTING...';
 
             try {
+                // Client-side Encryption
+                const { data, key } = await encryptContent(content);
+                const tags = tagsInput.value.split(',').map(t => t.trim()).filter(t => t);
+
                 const response = await fetch('/yaiba/publish', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ content, tags })
+                    body: JSON.stringify({ content: data, tags })
                 });
 
                 if (response.ok) {
-                    const data = await response.json();
-                    showSuccessModal(data.id);
+                    const result = await response.json();
+                    showSuccessModal(result.id, key);
                 } else {
                     const err = await response.json();
-                    alert(err.error || 'Failed to publish.');
+                    alert(err.error || 'Publish failed');
                     publishBtn.disabled = false;
                     publishBtn.innerText = 'PUBLISH';
                 }
             } catch (err) {
-                alert('Network error.');
+                console.error(err);
                 publishBtn.disabled = false;
                 publishBtn.innerText = 'PUBLISH';
             }
         });
 
-        function showSuccessModal(id) {
-            const url = window.location.origin + '/y/' + id;
+        function showSuccessModal(id, key) {
+            const url = window.location.origin + '/y/' + id + '#' + key;
             document.getElementById('final-link').innerText = url;
-            const modal = document.getElementById('success-modal');
-            modal.classList.add('show');
+            document.getElementById('success-modal').classList.add('show');
 
             const copyBtn = document.getElementById('modal-copy-btn');
             copyBtn.onclick = () => {
                 navigator.clipboard.writeText(url);
                 copyBtn.innerText = 'COPIED!';
-                copyBtn.style.background = 'var(--accent)';
-                copyBtn.style.color = '#000';
-                setTimeout(() => {
-                    copyBtn.innerText = 'COPY';
-                    copyBtn.style.background = 'rgba(34,197,94,0.1)';
-                    copyBtn.style.color = 'var(--accent)';
-                }, 2000);
+                setTimeout(() => copyBtn.innerText = 'COPY', 2000);
             };
         }
     </script>
@@ -493,6 +629,13 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
         }
 
+        .status-badge {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            gap: 5px;
+        }
+
         .expiry-badge {
             background: rgba(239, 68, 68, 0.1);
             color: #ef4444;
@@ -502,6 +645,15 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             font-size: 0.7rem;
             font-weight: 700;
             text-transform: uppercase;
+        }
+
+        .secure-lock {
+            font-size: 0.65rem;
+            color: var(--accent);
+            text-transform: uppercase;
+            display: flex;
+            align-items: center;
+            gap: 4px;
         }
 
         /* Markdown Preview Styling */
@@ -571,10 +723,13 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
                 <div class="timestamp" id="ts-display">Published: ...</div>
                 <div class="tags" id="tags-container"></div>
             </div>
-            <div class="expiry-badge">Expires in 3 Days</div>
+            <div class="status-badge">
+                <div class="expiry-badge">Expires in 3 Days</div>
+                <div class="secure-lock">🔒 Zero-Knowledge Storage</div>
+            </div>
         </div>
 
-        <div id="content">Loading...</div>
+        <div id="content">Decrypting Shadow Node...</div>
 
         <div class="footer">
             <a href="/yaiba">[ Forged via YAIBA ]</a>
@@ -584,8 +739,47 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
     <div id="raw-data"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
+        /* SHADOW PERSISTENCE: AES-GCM Decryption Core */
+        async function decryptContent(encryptedData, keyBase64) {
+            try {
+                const parts = encryptedData.split('.');
+                const encrypted = Uint8Array.from(atob(parts[0]), c => c.charCodeAt(0));
+                const iv = Uint8Array.from(atob(parts[1]), c => c.charCodeAt(0));
+                
+                // Normalizing base64 from URL fragment
+                const normalizedKey = keyBase64.replace(/-/g, '+').replace(/_/g, '/');
+                const keyRaw = Uint8Array.from(atob(normalizedKey), c => c.charCodeAt(0));
+                
+                const key = await window.crypto.subtle.importKey(
+                    "raw",
+                    keyRaw,
+                    { name: "AES-GCM" },
+                    false,
+                    ["decrypt"]
+                );
+
+                const decrypted = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    encrypted
+                );
+
+                return new TextDecoder().decode(decrypted);
+            } catch (e) {
+                console.error(e);
+                return null;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', async () => {
             const rawDataEl = document.getElementById('raw-data');
+            const hash = window.location.hash.substring(1);
+            
+            if (!hash) {
+                document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption key missing from URL. This note cannot be read without the fragment key.</div>';
+                return;
+            }
+
             if (rawDataEl && rawDataEl.textContent) {
                 try {
                     const data = JSON.parse(rawDataEl.textContent);
@@ -602,11 +796,14 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
                         document.getElementById('tags-container').innerHTML = tagsHtml;
                     }
 
-                    // Render Markdown
-                    if (data.content) {
-                        const rawHtml = marked.parse(data.content);
+                    // Decrypt Content
+                    const decrypted = await decryptContent(data.content, hash);
+                    if (decrypted) {
+                        const rawHtml = marked.parse(decrypted);
                         const cleanHtml = DOMPurify.sanitize(rawHtml);
                         document.getElementById('content').innerHTML = cleanHtml;
+                    } else {
+                        document.getElementById('content').innerHTML = '<div style="color:#ef4444">ERROR: Decryption failed. The key in your link may be incorrect or corrupted.</div>';
                     }
                 } catch (e) {
                     document.getElementById('content').innerText = 'Error loading note data.';
