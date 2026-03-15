@@ -40,7 +40,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,900;1,900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,900;1,900&family=Outfit:wght@400;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -181,6 +181,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                 <select id="font-family" onchange="renderCanvas()">
                     <option value="'Bitcount Prop Double'">Bitcount Prop Double</option>
                     <option value="'JetBrains Mono'">JetBrains Mono</option>
+                    <option value="'Outfit'">Outfit (Google Sans)</option>
                     <option value="'Inter'">Inter (Sans)</option>
                     <option value="'Oswald'">Oswald (Bold)</option>
                     <option value="'Playfair Display'">Playfair (Elegant)</option>
@@ -197,8 +198,8 @@ export const PICASSO_HTML = `<!DOCTYPE html>
 
                 <h3 style="margin-top: 1.5rem;">Dimensions</h3>
                 <div style="display: flex; gap: 10px; margin-bottom: 1.5rem;">
-                    <input type="number" id="img-width" value="1920" placeholder="Width" oninput="renderCanvas()">
-                    <input type="number" id="img-height" value="1080" placeholder="Height" oninput="renderCanvas()">
+                    <input type="number" id="img-width" value="1920" placeholder="Width" oninput="updateImageBuffer(); renderCanvas()">
+                    <input type="number" id="img-height" value="1080" placeholder="Height" oninput="updateImageBuffer(); renderCanvas()">
                 </div>
                 
                 <button class="btn" onclick="downloadImage()" id="download-btn" disabled>Download WEBP</button>
@@ -209,15 +210,19 @@ export const PICASSO_HTML = `<!DOCTYPE html>
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
+        const offscreenCanvas = document.createElement('canvas');
+        const offCtx = offscreenCanvas.getContext('2d');
+        
         let currentImage = null;
         let currentPage = 1;
         let currentQuery = '';
+        const tinyCache = {}; // Global cache for pre-fetched tiny images
 
         // Default to a blank 1920x1080 canvas
         canvas.width = 1920;
         canvas.height = 1080;
-        ctx.fillStyle = '#111';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        updateImageBuffer(); // Initialize empty buffer
+        renderCanvas();
 
         async function searchImages(isNewSearch = false) {
             const input = document.getElementById('search-input').value;
@@ -238,11 +243,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             }
             
             try {
-                const res = await fetch('/picasso/search', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ query: currentQuery, page: currentPage })
-                });
+                const res = await fetch('/picasso/search?q=' + encodeURIComponent(currentQuery) + '&p=' + currentPage);
                 
                 if (res.ok) {
                     const data = await res.json();
@@ -267,12 +268,18 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             if (replace) grid.innerHTML = '';
             
             images.forEach(img => {
+                // Pre-fetch tiny version immediately
+                const tinyImg = new Image();
+                tinyImg.crossOrigin = "anonymous";
+                tinyImg.src = img.tiny;
+                tinyCache[img.id] = tinyImg;
+
                 const item = document.createElement('div');
                 item.className = 'image-item';
                 item.onclick = () => {
                     document.querySelectorAll('.image-item').forEach(el => el.classList.remove('active'));
                     item.classList.add('active');
-                    loadImage(img.url);
+                    loadImage(img.id, img.url, img.preview); // Passing ID for Tier 0
                 };
                 
                 const imgEl = document.createElement('img');
@@ -286,34 +293,56 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             });
         }
 
-        function loadImage(url) {
+        function loadImage(id, url, previewUrl) {
             const btn = document.getElementById('download-btn');
             btn.disabled = true;
             btn.innerText = 'FORGING...';
             
-            const img = new Image();
-            img.crossOrigin = "anonymous";
-            img.onload = () => {
-                currentImage = img;
-                // DO NOT overwrite dimensions with original image dimensions
-                // Let the user force the 1920x1080 (or custom) output size
+            // Tier 0: Check if tiny image is already in pre-fetch cache
+            if (tinyCache[id] && tinyCache[id].complete) {
+                currentImage = tinyCache[id];
+                updateImageBuffer();
+                renderCanvas();
+                btn.innerText = 'PREVIEWING...';
+            }
+
+            // Tier 1: Load Low-Res Preview
+            const previewImg = new Image();
+            previewImg.crossOrigin = "anonymous";
+            previewImg.onload = () => {
+                // Only replace if we haven't already loaded the master
+                if (currentImage === null || currentImage.src !== url) {
+                    currentImage = previewImg;
+                    updateImageBuffer();
+                    renderCanvas();
+                    btn.disabled = false;
+                    btn.innerText = 'FORGING MASTER...';
+                }
+            };
+            previewImg.src = previewUrl;
+
+            // Tier 2: Load High-Res Master
+            const masterImg = new Image();
+            masterImg.crossOrigin = "anonymous";
+            masterImg.onload = () => {
+                currentImage = masterImg;
+                updateImageBuffer();
                 btn.disabled = false;
                 btn.innerText = 'Download WEBP';
                 renderCanvas();
             };
-            img.src = url; 
+            masterImg.src = url; 
         }
 
-        function renderCanvas() {
+        function updateImageBuffer() {
             const wInput = parseInt(document.getElementById('img-width').value) || 1920;
             const hInput = parseInt(document.getElementById('img-height').value) || 1080;
-            const text = document.getElementById('text-overlay').value;
-
-            canvas.width = wInput;
-            canvas.height = hInput;
+            
+            offscreenCanvas.width = wInput;
+            offscreenCanvas.height = hInput;
 
             if (currentImage) {
-                // Object cover logic for canvas
+                // Object cover logic for offscreen buffer
                 const imgRatio = currentImage.width / currentImage.height;
                 const canvasRatio = wInput / hInput;
                 let drawW, drawH, dx, dy;
@@ -329,12 +358,23 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                     dx = 0;
                     dy = (hInput - drawH) / 2;
                 }
-
-                ctx.drawImage(currentImage, dx, dy, drawW, drawH);
+                offCtx.drawImage(currentImage, dx, dy, drawW, drawH);
             } else {
-                ctx.fillStyle = '#111';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                offCtx.fillStyle = '#111';
+                offCtx.fillRect(0, 0, wInput, hInput);
             }
+        }
+
+        function renderCanvas() {
+            const wInput = parseInt(document.getElementById('img-width').value) || 1920;
+            const hInput = parseInt(document.getElementById('img-height').value) || 1080;
+            const text = document.getElementById('text-overlay').value;
+
+            canvas.width = wInput;
+            canvas.height = hInput;
+
+            // Blit the pre-calculated buffer
+            ctx.drawImage(offscreenCanvas, 0, 0);
 
             // Dark Wash Overlay
             const washValue = parseInt(document.getElementById('dark-wash').value) || 0;

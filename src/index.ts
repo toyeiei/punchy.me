@@ -13,9 +13,10 @@ import { handlePicassoGet, handlePicassoSearch } from './handlers/picasso';
 import { handleRender } from './handlers/render';
 
 export default {
-	async fetch(request: Request, env: Env): Promise<Response> {
+	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 		const url = new URL(request.url);
 		const path = url.pathname;
+		const method = request.method;
 
 		// 0. Global Security Hardening: Payload Size Limit (1MB)
 		if (request.method === 'POST') {
@@ -64,7 +65,7 @@ export default {
 		if (path === '/loki/timeline' && request.method === 'GET') return handleLokiTimeline(request, env);
 		if (path === '/loki/support' && request.method === 'POST') return handleLokiSupport(request, env);
 		if (path === '/odin/analyze' && request.method === 'POST') return handleOdinAnalyze(request, env);
-		if (path === '/picasso/search' && request.method === 'POST') return handlePicassoSearch(request, env);
+		if (path === '/picasso/search' && method === 'GET') return handlePicassoSearch(request, env, ctx);
 
 		// 5. Dynamic Redirection & Rendering
 		if (path.length > 1) return handleRender(request, env, path);
