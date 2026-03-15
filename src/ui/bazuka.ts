@@ -235,7 +235,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         /* SUCCESS MODAL */
         #modal-overlay {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.9);
+            background: rgba(0, 0, 0, 0.95);
             display: none; align-items: center; justify-content: center;
             z-index: 2000; opacity: 0; transition: opacity 0.3s;
         }
@@ -243,7 +243,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         .modal {
             background: #000; border: 1px solid var(--accent);
             padding: 3rem; border-radius: 24px; text-align: center;
-            max-width: 450px; width: 90%; transform: scale(0.9); transition: transform 0.3s;
+            max-width: 450px; width: 95%; transform: scale(0.9); transition: transform 0.3s;
             box-shadow: 0 0 50px rgba(34, 197, 94, 0.2);
             position: relative;
         }
@@ -258,11 +258,42 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
         @keyframes success-pop { 0% { transform: scale(0); } 100% { transform: scale(1); } }
         .success-icon svg { width: 40px; height: 40px; color: #000; }
 
-        /* SYNCING OVERLAY */
-        #sync-overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #000; z-index: 3000; display: none;
-            flex-direction: column; align-items: center; justify-content: center;
+        .modal-title {
+            font-family: var(--font-mono); 
+            font-size: 1.8rem; 
+            font-weight: 700;
+            color: var(--accent); 
+            margin-bottom: 0.5rem;
+            letter-spacing: 2px;
+        }
+
+        .modal-link {
+            display: inline-block;
+            margin-top: 2rem;
+            padding: 1rem 2rem;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--accent);
+            color: var(--accent);
+            text-decoration: none;
+            font-family: var(--font-mono);
+            font-weight: 700;
+            border-radius: 12px;
+            transition: all 0.3s;
+            opacity: 0.5;
+            pointer-events: none;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .modal-link.ready {
+            opacity: 1;
+            pointer-events: auto;
+            background: var(--accent);
+            color: #000;
+            box-shadow: 0 0 20px rgba(34, 197, 94, 0.4);
+        }
+        .modal-link.ready:hover {
+            transform: scale(1.05);
+            background: var(--accent-hover);
         }
     </style>
 </head>
@@ -277,21 +308,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 13l4 4L19 7" />
                 </svg>
             </div>
-            <h2 style="font-family: var(--font-brand); font-size: 2.5rem; color: var(--accent); margin-bottom: 0.5rem;">CARD FORGED</h2>
-            <p style="color: var(--text-dim); font-family: var(--font-mono); font-size: 0.9rem;">Your high-impact identity is live.</p>
+            <h2 class="modal-title">CARD FORGED</h2>
+            <p style="color: var(--text-dim); font-family: var(--font-mono); font-size: 0.8rem; letter-spacing: 1px;">TACTICAL IDENTITY IS NOW LIVE</p>
+            <a href="#" id="success-link" class="modal-link">INITIALIZING...</a>
         </div>
-    </div>
-
-    <div id="sync-overlay">
-        <div class="grid-bg"></div>
-        <div class="container" style="max-width: 400px; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px);">
-            <h1 style="font-size: 2.5rem; color: var(--accent);">SYNCING...</h1>
-            <p style="color: var(--text-dim); margin: 1rem 0;">Propagating tactical data to the edge...</p>
-            <div style="width: 100%; height: 2px; background: rgba(255,255,255,0.1); border-radius: 2px; overflow: hidden;">
-                <div style="width: 0%; height: 100%; background: var(--accent); animation: progress 1.2s linear forwards;"></div>
-            </div>
-        </div>
-        <style>@keyframes progress { to { width: 100%; } }</style>
     </div>
 
     <a href="/" class="punchy-portal">
@@ -414,16 +434,17 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
                 });
                 
                 if (res.ok) {
-                    // ELITE FLOW: Show success, then sync, then redirect
-                    document.getElementById('modal-overlay').classList.add('show');
+                    // ELITE FLOW: Show success modal immediately
+                    const modal = document.getElementById('modal-overlay');
+                    const link = document.getElementById('success-link');
                     
+                    modal.classList.add('show');
+                    link.href = '/' + suggestedId;
+                    
+                    // Unlock link after 1.5s (simulating propagation)
                     setTimeout(() => {
-                        document.getElementById('modal-overlay').classList.remove('show');
-                        document.getElementById('sync-overlay').style.display = 'flex';
-                        
-                        setTimeout(() => {
-                            window.location.href = '/' + suggestedId;
-                        }, 1200);
+                        link.innerText = 'VIEW DIGITAL CARD';
+                        link.classList.add('ready');
                     }, 1500);
                 } else {
                     alert('Forge failed. Please try again.');
@@ -568,17 +589,52 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         .bottom-left { bottom: 20px; left: 20px; border-right: none; border-top: none; }
         .bottom-right { bottom: 20px; right: 20px; border-left: none; border-top: none; }
 
-        .nickname { font-family: var(--font-brand); font-size: 3rem; font-weight: 400; color: var(--accent); margin-bottom: 0.5rem; text-transform: uppercase; }
-        .job { font-weight: 700; color: var(--text-main); margin-bottom: 1.5rem; letter-spacing: 1px; }
+        .nickname { 
+            font-family: var(--font-brand); 
+            font-size: clamp(2.2rem, 10vw, 3.45rem); 
+            font-weight: 400; 
+            color: var(--accent); 
+            margin-bottom: 0.5rem; 
+            text-transform: uppercase; 
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            padding-left: 2.25rem; /* Indent to align with contact text below icons */
+        }
+        .job { 
+            font-weight: 700; 
+            color: var(--text-main); 
+            margin-bottom: 1.5rem; 
+            letter-spacing: 1px; 
+            font-size: 0.9rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+            padding-left: 2.25rem; /* Indent to align with contact text below icons */
+        }
         
         .contact-bar {
             display: flex;
             flex-direction: column;
             gap: 0.8rem;
         }
-        .contact-item { display: flex; align-items: center; gap: 0.8rem; color: var(--text-dim); text-decoration: none; transition: color 0.2s; font-size: 0.9rem; }
+        .contact-item { 
+            display: flex; 
+            align-items: center; 
+            gap: 1rem; 
+            color: var(--text-dim); 
+            text-decoration: none; 
+            transition: color 0.2s; 
+            font-size: 0.9rem;
+            word-wrap: break-word;
+            overflow-wrap: break-word;
+        }
         .contact-item:hover { color: var(--accent); }
-        .contact-item svg { width: 16px; height: 16px; }
+        
+        .icon-svg { 
+            width: 1.25rem; 
+            height: 1.25rem; 
+            flex-shrink: 0; 
+            color: var(--accent);
+        }
 
         .expiration-note {
             position: absolute;
@@ -619,11 +675,11 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             <div class="job" id="card-job">JOB TITLE</div>
             <div class="contact-bar">
                 <a href="#" class="contact-item" id="card-email-link">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M20,8L12,13L4,8V6L12,11L20,6M20,4H4C2.89,4 2,4.89 2,6V18A2,2 0 0,0 4,20H20A2,2 0 0,0 22,18V6C22,4.89 21.1,4 20,4Z" /></svg>
                     <span id="card-email">email@example.com</span>
                 </a>
                 <a href="#" class="contact-item" id="card-website-link" target="_blank">
-                    <svg viewBox="0 0 24 24"><path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>
+                    <svg class="icon-svg" viewBox="0 0 24 24"><path fill="currentColor" d="M7,2V13H10V22L17,10H13L17,2H7Z" /></svg>
                     <span id="card-website">website.com</span>
                 </a>
             </div>

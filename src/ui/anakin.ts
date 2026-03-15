@@ -531,9 +531,10 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             submitBtn.innerText = 'FORGING...';
             isUserInitiated = true;
 
+            // ULTRA-FAST HANDSHAKE: 1s timeout for Turnstile
             turnstileTimeoutId = setTimeout(() => {
                 if (isUserInitiated) createAnakin();
-            }, 6000);
+            }, 1000);
 
             if (window.turnstile) {
                 try {
@@ -720,7 +721,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             border-radius: 24px;
             max-width: 900px;
             width: 92%;
-            margin: 2rem auto 4rem;
+            margin: 3rem auto;
             padding: clamp(1.5rem, 5vw, 4rem);
             box-shadow: 0 40px 100px rgba(0,0,0,0.8);
             position: relative;
@@ -817,6 +818,9 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         }
 
         .section { margin-bottom: 1rem; position: relative; }
+
+        .main-col .section:last-of-type { margin-bottom: 0; }
+        
         .section-title { 
             font-family: var(--font-brand);
             font-size: 1.25rem; 
