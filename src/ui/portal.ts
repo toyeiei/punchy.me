@@ -13,7 +13,7 @@ export const PUNCHY_PORTAL_HTML = `
             border-radius: 12px; padding: 0.5rem; gap: 0; overflow: hidden; width: 44px; height: 44px; 
             transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; cursor: pointer; text-decoration: none;
         }
-        .punchy-portal:hover { width: 420px; gap: 1rem; border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+        .punchy-portal:hover { width: 520px; gap: 1rem; border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
         .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
         .portal-brand { color: #22c55e; font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: 'JetBrains Mono', monospace; }
         .punchy-portal:hover .portal-brand { opacity: 1; }

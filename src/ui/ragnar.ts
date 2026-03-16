@@ -10,7 +10,6 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000;
             --accent: #22c55e;
             --accent-hover: #4ade80;
             --text-main: #f8fafc;
@@ -19,9 +18,9 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        
+
         body {
-            background-color: var(--bg);
+            background-color: #000;
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
@@ -32,13 +31,32 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             padding: 10vh 2rem;
         }
 
-        .container { 
-            z-index: 10; 
-            max-width: 800px; 
+        /* Background image + cinematic overlay */
+        .bg-image {
+            position: fixed;
+            inset: 0;
+            background: url('/backgrounds/ragnar.webp') center / cover no-repeat;
+            z-index: -2;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(
+                160deg,
+                rgba(0, 0, 0, 0.80) 0%,
+                rgba(0, 0, 0, 0.55) 45%,
+                rgba(0, 0, 0, 0.78) 100%
+            );
+            z-index: -1;
+        }
+
+        .container {
+            z-index: 10;
+            max-width: 800px;
             width: 100%;
             text-align: center;
         }
-        
+
         .title-container {
             display: flex;
             align-items: center;
@@ -48,12 +66,13 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
         }
 
         h1 {
-            font-family: var(--font-brand); 
-            font-size: clamp(3rem, 12vw, 100px); 
+            font-family: var(--font-brand);
+            font-size: clamp(3rem, 12vw, 100px);
             font-weight: 400;
             line-height: 0.8;
             letter-spacing: -3px;
             text-transform: uppercase;
+            text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8);
         }
 
         .beta-badge {
@@ -65,13 +84,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
-            animation: pulse 2s infinite alternate;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            100% { transform: scale(1.05); opacity: 1; }
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
         }
 
         .desc {
@@ -82,6 +95,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             margin-left: auto;
             margin-right: auto;
             line-height: 1.6;
+            text-shadow: 0 1px 8px rgba(0, 0, 0, 0.9);
         }
 
         .ai-badge {
@@ -95,7 +109,6 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-left: 0.5rem;
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
         }
 
         .char-counter {
@@ -104,33 +117,26 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             margin-top: 0.5rem;
             text-align: right;
         }
-
-        .char-counter.warning {
-            color: #f59e0b;
-        }
-
-        .char-counter.error {
-            color: #ef4444;
-        }
+        .char-counter.warning { color: #f59e0b; }
+        .char-counter.error { color: #ef4444; }
 
         .panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+            background: rgba(0, 0, 0, 0.55);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             padding: 3rem;
             border-radius: 24px;
             text-align: left;
-            transition: all 0.3s ease;
+            transition: border-color 0.3s ease, box-shadow 0.3s ease;
         }
 
         .panel:hover {
-            border-color: var(--accent);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+            border-color: rgba(34, 197, 94, 0.4);
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
         }
 
-        .input-group {
-            margin-bottom: 2rem;
-        }
+        .input-group { margin-bottom: 2rem; }
 
         label {
             display: block;
@@ -144,20 +150,20 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
 
         input, textarea {
             width: 100%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.10);
             border-radius: 12px;
             padding: 1rem 1.2rem;
             color: var(--text-main);
             font-family: var(--font-mono);
             outline: none;
-            transition: all 0.2s;
+            transition: border-color 0.2s, background 0.2s, box-shadow 0.2s;
         }
 
         input:focus, textarea:focus {
             border-color: var(--accent);
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 10px rgba(34, 197, 94, 0.1);
+            background: rgba(255, 255, 255, 0.09);
+            box-shadow: 0 0 12px rgba(34, 197, 94, 0.12);
         }
 
         textarea {
@@ -178,14 +184,14 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             letter-spacing: 2px;
             cursor: pointer;
             font-family: var(--font-mono);
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
             margin-top: 1rem;
         }
 
         .btn-forge:hover:not(:disabled) {
             background: var(--accent-hover);
             transform: translateY(-2px);
-            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
+            box-shadow: 0 10px 24px rgba(34, 197, 94, 0.35);
         }
 
         .btn-forge:disabled {
@@ -195,8 +201,8 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
 
         .terminal-log {
             margin-top: 2rem;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(255, 255, 255, 0.05);
+            background: rgba(0, 0, 0, 0.6);
+            border: 1px solid rgba(34, 197, 94, 0.15);
             border-radius: 12px;
             padding: 1.5rem;
             font-size: 0.85rem;
@@ -206,16 +212,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             line-height: 1.8;
         }
 
-        .log-line {
-            overflow: hidden;
-            white-space: nowrap;
-            border-right: 2px solid var(--accent);
-            width: fit-content;
-            animation: typing 2s steps(40, end), blink .75s step-end infinite;
-        }
-
-        @keyframes typing { from { width: 0 } to { width: 100% } }
-        @keyframes blink { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
+        .log-line { white-space: nowrap; }
 
         .success-box {
             display: none;
@@ -223,7 +220,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             animation: fadeIn 0.5s ease forwards;
         }
 
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
 
         .result-link {
             display: block;
@@ -234,7 +231,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             text-decoration: none;
             font-weight: 900;
             margin-bottom: 1rem;
-            transition: all 0.3s;
+            transition: background 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
             text-align: center;
             font-size: 1rem;
             letter-spacing: 1px;
@@ -247,67 +244,22 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
         }
 
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
-            background-size: 50px 50px;
-            z-index: -1;
-            animation: gridMove 20s linear infinite;
-        }
-
-        @keyframes gridMove {
-            0% { transform: translate(0, 0); }
-            100% { transform: translate(50px, 50px); }
-        }
-
-        .scanline {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(
-                to bottom,
-                transparent 0%,
-                rgba(34, 197, 94, 0.03) 50%,
-                transparent 100%
-            );
-            background-size: 100% 4px;
-            animation: scanlineMove 8s linear infinite;
-            pointer-events: none;
-            z-index: 1;
-        }
-
-        @keyframes scanlineMove {
-            0% { background-position: 0 0; }
-            100% { background-position: 0 100vh; }
-        }
-
         .processing-notice {
             display: none;
-            background: rgba(34, 197, 94, 0.1);
-            border: 1px solid var(--accent);
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.3);
             border-radius: 8px;
             padding: 0.75rem 1rem;
             margin-top: 1rem;
             font-size: 0.85rem;
             color: var(--accent);
             text-align: center;
-            animation: pulseNotice 2s ease-in-out infinite;
-        }
-
-        @keyframes pulseNotice {
-            0%, 100% { opacity: 0.7; }
-            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
-    <div class="grid-bg"></div>
-    <div class="scanline"></div>
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
     ${PUNCHY_PORTAL_HTML}
 
     <div class="container">

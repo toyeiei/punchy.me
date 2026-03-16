@@ -8,7 +8,7 @@ export const MAX_PAYLOAD_SIZE = 1_048_576;
 export const AI_MAX_TOKENS_STANDARD = 350;
 
 /** Extended AI token budget for Ragnar slide deck generation */
-export const AI_MAX_TOKENS_RAGNAR = 4000;
+export const AI_MAX_TOKENS_RAGNAR = 6000;
 
 /** Freya search result cache TTL in seconds (10 minutes) */
 export const FREYA_CACHE_TTL = 600;
