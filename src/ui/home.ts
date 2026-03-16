@@ -285,6 +285,9 @@ export const HTML = `<!DOCTYPE html>
             text-align: left;
             position: relative;
             overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
         }
 
         .feature-card:hover {
