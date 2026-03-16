@@ -106,11 +106,11 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             transform: scale(1.0);
         }
 
-        /* Tactical Overlay (70% Dim) */
+        /* Tactical Overlay (50% Dim) */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.7);
+            background: rgba(0, 0, 0, 0.5);
             z-index: 1;
             pointer-events: none;
         }
@@ -374,6 +374,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
         <div class="date-display" id="date">JANUARY 1</div>
         <div class="greeting" id="greeting">Welcome to Asgard.</div>
         
+        <!-- POMODORO DISABLED FOR NOW
         <div class="pomodoro-container" id="pomodoro" onclick="togglePomodoro()" oncontextmenu="resetPomodoro(event)">
             <span id="pomo-status">FOCUS</span>
             <span id="pomo-timer">25:00</span>
@@ -381,6 +382,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
                 <div class="pomodoro-bar" id="pomo-bar"></div>
             </div>
         </div>
+        -->
     </div>
 
     <div class="spotlight-overlay" id="spotlight">
@@ -527,9 +529,28 @@ export const ASGARD_HTML = `<!DOCTYPE html>
 
         spotlightInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
-                const query = spotlightInput.value.trim();
+                const rawQuery = spotlightInput.value.trim();
+                const query = rawQuery.toLowerCase();
+
                 if (query) {
-                    window.open('https://www.google.com/search?q=' + encodeURIComponent(query), '_blank');
+                    // Ecosystem Discovery
+                    const tools = {
+                        'bazuka': '/bazuka', 'card': '/bazuka', 'profile': '/bazuka',
+                        'anakin': '/anakin', 'resume': '/anakin', 'cv': '/anakin',
+                        'musashi': '/musashi', 'job': '/musashi', 'intel': '/musashi',
+                        'odin': '/odin', 'data': '/odin', 'analysis': '/odin',
+                        'yaiba': '/yaiba', 'write': '/yaiba', 'markdown': '/yaiba',
+                        'freya': '/freya', 'image': '/freya', 'design': '/freya',
+                        'loki': '/loki', 'pledge': '/loki',
+                        'asgard': '/asgard',
+                        'home': '/'
+                    };
+
+                    if (tools[query]) {
+                        window.location.href = tools[query];
+                    } else {
+                        window.open('https://www.google.com/search?q=' + encodeURIComponent(rawQuery), '_blank');
+                    }
                     spotlight.classList.remove('active');
                     spotlightInput.value = '';
                 }

@@ -41,7 +41,7 @@ export async function handleFreyaSearch(request: Request, env: Env, ctx: Executi
 			},
 			cf: { 
 				cacheTtl: isSearch ? 600 : 0, 
-				cacheEverything: isSearch 
+				cacheEverything: !!isSearch 
 			}
 		});
 

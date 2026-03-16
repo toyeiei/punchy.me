@@ -9,7 +9,7 @@ export const ODIN_HTML = `<!DOCTYPE html>
     <meta name="description" content="ODIN Tactical Terminal: A high-performance, edge-native data command center for professional analysts. Crunch intel at the edge with supreme precision and style.">
     <meta name="keywords" content="ODIN, tactical data, edge analytics, data command, terminal style, professional analytics, PUNCHY.ME">
     <link rel="canonical" href="https://punchy.me/odin" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🐦‍⬛%3C/text%3E%3C/svg%3E">
 
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">

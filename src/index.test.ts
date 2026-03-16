@@ -1,5 +1,8 @@
-import { env, SELF } from "cloudflare:test";
+import { env as untypedEnv, SELF } from "cloudflare:test";
 import { describe, it, expect, vi, beforeEach } from "vitest";
+import { Env } from "./core/types";
+
+const env = untypedEnv as unknown as Env;
 
 describe("PUNCHY.ME URL Shortener", () => {
   
@@ -503,7 +506,7 @@ Hope this helps!`
       });
 
       expect(res.status).toBe(200);
-      const data = await res.json() as Record<string, unknown>;
+      const data = await res.json() as { skills: string[] };
       expect(data.skills).toHaveLength(5);
       expect(data.skills[0]).toBe("TypeScript");
       

@@ -1,32 +1,28 @@
 # PUNCHY.ME | Tactical Roadmap & TODOs
 
-## Phase 1: Final Deployment (Immediate Actions)
-- [ ] **Commit Configuration**: Stage and commit the hardened `wrangler.toml` and new `worker-configuration.d.ts`.
-- [ ] **Production Merge**: Merge the `loki` branch into `main`.
-- [ ] **Edge Launch**: Execute `npm run deploy` to push the LOKI HUD to `punchy.me`.
-- [ ] **Secret Provisioning**: Set up the Resend API key in production: `npx wrangler secret put RESEND_API_KEY`.
-- [ ] **Log Synchronization**: Update `IMPLEMENTATION_LOG.md` and `GEMINI.md` for the v4.4.0 milestone.
+*Status: ASGARD Workspace & Spotlight Search Hardened. 61/61 Tests Passing. (v4.8.1)*
 
-## Phase 2: LOKI Expansion (Post-MVP)
-- [ ] **Digital Gift Delivery**: Implement the logic to trigger Resend emails containing the "Strategist's Ebook" upon a successful pledge.
-- [ ] **Admin Command Center**: Create a hidden, protected route (e.g., `/loki/admin`) to post updates to the Tactical Timeline via the UI.
-- [ ] **Pledge Metrics**: Update the D1 schema to include `amount` and `currency` for financial tracking.
-- [ ] **Supporter Arsenal**: Add a "Wall of Agents" to the LOKI page, displaying the names of top supporters.
+## Phase 1: Completed Milestones (Archive)
+- [x] **ASGARD Supreme Workspace**: World-class desktop launchpad at `/asgard` with cinematic entrance.
+- [x] **Spotlight Ecosystem Discovery**: Integrated `Ctrl+K` search for instant navigation across all 6 professional tools.
+- [x] **FREYA Identity Shift**: Full-stack rename from "Picasso" to "Freya" with UI hardening.
+- [x] **Ecosystem Portal Modularization**: Extracted tactical navigation into `src/ui/portal.ts` for "Update Once, Use Everywhere" consistency.
+- [x] **LOKI Support Integration**: Integrated the support timeline and pledge system into the Spotlight index.
+- [x] **ODIN Tactical Hub**: Hardened data analysis platform with Workers AI insights.
 
-## Phase 3: Strategic Roadmap (High-Impact)
-- [ ] **Edge Tactical Analytics**: Real-time world-map visualization of clicks, devices, and recruiter engagement.
-- [ ] **Branded Slugs**: Empower users to create custom aliases (e.g., `punchy.me/toy-card`).
+## Phase 2: Immediate Actions (Current Sprint)
+- [ ] **Dual-Blade Portfolio Hub**: Implement the unified tactical dashboard showcasing dual career paths side-by-side (linking Shortener, BAZUKA, and ANAKIN).
+- [ ] **Edge Tactical Analytics**: Real-time world-map visualization of views, devices, and recruiter engagement.
 - [ ] **QR Arsenal**: Automatically generate visually matching QR codes for every shortened link.
-- [ ] **Expiry Protocols**: Add Time-to-Live (TTL) support for temporary tactical links.
+- [ ] **Branded Slugs**: Empower users to create custom aliases (e.g., `punchy.me/toy-card`).
 
-## Phase 4: Design Hardening
-- [ ] **Mobile UX Audit**: Refine the LOKI dual-pane layout for small-screen "Single-Column" fluidity.
+## Phase 3: LOKI & ODIN Evolution
+- [ ] **LOKI Digital Gift Delivery**: Implement logic to trigger Resend emails with the "Strategist's Ebook" upon pledge.
+- [ ] **LOKI Admin Command Center**: Hidden, protected route (`/loki/admin`) for timeline updates via UI.
+- [ ] **ODIN Visual HUD**: Integrate ECharts/Vega-Lite for real-time charting in the results panel.
+- [ ] **ODIN Oracle Forge**: Natural Language AI to translate English queries into raw Arquero code.
+
+## Phase 4: System Robustness
+- [ ] **Mobile UX Audit**: Refine LOKI dual-pane and ODIN terminal for small-screen fluidity.
 - [ ] **Accessibility Strike**: Ensure all forms and timeline entries meet high-contrast accessibility standards.
-
-## Phase 5: ODIN Strategic Evolution
-- [ ] **ODIN Oracle Forge**: Implement Natural Language AI to translate English queries into raw Arquero code for non-coders.
-- [ ] **ODIN Visual HUD**: Integrate ECharts/Vega-Lite for real-time charting and data visualization directly in the results panel.
-- [ ] **ODIN Tactical Save**: Implement state persistence via KV, allowing users to share their analysis results via PUNCHY.ME short links.
-
----
-*Status: ODIN Hardened & Secured. 41/41 Tests Passing.*
+- [ ] **Expiry Protocols**: Add Time-to-Live (TTL) support for temporary tactical links.
