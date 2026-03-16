@@ -1,6 +1,7 @@
 import { Env } from '../core/types';
 import { BazukaHandler, AnakinHandler } from '../core/rewriters';
 import { BAZUKA_CARD_TEMPLATE, ANAKIN_RESUME_TEMPLATE, YAIBA_VIEW_HTML, RAGNAR_SLIDE_TEMPLATE, SYNC_ERROR_HTML } from '../ui';
+import { escapeHTML } from '../core/utils';
 
 export async function handleRender(request: Request, env: Env, path: string): Promise<Response> {
 	if (request.method !== 'GET') return new Response('Method Not Allowed', { status: 405 });
@@ -19,22 +20,22 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 						if (type === 'quote') {
 							slidesHtml += `
 								<section class="center slide-quote" data-transition="zoom">
-									<blockquote>"${s.content}"</blockquote>
+									<blockquote>"${escapeHTML(s.content)}"</blockquote>
 									<div class="quote-attribution">— RAGNAR'S COUNSEL</div>
 								</section>`;
 						} else if (type === 'bigtext') {
 							slidesHtml += `
 								<section class="center slide-bigtext" data-transition="fade">
-									<h2>${s.header}</h2>
-									<p>${s.content}</p>
+									<h2>${escapeHTML(s.header)}</h2>
+									<p>${escapeHTML(s.content)}</p>
 								</section>`;
 						} else if (type === 'comparison') {
 							const parts = s.content.split(' | ');
-							const left = parts[0] || 'Unknown';
-							const right = parts[1] || 'Unknown';
+							const left = escapeHTML(parts[0] || 'Unknown');
+							const right = escapeHTML(parts[1] || 'Unknown');
 							slidesHtml += `
 								<section class="slide-comparison" data-transition="convex">
-									<h2>${s.header}</h2>
+									<h2>${escapeHTML(s.header)}</h2>
 									<div class="comparison-grid">
 										<div class="comparison-box box-red">
 											<h4 class="text-red">CURRENT STATE</h4>
@@ -48,11 +49,11 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 								</section>`;
 						} else {
 							// DEFAULT: list
-							slidesHtml += `<section data-transition="slide"><h2>${s.header}</h2><ul>`;
+							slidesHtml += `<section data-transition="slide"><h2>${escapeHTML(s.header)}</h2><ul>`;
 							const lines = s.content.split('\n');
 							lines.forEach(l => {
 								if (l.trim()) {
-									slidesHtml += `<li>${l.trim().replace(/^•\s*/, '')}</li>`;
+									slidesHtml += `<li>${escapeHTML(l.trim().replace(/^•\s*/, ''))}</li>`;
 								}
 							});
 							slidesHtml += `</ul></section>`;
@@ -60,8 +61,8 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 					});
 					
 					const html = RAGNAR_SLIDE_TEMPLATE
-						.replace(/{{TITLE}}/g, data.title)
-						.replace(/{{AUDIENCE}}/g, data.audience)
+						.replace(/{{TITLE}}/g, escapeHTML(data.title))
+						.replace(/{{AUDIENCE}}/g, escapeHTML(data.audience))
 						.replace(/{{SLIDES_HTML}}/g, slidesHtml);
 						
 					return new Response(html, { headers: { "Content-Type": "text/html" } });
@@ -74,12 +75,9 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 	const id = path.startsWith('/y/') ? path.substring(3) : path.substring(1);
 	let value = await env.SHORT_LINKS.get(id);
 
-	if (!value) {
+	// Only retry for /y/ (Yaiba) paths where eventual consistency is expected
+	if (!value && path.startsWith('/y/')) {
 		await new Promise(r => setTimeout(r, 600)); 
-		value = await env.SHORT_LINKS.get(id);
-	}
-	if (!value) {
-		await new Promise(r => setTimeout(r, 1200)); 
 		value = await env.SHORT_LINKS.get(id);
 	}
 

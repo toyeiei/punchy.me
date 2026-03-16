@@ -1,6 +1,7 @@
 import { Env, RagnarData } from '../core/types';
 import { RAGNAR_HTML } from '../ui/ragnar';
-import { generateUniqueId } from '../core/utils';
+import { generateUniqueId, jsonResponse, parseAIResponse } from '../core/utils';
+import { validateRagnarRequest } from '../core/validation';
 
 export async function handleRagnarGet() {
 	return new Response(RAGNAR_HTML, {
@@ -10,14 +11,15 @@ export async function handleRagnarGet() {
 
 export async function handleRagnarForge(request: Request, env: Env) {
 	try {
-		const { title, audience, details } = await request.json() as { title: string, audience: string, details: string };
-
-		if (!title || !details) {
-			return new Response(JSON.stringify({ error: 'Title and Details are required to summon Ragnar.' }), {
-				status: 400,
-				headers: { 'Content-Type': 'application/json' },
-			});
+		const body = await request.json();
+		const validation = validateRagnarRequest(body);
+		
+		if (!validation.success) {
+			return jsonResponse({ error: validation.error }, 400);
 		}
+		
+		const { title, audience, details, hp_field } = validation.data!;
+		if (hp_field) return jsonResponse({ error: 'Bot detected.' }, 403);
 
 		// RAGNAR AI PROMPT
 		const systemPrompt = `You are RAGNAR, the Legendary Viking King and Master Strategist. 
@@ -65,31 +67,17 @@ STRATEGIC DETAILS: ${details}`;
 			temperature: 0.7
 		}) as { response: string };
 
-		let result: RagnarData;
-		try {
-			// Clean up AI response if it contains markdown markers
-			const cleanText = aiResponse.response.replace(/```json/g, '').replace(/```/g, '').trim();
-			const parsed = JSON.parse(cleanText);
-			
-			result = {
-				type: 'ragnar',
-				title: parsed.title || title,
-				audience: parsed.audience || audience,
-				slides: parsed.slides || []
-			};
-		} catch (e) {
-			console.error('AI JSON PARSE ERROR:', e);
-			return new Response(JSON.stringify({ error: 'Ragnar failed to forge the JSON structure. Try again, warrior.' }), {
-				status: 500,
-				headers: { 'Content-Type': 'application/json' },
-			});
-		}
+		const parsed = parseAIResponse(aiResponse.response);
+		
+		const result: RagnarData = {
+			type: 'ragnar',
+			title: parsed.title as string || title,
+			audience: parsed.audience as string || audience,
+			slides: parsed.slides as RagnarData['slides'] || []
+		};
 
 		if (!result.slides || result.slides.length === 0) {
-			return new Response(JSON.stringify({ error: 'The forge returned no slides. The gods are testing us.' }), {
-				status: 500,
-				headers: { 'Content-Type': 'application/json' },
-			});
+			return jsonResponse({ error: 'The forge returned no slides. The gods are testing us.' }, 500);
 		}
 
 		const id = generateUniqueId();
@@ -97,14 +85,11 @@ STRATEGIC DETAILS: ${details}`;
 			expirationTtl: 60 * 60 * 24 * 3 // 3 days
 		});
 
-		return new Response(JSON.stringify({ id }), {
-			headers: { 'Content-Type': 'application/json' },
-		});
+		return jsonResponse({ id });
 
-	} catch (err: any) {
-		return new Response(JSON.stringify({ error: err.message }), {
-			status: 500,
-			headers: { 'Content-Type': 'application/json' },
-		});
+	} catch (err: unknown) {
+		console.error('Ragnar forge error:', err);
+		const message = err instanceof Error ? err.message : 'Unknown error';
+		return jsonResponse({ error: message }, 500);
 	}
 }

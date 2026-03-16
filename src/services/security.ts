@@ -1,5 +1,19 @@
 import { Env } from '../core/types';
 
+/**
+ * KV-based rate limiting with known race condition limitations.
+ * 
+ * KNOWN ISSUE: Cloudflare KV is eventually consistent. Two concurrent requests
+ * can both read count=N, both write count=N+1, effectively bypassing the limit.
+ * 
+ * This is acceptable for this project's scale. For production-grade enforcement,
+ * use Cloudflare Durable Objects or the Rate Limiting API.
+ * 
+ * @param env - Worker environment bindings
+ * @param rlKey - Rate limit key (e.g., "rl:ip:1.2.3.4")
+ * @param limit - Maximum requests allowed in the window
+ * @param ttl - Time window in seconds (default: 60)
+ */
 export async function checkRateLimit(env: Env, rlKey: string, limit: number, ttl: number = 60): Promise<boolean> {
 	const currentRl = await env.SHORT_LINKS.get(rlKey);
 	const rlCount = currentRl ? parseInt(currentRl) : 0;
@@ -8,10 +22,12 @@ export async function checkRateLimit(env: Env, rlKey: string, limit: number, ttl
 	return true;
 }
 
-export async function verifyTurnstile(token: string): Promise<boolean> {
-	if (token === 'test-token') return true;
+export async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
+	// Allow test-token bypass only in test environment
+	if (token === 'test-token' && typeof (globalThis as { VITEST?: unknown }).VITEST !== 'undefined') return true;
+	
 	const formData = new FormData();
-	formData.append('secret', '0x4AAAAAAApO5kHNRhLAhQOH-X-SECRET-KEY');
+	formData.append('secret', secretKey);
 	formData.append('response', token);
 	const verifyRes = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', { method: 'POST', body: formData });
 	const verifyData = await verifyRes.json() as { success: boolean };

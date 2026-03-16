@@ -1,6 +1,8 @@
 import { Env } from '../core/types';
 import { MUSASHI_FORM_HTML } from '../ui';
 import { checkRateLimit } from '../services/security';
+import { validateMusashiRequest } from '../core/validation';
+import { jsonResponse, parseAIResponse } from '../core/utils';
 
 export async function handleMusashiGet(): Promise<Response> {
     return new Response(MUSASHI_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
@@ -8,13 +10,18 @@ export async function handleMusashiGet(): Promise<Response> {
 
 export async function handleMusashiForge(request: Request, env: Env): Promise<Response> {
 	try {
-		const { description, hp_field } = await request.json() as { description: string, hp_field?: string };
-		if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
-		if (!description || description.length < 50) return new Response(JSON.stringify({ error: 'Intel too shallow.' }), { status: 400 });
-		if (description.length > 1000) return new Response(JSON.stringify({ error: 'Intel too dense. Limit 1000 characters.' }), { status: 400 });
+		const body = await request.json();
+		const validation = validateMusashiRequest(body);
+		
+		if (!validation.success) {
+			return jsonResponse({ error: validation.error }, 400);
+		}
+		
+		const { description, hp_field } = validation.data!;
+		if (hp_field) return jsonResponse({ error: 'Bot detected.' }, 403);
 		
 		const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
-		if (!(await checkRateLimit(env, `rl:ai:${ip}`, 5))) return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 5 per minute.' }), { status: 429 });
+		if (!(await checkRateLimit(env, `rl:ai:${ip}`, 5))) return jsonResponse({ error: 'Tactical cooling in progress. Limit 5 per minute.' }, 429);
 
 		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 			max_tokens: 350, temperature: 0.2, response_format: { type: 'json_object' },
@@ -24,27 +31,10 @@ export async function handleMusashiForge(request: Request, env: Env): Promise<Re
 			]
 		}) as { response: string | Record<string, unknown> };
 		
-		let result: Record<string, unknown> = {};
-		if (typeof aiResponse.response === 'string') {
-			try {
-				const jsonMatch = aiResponse.response.match(/\{[\s\S]*\}/);
-				if (jsonMatch) {
-					result = JSON.parse(jsonMatch[0]);
-				} else {
-					result = JSON.parse(aiResponse.response);
-				}
-			} catch (_e) {
-				console.error("MUSASHI: Final JSON Parse Failure on:", aiResponse.response);
-				return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 });
-			}
-		} else {
-			result = aiResponse.response || {};
-		}
-		
-		console.log('\n--- MUSASHI AI RAW OUTPUT ---');
-		console.log(typeof aiResponse.response === 'string' ? aiResponse.response : JSON.stringify(result, null, 2));
-		console.log('----------------------------\n');
-
-		return new Response(JSON.stringify(result), { headers: { 'Content-Type': 'application/json' } });
-	} catch (_e) { return new Response(JSON.stringify({ error: 'AI Forge failed.' }), { status: 500 }); }
+		const result = parseAIResponse(aiResponse.response);
+		return jsonResponse(result);
+	} catch (e) {
+		console.error('Musashi forge error:', e);
+		return jsonResponse({ error: 'AI Forge failed.' }, 500);
+	}
 }

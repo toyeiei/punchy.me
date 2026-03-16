@@ -1,6 +1,7 @@
-import { Env, BazukaData } from '../core/types';
+import { Env } from '../core/types';
 import { BAZUKA_FORM_HTML } from '../ui';
-import { generateUniqueId } from '../core/utils';
+import { generateUniqueId, jsonResponse } from '../core/utils';
+import { validateBazukaRequest } from '../core/validation';
 
 export async function handleBazukaGet(): Promise<Response> {
     return new Response(BAZUKA_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
@@ -8,11 +9,21 @@ export async function handleBazukaGet(): Promise<Response> {
 
 export async function handleBazukaPost(request: Request, env: Env): Promise<Response> {
 	try {
-		const data = await request.json() as BazukaData & { suggestedId?: string, hp_field?: string };
-		if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
-		if (!data.nickname || !data.job) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });
-		const id = data.suggestedId || generateUniqueId();
+		const body = await request.json();
+		const validation = validateBazukaRequest(body);
+		
+		if (!validation.success) {
+			return jsonResponse({ error: validation.error }, 400);
+		}
+		
+		const { hp_field, suggestedId, ...data } = validation.data!;
+		if (hp_field) return jsonResponse({ error: 'Bot detected.' }, 403);
+		
+		const id = suggestedId || generateUniqueId();
 		await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'bazuka' }), { expirationTtl: 259200 });
 		return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
-	} catch (_e) { return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 }); }
+	} catch (e) {
+		console.error('Bazuka POST error:', e);
+		return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 });
+	}
 }
