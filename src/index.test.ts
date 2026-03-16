@@ -381,6 +381,58 @@ Hope this helps!`
     });
   });
 
+  describe("RAGNAR Feature (Slide Forge)", () => {
+    it("serves the RAGNAR HUD page", async () => {
+      const res = await SELF.fetch("http://localhost/ragnar");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("RAGNAR");
+      expect(html).toContain("Forge Presentation");
+    });
+
+    it("forges a tactical slide deck with various slide types", async () => {
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({
+          title: "Viking Strategy",
+          audience: "Modern Warriors",
+          slides: [
+            { header: "The Mission", content: "• Conquer the digital realm\\n• Establish dominance", type: "list" },
+            { header: "Wisdom", content: "Victory belongs to those who prepare.", type: "quote" },
+            { header: "Impact", content: "100% Market Capture", type: "bigtext" },
+            { header: "Transformation", content: "Legacy Systems | The AI Vanguard", type: "comparison" },
+            { header: "Next Steps", content: "• Deploy the fleet", type: "list" },
+            { header: "Next Steps", content: "• Deploy the fleet", type: "list" },
+            { header: "Next Steps", content: "• Deploy the fleet", type: "list" },
+            { header: "Next Steps", content: "• Deploy the fleet", type: "list" },
+            { header: "Next Steps", content: "• Deploy the fleet", type: "list" },
+            { header: "Next Steps", content: "• Deploy the fleet", type: "list" }
+          ]
+        })
+      });
+
+      const res = await SELF.fetch("http://localhost/ragnar/forge", {
+        method: "POST",
+        body: JSON.stringify({ title: "Viking Strategy", audience: "Warriors", details: "Conquer the digital realm." }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(res.status).toBe(200);
+      const { id } = await res.json() as { id: string };
+      expect(id).toBeDefined();
+
+      const renderRes = await SELF.fetch(`http://localhost/ragnar/slide/${id}`);
+      expect(renderRes.status).toBe(200);
+      const html = await renderRes.text();
+      expect(html).toContain("Viking Strategy");
+      expect(html).toContain("reveal.js");
+      expect(html).toContain("RAGNAR'S COUNSEL"); // Check for quote slide
+      expect(html).toContain("VICTORY STATE"); // Check for comparison slide
+      expect(html.match(/<section/g)?.length).toBeGreaterThan(10);
+
+      aiSpy.mockRestore();
+    });
+  });
+
   describe("MUSASHI Feature (Attack Engine)", () => {
     const validJobIntel = "We are seeking a Senior Data Analyst with 5 years experience in SQL and Python. You will build dashboards and lead a team.";
 
@@ -748,14 +800,14 @@ Hope this helps!`
     it("verifies all professional tools are reachable from the homepage", async () => {
       const res = await SELF.fetch("http://localhost/");
       const html = await res.text();
-      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/freya"];
+      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/ragnar", "/freya"];
 
       for (const tool of tools) {
         expect(html).toContain(`href="${tool}"`);
       }
     });
 
-    it("verifies the ECOSYSTEM Portal shows all 6 launched tools and brand", async () => {
+    it("verifies the ECOSYSTEM Portal shows all 7 launched tools and brand", async () => {
       // Fetch ODIN as a representative page with the portal
       const res = await SELF.fetch("http://localhost/odin");
       const html = await res.text();
@@ -764,8 +816,8 @@ Hope this helps!`
       expect(html).toContain("punchy-portal");
       expect(html).toContain("PUNCHY.ME");
       
-      // Verify all 6 Tools are in the portal
-      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/freya"];
+      // Verify all 7 Tools are in the portal
+      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/ragnar", "/freya"];
       for (const tool of portalTools) {
         // Look for the specific link structure used in the portal switcher
         expect(html).toContain(`href="${tool}"`);

@@ -422,6 +422,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
         <a href="/musashi" class="dock-item" data-title="MUSASHI">⚔️</a>
         <a href="/odin" class="dock-item" data-title="ODIN">🐦‍⬛</a>
         <a href="/yaiba" class="dock-item" data-title="YAIBA">✒️</a>
+        <a href="/ragnar" class="dock-item" data-title="RAGNAR">🛡️</a>
         <a href="/freya" class="dock-item" data-title="FREYA">🌠</a>
         <div class="dock-item" data-title="SOUND" onclick="toggleSound()" style="cursor:pointer" id="sound-btn">🎧</div>
     </div>
@@ -563,6 +564,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
                         'musashi': '/musashi', 'job': '/musashi', 'intel': '/musashi',
                         'odin': '/odin', 'data': '/odin', 'analysis': '/odin',
                         'yaiba': '/yaiba', 'write': '/yaiba', 'markdown': '/yaiba',
+                        'ragnar': '/ragnar', 'slide': '/ragnar', 'presentation': '/ragnar',
                         'freya': '/freya', 'image': '/freya', 'design': '/freya',
                         'asgard': '/asgard',
                         'home': '/'

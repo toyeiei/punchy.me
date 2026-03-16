@@ -1,5 +1,7 @@
-import { Env, AnakinData } from '../core/types';
+import { Env } from '../core/types';
 import { ANAKIN_FORM_HTML } from '../ui';
+import { generateUniqueId, jsonResponse, parseAIResponse } from '../core/utils';
+import { validateAnakinRequest } from '../core/validation';
 
 export async function handleAnakinGet(): Promise<Response> {
     return new Response(ANAKIN_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
@@ -7,27 +9,36 @@ export async function handleAnakinGet(): Promise<Response> {
 
 export async function handleAnakinPost(request: Request, env: Env): Promise<Response> {
 	try {
-		const data = await request.json() as AnakinData & { suggestedId?: string, hp_field?: string };
-		if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
-		if (!data.name || !data.experience || !data.skills) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });      
-		if (data.experience.length > 500) return new Response(JSON.stringify({ error: 'Experience too dense. Limit 500 characters.' }), { status: 400 });
-		const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
+		const body = await request.json();
+		const validation = validateAnakinRequest(body);
+		
+		if (!validation.success) {
+			return new Response(JSON.stringify({ error: validation.error }), { status: 400 });
+		}
+		
+		const { hp_field, suggestedId, ...data } = validation.data!;
+		if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+		
+		const id = suggestedId || generateUniqueId();
 		await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: 259200 });
-		return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
-	} catch (_e) { return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 }); }
+		return jsonResponse({ id });
+	} catch (e) {
+		console.error('Anakin POST error:', e);
+		return jsonResponse({ error: 'Invalid request' }, 400);
+	}
 }
 
 export async function handleAnakinHydrate(request: Request, env: Env, path: string): Promise<Response> {
 	if (request.method !== 'POST') return new Response('Method Not Allowed', { status: 405 });
 	const id = path.split('/').pop();
-	if (!id) return new Response(JSON.stringify({ error: 'Invalid ID' }), { status: 400 });
+	if (!id) return jsonResponse({ error: 'Invalid ID' }, 400);
 	const value = await env.SHORT_LINKS.get(id);
-	if (!value) return new Response(JSON.stringify({ error: 'Not Found' }), { status: 404 });
+	if (!value) return jsonResponse({ error: 'Not Found' }, 404);
 	try {
-		if (!value.startsWith('{')) return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
+		if (!value.startsWith('{')) return jsonResponse({ error: 'Invalid Type' }, 400);
 		const data = JSON.parse(value);
-		if (data.type !== 'anakin') return new Response(JSON.stringify({ error: 'Invalid Type' }), { status: 400 });
-		if (data.aiHydrated) return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
+		if (data.type !== 'anakin') return jsonResponse({ error: 'Invalid Type' }, 400);
+		if (data.aiHydrated) return jsonResponse(data);
 		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
 			max_tokens: 350, temperature: 0.4, response_format: { type: 'json_object' },
 			messages: [
@@ -36,25 +47,7 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 			]
 		}) as { response: string | Record<string, unknown> };
 		
-		let result: Record<string, unknown> = {};
-		if (typeof aiResponse.response === 'string') {
-			try {
-				const jsonMatch = aiResponse.response.match(/\{[\s\S]*\}/);
-				if (jsonMatch) {
-					result = JSON.parse(jsonMatch[0]);
-				} else {
-					result = JSON.parse(aiResponse.response);
-				}
-			} catch (_e) {
-				console.error("ANAKIN: Final JSON Parse Failure on:", aiResponse.response);
-			}
-		} else {
-			result = aiResponse.response || {};
-		}
-
-		console.log('\n--- ANAKIN AI RAW OUTPUT ---');
-		console.log(typeof aiResponse.response === 'string' ? aiResponse.response : JSON.stringify(result, null, 2));
-		console.log('----------------------------\n');
+		const result = parseAIResponse(aiResponse.response);
 
 		data.aiSummary = result.summary ? String(result.summary).trim() : "Elite profile forged.";
 		
@@ -68,6 +61,9 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 		
 		data.aiHydrated = true;
 		await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
-		return new Response(JSON.stringify(data), { headers: { 'Content-Type': 'application/json' } });
-	} catch (_e) { return new Response(JSON.stringify({ error: 'Hydration failed' }), { status: 500 }); }
+		return jsonResponse(data);
+	} catch (e) {
+		console.error('Anakin hydration error:', e);
+		return jsonResponse({ error: 'Hydration failed' }, 500);
+	}
 }

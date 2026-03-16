@@ -36,6 +36,7 @@ export const PUNCHY_PORTAL_HTML = `
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
             <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
+            <object><a href="/ragnar" class="portal-tool-link" title="RAGNAR">🛡️</a></object>
             <object><a href="/freya" class="portal-tool-link" title="FREYA">🌠</a></object>
             <object><a href="/asgard" class="portal-tool-link" title="ASGARD">🌌</a></object>
         </div>

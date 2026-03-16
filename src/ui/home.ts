@@ -545,6 +545,14 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
             </a>
+            <a href="/ragnar" class="feature-card">
+                <span class="feature-icon">🛡️</span>
+                <div class="feature-title">
+                    RAGNAR
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
+                <div class="feature-tagline">Legendary Slide Forge. Elite 10-page decks forged by AI in seconds.</div>
+            </a>
             <a href="/freya" class="feature-card">
                 <span class="feature-icon">🌠</span>
                 <div class="feature-title">
@@ -682,7 +690,7 @@ export const HTML = `<!DOCTYPE html>
         <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>SYNCING TO EDGE | PUNCHY.ME</title>
+        <title>NOT FOUND | PUNCHY.ME</title>
         <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
         <style>
         :root { --bg: #000000; --accent: #22c55e; --text: #f8fafc; --font-brand: 'Bitcount Prop Double', cursive; --font-mono: 'JetBrains Mono', monospace; }
@@ -695,20 +703,17 @@ export const HTML = `<!DOCTYPE html>
         .container { z-index: 10; padding: 2rem; border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 24px; background: rgba(17, 17, 17, 0.8); backdrop-filter: blur(10px); max-width: 400px; }
         h1 { font-family: var(--font-brand); color: var(--accent); font-size: 2.5rem; margin-bottom: 1rem; text-transform: uppercase; font-weight: 400; }
         p { color: #94a3b8; line-height: 1.6; font-size: 0.9rem; margin-bottom: 2rem; }
-        .loader { width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); position: relative; overflow: hidden; border-radius: 2px; }
-        .loader-bar { position: absolute; top: 0; left: 0; height: 100%; background: var(--accent); width: 0%; animation: sync 1.5s linear forwards; box-shadow: 0 0 10px var(--accent); }
-        @keyframes sync { 0% { width: 0%; } 100% { width: 100%; } }
-        .status { margin-top: 1rem; font-size: 0.7rem; font-weight: 700; color: var(--accent); letter-spacing: 2px; opacity: 0.8; }
+        a { color: var(--accent); text-decoration: none; font-weight: 700; }
+        a:hover { text-decoration: underline; }
         </style>
         </head>
         <body>
         <div class="grid-bg"></div>
         <div class="pixel-bg" id="pixel-bg"></div>
         <div class="container">
-        <h1>SYNCING...</h1>
-        <p>Forging your link across the global edge network. This usually takes a few seconds.</p>
-        <div class="loader"><div class="loader-bar"></div></div>
-        <div class="status">RE-SYNCING IN 1.5s</div>
+        <h1>404</h1>
+        <p>This link doesn't exist or has expired. Short links are deleted after 72 hours.</p>
+        <a href="/">← Back to PUNCHY.ME</a>
         </div>
         <script>
         const bg = document.getElementById('pixel-bg');
@@ -725,9 +730,6 @@ export const HTML = `<!DOCTYPE html>
         }
         setInterval(createPixel, 300);
         for(let i=0; i<20; i++) createPixel();
-
-        // Auto-Reload after 1.5 seconds
-        setTimeout(() => window.location.reload(), 1500);
         </script>
         </body>
         </html>`;

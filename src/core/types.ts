@@ -27,10 +27,24 @@ export interface YaibaData {
 	createdAt: number;
 }
 
+export interface RagnarSlide {
+	header: string;
+	content: string;
+	type?: 'list' | 'quote' | 'bigtext' | 'comparison';
+}
+
+export interface RagnarData {
+	type: 'ragnar';
+	title: string;
+	audience: string;
+	slides: RagnarSlide[];
+}
+
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
 	TURNSTILE_SITE_KEY: string;
+	TURNSTILE_SECRET_KEY: string;
 	UNSPLASH_ACCESS_KEY: string;
 	RESEND_API_KEY?: string;
 }

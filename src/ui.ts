@@ -3,6 +3,8 @@ export * from './ui/bazuka';
 export * from './ui/anakin';
 export * from './ui/musashi';
 export * from './ui/yaiba';
+export * from './ui/ragnar';
+export * from './ui/ragnar_slides';
 export * from './ui/odin';
 export * from './ui/freya';
 export * from './ui/asgard';
