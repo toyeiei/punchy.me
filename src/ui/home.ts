@@ -543,7 +543,7 @@ export const HTML = `<!DOCTYPE html>
                 <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
             </a>
             <a href="/freya" class="feature-card">
-                <span class="feature-icon">🎨</span>
+                <span class="feature-icon">🌠</span>
                 <div class="feature-title">
                     FREYA
                     <span class="coming-soon-badge">BETA</span>

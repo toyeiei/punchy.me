@@ -616,7 +616,8 @@ export const FREYA_HTML = `<!DOCTYPE html>
                 textCtx.fillStyle = "white";
 
                 const posX = (w * posXPercent) / 100;
-                const posY = (h * posYPercent) / 100;
+                // Invert Y axis: sliding right (higher percent) moves text UP (lower Y value)
+                const posY = h - ((h * posYPercent) / 100);
                 textCtx.fillText(text, posX, posY);
             }
         }
