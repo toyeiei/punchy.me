@@ -877,4 +877,36 @@ Hope this helps!`
     });
   });
 
+  describe("ASGARD Workspace Robustness", () => {
+    it("Workspace Accessibility: serves correct HTML structure", async () => {
+      const res = await SELF.fetch("http://localhost/asgard");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain('class="bg-layer"');
+      expect(html).toContain('class="dock-container"');
+      expect(html).toContain('id="spotlight"');
+      expect(html).toContain('id="clock"');
+      expect(html).toContain('id="pomodoro"');
+    });
+
+    it("Soundscape Edge Integrity: verifies local asset path and performance headers", async () => {
+      const res = await SELF.fetch("http://localhost/asgard");
+      const html = await res.text();
+      // Verify local asset usage
+      expect(html).toContain('src="/asgard_assets/all-of-my-pryces-asgard.mp3"');
+      // Verify performance mandate (preload="none")
+      expect(html).toContain('preload="none"');
+    });
+
+    it("Zen Mode State Consistency: verifies CSS existence and layout stability", async () => {
+      const res = await SELF.fetch("http://localhost/asgard");
+      const html = await res.text();
+      // Check for Zen mode specific CSS rules that prevent layout shift
+      expect(html).toContain('body.zen-mode .dock-container');
+      expect(html).toContain('body.zen-mode .pomodoro-container');
+      // Verify the removed bright green neon state (checking absence of the class rule)
+      expect(html).not.toContain('.pomodoro-container.active { color: #22c55e; }');
+    });
+  });
+
 });

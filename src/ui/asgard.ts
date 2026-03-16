@@ -192,29 +192,98 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
         }
 
         /* Extremely subtle branding */
-        .brand-watermark {
-            position: absolute;
-            bottom: 1rem;
-            right: 1.5rem;
-            font-family: var(--font-mono);
+        /* Spotlight Search */
+        .spotlight-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: none;
+            align-items: center;
+            justify-content: center;
+        }
+        .spotlight-overlay.active { display: flex; }
+        .spotlight-search-box {
+            width: 600px;
+            max-width: 90%;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            transform: translateY(-50px);
+            transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+        .spotlight-overlay.active .spotlight-search-box { transform: translateY(0); }
+        .spotlight-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #fff;
+            font-size: 1.5rem;
+            font-family: var(--font-display);
+        }
+        .spotlight-hint {
             font-size: 0.7rem;
             color: var(--text-dim);
-            letter-spacing: 2px;
-            opacity: 0.5;
-            z-index: 10;
+            margin-top: 1rem;
             text-transform: uppercase;
+            letter-spacing: 1px;
+            font-family: var(--font-mono);
         }
-        .brand-watermark a { color: inherit; text-decoration: none; }
-        .brand-watermark a:hover { color: #fff; }
+
+        /* Pomodoro Timer */
+        .pomodoro-container {
+            margin-top: 1rem;
+            font-family: var(--font-mono);
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            user-select: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .pomodoro-container:hover { color: #fff; }
+        .pomodoro-progress {
+            width: 100px;
+            height: 2px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 1px;
+            overflow: hidden;
+            position: relative;
+        }
+        .pomodoro-bar {
+            height: 100%;
+            background: #22c55e;
+            width: 0%;
+            transition: width 1s linear;
+        }
+
+        /* Total Stealth (Zen Mode) */
+        body.zen-mode .dock-container,
+        body.zen-mode .greeting {
+            opacity: 0 !important;
+            pointer-events: none !important;
+        }
+        body.zen-mode .pomodoro-container {
+            margin-top: 0.5rem;
+        }
 
         @media (max-width: 768px) {
-            .clock { font-size: 5rem; }
-            .greeting { font-size: 1.5rem; }
+            .time-container { top: 15%; width: 100%; padding: 0 1rem; }
+            .clock { font-size: 8.5rem; letter-spacing: -4px; }
+            .date-display { font-size: 1.7rem; letter-spacing: 2px; }
+            .greeting { font-size: 1.2rem; }
             .dock-container {
-                width: 90%;
+                width: 95%;
                 justify-content: center;
                 gap: 5px;
                 padding: 10px;
+                bottom: 1rem;
             }
             .dock-item { width: 40px; height: 40px; font-size: 1.2rem; }
             .dock-item:hover { transform: scale(1.3) translateY(-5px); margin: 0 5px; }
@@ -231,6 +300,21 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
         <div class="clock" id="clock">00:00</div>
         <div class="date-display" id="date">JANUARY 1</div>
         <div class="greeting" id="greeting">Welcome to Asgard.</div>
+        
+        <div class="pomodoro-container" id="pomodoro" onclick="togglePomodoro()" oncontextmenu="resetPomodoro(event)">
+            <span id="pomo-status">FOCUS</span>
+            <span id="pomo-timer">25:00</span>
+            <div class="pomodoro-progress">
+                <div class="pomodoro-bar" id="pomo-bar"></div>
+            </div>
+        </div>
+    </div>
+
+    <div class="spotlight-overlay" id="spotlight">
+        <div class="spotlight-search-box">
+            <input type="text" class="spotlight-input" id="spotlight-input" placeholder="Search Google or Ecosystem..." autocomplete="off">
+            <div class="spotlight-hint">Press ENTER to Search • ESC to Close • ⌘K to Open</div>
+        </div>
     </div>
 
     <div class="dock-container">
@@ -241,11 +325,12 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
         <a href="/odin" class="dock-item" data-title="ODIN">🐦‍⬛</a>
         <a href="/yaiba" class="dock-item" data-title="YAIBA">✒️</a>
         <a href="/freya" class="dock-item" data-title="FREYA">🌠</a>
+        <div class="dock-item" data-title="SOUND" onclick="toggleSound()" style="cursor:pointer" id="sound-btn">🎧</div>
     </div>
 
-    <div class="brand-watermark">
-        <a href="/">PUNCHY.ME</a>
-    </div>
+    <audio id="ambient-audio" loop preload="none">
+        <source src="/asgard_assets/all-of-my-pryces-asgard.mp3" type="audio/mpeg">
+    </audio>
 
     <script>
         function updateTime() {
@@ -276,6 +361,122 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
 
         setInterval(updateTime, 1000);
         updateTime(); // Initial call
+
+        // --- POMODORO LOGIC ---
+        let pomoMinutes = 25;
+        let pomoSeconds = 0;
+        let pomoInterval = null;
+        let isPomoActive = false;
+
+        function togglePomodoro() {
+            const container = document.getElementById('pomodoro');
+            if (isPomoActive) {
+                clearInterval(pomoInterval);
+                isPomoActive = false;
+                container.classList.remove('active');
+                document.getElementById('pomo-status').innerText = 'PAUSED';
+            } else {
+                isPomoActive = true;
+                container.classList.add('active');
+                document.getElementById('pomo-status').innerText = 'FOCUS';
+                pomoInterval = setInterval(updatePomodoro, 1000);
+            }
+        }
+
+        function updatePomodoro() {
+            if (pomoSeconds === 0) {
+                if (pomoMinutes === 0) {
+                    clearInterval(pomoInterval);
+                    alert('Focus Session Complete, Asgardian.');
+                    resetPomodoro();
+                    return;
+                }
+                pomoMinutes--;
+                pomoSeconds = 59;
+            } else {
+                pomoSeconds--;
+            }
+            renderPomo();
+        }
+
+        function renderPomo() {
+            const m = pomoMinutes < 10 ? '0' + pomoMinutes : pomoMinutes;
+            const s = pomoSeconds < 10 ? '0' + pomoSeconds : pomoSeconds;
+            document.getElementById('pomo-timer').innerText = m + ':' + s;
+            const percent = ((25 * 60 - (pomoMinutes * 60 + pomoSeconds)) / (25 * 60)) * 100;
+            document.getElementById('pomo-bar').style.width = percent + '%';
+        }
+
+        function resetPomodoro(e) {
+            if (e) e.preventDefault();
+            clearInterval(pomoInterval);
+            isPomoActive = false;
+            pomoMinutes = 25;
+            pomoSeconds = 0;
+            document.getElementById('pomodoro').classList.remove('active');
+            document.getElementById('pomo-status').innerText = 'FOCUS';
+            renderPomo();
+        }
+
+        // --- SPOTLIGHT LOGIC ---
+        const spotlight = document.getElementById('spotlight');
+        const spotlightInput = document.getElementById('spotlight-input');
+
+        window.addEventListener('keydown', (e) => {
+            // Toggle Zen Mode (Z key)
+            if (e.key.toLowerCase() === 'z' && document.activeElement.tagName !== 'INPUT') {
+                document.body.classList.toggle('zen-mode');
+            }
+
+            // Open Spotlight (Ctrl+K or Cmd+K)
+            if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'k') {
+                e.preventDefault();
+                spotlight.classList.add('active');
+                spotlightInput.focus();
+            }
+
+            // Close Spotlight (Escape)
+            if (e.key === 'Escape') {
+                spotlight.classList.remove('active');
+                spotlightInput.blur();
+            }
+        });
+
+        spotlightInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                const query = spotlightInput.value.trim();
+                if (query) {
+                    window.open('https://www.google.com/search?q=' + encodeURIComponent(query), '_blank');
+                    spotlight.classList.remove('active');
+                    spotlightInput.value = '';
+                }
+            }
+        });
+
+        spotlight.addEventListener('click', (e) => {
+            if (e.target === spotlight) {
+                spotlight.classList.remove('active');
+            }
+        });
+
+        // --- SOUNDSCAPE LOGIC ---
+        let isSoundOn = false;
+        const audio = document.getElementById('ambient-audio');
+        const soundBtn = document.getElementById('sound-btn');
+
+        function toggleSound() {
+            if (isSoundOn) {
+                audio.pause();
+                soundBtn.innerText = '🎧';
+                soundBtn.style.filter = 'grayscale(1)';
+                isSoundOn = false;
+            } else {
+                audio.play();
+                soundBtn.innerText = '🔊';
+                soundBtn.style.filter = 'grayscale(0)';
+                isSoundOn = true;
+            }
+        }
     </script>
 </body>
 </html>`;
