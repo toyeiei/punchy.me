@@ -17,3 +17,19 @@ export async function verifyTurnstile(token: string): Promise<boolean> {
 	const verifyData = await verifyRes.json() as { success: boolean };
 	return verifyData.success;
 }
+
+/**
+ * Global Security Hardening: Enforce 1MB payload size limit for POST requests.
+ */
+export function validatePayloadSize(request: Request): Response | null {
+	if (request.method === 'POST') {
+		const contentLength = request.headers.get('content-length');
+		if (contentLength && parseInt(contentLength, 10) > 1048576) {
+			return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), { 
+				status: 413, 
+				headers: { 'Content-Type': 'application/json' } 
+			});
+		}
+	}
+	return null;
+}

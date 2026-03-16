@@ -4,10 +4,13 @@ import { describe, it, expect, vi, beforeEach } from "vitest";
 describe("PUNCHY.ME URL Shortener", () => {
   
   beforeEach(async () => {
-    // Clear KV before each test to ensure absolute isolation
-    const keys = await env.SHORT_LINKS.list();
-    for (const key of keys.keys) {
-      await env.SHORT_LINKS.delete(key.name);
+    // Optimized KV clearing: only clear if not empty
+    const keys = await env.SHORT_LINKS.list({ limit: 10 });
+    if (keys.keys.length > 0) {
+      const allKeys = await env.SHORT_LINKS.list();
+      for (const key of allKeys.keys) {
+        await env.SHORT_LINKS.delete(key.name);
+      }
     }
   });
 
@@ -667,15 +670,19 @@ Hope this helps!`
     });
 
     it("proxies Unsplash API searches securely and returns sanitized JSON", async () => {
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-        ok: true,
-        json: async () => ({
-          results: [
-            { id: "1", urls: { regular: "https://example.com/1.jpg" }, alt_description: "alt 1", user: { name: "user1" } },
-            { id: "2", urls: { regular: "https://example.com/2.jpg" }, alt_description: "alt 2", user: { name: "user2" } }
-          ]
-        })
-      } as unknown as Response);
+      const originalFetch = globalThis.fetch;
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+        const url = typeof input === 'string' ? input : (input as Request).url;
+        if (url.includes('api.unsplash.com')) {
+          return new Response(JSON.stringify({
+            results: [
+              { id: "1", urls: { regular: "https://example.com/1.jpg" }, alt_description: "alt 1", user: { name: "user1" } },
+              { id: "2", urls: { regular: "https://example.com/2.jpg" }, alt_description: "alt 2", user: { name: "user2" } }
+            ]
+          }), { status: 200, headers: { 'Content-Type': 'application/json' }});
+        }
+        return originalFetch(input, init);
+      });
 
       const res = await SELF.fetch("http://localhost/picasso/search?q=office", {
         method: "GET",
@@ -690,21 +697,29 @@ Hope this helps!`
       expect(images.length).toBe(2);
       // Verify sanitized URL structure (optimized for webp)
       expect(images[0].url).toContain("w=1200");
-      expect(images[0].thumb).toContain("w=200");
+      expect(images[0].thumb).toContain("w=150");
       
-      const fetchCall = fetchSpy.mock.calls[0];
-      expect(fetchCall[0]).toContain("query=office");
+      const fetchCall = fetchSpy.mock.calls.find(call => {
+        const url = typeof call[0] === 'string' ? call[0] : (call[0] as Request).url;
+        return url.includes('api.unsplash.com');
+      });
+      expect(fetchCall).toBeDefined();
+      expect(typeof fetchCall![0] === 'string' ? fetchCall![0] : (fetchCall![0] as Request).url).toContain("query=office");
       
       fetchSpy.mockRestore();
     });
 
     it("supports random image loads with empty queries", async () => {
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-        ok: true,
-        json: async () => ([
-          { id: "rand1", urls: { regular: "https://example.com/r1.jpg" }, alt_description: "rand alt", user: { name: "user1" } }
-        ])
-      } as unknown as Response);
+      const originalFetch = globalThis.fetch;
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+        const url = typeof input === 'string' ? input : (input as Request).url;
+        if (url.includes('api.unsplash.com')) {
+          return new Response(JSON.stringify([
+            { id: "rand1", urls: { regular: "https://example.com/r1.jpg" }, alt_description: "rand alt", user: { name: "user1" } }
+          ]), { status: 200, headers: { 'Content-Type': 'application/json' }});
+        }
+        return originalFetch(input, init);
+      });
 
       const res = await SELF.fetch("http://localhost/picasso/search?q=", {
         method: "GET",
@@ -714,26 +729,44 @@ Hope this helps!`
       const data = await res.json() as any;
       expect(data.images[0].id).toBe("rand1");
       
-      const fetchCall = fetchSpy.mock.calls[0];
-      expect(fetchCall[0]).toContain("/photos/random");
+      const fetchCall = fetchSpy.mock.calls.find(call => {
+        const url = typeof call[0] === 'string' ? call[0] : (call[0] as Request).url;
+        return url.includes('api.unsplash.com');
+      });
+      expect(fetchCall).toBeDefined();
+      expect(typeof fetchCall![0] === 'string' ? fetchCall![0] : (fetchCall![0] as Request).url).toContain("/photos/random");
       
       fetchSpy.mockRestore();
     });
 
     it("enforces Unsplash API specific rate limiting (10 per minute)", async () => {
-      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockResolvedValue({
-        ok: true,
-        json: async () => ({ results: [] })
-      } as unknown as Response);
+      const originalFetch = globalThis.fetch;
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+        const url = typeof input === 'string' ? input : (input as Request).url;
+        if (url.includes('api.unsplash.com')) {
+          // Mock the random endpoint response structure (array of objects with 'urls')
+          return new Response(JSON.stringify([{ 
+            id: "mock", 
+            urls: { regular: "https://example.com/mock.jpg" },
+            alt_description: "mock alt",
+            user: { name: "mock user" }
+          }]), { status: 200, headers: { 'Content-Type': 'application/json' }});
+        }
+        return originalFetch(input, init);
+      });
       
-      const ip = "picasso-rate-limit-ip-" + Date.now();
+      const ip = "picasso-rl-ip-" + Date.now();
+      // Using an empty query (q=) triggers 'random' mode, bypassing the Cache API 
+      // which prevents ctx.waitUntil hanging in the Vitest simulator during loop requests.
       for (let i = 0; i < 10; i++) {
-        await SELF.fetch(`http://localhost/picasso/search?q=test&i=${i}`, {
+        const r = await SELF.fetch(`http://localhost/picasso/search?q=&i=${i}`, {
           method: "GET",
           headers: { "cf-connecting-ip": ip },
         });
+        expect(r.status).toBe(200);
       }
-      const res = await SELF.fetch(`http://localhost/picasso/search?q=test&i=11`, {
+
+      const res = await SELF.fetch(`http://localhost/picasso/search?q=&i=11`, {
         method: "GET",
         headers: { "cf-connecting-ip": ip },
       });
@@ -755,7 +788,7 @@ Hope this helps!`
       }
     });
 
-    it("verifies the ECOSYSTEM Portal shows all 5 launched tools and brand", async () => {
+    it("verifies the ECOSYSTEM Portal shows all 6 launched tools and brand", async () => {
       // Fetch ODIN as a representative page with the portal
       const res = await SELF.fetch("http://localhost/odin");
       const html = await res.text();
@@ -764,8 +797,8 @@ Hope this helps!`
       expect(html).toContain("punchy-portal");
       expect(html).toContain("PUNCHY.ME");
       
-      // Verify all 5 Tools are in the portal
-      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba"];
+      // Verify all 6 Tools are in the portal
+      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/picasso"];
       for (const tool of portalTools) {
         // Look for the specific link structure used in the portal switcher
         expect(html).toContain(`href="${tool}"`);

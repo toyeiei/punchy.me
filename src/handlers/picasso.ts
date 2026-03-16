@@ -26,7 +26,7 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 		const cache = caches.default;
 		const cacheKey = new Request(url.toString(), request);
 		if (isSearch) {
-			let cachedResponse = await cache.match(cacheKey);
+			const cachedResponse = await cache.match(cacheKey);
 			if (cachedResponse) return cachedResponse;
 		}
 
@@ -38,6 +38,10 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 		const res = await fetch(unsplashUrl, {
 			headers: {
 				'Authorization': `Client-ID ${env.UNSPLASH_ACCESS_KEY}`
+			},
+			cf: { 
+				cacheTtl: isSearch ? 600 : 0, 
+				cacheEverything: isSearch 
 			}
 		});
 
@@ -57,9 +61,9 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 			return {
 				id: img.id,
 				url: `${baseUrl}${joiner}w=1200&fit=max&fm=webp&q=70`, // Optimized for Social Media (1200px)
-				preview: `${baseUrl}${joiner}w=800&fit=max&fm=webp&q=40`,
-				tiny: `${baseUrl}${joiner}w=200&fit=max&fm=webp&q=20`, // Tier 0
-				thumb: `${baseUrl}${joiner}w=200&fit=crop&fm=webp&q=45`, // Ultra-tiny grid thumb
+				preview: `${baseUrl}${joiner}w=600&fit=max&fm=webp&q=30`, // Fast canvas "ghost" load (600px)
+				tiny: `${baseUrl}${joiner}w=100&fit=max&fm=webp&q=15`, // Extreme pre-fetch (100px)
+				thumb: `${baseUrl}${joiner}w=150&fit=crop&fm=webp&q=30`, // Optimized grid thumb (150px)
 				alt: img.alt_description,
 				author: img.user?.name || 'Unknown'
 			};

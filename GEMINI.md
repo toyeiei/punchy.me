@@ -73,6 +73,7 @@ Before implementing complex roadmap items (e.g., MUSASHI blades), demand **Techn
 
 ## CLI & Environment
 - **Command Separation**: Always use `;` to separate multiple commands in a single line (PowerShell requirement). Do **NOT** use `&&` as it is not supported in this environment.
+- **Verbose Testing**: Use `npx vitest run --reporter=verbose` to debug hanging tests or detailed execution flow. This is the primary method for identifying bottlenecks in AI or Rate-Limiting suites.
 
 ## Deployment Protocol
 - **Explicit Approval**: NEVER deploy automatically (e.g., `wrangler deploy` or `npm run deploy`). You MUST ask for explicit user permission before every deployment to production.
@@ -146,6 +147,12 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
     - **Tone:** Senior-level, action-oriented, and result-focused.
 
 ## Progress & Architectural Milestones
+
+### Version 4.7.0 - PICASSO Edge Image Forge (2026-03-16)
+- **PICASSO Image Editor**: Launched the ultra-fast, edge-native image editor (`/picasso`) with a 3-layer canvas rendering engine.
+- **Multi-Tier Loading**: Implemented a Zero-Latency loading strategy (Tiny -> Preview -> Master) for high-resolution Unsplash assets.
+- **Tactical Search Engine**: Integrated Unsplash API with Edge Caching and strict rate-limiting for optimized resource management.
+- **Social Export Pipeline**: Engineered a client-side WebP export (1200px) optimized for high-impact Open Graph and social banners.
 
 ### Version 4.6.1 - World-Class Modularization (2026-03-15)
 - **Architecture**: Extracted all tool logic from index.ts into isolated domain handlers (`src/handlers/`).

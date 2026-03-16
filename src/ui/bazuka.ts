@@ -326,6 +326,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
             <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
+            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
         </div>
     </a>
 
@@ -670,6 +671,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
             <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
+            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
         </div>
     </a>
 

@@ -38,6 +38,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
 
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='48' fill='%23000000' /%3E%3Cg transform='rotate(15, 50, 50)'%3E%3Cpath d='M35 25 H55 C65 25 75 32 75 45 C75 58 65 65 55 65 H45 V80' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' stroke-linejoin='round' fill='none' /%3E%3Cpath d='M45 45 H55' stroke='%2322c55e' stroke-width='10' stroke-linecap='round' fill='none' /%3E%3C/g%3E%3C/svg%3E">
     
+    <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,900;1,900&family=Outfit:wght@400;900&display=swap" rel="stylesheet">
@@ -102,7 +103,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         .canvas-top-menu .menu-group { display: flex; align-items: center; gap: 8px; }
         .canvas-top-menu input, .canvas-top-menu select { margin-bottom: 0 !important; height: 40px; }
         .canvas-top-menu input[type="number"] { width: 80px; text-align: center; }
-        .canvas-top-menu input[type="text"] { width: 200px; }
+        .canvas-top-menu input[type="text"] { width: 100%; }
         .canvas-top-menu select { width: 180px; }
         .menu-label { font-size: 0.6rem; color: var(--text-dim); text-transform: uppercase; letter-spacing: 1px; font-weight: 700; margin-right: 4px; }
 
@@ -165,13 +166,14 @@ export const PICASSO_HTML = `<!DOCTYPE html>
 
     <a href="/" class="punchy-portal">
         <div class="portal-trigger">⚡</div>
-        <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
             <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
             <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
             <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
             <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
             <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
+            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
+        </div>
             <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
         </div>
     </a>
@@ -199,12 +201,12 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         <div class="sidebar">
             <div class="sidebar-section">
                 <h3>SEARCH UNSPLASH</h3>
-                <div class="search-row">
-                    <input type="text" id="search-input" placeholder="Tactical Search..." oninput="debouncedSearch()" style="margin-bottom: 0;">
-                    <button class="icon-btn" onclick="searchImages(true)" id="search-btn" title="Search Unsplash">
+                <input type="text" id="search-input" placeholder="Tactical Search..." oninput="debouncedSearch()" style="margin-bottom: 0.8rem;">
+                <div class="search-row" style="margin-bottom: 0;">
+                    <button class="icon-btn" onclick="searchImages(true)" id="search-btn" title="Search Unsplash" style="flex: 1;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
                     </button>
-                    <button class="icon-btn secondary" onclick="searchImages(false)" id="load-more-btn" title="Fetch New Set">
+                    <button class="icon-btn secondary" onclick="searchImages(false)" id="load-more-btn" title="Fetch New Set" style="flex: 1;">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
                     </button>
                 </div>
@@ -229,23 +231,9 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                 
                 <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.1); margin: 0 1rem;"></div>
 
-                <div class="menu-group">
+                <div class="menu-group" style="flex: 1;">
                     <span class="menu-label">Text:</span>
-                    <input type="text" id="text-overlay" value="Punchy" placeholder="Overlay Text" oninput="renderText()">
-                </div>
-
-                <div style="width: 1px; height: 30px; background: rgba(255,255,255,0.1); margin: 0 1rem;"></div>
-
-                <div class="menu-group">
-                    <span class="menu-label">Font:</span>
-                    <select id="font-family" onchange="renderText()">
-                        <option value="'Bitcount Prop Double'">Bitcount Prop Double</option>
-                        <option value="'JetBrains Mono'">JetBrains Mono</option>
-                        <option value="'Outfit'">Outfit (Google Sans)</option>
-                        <option value="'Inter'">Inter (Sans)</option>
-                        <option value="'Oswald'">Oswald (Bold)</option>
-                        <option value="'Playfair Display'">Playfair (Elegant)</option>
-                    </select>
+                    <input type="text" id="text-overlay" value="Punchy" placeholder="Overlay Text" oninput="renderText()" style="width: 100%;">
                 </div>
             </div>
             
@@ -261,10 +249,10 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         <!-- RIGHT SIDEBAR: Editor -->
         <div class="sidebar">
             <div class="sidebar-section">
-                <h3>EDITOR</h3>
+                <h3>Editor and Font</h3>
                 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Zoom (<span id="zoom-val">100</span>%)</label>
-                <input type="range" id="img-zoom" min="10" max="500" value="100" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('zoom-val').innerText = this.value; renderBG()">
+                <input type="range" id="img-zoom" min="100" max="500" value="100" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('zoom-val').innerText = this.value; renderBG()">
 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Dark Wash (<span id="wash-val">0</span>%)</label>
                 <input type="range" id="dark-wash" min="0" max="100" value="0" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('wash-val').innerText = this.value; renderWash()">
@@ -275,8 +263,16 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Image Y (<span id="img-y-val">50</span>%)</label>
                 <input type="range" id="img-y" min="0" max="100" value="50" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('img-y-val').innerText = this.value; renderBG()">
 
-                <h3 style="margin-top: 1.5rem;">Typography Layout</h3>
-                
+                <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Font Family</label>
+                <select id="font-family" onchange="renderText()">
+                    <option value="'Bitcount Prop Double'">Bitcount Prop Double</option>
+                    <option value="'JetBrains Mono'">JetBrains Mono</option>
+                    <option value="'Outfit'">Outfit (Google Sans)</option>
+                    <option value="'Inter'">Inter (Sans)</option>
+                    <option value="'Oswald'">Oswald (Bold)</option>
+                    <option value="'Playfair Display'">Playfair (Elegant)</option>
+                </select>
+
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Font Size (<span id="font-size-val">120</span>px)</label>
                 <input type="range" id="font-size" min="10" max="400" value="120" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('font-size-val').innerText = this.value; renderText()">
 
@@ -285,6 +281,11 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Position Y (<span id="text-y-val">50</span>%)</label>
                 <input type="range" id="text-y" min="0" max="100" value="50" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('text-y-val').innerText = this.value; renderText()">
+
+                <button class="btn btn-outline" onclick="resetEditor()" style="font-size: 0.7rem; padding: 10px; margin-top: 1.5rem; border-color: rgba(255,255,255,0.1); color: var(--text-dim); display: flex; align-items: center; justify-content: center; gap: 8px;">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
+                    RESET EDITOR
+                </button>
             </div>
         </div>
     </div>
@@ -308,9 +309,31 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         resizeCanvases();
         renderAll();
 
+        function resetEditor() {
+            // Sliders & Inputs
+            document.getElementById('img-zoom').value = 100;
+            document.getElementById('dark-wash').value = 0;
+            document.getElementById('img-x').value = 50;
+            document.getElementById('img-y').value = 50;
+            document.getElementById('font-size').value = 120;
+            document.getElementById('text-x').value = 50;
+            document.getElementById('text-y').value = 50;
+            
+            // Labels
+            document.getElementById('zoom-val').innerText = '100';
+            document.getElementById('wash-val').innerText = '0';
+            document.getElementById('img-x-val').innerText = '50';
+            document.getElementById('img-y-val').innerText = '50';
+            document.getElementById('font-size-val').innerText = '120';
+            document.getElementById('text-x-val').innerText = '50';
+            document.getElementById('text-y-val').innerText = '50';
+            
+            renderAll();
+        }
+
         function debouncedSearch() {
             clearTimeout(searchTimeout);
-            searchTimeout = setTimeout(() => searchImages(true), 600);
+            searchTimeout = setTimeout(() => searchImages(true), 300);
         }
 
         function resizeCanvases() {
