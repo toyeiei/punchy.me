@@ -66,17 +66,27 @@ export const ASGARD_HTML = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        body {
+        html, body {
+            height: 100%;
+            width: 100%;
+            height: 100svh; /* Stable mobile height */
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
             background-color: #000;
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+
+        /* Hide scrollbars globally */
+        ::-webkit-scrollbar { display: none; }
+
+        body {
             color: var(--text-main);
             font-family: var(--font-display);
-            height: 100vh;
-            width: 100vw;
-            overflow: hidden;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
             position: relative;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
         /* The Cinematic Background Layer */
@@ -88,7 +98,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             background-repeat: no-repeat;
             z-index: 0;
             opacity: 0;
-            transform: scale(1.1);
+            transform: scale(1.08); /* Subtle zoom for entrance */
             transition: opacity 2.5s cubic-bezier(0.22, 1, 0.36, 1), transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
         #bg-layer.loaded {
@@ -96,31 +106,32 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             transform: scale(1.0);
         }
 
-        /* Tactical Overlay (20% Dim) */
+        /* Tactical Overlay (70% Dim) */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.2);
+            background: rgba(0, 0, 0, 0.7);
             z-index: 1;
             pointer-events: none;
         }
 
-        /* Clock and Greeting */
+        /* Clock and Greeting - Centered HUD */
         .time-container {
             position: absolute;
-            top: 20%;
+            top: 45%;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translate(-50%, -50%);
             text-align: center;
             z-index: 10;
-            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            width: 90%;
+            text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
             opacity: 0;
             animation: fadeInUI 1.5s ease-out 0.8s forwards;
         }
 
         @keyframes fadeInUI {
-            from { opacity: 0; transform: translate(-50%, 10px); }
-            to { opacity: 1; transform: translate(-50%, 0); }
+            from { opacity: 0; transform: translate(-50%, -45%); }
+            to { opacity: 1; transform: translate(-50%, -50%); }
         }
 
         .clock {
@@ -317,32 +328,40 @@ export const ASGARD_HTML = `<!DOCTYPE html>
         }
 
         @media (max-width: 768px) {
-            .time-container { top: 15%; width: 100%; padding: 0 1rem; }
-            .clock { font-size: 8.5rem; letter-spacing: -4px; }
-            .date-display { font-size: 1.7rem; letter-spacing: 2px; }
-            .greeting { font-size: 1.2rem; }
+            .time-container { top: 40%; width: 100%; padding: 0 1rem; }
+            .clock { font-size: 8.5rem; letter-spacing: -4px; margin-bottom: 0.2rem; }
+            .date-display { font-size: 1.7rem; letter-spacing: 2px; margin-bottom: 1rem; }
+            .greeting { font-size: 1.1rem; line-height: 1.4; max-width: 80%; margin: 0 auto; }
+            
             .dock-container {
                 width: auto;
-                max-width: 95vw;
+                max-width: 90vw;
                 justify-content: flex-start;
-                gap: 6px;
-                padding: 8px 15px;
-                bottom: 1.5rem;
-                height: 60px;
+                gap: 8px;
+                padding: 10px 18px;
+                bottom: calc(2.5rem + env(safe-area-inset-bottom));
+                height: 64px;
+                border-radius: 32px;
                 overflow-x: auto;
-                scrollbar-width: none; /* Hide scrollbar for Firefox */
+                -webkit-overflow-scrolling: touch;
             }
-            .dock-container::-webkit-scrollbar { display: none; } /* Hide scrollbar for Chrome/Safari */
             
             .dock-item { 
-                width: 38px; 
-                height: 38px; 
-                font-size: 1.3rem; 
+                width: 42px; 
+                height: 42px; 
+                font-size: 1.4rem; 
                 flex-shrink: 0; 
             }
-            .dock-item:hover { transform: scale(1.2) translateY(-5px); margin: 0 2px; }
+            .dock-item:hover { transform: scale(1.2) translateY(-5px); margin: 0; }
             .dock-item:hover + .dock-item,
-            .dock-item:has(+ .dock-item:hover) { transform: scale(1.1); margin: 0 1px; }
+            .dock-item:has(+ .dock-item:hover) { transform: scale(1.1); margin: 0; }
+        }
+
+        /* Extra landscape mobile optimization */
+        @media (max-height: 500px) {
+            .time-container { top: 35%; scale: 0.7; }
+            .dock-container { height: 50px; bottom: 0.5rem; padding: 5px 15px; }
+            .dock-item { width: 34px; height: 34px; font-size: 1.1rem; }
         }
     </style>
 </head>
