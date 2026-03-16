@@ -30,7 +30,6 @@ export interface YaibaData {
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
-	LOKI_DB: D1Database;
 	TURNSTILE_SITE_KEY: string;
 	UNSPLASH_ACCESS_KEY: string;
 	RESEND_API_KEY?: string;

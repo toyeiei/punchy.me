@@ -564,7 +564,6 @@ export const ASGARD_HTML = `<!DOCTYPE html>
                         'odin': '/odin', 'data': '/odin', 'analysis': '/odin',
                         'yaiba': '/yaiba', 'write': '/yaiba', 'markdown': '/yaiba',
                         'freya': '/freya', 'image': '/freya', 'design': '/freya',
-                        'loki': '/loki', 'pledge': '/loki',
                         'asgard': '/asgard',
                         'home': '/'
                     };

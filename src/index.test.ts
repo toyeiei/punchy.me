@@ -548,43 +548,6 @@ Hope this helps!`
     });
   });
 
-  describe("LOKI Feature (Support & Timeline)", () => {
-    it("serves the LOKI HUD page", async () => {
-      const res = await SELF.fetch("http://localhost/loki");
-      expect(res.status).toBe(200);
-      const html = await res.text();
-      expect(html).toContain("LOKI");
-      expect(html).toContain("Strategic Support");
-    });
-
-    it("records a support pledge in D1", async () => {
-      // Ensure table exists (defensive for test env)
-      await env.LOKI_DB.prepare('CREATE TABLE IF NOT EXISTS loki_supporters (id INTEGER PRIMARY KEY AUTOINCREMENT, name TEXT, email TEXT, message TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)').run();
-      
-      const pledge = { name: "Agent 47", email: "47@hitman.com", message: "Contracts completed." };
-      const res = await SELF.fetch("http://localhost/loki/support", {
-        method: "POST",
-        body: JSON.stringify(pledge),
-        headers: { "Content-Type": "application/json" },
-      });
-      
-      expect(res.status).toBe(200);
-      const { results } = await env.LOKI_DB.prepare('SELECT * FROM loki_supporters WHERE email = ?').bind(pledge.email).all();
-      expect(results).toHaveLength(1);
-      expect(results[0].name).toBe(pledge.name);
-    });
-
-    it("fetches the tactical timeline from D1", async () => {
-      await env.LOKI_DB.prepare('CREATE TABLE IF NOT EXISTS loki_timeline (id INTEGER PRIMARY KEY AUTOINCREMENT, content TEXT, created_at DATETIME DEFAULT CURRENT_TIMESTAMP)').run();
-      await env.LOKI_DB.prepare('INSERT INTO loki_timeline (content) VALUES (?)').bind("Test Strategic Update").run();
-
-      const res = await SELF.fetch("http://localhost/loki/timeline");
-      expect(res.status).toBe(200);
-      const data = await res.json() as Record<string, unknown>[];
-      expect(data.some(e => e.content === "Test Strategic Update")).toBe(true);
-    });
-  });
-
   describe("ODIN Feature (Tactical Analysis)", () => {
     it("serves the ODIN HUD page with all tactical dependencies", async () => {
       const res = await SELF.fetch("http://localhost/odin");
@@ -786,6 +749,7 @@ Hope this helps!`
       const res = await SELF.fetch("http://localhost/");
       const html = await res.text();
       const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/freya"];
+
       for (const tool of tools) {
         expect(html).toContain(`href="${tool}"`);
       }

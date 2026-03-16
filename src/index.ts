@@ -6,7 +6,6 @@ import { handleBazukaGet, handleBazukaPost } from './handlers/bazuka';
 import { handleAnakinGet, handleAnakinPost, handleAnakinHydrate } from './handlers/anakin';
 import { handleMusashiGet, handleMusashiForge } from './handlers/musashi';
 import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
-import { handleLokiGet, handleLokiTimeline, handleLokiSupport } from './handlers/loki';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleAsgardGet } from './handlers/asgard';
@@ -41,7 +40,6 @@ export default {
 		if (path === '/anakin' && method === 'GET') return handleAnakinGet();
 		if (path === '/musashi' && method === 'GET') return handleMusashiGet();
 		if (path === '/yaiba' && method === 'GET') return handleYaibaGet();
-		if (path === '/loki' && method === 'GET') return handleLokiGet();
 		if (path === '/odin' && method === 'GET') return handleOdinGet();
 		if (path === '/freya' && method === 'GET') return handleFreyaGet();
 
@@ -51,8 +49,6 @@ export default {
 		if (path.startsWith('/anakin/hydrate/') && method === 'POST') return handleAnakinHydrate(request, env, path);
 		if (path === '/musashi/forge' && method === 'POST') return handleMusashiForge(request, env);
 		if (path === '/yaiba/publish' && method === 'POST') return handleYaibaPublish(request, env);
-		if (path === '/loki/timeline' && method === 'GET') return handleLokiTimeline(request, env);
-		if (path === '/loki/support' && method === 'POST') return handleLokiSupport(request, env);
 		if (path === '/odin/analyze' && method === 'POST') return handleOdinAnalyze(request, env);
 		if (path === '/freya/search' && method === 'GET') return handleFreyaSearch(request, env, ctx);
 

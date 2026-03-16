@@ -9,7 +9,6 @@ To ensure mission-critical clarity, we use the following standard terms:
     - **ANAKIN**: AI-Powered Resume Forge.
     - **MUSASHI**: Cold Attack Engine (Job Intel).
     - **ODIN**: Tactical Data Command (Edge Analytics).
-    - **LOKI**: Tactical Support & Timeline (*In Development*).
 
 ---
 
