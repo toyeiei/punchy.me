@@ -1,3 +1,5 @@
+import { PUNCHY_PORTAL_HTML } from './portal';
+
 export const PICASSO_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -41,7 +43,8 @@ export const PICASSO_HTML = `<!DOCTYPE html>
     <link rel="preconnect" href="https://images.unsplash.com">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&family=Inter:wght@400;900&family=Oswald:wght@400;700&family=Playfair+Display:ital,wght@0,900;1,900&family=Outfit:wght@400;900&display=swap" rel="stylesheet">
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@400;900&display=swap">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=Inter:wght@400;900&family=JetBrains+Mono:wght@400;700&family=Outfit:wght@400;900&display=swap" rel="stylesheet">
     
     <style>
         :root {
@@ -70,7 +73,45 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         
         .brand-text-wrapper { display: flex; flex-direction: column; gap: 4px; }
         .title-row { display: flex; align-items: center; gap: 1.5rem; }
-        .brand { font-family: var(--font-brand); font-size: 4.5rem; color: var(--text-main); text-transform: uppercase; text-decoration: none; letter-spacing: -3px; line-height: 0.8; font-weight: 400; }
+        .brand { 
+            font-family: var(--font-brand); 
+            font-size: 4.5rem; 
+            color: var(--text-main); 
+            text-transform: uppercase; 
+            text-decoration: none; 
+            letter-spacing: -3px; 
+            line-height: 0.8; 
+            font-weight: 400; 
+            position: relative;
+            animation: picasso-glitch 5s infinite;
+        }
+        .brand::before, .brand::after {
+            content: attr(data-text);
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg);
+            opacity: 0;
+            z-index: -1;
+        }
+        .brand::before { left: 2px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
+        .brand::after { left: -2px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
+
+        @keyframes picasso-glitch {
+            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; } 
+            81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }  
+            82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg); text-shadow: none; }
+        }
+        @keyframes glitch-anim-1 {
+            0%, 90%, 100% { opacity: 0; transform: translate(0); clip-path: inset(50% 0 50% 0); }
+            91% { opacity: 0.5; transform: translate(-2px, 2px); clip-path: inset(10% 0 80% 0); }
+            92% { opacity: 0; transform: translate(0); }
+        }
+        @keyframes glitch-anim-2 {
+            0%, 94%, 100% { opacity: 0; transform: translate(0); clip-path: inset(50% 0 50% 0); }
+            95% { opacity: 0.5; transform: translate(2px, -2px); clip-path: inset(80% 0 10% 0); }
+            96% { opacity: 0; transform: translate(0); }
+        }
         .tagline { font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; font-weight: 700; opacity: 0.8; }
         
         .beta-badge { background: var(--accent); color: #000; font-size: 0.8rem; font-weight: 900; padding: 4px 10px; border-radius: 6px; font-family: var(--font-mono); box-shadow: 0 0 15px rgba(34, 197, 94, 0.6); animation: pulse 2s infinite alternate; letter-spacing: 1px; margin-top: -10px; }
@@ -135,17 +176,6 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         }
         #header-download-btn svg { animation: downloadBob 2s ease-in-out infinite; }
 
-        /* ECOSYSTEM PORTAL */
-        .punchy-portal { position: fixed; bottom: 1.5rem; right: 1.5rem; display: flex; flex-direction: row-reverse; align-items: center; background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.2); border-radius: 12px; padding: 0.5rem; gap: 0; overflow: hidden; width: 44px; height: 44px; transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 1000; cursor: pointer; text-decoration: none; }
-        .punchy-portal:hover { width: 360px; gap: 1rem; border-color: var(--accent); box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
-        .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
-        .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
-        .punchy-portal:hover .portal-brand { opacity: 1; }
-        .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
-        .punchy-portal:hover .portal-tools { opacity: 1; }
-        .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
-        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
-
         /* MOBILE RESTRICTION */
         .mobile-only-notice { display: none; height: 100vh; width: 100vw; flex-direction: column; align-items: center; justify-content: center; padding: 2rem; text-align: center; background: #000; position: fixed; top: 0; left: 0; z-index: 9999; }
         .mobile-only-notice h1 { font-family: var(--font-brand); font-size: 3rem; color: var(--accent); margin-bottom: 1rem; font-weight: 400; letter-spacing: -2px; text-transform: uppercase; }
@@ -164,19 +194,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         <a href="/" class="btn" style="margin-top: 2rem; width: auto;">Return to Base</a>
     </div>
 
-    <a href="/" class="punchy-portal">
-        <div class="portal-trigger">⚡</div>
-        <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
-            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
-            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
-        </div>
-            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
-        </div>
-    </a>
+    ${PUNCHY_PORTAL_HTML}
 
     <header class="tactical-header">
         <div class="brand-text-wrapper">
@@ -269,8 +287,6 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                     <option value="'JetBrains Mono'">JetBrains Mono</option>
                     <option value="'Outfit'">Outfit (Google Sans)</option>
                     <option value="'Inter'">Inter (Sans)</option>
-                    <option value="'Oswald'">Oswald (Bold)</option>
-                    <option value="'Playfair Display'">Playfair (Elegant)</option>
                 </select>
 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Font Size (<span id="font-size-val">120</span>px)</label>

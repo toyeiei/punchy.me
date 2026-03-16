@@ -1,3 +1,5 @@
+import { PUNCHY_PORTAL_HTML } from './portal';
+
 export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -17,7 +19,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" content="ANAKIN | AI-Powered Professional Resumes">  
+    <meta property="twitter:title" id="twitter-title" content="Professional Resume | PUNCHY.ME">  
     <meta property="twitter:description" content="Generate your professional digital resume with AI. Fast, stylish, and free.">
     <meta property="twitter:image" content="https://punchy.me/og-image.webp">
 
@@ -57,42 +59,6 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             overflow-y: auto;
             -webkit-overflow-scrolling: touch;
         }
-
-        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
-        .punchy-portal {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            display: flex;
-            flex-direction: row-reverse;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 12px;
-            padding: 0.5rem;
-            gap: 0;
-            overflow: hidden;
-            width: 44px;
-            height: 44px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .punchy-portal:hover {
-            width: 320px;
-            gap: 1rem;
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-        }
-        .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
-        .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
-        .punchy-portal:hover .portal-brand { opacity: 1; }
-        .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
-        .punchy-portal:hover .portal-tools { opacity: 1; }
-        .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
-        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
 
         .pixel-bg {
             position: fixed;
@@ -360,27 +326,13 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 
         button#anakin-btn:hover { background: var(--accent-hover); }
         button#anakin-btn:disabled { opacity: 0.5; cursor: not-allowed; animation: none; }
-        @media (max-width: 768px) {
-            .punchy-portal { display: none !important; }
-        }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
 
-    <a href="/" class="punchy-portal">
-        <div class="portal-trigger">⚡</div>
-        <div class="portal-brand">PUNCHY.ME</div>
-        <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
-            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
-            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
-        </div>
-    </a>
+    ${PUNCHY_PORTAL_HTML}
 
     <div class="container">
         <div class="title-container">
@@ -682,42 +634,6 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
         }
 
-        /* ECOSYSTEM PORTAL (Fast-Switcher) - ANCHORED BOTTOM RIGHT */
-        .punchy-portal {
-            position: fixed;
-            bottom: 1.5rem;
-            right: 1.5rem;
-            display: flex;
-            flex-direction: row-reverse;
-            align-items: center;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 12px;
-            padding: 0.5rem;
-            gap: 0;
-            overflow: hidden;
-            width: 44px;
-            height: 44px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-            z-index: 1000;
-            cursor: pointer;
-            text-decoration: none;
-        }
-        .punchy-portal:hover {
-            width: 320px;
-            gap: 1rem;
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(34, 197, 94, 0.2);
-        }
-        .portal-trigger { font-size: 1.2rem; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
-        .portal-brand { color: var(--accent); font-weight: 700; font-size: 0.8rem; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: var(--font-mono); }
-        .punchy-portal:hover .portal-brand { opacity: 1; }
-        .portal-tools { display: flex; gap: 0.8rem; opacity: 0; transition: opacity 0.3s ease; }
-        .punchy-portal:hover .portal-tools { opacity: 1; }
-        .portal-tool-link { text-decoration: none; font-size: 1.1rem; transition: transform 0.2s ease; filter: grayscale(1); }
-        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
-
         .resume-card {
             z-index: 10;
             background: rgba(255, 255, 255, 0.03); /* SHINOBI GLASS */
@@ -937,27 +853,13 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
             }
             .print-footer { display: block !important; text-align: center; margin-top: 20pt; font-size: 8pt; color: #666; border-top: 0.5pt solid #ddd; padding-top: 10pt; font-weight: bold; }
         }
-        @media (max-width: 768px) {
-            .punchy-portal { display: none !important; }
-        }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
 
-    <a href="/" class="punchy-portal">
-        <div class="portal-trigger">⚡</div>
-        <div class="portal-brand">PUNCHY.ME</div>
-        <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
-            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
-            <object><a href="/picasso" class="portal-tool-link" title="PICASSO">🎨</a></object>
-        </div>
-    </a>
+    ${PUNCHY_PORTAL_HTML}
     
     <div class="resume-card">
         <div class="hud-corner top-left"></div>

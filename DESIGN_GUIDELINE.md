@@ -107,6 +107,7 @@ Every new professional tool must be initialized with these 3 tactical pillars:
 ## 7. Ecosystem Portal (The Fast-Switcher)
 The standard back-link is replaced by an interactive portal that allows rapid movement between professional tools.
 
+- **Modular Protocol**: The portal must be implemented as a standalone module (`src/ui/portal.ts`) and injected into tool pages via the `${PUNCHY_PORTAL_HTML}` constant. This ensures "Update Once, Use Everywhere" consistency.
 - **Trigger**: A compact `44x44px` glass square with the brand `⚡` icon.
 - **Position**: `fixed`, `bottom: 1.5rem`, `right: 1.5rem`.
 - **Interaction**:

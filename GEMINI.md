@@ -6,6 +6,7 @@ To build a high-performance, visually striking, and reliable URL shortening serv
 ## Engineering Philosophy
 "This is our way. This is the only way to create great software."
 - **MIYAMOTO MUSASHI Strategy**: One feature at a time. Total focus. We tackle one mission until it is perfected before moving to the next.
+- **Update Once, Use Everywhere**: We prioritize extreme modularization. High-impact UI elements (like the Ecosystem Portal) must be isolated into standalone modules to ensure global consistency and zero maintenance friction.
 - **Speed & Simplicity**: Speed is our priority, simplicity is in our blood. Elegant solutions are stronger than complex ones.
 - **Reliability & Strength**: We forge things that are strong and consistent. We build systems that aren't easily broken.
 - **TDD (Test-Driven Development) First**: No code without a failing test case. We build with confidence by writing tests before code.
@@ -147,6 +148,12 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
     - **Tone:** Senior-level, action-oriented, and result-focused.
 
 ## Progress & Architectural Milestones
+
+### Version 4.7.1 - Ecosystem Portal Modularization (2026-03-16)
+- **Global Portal Modularization**: Engineered a standalone `src/ui/portal.ts` module, establishing a single source of truth for project-wide tactical navigation.
+- **Dynamic HTML Injection**: Implemented the `${PUNCHY_PORTAL_HTML}` injection protocol across all 6 professional tools, stripping redundant hardcoded HTML/CSS.
+- **Zero-Regression Resolution**: Surmounted and resolved complex "unterminated string literal" syntax errors using sub-agent (`generalist`) batch processing.
+- **"Update Once, Use Everywhere" Mandate**: Officially codified the strict modularization requirement in `GEMINI.md` and `DESIGN_GUIDELINE.md`.
 
 ### Version 4.7.0 - PICASSO Edge Image Forge (2026-03-16)
 - **PICASSO Image Editor**: Launched the ultra-fast, edge-native image editor (`/picasso`) with a 3-layer canvas rendering engine.
