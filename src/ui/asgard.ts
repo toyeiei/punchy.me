@@ -7,7 +7,7 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
     <meta name="description" content="ASGARD: The Bifrost. A world-class web workspace for the PUNCHY.ME ecosystem.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@200;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=Outfit:wght@200;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌌%3C/text%3E%3C/svg%3E">
     <style>
         :root {
@@ -15,6 +15,7 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             --text-dim: rgba(255, 255, 255, 0.7);
             --font-display: 'Outfit', sans-serif;
             --font-mono: 'JetBrains Mono', monospace;
+            --font-brand: 'Bitcount Prop Double', cursive;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -63,14 +64,16 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
         }
 
         .clock {
+            font-family: var(--font-brand);
             font-size: clamp(6rem, 12vw, 10rem);
-            font-weight: 200;
+            font-weight: 400;
             line-height: 1;
             letter-spacing: -2px;
             margin-bottom: 0.5rem;
         }
 
         .date-display {
+            font-family: var(--font-brand);
             font-size: clamp(1rem, 2vw, 1.5rem);
             font-weight: 400;
             color: var(--text-dim);
@@ -211,6 +214,7 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
     </div>
 
     <div class="dock-container">
+        <a href="/" class="dock-item" data-title="HOME">✨</a>
         <a href="/bazuka" class="dock-item" data-title="BAZUKA">👤</a>
         <a href="/anakin" class="dock-item" data-title="ANAKIN">⚡</a>
         <a href="/musashi" class="dock-item" data-title="MUSASHI">⚔️</a>
@@ -242,10 +246,10 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             // Greeting
             const currentHour = now.getHours();
             let greeting = 'Welcome to Asgard.';
-            if (currentHour >= 5 && currentHour < 12) greeting = 'Good Morning, Commander.';
-            else if (currentHour >= 12 && currentHour < 18) greeting = 'Good Afternoon, Commander.';
-            else if (currentHour >= 18 && currentHour < 22) greeting = 'Good Evening, Commander.';
-            else greeting = 'The Bifrost is quiet tonight.';
+            if (currentHour >= 5 && currentHour < 12) greeting = 'Good Morning, ASGARDIAN.';
+            else if (currentHour >= 12 && currentHour < 18) greeting = 'Good Afternoon, ASGARDIAN.';
+            else if (currentHour >= 18 && currentHour < 22) greeting = 'Good Evening, ASGARDIAN.';
+            else greeting = 'The Bifrost is quiet tonight, ASGARDIAN.';
             
             document.getElementById('greeting').innerText = greeting;
         }
