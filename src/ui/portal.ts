@@ -10,11 +10,12 @@ export const PUNCHY_PORTAL_HTML = `
         .punchy-portal {
             position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: row-reverse; align-items: center;
             background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 12px; padding: 8px; gap: 0; overflow: hidden; width: 44px; height: 44px;
-            transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1); z-index: 9999; cursor: pointer; text-decoration: none;
-            font-size: 16px;
+            border-radius: 12px; padding: 8px; gap: 0; overflow: hidden;
+            width: auto; max-width: 44px; height: 44px;
+            transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), gap 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
+            z-index: 9999; cursor: pointer; text-decoration: none; font-size: 16px;
         }
-        .punchy-portal:hover { width: 520px; gap: 16px; border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
+        .punchy-portal:hover { max-width: 600px; gap: 16px; border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
         .portal-trigger { font-size: 19px; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
         .portal-brand { color: #22c55e; font-weight: 700; font-size: 13px; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: 'JetBrains Mono', monospace; }
         .punchy-portal:hover .portal-brand { opacity: 1; }
