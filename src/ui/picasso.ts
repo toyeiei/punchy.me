@@ -168,6 +168,16 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         input[type="range"]::-webkit-slider-thumb { height: 16px; width: 16px; border-radius: 50%; background: #ffffff; cursor: pointer; -webkit-appearance: none; margin-top: -6px; box-shadow: 0 0 10px rgba(255, 255, 255, 0.3); }
         input[type="range"]:focus::-webkit-slider-runnable-track { background: rgba(255, 255, 255, 0.2); }
 
+        /* SLIDER TICKS */
+        .slider-wrapper { position: relative; width: 100%; margin-bottom: 1.5rem; }
+        .slider-ticks {
+            position: absolute; top: 50%; left: 0; width: 100%; height: 0;
+            display: flex; justify-content: space-evenly; padding: 0 8px;
+            pointer-events: none; transform: translateY(-50%);
+        }
+        .tick { width: 1px; height: 4px; background: rgba(255, 255, 255, 0.15); }
+        .tick.center { width: 1px; height: 8px; background: rgba(255, 255, 255, 0.3); }
+
         /* DOWNLOAD ANIMATION */
         @keyframes downloadBob {
             0% { transform: translateY(0); }
@@ -269,17 +279,45 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             <div class="sidebar-section">
                 <h3>Editor and Font</h3>
                 
-                <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Zoom (<span id="zoom-val">100</span>%)</label>
-                <input type="range" id="img-zoom" min="100" max="500" value="100" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('zoom-val').innerText = this.value; renderBG()">
-
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Dark Wash (<span id="wash-val">0</span>%)</label>
-                <input type="range" id="dark-wash" min="0" max="100" value="0" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('wash-val').innerText = this.value; renderWash()">
+                <div class="slider-wrapper">
+                    <input type="range" id="dark-wash" min="0" max="100" value="0" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('wash-val').innerText = this.value; renderWash()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
+
+                <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Zoom (<span id="zoom-val">100</span>%)</label>
+                <div class="slider-wrapper">
+                    <input type="range" id="img-zoom" min="100" max="500" value="100" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('zoom-val').innerText = this.value; renderBG()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
                 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Image X (<span id="img-x-val">50</span>%)</label>
-                <input type="range" id="img-x" min="0" max="100" value="50" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('img-x-val').innerText = this.value; renderBG()">
+                <div class="slider-wrapper">
+                    <input type="range" id="img-x" min="0" max="100" value="50" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('img-x-val').innerText = this.value; renderBG()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
                 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Image Y (<span id="img-y-val">50</span>%)</label>
-                <input type="range" id="img-y" min="0" max="100" value="50" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('img-y-val').innerText = this.value; renderBG()">
+                <div class="slider-wrapper">
+                    <input type="range" id="img-y" min="0" max="100" value="50" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('img-y-val').innerText = this.value; renderBG()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Font Family</label>
                 <select id="font-family" onchange="renderText()">
@@ -290,13 +328,34 @@ export const PICASSO_HTML = `<!DOCTYPE html>
                 </select>
 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Font Size (<span id="font-size-val">120</span>px)</label>
-                <input type="range" id="font-size" min="10" max="400" value="120" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('font-size-val').innerText = this.value; renderText()">
+                <div class="slider-wrapper">
+                    <input type="range" id="font-size" min="10" max="400" value="120" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('font-size-val').innerText = this.value; renderText()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Position X (<span id="text-x-val">50</span>%)</label>
-                <input type="range" id="text-x" min="0" max="100" value="50" style="width: 100%; margin-bottom: 1rem; accent-color: #ffffff;" oninput="document.getElementById('text-x-val').innerText = this.value; renderText()">
+                <div class="slider-wrapper" style="margin-bottom: 1rem;">
+                    <input type="range" id="text-x" min="0" max="100" value="50" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('text-x-val').innerText = this.value; renderText()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
                 
                 <label style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 5px; display: block; text-transform: uppercase;">Position Y (<span id="text-y-val">50</span>%)</label>
-                <input type="range" id="text-y" min="0" max="100" value="50" style="width: 100%; margin-bottom: 1.5rem; accent-color: #ffffff;" oninput="document.getElementById('text-y-val').innerText = this.value; renderText()">
+                <div class="slider-wrapper">
+                    <input type="range" id="text-y" min="0" max="100" value="50" style="width: 100%; accent-color: #ffffff;" oninput="document.getElementById('text-y-val').innerText = this.value; renderText()">
+                    <div class="slider-ticks">
+                        <div class="tick"></div>
+                        <div class="tick center"></div>
+                        <div class="tick"></div>
+                    </div>
+                </div>
 
                 <button class="btn btn-outline" onclick="resetEditor()" style="font-size: 0.7rem; padding: 10px; margin-top: 1.5rem; border-color: rgba(255,255,255,0.1); color: var(--text-dim); display: flex; align-items: center; justify-content: center; gap: 8px;">
                     <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>
@@ -515,8 +574,9 @@ export const PICASSO_HTML = `<!DOCTYPE html>
 
                 // Calculate position based on percentage (50% is center)
                 // We calculate the available "slack" (difference between canvas and drawn image)
-                // and apply the percentage to that slack.
-                const dx = (w - drawW) * (posXPercent / 100);
+                // We reverse the slack calculation so that sliding right (higher %) 
+                // moves the image right (increasing dx).
+                const dx = (drawW - w) * ((posXPercent - 50) / 100) + (w - drawW) / 2;
                 const dy = (h - drawH) * (posYPercent / 100);
 
                 bgCtx.drawImage(currentImage, dx, dy, drawW, drawH);
