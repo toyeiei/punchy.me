@@ -13,13 +13,13 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     <meta property="og:description" content="High-performance, client-side encrypted Markdown editor. Secure, focused, and edge-native.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/yaiba">
-    <meta property="og:image" content="https://punchy.me/og-image.webp">
-    
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-yaiba.webp">
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="YAIBA | Zen Markdown Editor | PUNCHY.ME">
     <meta name="twitter:description" content="High-performance, client-side encrypted Markdown editor. Secure, focused, and edge-native.">
-    <meta name="twitter:image" content="https://punchy.me/og-image.webp">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-yaiba.webp">
 
     <!-- JSON-LD Schema -->
     <script type="application/ld+json">

@@ -9,7 +9,34 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     <meta name="description" content="Generate your high-impact, neon-glitch digital business card in seconds with BAZUKA. Built for speed and professional impact.">
     <link rel="canonical" href="https://punchy.me/bazuka" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E👤%3C/text%3E%3C/svg%3E">
-    
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://punchy.me/bazuka">
+    <meta property="og:title" content="BAZUKA | Instant Digital Business Cards | PUNCHY.ME">
+    <meta property="og:description" content="Generate your high-impact digital business card in seconds. Free, stylish, and edge-native.">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-bazuka.webp">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="BAZUKA | Instant Digital Business Cards | PUNCHY.ME">
+    <meta name="twitter:description" content="Generate your high-impact digital business card in seconds. Free, stylish, and edge-native.">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-bazuka.webp">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "BAZUKA Digital Business Cards",
+      "operatingSystem": "Any",
+      "applicationCategory": "BusinessApplication",
+      "url": "https://punchy.me/bazuka",
+      "description": "Generate high-impact, neon-glitch digital business cards in seconds. Free and edge-native.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">

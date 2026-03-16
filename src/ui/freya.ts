@@ -13,13 +13,13 @@ export const FREYA_HTML = `<!DOCTYPE html>
     <meta property="og:description" content="Ultra-fast, edge-native image editing with Unsplash integration.">
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/freya">
-    <meta property="og:image" content="https://punchy.me/og-image.webp">
-    
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-freya.webp">
+
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="FREYA | Ultra-Fast Image Editor | PUNCHY.ME">
     <meta name="twitter:description" content="Ultra-fast, edge-native image editing with Unsplash integration.">
-    <meta name="twitter:image" content="https://punchy.me/og-image.webp">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-freya.webp">
 
     <!-- JSON-LD Schema -->
     <script type="application/ld+json">

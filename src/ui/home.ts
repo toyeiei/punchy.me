@@ -34,7 +34,7 @@ export const HTML = `<!DOCTYPE html>
       "applicationCategory": "Utility",
       "applicationSubCategory": "URL Shortener",
       "operatingSystem": "Web",
-      "softwareVersion": "2.9",
+      "softwareVersion": "5.0",
       "author": {
         "@type": "Person",
         "name": "Kasidis Satangmongkol",

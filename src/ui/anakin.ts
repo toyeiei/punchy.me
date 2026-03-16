@@ -15,13 +15,13 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
     <meta property="og:url" content="https://punchy.me/anakin">
     <meta property="og:title" content="ANAKIN | AI-Powered Professional Resumes">
     <meta property="og:description" content="Generate your professional digital resume with AI. Fast, stylish, and free.">
-    <meta property="og:image" content="https://punchy.me/og-image.webp">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-anakin.webp">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
-    <meta property="twitter:title" id="twitter-title" content="Professional Resume | PUNCHY.ME">  
+    <meta property="twitter:title" id="twitter-title" content="Professional Resume | PUNCHY.ME">
     <meta property="twitter:description" content="Generate your professional digital resume with AI. Fast, stylish, and free.">
-    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+    <meta property="twitter:image" content="https://punchy.me/og-images/og-image-anakin.webp">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -569,13 +569,13 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
     <meta property="og:type" content="website">
     <meta property="og:title" id="og-title" content="AI Refined Resume | PUNCHY.ME">
     <meta property="og:description" id="og-description" content="View my professional digital resume. Part of the PUNCHY.ME ecosystem.">
-    <meta property="og:image" content="https://punchy.me/og-image.webp">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-anakin.webp">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:title" id="twitter-title" content="Professional Resume | PUNCHY.ME">
     <meta property="twitter:description" id="twitter-description" content="View my professional digital resume. Refined by Anakin AI.">
-    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+    <meta property="twitter:image" content="https://punchy.me/og-images/og-image-anakin.webp">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

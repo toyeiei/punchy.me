@@ -6,7 +6,37 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAGNAR | Legendary Slide Forge | PUNCHY.ME</title>
+    <link rel="canonical" href="https://punchy.me/ragnar" />
+    <meta name="description" content="RAGNAR AI Slide Forge: Transform your strategic vision into elite 6-slide presentations in seconds. Powered by Mistral 24B.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://punchy.me/ragnar">
+    <meta property="og:title" content="RAGNAR | Legendary AI Slide Forge | PUNCHY.ME">
+    <meta property="og:description" content="Transform your strategic vision into elite 6-slide presentations in seconds. Powered by Mistral 24B AI.">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-ragnar.webp">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="RAGNAR | Legendary AI Slide Forge | PUNCHY.ME">
+    <meta name="twitter:description" content="Transform your strategic vision into elite 6-slide presentations in seconds. Powered by Mistral 24B AI.">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-ragnar.webp">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "RAGNAR AI Slide Forge",
+      "operatingSystem": "Any",
+      "applicationCategory": "PresentationApplication",
+      "url": "https://punchy.me/ragnar",
+      "description": "AI-powered strategic presentation generator. Creates elite 6-slide decks using Mistral 24B for professional impact.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {

@@ -8,6 +8,34 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     <title>MUSASHI | Cold Attack Engine | PUNCHY.ME</title>
     <link rel="canonical" href="https://punchy.me/musashi" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚔️%3C/text%3E%3C/svg%3E">
+
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://punchy.me/musashi">
+    <meta property="og:title" content="MUSASHI | Cold Attack Engine | PUNCHY.ME">
+    <meta property="og:description" content="AI-powered job intel extraction and interview strike-path generator. Built for career-winning precision.">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-musashi.webp">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="MUSASHI | Cold Attack Engine | PUNCHY.ME">
+    <meta name="twitter:description" content="AI-powered job intel extraction and interview strike-path generator. Built for career-winning precision.">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-musashi.webp">
+
+    <!-- JSON-LD Schema -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "SoftwareApplication",
+      "name": "MUSASHI Cold Attack Engine",
+      "operatingSystem": "Any",
+      "applicationCategory": "BusinessApplication",
+      "url": "https://punchy.me/musashi",
+      "description": "AI-powered strategic intelligence tool for job applications. Extracts key intel and forges interview strike-paths.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+    }
+    </script>
+
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
