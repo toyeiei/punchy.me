@@ -149,6 +149,16 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
 
 ## Progress & Architectural Milestones
 
+### Version 5.0.0 - RAGNAR Intelligence & UX Overhaul (2026-03-17)
+- **Richer AI Content**: Expanded system prompt word targets per slide — `bigtext` 40-60w, `list` 25-40w/bullet, `quote` 50-70w, `comparison` 30-50w/side. Updated full example output to anchor AI output length.
+- **Professional Tone Calibration**: Lowered temperature `0.6 → 0.3` for cleaner, more authoritative business language. Raised `max_tokens` `4000 → 6000` to prevent truncation on dense decks.
+- **Cinematic Background**: Replaced the animated grid/scanline background on `/ragnar` with `ragnar.webp` (Viking commander art) and a `160deg` diagonal dark overlay (80% → 55% → 78%) for a cinematic vignette. All decorative animations removed.
+- **Heavier Glassmorphism Panel**: Upgraded `/ragnar` input panel to `rgba(0,0,0,0.55)` + `blur(24px)` for legibility over the image background.
+- **Light/Dark Theme Toggle on Slides**: Added a CSS-variable-driven dual-theme system to generated Reveal.js decks. Dark (default): `#000`/`#f8fafc`/`#22c55e`. Light: `#f1f5f9`/`#0f172a`/`#16a34a`. Toggle button fixed bottom-left, preference persisted in `localStorage`.
+- **Slide Cleanup**: Removed `grid-bg` and `pixel-bg` animations from generated slide decks for a clean, professional presentation surface.
+- **Ecosystem Portal Expansion**: Expanded portal hover width `420px → 520px` to accommodate all 8 tools without clipping.
+- **Validation**: 74/74 tests passing · zero TypeScript errors · zero ESLint warnings.
+
 ### Version 4.9.5 - RAGNAR Mistral 24B Strategic Revolution (2026-03-16)
 - **Mistral Small 3.1 24B**: Upgraded the slide forge engine to the superior 24B model for world-class strategic reasoning and JSON reliability.
 - **Semantic Dynamic Slides**: Engineered a 4-type dynamic narrative system: `bigtext`, `quote`, `list`, and `comparison`, enabling the AI to forge sophisticated 6-slide strategic arcs.

@@ -4,6 +4,42 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-17 (Version 5.0.0 - RAGNAR Intelligence & UX Overhaul)
+
+**Objective**: Elevate RAGNAR slide quality, redesign the forge page, and add light/dark theme control to generated presentations.
+
+#### AI Quality Hardening
+- **Expanded word-count targets in system prompt**: `bigtext` 40-60w (was 10-15w), `list` 25-40w per bullet (was 12-20w), `quote` 50-70w (was 15-25w), `comparison` 30-50w per side (was 10-15w).
+- **Updated full example output** in the prompt to match new targets — AI models anchor to examples more reliably than word-count rules alone.
+- **Temperature**: `0.6 → 0.3` for professional, concise, non-verbose language.
+- **Max tokens**: `4000 → 6000` (`src/core/constants.ts`) to prevent mid-deck truncation on dense content.
+
+#### `/ragnar` Input Page Redesign
+- Replaced animated `grid-bg` + `scanline` background with `ragnar.webp` (Viking commander illustration) served from `/public/backgrounds/`.
+- Added a two-layer background system: `.bg-image` (full-viewport cover) + `.bg-overlay` (diagonal `160deg` gradient: `rgba(0,0,0,0.80) → rgba(0,0,0,0.55) → rgba(0,0,0,0.78)`) for a cinematic vignette effect.
+- Removed all decorative animations: `gridMove`, `scanlineMove`, `pulse` (beta badge), `pulseNotice`, `typing`, `blink`.
+- Upgraded panel to `rgba(0,0,0,0.55)` + `backdrop-filter: blur(24px)` for strong legibility over a detailed background image.
+- Added `text-shadow` to title and description for readability.
+
+#### Generated Slide Deck Improvements
+- **Light/Dark theme toggle**: CSS custom properties (`--bg`, `--fg`, `--accent`, `--quote-glass-bg`, `--comp-bg`, etc.) drive both themes from a single stylesheet using `html[data-theme]`.
+  - Dark (default): `#000000` bg · `#f8fafc` text · `#22c55e` accent.
+  - Light: `#f1f5f9` bg · `#0f172a` text · `#16a34a` accent (higher contrast on light).
+- **Toggle button**: Fixed bottom-left pill (avoids Reveal.js controls at bottom-right). Shows `☀️ Light` / `🌙 Dark`. Preference saved to `localStorage`.
+- Removed `grid-bg` and `pixel-bg` animations from slide template — cleaner surface, compatible with light theme.
+- Replaced hardcoded color values in slide template with CSS variables throughout.
+
+#### Ecosystem Portal
+- Expanded portal hover width `420px → 520px` to comfortably fit all 8 tools + brand label without overflow.
+
+#### Validation Status
+- ✅ `npx tsc --noEmit` — zero errors
+- ✅ `npm run lint` — zero errors, zero warnings
+- ✅ `npm test` — 74/74 tests passing
+- ✅ Committed and pushed: `349398c`
+
+---
+
 ### 2026-03-16 (Version 4.9.5 - RAGNAR Mistral 24B Strategic Revolution)
 - **Mistral Small 3.1 24B Upgrade**: Revolutionized the Ragnar engine by switching to the 24B model, achieving superior strategic reasoning and instruction following.
 - **Dynamic Semantic Narrative**: Implemented a 4-type dynamic slide system (`bigtext`, `quote`, `list`, `comparison`) allowing the AI to choose the best visual structure for each piece of content.
