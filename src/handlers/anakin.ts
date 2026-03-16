@@ -1,5 +1,6 @@
 import { Env, AnakinData } from '../core/types';
 import { ANAKIN_FORM_HTML } from '../ui';
+import { generateUniqueId } from '../core/utils';
 
 export async function handleAnakinGet(): Promise<Response> {
     return new Response(ANAKIN_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
@@ -11,7 +12,7 @@ export async function handleAnakinPost(request: Request, env: Env): Promise<Resp
 		if (data.hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
 		if (!data.name || !data.experience || !data.skills) return new Response(JSON.stringify({ error: 'Missing fields' }), { status: 400 });      
 		if (data.experience.length > 500) return new Response(JSON.stringify({ error: 'Experience too dense. Limit 500 characters.' }), { status: 400 });
-		const id = data.suggestedId || Math.random().toString(36).substring(2, 8);
+		const id = data.suggestedId || generateUniqueId();
 		await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: 259200 });
 		return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });
 	} catch (_e) { return new Response(JSON.stringify({ error: 'Invalid request' }), { status: 400 }); }

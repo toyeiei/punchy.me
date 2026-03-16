@@ -545,6 +545,14 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
             </a>
+            <a href="/ragnar" class="feature-card">
+                <span class="feature-icon">🛡️</span>
+                <div class="feature-title">
+                    RAGNAR
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
+                <div class="feature-tagline">Legendary Slide Forge. Elite 10-page decks forged by AI in seconds.</div>
+            </a>
             <a href="/freya" class="feature-card">
                 <span class="feature-icon">🌠</span>
                 <div class="feature-title">

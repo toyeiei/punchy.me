@@ -1,5 +1,6 @@
 import { Env } from '../core/types';
 import { checkRateLimit } from '../services/security';
+import { generateUniqueId } from '../core/utils';
 
 export async function handleShorten(request: Request, env: Env): Promise<Response> {
 	const url = new URL(request.url);
@@ -24,9 +25,9 @@ export async function handleShorten(request: Request, env: Env): Promise<Respons
 		const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
 		if (!(await checkRateLimit(env, `rl:${ip}`, 10))) return new Response(JSON.stringify({ error: 'Too many requests' }), { status: 429 });
 
-		let id = suggestedId || Math.random().toString(36).substring(2, 8);
+		let id = suggestedId || generateUniqueId();
 		const collision = await env.SHORT_LINKS.get(id);
-		if (collision && suggestedId) id = Math.random().toString(36).substring(2, 8);
+		if (collision && suggestedId) id = generateUniqueId();
 		await env.SHORT_LINKS.put(id, targetUrl);
 		await env.SHORT_LINKS.put(`url:${normalized}`, id);
 		return new Response(JSON.stringify({ id }), { headers: { 'Content-Type': 'application/json' } });

@@ -27,6 +27,19 @@ export interface YaibaData {
 	createdAt: number;
 }
 
+export interface RagnarSlide {
+	header: string;
+	content: string;
+	type?: 'list' | 'quote' | 'bigtext' | 'comparison';
+}
+
+export interface RagnarData {
+	type: 'ragnar';
+	title: string;
+	audience: string;
+	slides: RagnarSlide[];
+}
+
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
