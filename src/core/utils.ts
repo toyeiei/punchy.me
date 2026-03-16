@@ -25,6 +25,16 @@ export function jsonResponse(data: unknown, status: number = 200): Response {
 	});
 }
 
+/** Serves a static HTML page with aggressive edge caching */
+export function htmlPage(html: string): Response {
+	return new Response(html, {
+		headers: {
+			'Content-Type': 'text/html',
+			'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+		}
+	});
+}
+
 /**
  * Parses AI response that may be wrapped in markdown code blocks
  * Handles both raw JSON strings and pre-parsed objects
@@ -39,12 +49,32 @@ export function parseAIResponse(response: string | Record<string, unknown>): Rec
 	// Remove markdown code block wrappers if present
 	const cleanText = response.replace(/```json/g, '').replace(/```/g, '').trim();
 	
-	// Try to extract JSON object from text
-	const jsonMatch = cleanText.match(/\{[\s\S]*\}/);
-	if (jsonMatch) {
-		return JSON.parse(jsonMatch[0]);
+	// Try to extract the first JSON-like object from text using a more robust approach
+	const start = cleanText.indexOf('{');
+	const end = cleanText.lastIndexOf('}');
+	
+	if (start !== -1 && end !== -1 && end > start) {
+		const potentialJson = cleanText.substring(start, end + 1);
+		try {
+			return JSON.parse(potentialJson);
+		} catch (_e) {
+			// Bracket-matching fallback: find the outermost balanced { ... }
+			let depth = 0;
+			let objStart = -1;
+			for (let i = 0; i < cleanText.length; i++) {
+				if (cleanText[i] === '{') {
+					if (depth === 0) objStart = i;
+					depth++;
+				} else if (cleanText[i] === '}') {
+					depth--;
+					if (depth === 0 && objStart !== -1) {
+						return JSON.parse(cleanText.substring(objStart, i + 1));
+					}
+				}
+			}
+		}
 	}
 	
-	// Fallback: try parsing the entire cleaned string
+	// Final fallback: try parsing the entire cleaned string
 	return JSON.parse(cleanText);
 }

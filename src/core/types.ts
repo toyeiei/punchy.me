@@ -1,5 +1,5 @@
 export interface BazukaData {
-	type?: string;
+	type?: 'bazuka';
 	nickname: string;
 	job: string;
 	email: string;
@@ -30,7 +30,7 @@ export interface YaibaData {
 export interface RagnarSlide {
 	header: string;
 	content: string;
-	type?: 'list' | 'quote' | 'bigtext' | 'comparison';
+	type?: 'list' | 'quote' | 'bigtext' | 'comparison' | 'opening' | 'points' | 'challenge' | 'solution' | 'action' | 'closing';
 }
 
 export interface RagnarData {
@@ -46,5 +46,4 @@ export interface Env {
 	TURNSTILE_SITE_KEY: string;
 	TURNSTILE_SECRET_KEY: string;
 	UNSPLASH_ACCESS_KEY: string;
-	RESEND_API_KEY?: string;
 }

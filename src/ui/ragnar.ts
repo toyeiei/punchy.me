@@ -84,6 +84,35 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             line-height: 1.6;
         }
 
+        .ai-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: #000;
+            font-size: 0.65rem;
+            font-weight: 900;
+            padding: 3px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-left: 0.5rem;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        .char-counter {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            margin-top: 0.5rem;
+            text-align: right;
+        }
+
+        .char-counter.warning {
+            color: #f59e0b;
+        }
+
+        .char-counter.error {
+            color: #ef4444;
+        }
+
         .panel {
             background: rgba(255, 255, 255, 0.03);
             backdrop-filter: blur(10px);
@@ -200,32 +229,85 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             display: block;
             background: var(--accent);
             color: #000;
-            padding: 1rem;
+            padding: 1.2rem;
             border-radius: 12px;
             text-decoration: none;
             font-weight: 900;
             margin-bottom: 1rem;
-            transition: all 0.2s;
+            transition: all 0.3s;
+            text-align: center;
+            font-size: 1rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
         }
 
         .result-link:hover {
-            opacity: 0.9;
-            transform: scale(1.02);
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.3);
         }
 
         .grid-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
             background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.03) 1px, transparent 1px);
-            background-size: 100px 100px;
+                linear-gradient(rgba(34, 197, 94, 0.05) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.05) 1px, transparent 1px);
+            background-size: 50px 50px;
             z-index: -1;
+            animation: gridMove 20s linear infinite;
+        }
+
+        @keyframes gridMove {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(50px, 50px); }
+        }
+
+        .scanline {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(
+                to bottom,
+                transparent 0%,
+                rgba(34, 197, 94, 0.03) 50%,
+                transparent 100%
+            );
+            background-size: 100% 4px;
+            animation: scanlineMove 8s linear infinite;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        @keyframes scanlineMove {
+            0% { background-position: 0 0; }
+            100% { background-position: 0 100vh; }
+        }
+
+        .processing-notice {
+            display: none;
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid var(--accent);
+            border-radius: 8px;
+            padding: 0.75rem 1rem;
+            margin-top: 1rem;
+            font-size: 0.85rem;
+            color: var(--accent);
+            text-align: center;
+            animation: pulseNotice 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseNotice {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
         }
     </style>
 </head>
 <body>
     <div class="grid-bg"></div>
+    <div class="scanline"></div>
     ${PUNCHY_PORTAL_HTML}
 
     <div class="container">
@@ -233,7 +315,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             <h1>RAGNAR</h1>
             <span class="beta-badge">BETA</span>
         </div>
-        <p class="desc">The Legendary Slide Forge. Ragnar transforms your strategic vision into an elite 10-page presentation in seconds.</p>
+        <p class="desc">The Legendary Slide Forge. Ragnar transforms your strategic vision into an elite 6-slide presentation in seconds.</p>
 
         <div class="panel">
             <div class="input-group">
@@ -245,10 +327,14 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
                 <input type="text" id="audience" placeholder="e.g., Tech Investors, Board of Directors">
             </div>
             <div class="input-group">
-                <label>Presentation Details (The Core Mission)</label>
-                <textarea id="details" placeholder="Describe the mission, the key problems, and the ultimate resolution..."></textarea>
+                <label>Presentation Details (The Core Mission)<span class="ai-badge">AI</span></label>
+                <textarea id="details" placeholder="Describe the mission, the key problems, and the ultimate resolution..." maxlength="250"></textarea>
+                <div class="char-counter" id="char-counter">0 / 250 characters</div>
             </div>
             <button class="btn-forge" id="forge-btn">Forge Presentation</button>
+            <div class="processing-notice" id="processing-notice">
+                ⚡ AI Processing... This typically takes 10-15 seconds
+            </div>
 
             <div class="terminal-log" id="log"></div>
 
@@ -270,6 +356,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
             const title = document.getElementById('title').value.trim();
             const audience = document.getElementById('audience').value.trim();
             const details = document.getElementById('details').value.trim();
+            const processingNotice = document.getElementById('processing-notice');
 
             if (!title || !details) {
                 alert('The King requires a Title and Details to forge a deck.');
@@ -278,13 +365,14 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
 
             forgeBtn.disabled = true;
             success.style.display = 'none';
+            processingNotice.style.display = 'block';
             log.style.display = 'block';
             log.innerHTML = '';
 
             const messages = [
                 '> SUMMONING RAGNAR AI...',
                 '> PARSING STRATEGIC INPUTS...',
-                '> FORGING 10-PAGE TACTICAL DECK...',
+                '> FORGING 6-SLIDE TACTICAL DECK...',
                 '> INJECTING REVEAL.JS CORE...',
                 '> FINALIZING PRESENTATION ASSETS...'
             ];
@@ -312,6 +400,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
                 if (res.ok) {
                     const { id } = await res.json();
                     clearInterval(logInterval);
+                    processingNotice.style.display = 'none';
                     log.style.display = 'none';
                     success.style.display = 'block';
                     slideLink.href = '/ragnar/slide/' + id;
@@ -320,14 +409,33 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
                     alert('FORGE FAILED: ' + (err.error || 'The gods were silent.'));
                     forgeBtn.disabled = false;
                     clearInterval(logInterval);
+                    processingNotice.style.display = 'none';
                     log.style.display = 'none';
                 }
             } catch (err) {
                 alert('NETWORK STRIKE FAILED: ' + err.message);
                 forgeBtn.disabled = false;
                 clearInterval(logInterval);
+                processingNotice.style.display = 'none';
             }
         };
+
+        // Character counter for details field
+        const detailsField = document.getElementById('details');
+        const charCounter = document.getElementById('char-counter');
+
+        detailsField.addEventListener('input', () => {
+            const length = detailsField.value.length;
+            charCounter.textContent = \`\${length} / 250 characters\`;
+            
+            // Update styling based on length
+            charCounter.classList.remove('warning', 'error');
+            if (length > 250) {
+                charCounter.classList.add('error');
+            } else if (length > 200) {
+                charCounter.classList.add('warning');
+            }
+        });
     </script>
 </body>
 </html>`;

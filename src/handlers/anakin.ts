@@ -1,10 +1,11 @@
 import { Env } from '../core/types';
 import { ANAKIN_FORM_HTML } from '../ui';
-import { generateUniqueId, jsonResponse, parseAIResponse } from '../core/utils';
-import { validateAnakinRequest } from '../core/validation';
+import { generateUniqueId, jsonResponse, parseAIResponse, htmlPage } from '../core/utils';
+import { validateAnakinRequest, isReservedId } from '../core/validation';
+import { TTL_3_DAYS, AI_MAX_TOKENS_STANDARD } from '../core/constants';
 
 export async function handleAnakinGet(): Promise<Response> {
-    return new Response(ANAKIN_FORM_HTML, { headers: { 'Content-Type': 'text/html' } });
+    return htmlPage(ANAKIN_FORM_HTML);
 }
 
 export async function handleAnakinPost(request: Request, env: Env): Promise<Response> {
@@ -13,14 +14,14 @@ export async function handleAnakinPost(request: Request, env: Env): Promise<Resp
 		const validation = validateAnakinRequest(body);
 		
 		if (!validation.success) {
-			return new Response(JSON.stringify({ error: validation.error }), { status: 400 });
+			return jsonResponse({ error: validation.error }, 400);
 		}
-		
+
 		const { hp_field, suggestedId, ...data } = validation.data!;
-		if (hp_field) return new Response(JSON.stringify({ error: 'Bot detected.' }), { status: 403 });
+		if (hp_field) return jsonResponse({ error: 'Bot detected.' }, 403);
 		
-		const id = suggestedId || generateUniqueId();
-		await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: 259200 });
+		const id = (suggestedId && !isReservedId(suggestedId)) ? suggestedId : generateUniqueId();
+		await env.SHORT_LINKS.put(id, JSON.stringify({ ...data, type: 'anakin', aiHydrated: false }), { expirationTtl: TTL_3_DAYS });
 		return jsonResponse({ id });
 	} catch (e) {
 		console.error('Anakin POST error:', e);
@@ -40,7 +41,7 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 		if (data.type !== 'anakin') return jsonResponse({ error: 'Invalid Type' }, 400);
 		if (data.aiHydrated) return jsonResponse(data);
 		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-			max_tokens: 350, temperature: 0.4, response_format: { type: 'json_object' },
+			max_tokens: AI_MAX_TOKENS_STANDARD, temperature: 0.4, response_format: { type: 'json_object' },
 			messages: [
 				{ role: 'system', content: 'You are ANAKIN, Resume Architect. You craft elite, action-oriented professional narratives. DO NOT hallucinate. You MUST USE ONLY the provided CONTEXT. Do not invent new skills or experiences. Output ONLY JSON.' },
 				{ role: 'user', content: `CONTEXT:\nTarget Role: ${data.job}\nCandidate Experience: ${data.experience}\nCandidate Skills: ${data.skills}\n\nAnalyze this CONTEXT and forge the resume to maximize interview chances for the Target Role.\n\nReturn JSON strictly matching this schema:\n{\n  "summary": "High-impact Professional Summary (20-28 words)",\n  "experience": ["Experience bullet 1 (15-20 words)", "Experience bullet 2", "Experience bullet 3"]\n}` }
@@ -60,7 +61,7 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 		data.aiExperience = expText;
 		
 		data.aiHydrated = true;
-		await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: 259200 });
+		await env.SHORT_LINKS.put(id, JSON.stringify(data), { expirationTtl: TTL_3_DAYS });
 		return jsonResponse(data);
 	} catch (e) {
 		console.error('Anakin hydration error:', e);

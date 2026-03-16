@@ -73,7 +73,7 @@ Before implementing complex roadmap items (e.g., MUSASHI blades), demand **Techn
 3. **Continuous Validation:** Success is only confirmed when behavioral correctness is verified and structural integrity is confirmed within the full project context.
 
 ## CLI & Environment
-- **Command Separation**: Always use `;` to separate multiple commands in a single line (PowerShell requirement). Do **NOT** use `&&` as it is not supported in this environment.
+- **Command Separation**: Use `&&` to chain commands (WSL Ubuntu/Bash support). The project has transitioned to a Linux-based workflow.
 - **Verbose Testing**: Use `npx vitest run --reporter=verbose` to debug hanging tests or detailed execution flow. This is the primary method for identifying bottlenecks in AI or Rate-Limiting suites.
 
 ## Deployment Protocol
@@ -148,6 +148,18 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
     - **Tone:** Senior-level, action-oriented, and result-focused.
 
 ## Progress & Architectural Milestones
+
+### Version 4.9.5 - RAGNAR Mistral 24B Strategic Revolution (2026-03-16)
+- **Mistral Small 3.1 24B**: Upgraded the slide forge engine to the superior 24B model for world-class strategic reasoning and JSON reliability.
+- **Semantic Dynamic Slides**: Engineered a 4-type dynamic narrative system: `bigtext`, `quote`, `list`, and `comparison`, enabling the AI to forge sophisticated 6-slide strategic arcs.
+- **Detailed Intelligence**: Recalibrated the AI prompt to enforce **50+ words per slide**, ensuring substantial, high-value content that impresses users.
+- **Zen UI Hardening**: Executed a total UI purge—removing watermarks and download buttons—to achieve a 100% immersive tactical HUD.
+- **Aesthetic Mastery**: Integrated the signature **Pixel Drift** and **Animated Grid** background, synchronized with strict `100px 150px` structural padding for global consistency.
+- **Reliability Forge**: Modularized the Reveal.js template into `HEADER` and `FOOTER` components to resolve template truncation bugs and ensure 100% build integrity.
+
+### Version 4.9.3 - Phase 4 Final Cleanup (2026-03-16)
+- **Code Quality Perfection**: Achieved 100% clean ESLint pass with zero errors and zero warnings across the entire codebase.
+- **TypeScript Hardening**: Eradicated all remaining `any` types in security services and handlers.
 
 ### Version 4.8.2 - Supreme UI Hardening & TypeScript Mastery (2026-03-16)
 - **RAGNAR AI Slide Forge**: Revolutionized the slide generation engine with support for dynamic slide types: `List`, `Quote`, `BigText`, and `Comparison`.

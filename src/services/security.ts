@@ -1,4 +1,5 @@
 import { Env } from '../core/types';
+import { MAX_PAYLOAD_SIZE } from '../core/constants';
 
 /**
  * KV-based rate limiting with known race condition limitations.
@@ -24,7 +25,17 @@ export async function checkRateLimit(env: Env, rlKey: string, limit: number, ttl
 
 export async function verifyTurnstile(token: string, secretKey: string): Promise<boolean> {
 	// Allow test-token bypass only in test environment
-	if (token === 'test-token' && typeof (globalThis as { VITEST?: unknown }).VITEST !== 'undefined') return true;
+	if (token === 'test-token') {
+		// Cloudflare Workers test environment detection
+		const g = globalThis as { VITEST?: unknown; process?: { env?: { NODE_ENV?: string } } };
+		if (typeof g.VITEST !== 'undefined') return true;
+		// Node.js test environment fallback
+		try {
+			if (g.process?.env?.NODE_ENV === 'test') return true;
+		} catch {
+			// Worker environment doesn't have process
+		}
+	}
 	
 	const formData = new FormData();
 	formData.append('secret', secretKey);
@@ -36,14 +47,24 @@ export async function verifyTurnstile(token: string, secretKey: string): Promise
 
 /**
  * Global Security Hardening: Enforce 1MB payload size limit for POST requests.
+ * Checks actual body size via clone — Content-Length is client-supplied and untrustworthy.
  */
-export function validatePayloadSize(request: Request): Response | null {
+export async function validatePayloadSize(request: Request): Promise<Response | null> {
 	if (request.method === 'POST') {
+		// Fast-fail on honest Content-Length
 		const contentLength = request.headers.get('content-length');
-		if (contentLength && parseInt(contentLength, 10) > 1048576) {
-			return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), { 
-				status: 413, 
-				headers: { 'Content-Type': 'application/json' } 
+		if (contentLength && parseInt(contentLength, 10) > MAX_PAYLOAD_SIZE) {
+			return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), {
+				status: 413,
+				headers: { 'Content-Type': 'application/json' }
+			});
+		}
+		// Verify actual body size (Content-Length can be omitted or spoofed)
+		const body = await request.clone().arrayBuffer();
+		if (body.byteLength > MAX_PAYLOAD_SIZE) {
+			return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), {
+				status: 413,
+				headers: { 'Content-Type': 'application/json' }
 			});
 		}
 	}

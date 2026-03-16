@@ -3,6 +3,17 @@
  * Provides type-safe parsing of incoming request payloads
  */
 
+/** IDs that would shadow application routes and become unreachable as short links */
+const RESERVED_IDS = new Set([
+	'shorten', 'bazuka', 'anakin', 'musashi', 'yaiba', 'ragnar',
+	'odin', 'freya', 'asgard', 'y', 'favicon.ico', 'favicon.svg',
+	'robots.txt', 'sitemap.xml',
+]);
+
+export function isReservedId(id: string): boolean {
+	return RESERVED_IDS.has(id.toLowerCase());
+}
+
 export interface ValidationResult<T> {
 	success: boolean;
 	data?: T;
@@ -221,6 +232,10 @@ export function validateRagnarRequest(body: unknown): ValidationResult<{ title: 
 
 	if (!isNonEmptyString(payload.details)) {
 		return { success: false, error: 'Details are required to summon Ragnar.' };
+	}
+
+	if (payload.details.length > 250) {
+		return { success: false, error: 'Details must be 250 characters or less.' };
 	}
 
 	return {

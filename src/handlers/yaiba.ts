@@ -1,10 +1,11 @@
 import { Env, YaibaData } from '../core/types';
 import { YAIBA_EDITOR_HTML } from '../ui';
-import { generateUniqueId, jsonResponse } from '../core/utils';
+import { generateUniqueId, jsonResponse, htmlPage } from '../core/utils';
 import { validateYaibaRequest } from '../core/validation';
+import { TTL_3_DAYS } from '../core/constants';
 
 export async function handleYaibaGet(): Promise<Response> {
-    return new Response(YAIBA_EDITOR_HTML, { headers: { 'Content-Type': 'text/html' } });
+    return htmlPage(YAIBA_EDITOR_HTML);
 }
 
 export async function handleYaibaPublish(request: Request, env: Env): Promise<Response> {
@@ -19,7 +20,7 @@ export async function handleYaibaPublish(request: Request, env: Env): Promise<Re
 		const { content } = validation.data!;
 		const id = generateUniqueId();
 		const yaibaData: YaibaData = { type: 'yaiba', content, tags: [], createdAt: Date.now() };
-		await env.SHORT_LINKS.put(id, JSON.stringify(yaibaData), { expirationTtl: 259200 });
+		await env.SHORT_LINKS.put(id, JSON.stringify(yaibaData), { expirationTtl: TTL_3_DAYS });
 		return jsonResponse({ id });
 	} catch (e) {
 		console.error('Yaiba publish error:', e);

@@ -1,9 +1,19 @@
 import { Env } from '../core/types';
 import { FREYA_HTML } from '../ui/freya';
 import { checkRateLimit } from '../services/security';
+import { jsonResponse, htmlPage } from '../core/utils';
+import { FREYA_CACHE_TTL } from '../core/constants';
+
+type UnsplashImage = { id: string; urls: { raw?: string; regular: string }; alt_description: string; user?: { name: string } };
+
+function isUnsplashImage(x: unknown): x is UnsplashImage {
+	if (typeof x !== 'object' || x === null) return false;
+	const obj = x as Record<string, unknown>;
+	return typeof obj.id === 'string' && typeof obj.urls === 'object' && obj.urls !== null;
+}
 
 export async function handleFreyaGet(): Promise<Response> {
-	return new Response(FREYA_HTML, { headers: { 'Content-Type': 'text/html' } });
+	return htmlPage(FREYA_HTML);
 }
 
 export async function handleFreyaSearch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -32,31 +42,36 @@ export async function handleFreyaSearch(request: Request, env: Env, ctx: Executi
 
 		const ip = request.headers.get('cf-connecting-ip') || 'anonymous';
 		if (!(await checkRateLimit(env, `rl:unsplash:${ip}`, 10))) {
-			return new Response(JSON.stringify({ error: 'Tactical cooling in progress. Limit 10 searches per minute.' }), { status: 429 });
+			return jsonResponse({ error: 'Tactical cooling in progress. Limit 10 searches per minute.' }, 429);
 		}
 		
 		const res = await fetch(unsplashUrl, {
 			headers: {
 				'Authorization': `Client-ID ${env.UNSPLASH_ACCESS_KEY}`
 			},
-			cf: { 
-				cacheTtl: isSearch ? 600 : 0, 
-				cacheEverything: !!isSearch 
+			cf: {
+				cacheTtl: isSearch ? FREYA_CACHE_TTL : 0,
+				cacheEverything: !!isSearch
 			}
 		});
 
 		if (!res.ok) {
-			console.error('Unsplash API error:', await res.text());
-			return new Response(JSON.stringify({ error: 'Failed to fetch from Unsplash.' }), { status: 500 });
+			console.error('Unsplash API error:', res.status, res.statusText);
+			return jsonResponse({ error: 'Failed to fetch from Unsplash.' }, 500);
 		}
 
-		type UnsplashImage = { id: string; urls: { raw?: string; regular: string }; alt_description: string; user?: { name: string } };
-
-		const rawData = await res.json() as { results?: UnsplashImage[] } | UnsplashImage[];
+		const rawData: unknown = await res.json();
 		// Unsplash returns results in .results for search, but as a top-level array for random
-		const results = (isSearch ? (rawData as { results?: UnsplashImage[] }).results : (rawData as UnsplashImage[])) || [];
+		let rawResults: unknown[];
+		if (isSearch) {
+			const searchData = rawData as { results?: unknown[] };
+			rawResults = Array.isArray(searchData.results) ? searchData.results : [];
+		} else {
+			rawResults = Array.isArray(rawData) ? rawData : [];
+		}
+		const results = rawResults.filter(isUnsplashImage);
 		
-		const sanitizedImages = results.map((img: UnsplashImage) => {
+		const sanitizedImages = results.map((img) => {
 			const baseUrl = img.urls.raw || img.urls.regular;
 			const joiner = baseUrl.includes('?') ? '&' : '?';
 
@@ -74,7 +89,7 @@ export async function handleFreyaSearch(request: Request, env: Env, ctx: Executi
 		const response = new Response(JSON.stringify({ images: sanitizedImages }), { 
 			headers: { 
 				'Content-Type': 'application/json',
-				'Cache-Control': isSearch ? 'public, max-age=600' : 'no-cache'
+				'Cache-Control': isSearch ? `public, max-age=${FREYA_CACHE_TTL}` : 'no-cache'
 			} 
 		});
 
@@ -84,6 +99,6 @@ export async function handleFreyaSearch(request: Request, env: Env, ctx: Executi
 		return response;
 	} catch (e) {
 		console.error("FREYA SEARCH ERROR:", e);
-		return new Response(JSON.stringify({ error: 'Internal server error during search.' }), { status: 500 });
+		return jsonResponse({ error: 'Internal server error during search.' }, 500);
 	}
 }

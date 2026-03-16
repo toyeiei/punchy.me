@@ -1,6 +1,6 @@
 import { Env } from '../core/types';
 import { BazukaHandler, AnakinHandler } from '../core/rewriters';
-import { BAZUKA_CARD_TEMPLATE, ANAKIN_RESUME_TEMPLATE, YAIBA_VIEW_HTML, RAGNAR_SLIDE_TEMPLATE, SYNC_ERROR_HTML } from '../ui';
+import { BAZUKA_CARD_TEMPLATE, ANAKIN_RESUME_TEMPLATE, YAIBA_VIEW_HTML, RAGNAR_SLIDE_HEADER, RAGNAR_SLIDE_FOOTER, SYNC_ERROR_HTML } from '../ui';
 import { escapeHTML } from '../core/utils';
 
 export async function handleRender(request: Request, env: Env, path: string): Promise<Response> {
@@ -17,53 +17,71 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 					data.slides.forEach((s: import('../core/types').RagnarSlide) => {
 						const type = s.type || 'list';
 						
-						if (type === 'quote') {
+						// 1. BIGTEXT: High-impact hero statement
+						if (type === 'bigtext' || type === 'opening' || type === 'closing') {
 							slidesHtml += `
-								<section class="center slide-quote" data-transition="zoom">
-									<blockquote>"${escapeHTML(s.content)}"</blockquote>
-									<div class="quote-attribution">— RAGNAR'S COUNSEL</div>
+								<section class="slide-bigtext">
+									<div class="slide-container">
+										<h2 class="hero-statement">${escapeHTML(s.content)}</h2>
+										${s.header ? `<p class="hero-subtitle">${escapeHTML(s.header)}</p>` : ''}
+									</div>
 								</section>`;
-						} else if (type === 'bigtext') {
+						}
+						
+						// 2. QUOTE: Cinematic blockquote
+						else if (type === 'quote' || type === 'challenge') {
 							slidesHtml += `
-								<section class="center slide-bigtext" data-transition="fade">
-									<h2>${escapeHTML(s.header)}</h2>
-									<p>${escapeHTML(s.content)}</p>
-								</section>`;
-						} else if (type === 'comparison') {
-							const parts = s.content.split(' | ');
-							const left = escapeHTML(parts[0] || 'Unknown');
-							const right = escapeHTML(parts[1] || 'Unknown');
-							slidesHtml += `
-								<section class="slide-comparison" data-transition="convex">
-									<h2>${escapeHTML(s.header)}</h2>
-									<div class="comparison-grid">
-										<div class="comparison-box box-red">
-											<h4 class="text-red">CURRENT STATE</h4>
-											<p>${left}</p>
-										</div>
-										<div class="comparison-box box-green">
-											<h4 class="text-green">VICTORY STATE</h4>
-											<p>${right}</p>
+								<section class="slide-quote">
+									<div class="slide-container">
+										<div class="quote-glass">
+											<p class="quote-text">"${escapeHTML(s.content)}"</p>
+											${s.header ? `<p class="quote-author">— ${escapeHTML(s.header)}</p>` : ''}
 										</div>
 									</div>
 								</section>`;
-						} else {
-							// DEFAULT: list
-							slidesHtml += `<section data-transition="slide"><h2>${escapeHTML(s.header)}</h2><ul>`;
+						}
+						
+						// 3. LIST: Tactical bullet points
+						else if (type === 'list' || type === 'points' || type === 'action') {
+							slidesHtml += `
+								<section class="slide-list">
+									<div class="slide-container">
+										<h2>${escapeHTML(s.header)}</h2>
+										<ul>`;
 							const lines = s.content.split('\n');
 							lines.forEach(l => {
 								if (l.trim()) {
-									slidesHtml += `<li>${escapeHTML(l.trim().replace(/^•\s*/, ''))}</li>`;
+									slidesHtml += `<li>${escapeHTML(l.trim().replace(/^[•▸-]\s*/, ''))}</li>`;
 								}
 							});
-							slidesHtml += `</ul></section>`;
+							slidesHtml += `</ul></div></section>`;
+						}
+						
+						// 4. COMPARISON: Before/After grid
+						else if (type === 'comparison' || type === 'solution') {
+							const parts = s.content.split(' | ');
+							const left = escapeHTML(parts[0] || 'Current State');
+							const right = escapeHTML(parts[1] || 'Future State');
+							slidesHtml += `
+								<section class="slide-comparison">
+									<div class="slide-container">
+										<h2>${escapeHTML(s.header)}</h2>
+										<div class="comparison-grid">
+											<div class="comparison-box box-red">
+												<h4 class="text-red">BEFORE</h4>
+												<p>${left}</p>
+											</div>
+											<div class="comparison-box box-green">
+												<h4 class="text-green">AFTER</h4>
+												<p>${right}</p>
+											</div>
+										</div>
+									</div>
+								</section>`;
 						}
 					});
 					
-					const html = RAGNAR_SLIDE_TEMPLATE
-						.replace(/{{TITLE}}/g, escapeHTML(data.title))
-						.replace(/{{AUDIENCE}}/g, escapeHTML(data.audience))
-						.replace(/{{SLIDES_HTML}}/g, slidesHtml);
+					const html = RAGNAR_SLIDE_HEADER.replace(/{{TITLE}}/g, escapeHTML(data.title)).replace(/{{AUDIENCE}}/g, escapeHTML(data.audience)) + slidesHtml + RAGNAR_SLIDE_FOOTER;
 						
 					return new Response(html, { headers: { "Content-Type": "text/html" } });
 				}
@@ -77,7 +95,7 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 
 	// Only retry for /y/ (Yaiba) paths where eventual consistency is expected
 	if (!value && path.startsWith('/y/')) {
-		await new Promise(r => setTimeout(r, 600)); 
+		await new Promise(r => setTimeout(r, 300));
 		value = await env.SHORT_LINKS.get(id);
 	}
 
@@ -95,7 +113,7 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 					return new HTMLRewriter().on('#res-name', handler).on('#res-job', handler).on('#res-email', handler).on('#res-website', handler).on('#res-email-link', handler).on('#res-website-link', handler).on('#res-summary', handler).on('#res-experience', handler).on('#res-education', handler).on('#res-skills', handler).on('#title-tag', handler).on('#og-title', handler).on('#twitter-title', handler).on('#og-description', handler).on('#twitter-description', handler).transform(new Response(ANAKIN_RESUME_TEMPLATE, { headers: { "Content-Type": "text/html" } }));
 				}
 				if (data.type === 'yaiba') {
-					return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value || '', { html: true }); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
+					return new HTMLRewriter().on('#raw-data', { element(element: Element) { element.setInnerContent(value || ''); } }).transform(new Response(YAIBA_VIEW_HTML, { headers: { "Content-Type": "text/html" } }));
 				}
 			} catch (_e) {
 				// Malformed JSON fallback
