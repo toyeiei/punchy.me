@@ -553,7 +553,7 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Ultra-Fast Image Editor. Edge-native Unsplash integration.</div>
             </a>
-            <a href="/asgard" class="feature-card">
+            <a href="/asgard" class="feature-card" onmouseover="const l=document.createElement('link');l.rel='prefetch';l.href='/asgard';document.head.appendChild(l);this.onmouseover=null;">
                 <span class="feature-icon">🌌</span>
                 <div class="feature-title">
                     ASGARD

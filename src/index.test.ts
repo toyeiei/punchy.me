@@ -882,7 +882,7 @@ Hope this helps!`
       const res = await SELF.fetch("http://localhost/asgard");
       expect(res.status).toBe(200);
       const html = await res.text();
-      expect(html).toContain('class="bg-layer"');
+      expect(html).toContain('id="bg-layer"');
       expect(html).toContain('class="dock-container"');
       expect(html).toContain('id="spotlight"');
       expect(html).toContain('id="clock"');

@@ -1,15 +1,60 @@
-export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
+export const ASGARD_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ASGARD | The Supreme Workspace</title>
-    <meta name="description" content="ASGARD: The Bifrost. A world-class web workspace for the PUNCHY.ME ecosystem.">
+    <title>ASGARD | The Supreme Workspace for Deep Work & Focus</title>
+    <meta name="description" content="Enter ASGARD: The ultimate minimalist web desktop. A world-class workspace featuring Spotlight search, Pomodoro focus timer, and ambient soundscapes for maximum productivity.">
+    <meta name="keywords" content="productivity, deep work, focus timer, pomodoro, web desktop, minimalist workspace, asgard, punchy.me">
+    
+    <!-- SEO & Social Mastery -->
+    <link rel="canonical" href="https://punchy.me/asgard">
+    <meta property="og:title" content="ASGARD | The Supreme Workspace">
+    <meta property="og:description" content="A world-class, distraction-free desktop environment for the elite creator. Ultra-fast, edge-native, and beautifully minimal.">
+    <meta property="og:url" content="https://punchy.me/asgard">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="https://punchy.me/og-image-asgard.webp">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="ASGARD | The Supreme Workspace">
+    <meta name="twitter:description" content="Maximize your focus with the Asgardian desktop launchpad. Integrated Spotlight search, Pomodoro, and Zen mode.">
+    <meta name="twitter:image" content="https://punchy.me/og-image-asgard.webp">
+
+    <!-- Structured Data: WebApplication -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "ASGARD Workspace",
+      "url": "https://punchy.me/asgard",
+      "description": "A world-class web-based desktop environment optimized for focus and deep work.",
+      "applicationCategory": "ProductivityApplication",
+      "operatingSystem": "All",
+      "browserRequirements": "Requires JavaScript and HTML5 support",
+      "offers": {
+        "@type": "Offer",
+        "price": "0",
+        "priceCurrency": "USD"
+      },
+      "featureList": [
+        "Minimalist Digital Clock",
+        "Mac-style Interactive Dock",
+        "Spotlight Tactical Search (Ctrl+K)",
+        "Integrated Pomodoro Focus Timer",
+        "Ambient Focus Soundscapes",
+        "Total Stealth Zen Mode"
+      ],
+      "publisher": {
+        "@type": "Organization",
+        "name": "PUNCHY.ME Ecosystem"
+      }
+    }
+    </script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=Outfit:wght@200;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌌%3C/text%3E%3C/svg%3E">
-    <link rel="preload" href="${bgUrl}" as="image">
+    
     <style>
         :root {
             --text-main: #f8fafc;
@@ -35,22 +80,20 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
         }
 
         /* The Cinematic Background Layer */
-        .bg-layer {
+        #bg-layer {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background-image: url('${bgUrl}');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
             z-index: 0;
             opacity: 0;
             transform: scale(1.1);
-            animation: cinematicFade 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+            transition: opacity 2.5s cubic-bezier(0.22, 1, 0.36, 1), transform 2.5s cubic-bezier(0.22, 1, 0.36, 1);
         }
-
-        @keyframes cinematicFade {
-            0% { opacity: 0; transform: scale(1.1); }
-            100% { opacity: 1; transform: scale(1.0); }
+        #bg-layer.loaded {
+            opacity: 1;
+            transform: scale(1.0);
         }
 
         /* Tactical Overlay (60% Dim) */
@@ -279,21 +322,32 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             .date-display { font-size: 1.7rem; letter-spacing: 2px; }
             .greeting { font-size: 1.2rem; }
             .dock-container {
-                width: 95%;
-                justify-content: center;
-                gap: 5px;
-                padding: 10px;
-                bottom: 1rem;
+                width: auto;
+                max-width: 95vw;
+                justify-content: flex-start;
+                gap: 6px;
+                padding: 8px 15px;
+                bottom: 1.5rem;
+                height: 60px;
+                overflow-x: auto;
+                scrollbar-width: none; /* Hide scrollbar for Firefox */
             }
-            .dock-item { width: 40px; height: 40px; font-size: 1.2rem; }
-            .dock-item:hover { transform: scale(1.3) translateY(-5px); margin: 0 5px; }
+            .dock-container::-webkit-scrollbar { display: none; } /* Hide scrollbar for Chrome/Safari */
+            
+            .dock-item { 
+                width: 38px; 
+                height: 38px; 
+                font-size: 1.3rem; 
+                flex-shrink: 0; 
+            }
+            .dock-item:hover { transform: scale(1.2) translateY(-5px); margin: 0 2px; }
             .dock-item:hover + .dock-item,
-            .dock-item:has(+ .dock-item:hover) { transform: scale(1.1); margin: 0 2px; }
+            .dock-item:has(+ .dock-item:hover) { transform: scale(1.1); margin: 0 1px; }
         }
     </style>
 </head>
 <body>
-    <div class="bg-layer"></div>
+    <div id="bg-layer"></div>
     <div class="overlay"></div>
 
     <div class="time-container">
@@ -361,6 +415,16 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
 
         setInterval(updateTime, 1000);
         updateTime(); // Initial call
+
+        // --- BACKGROUND LOADING (Cinematic Fade-in) ---
+        const background = '/asgard_assets/asgard_bg_midjourney.webp';
+        const bgLayer = document.getElementById('bg-layer');
+        const img = new Image();
+        img.src = background;
+        img.onload = () => {
+            bgLayer.style.backgroundImage = 'url(' + background + ')';
+            bgLayer.classList.add('loaded');
+        };
 
         // --- POMODORO LOGIC ---
         let pomoMinutes = 25;

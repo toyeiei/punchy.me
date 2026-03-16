@@ -2,19 +2,15 @@ import { Env } from '../core/types';
 import { ASGARD_HTML } from '../ui/asgard';
 
 export async function handleAsgardGet(_request: Request, _env: Env, _ctx: ExecutionContext): Promise<Response> {
-	// Rotate between the 3 optimized local WebP images
-	const backgrounds = [
-		'/asgard_bg/asgard_bg_01.webp',
-		'/asgard_bg/asgard_bg_02.webp',
-		'/asgard_bg/asgard_bg_03.webp'
-	];
-	const randomBg = backgrounds[Math.floor(Math.random() * backgrounds.length)];
-	
-	return new Response(ASGARD_HTML(randomBg), {
+	// The HTML is now static (randomness handled on client), allowing 100% Edge caching
+	const response = new Response(ASGARD_HTML, {
 		headers: { 
 			'Content-Type': 'text/html;charset=UTF-8',
-			// Prevent caching the HTML so the background rotates on reload
-			'Cache-Control': 'no-cache, no-store, must-revalidate'
+			'Cache-Control': 'public, max-age=3600, stale-while-revalidate=86400',
+			// Early Hints & Preloading for critical assets
+			'Link': '<https://fonts.googleapis.com>; rel=preconnect, <https://fonts.gstatic.com>; rel=preconnect, </asgard_assets/asgard_bg_midjourney.webp>; rel=preload; as=image'
 		},
 	});
+	
+	return response;
 }
