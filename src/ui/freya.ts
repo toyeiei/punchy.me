@@ -1,23 +1,23 @@
 import { PUNCHY_PORTAL_HTML } from './portal';
 
-export const PICASSO_HTML = `<!DOCTYPE html>
+export const FREYA_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PICASSO | Ultra-Fast Image Editor | PUNCHY.ME</title>
-    <meta name="description" content="PICASSO Image Editor: Ultra-fast, edge-native image editing with Unsplash integration.">
+    <title>FREYA | Ultra-Fast Image Editor | PUNCHY.ME</title>
+    <meta name="description" content="FREYA Image Editor: Ultra-fast, edge-native image editing with Unsplash integration.">
     
     <!-- Open Graph / Social -->
-    <meta property="og:title" content="PICASSO | Ultra-Fast Image Editor | PUNCHY.ME">
+    <meta property="og:title" content="FREYA | Ultra-Fast Image Editor | PUNCHY.ME">
     <meta property="og:description" content="Ultra-fast, edge-native image editing with Unsplash integration.">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://punchy.me/picasso">
+    <meta property="og:url" content="https://punchy.me/freya">
     <meta property="og:image" content="https://punchy.me/og-image.webp">
     
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="PICASSO | Ultra-Fast Image Editor | PUNCHY.ME">
+    <meta name="twitter:title" content="FREYA | Ultra-Fast Image Editor | PUNCHY.ME">
     <meta name="twitter:description" content="Ultra-fast, edge-native image editing with Unsplash integration.">
     <meta name="twitter:image" content="https://punchy.me/og-image.webp">
 
@@ -26,11 +26,11 @@ export const PICASSO_HTML = `<!DOCTYPE html>
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "PICASSO Image Editor",
+      "name": "FREYA Image Editor",
       "operatingSystem": "Any",
       "applicationCategory": "MultimediaApplication",
       "description": "Ultra-fast, edge-native image editing with Unsplash integration.",
-      "url": "https://punchy.me/picasso",
+      "url": "https://punchy.me/freya",
       "publisher": {
         "@type": "Organization",
         "name": "PUNCHY.ME"
@@ -83,7 +83,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             line-height: 0.8; 
             font-weight: 400; 
             position: relative;
-            animation: picasso-glitch 5s infinite;
+            animation: freya-glitch 5s infinite;
         }
         .brand::before, .brand::after {
             content: attr(data-text);
@@ -96,7 +96,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
         .brand::before { left: 2px; color: #ff00ff; animation: glitch-anim-1 4s infinite; }
         .brand::after { left: -2px; color: #00ffff; animation: glitch-anim-2 3s infinite; }
 
-        @keyframes picasso-glitch {
+        @keyframes freya-glitch {
             0%, 80%, 100% { transform: skew(0deg); text-shadow: none; } 
             81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }  
             82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
@@ -200,7 +200,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
 <body>
     <div class="mobile-only-notice">
         <h1>DESKTOP ONLY</h1>
-        <p>PICASSO is a precision tactical tool optimized for high-resolution displays. Please switch to a desktop environment to continue forging.</p>
+        <p>FREYA is a precision tactical tool optimized for high-resolution displays. Please switch to a desktop environment to continue forging.</p>
         <a href="/" class="btn" style="margin-top: 2rem; width: auto;">Return to Base</a>
     </div>
 
@@ -209,7 +209,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
     <header class="tactical-header">
         <div class="brand-text-wrapper">
             <div class="title-row">
-                <a href="/" class="brand" data-text="PICASSO">PICASSO</a>
+                <a href="/" class="brand" data-text="FREYA">FREYA</a>
                 <div class="beta-badge">BETA</div>
             </div>
             <div class="tagline">Ultra-Fast Edge-Native Image Editor</div>
@@ -441,7 +441,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             }
             
             try {
-                const res = await fetch('/picasso/search?q=' + encodeURIComponent(currentQuery) + '&p=' + currentPage);
+                const res = await fetch('/freya/search?q=' + encodeURIComponent(currentQuery) + '&p=' + currentPage);
                 
                 if (res.ok) {
                     const data = await res.json();
@@ -634,7 +634,7 @@ export const PICASSO_HTML = `<!DOCTYPE html>
             const dataUrl = final.toDataURL('image/webp', 0.9);
             const a = document.createElement('a');
             a.href = dataUrl;
-            a.download = 'punchy-picasso-' + Date.now() + '.webp';
+            a.download = 'punchy-freya-' + Date.now() + '.webp';
             document.body.appendChild(a);
             a.click();
             document.body.removeChild(a);

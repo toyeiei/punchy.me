@@ -8,7 +8,7 @@ import { handleMusashiGet, handleMusashiForge } from './handlers/musashi';
 import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
 import { handleLokiGet, handleLokiTimeline, handleLokiSupport } from './handlers/loki';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
-import { handlePicassoGet, handlePicassoSearch } from './handlers/picasso';
+import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -41,7 +41,7 @@ export default {
 		if (path === '/yaiba' && method === 'GET') return handleYaibaGet();
 		if (path === '/loki' && method === 'GET') return handleLokiGet();
 		if (path === '/odin' && method === 'GET') return handleOdinGet();
-		if (path === '/picasso' && method === 'GET') return handlePicassoGet();
+		if (path === '/freya' && method === 'GET') return handleFreyaGet();
 
 		// 4. POST APIs & Dynamic Routes
 		if (path === '/bazuka' && method === 'POST') return handleBazukaPost(request, env);
@@ -52,7 +52,7 @@ export default {
 		if (path === '/loki/timeline' && method === 'GET') return handleLokiTimeline(request, env);
 		if (path === '/loki/support' && method === 'POST') return handleLokiSupport(request, env);
 		if (path === '/odin/analyze' && method === 'POST') return handleOdinAnalyze(request, env);
-		if (path === '/picasso/search' && method === 'GET') return handlePicassoSearch(request, env, ctx);
+		if (path === '/freya/search' && method === 'GET') return handleFreyaSearch(request, env, ctx);
 
 		// 5. Dynamic Redirection & Rendering
 		if (path.length > 1) return handleRender(request, env, path);

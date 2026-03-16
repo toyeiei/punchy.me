@@ -27,7 +27,7 @@ export function handleSitemap(): Response {
 	<url><loc>https://punchy.me/musashi</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 	<url><loc>https://punchy.me/odin</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 	<url><loc>https://punchy.me/yaiba</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
-	<url><loc>https://punchy.me/picasso</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
+	<url><loc>https://punchy.me/freya</loc><changefreq>weekly</changefreq><priority>0.8</priority></url>
 </urlset>`.trim();
 	return new Response(sitemap, { headers: { 'Content-Type': 'application/xml' } });
 }

@@ -155,8 +155,8 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
 - **Zero-Regression Resolution**: Surmounted and resolved complex "unterminated string literal" syntax errors using sub-agent (`generalist`) batch processing.
 - **"Update Once, Use Everywhere" Mandate**: Officially codified the strict modularization requirement in `GEMINI.md` and `DESIGN_GUIDELINE.md`.
 
-### Version 4.7.0 - PICASSO Edge Image Forge (2026-03-16)
-- **PICASSO Image Editor**: Launched the ultra-fast, edge-native image editor (`/picasso`) with a 3-layer canvas rendering engine.
+### Version 4.7.0 - FREYA Edge Image Forge (2026-03-16)
+- **FREYA Image Editor**: Launched the ultra-fast, edge-native image editor (`/freya`) with a 3-layer canvas rendering engine.
 - **Multi-Tier Loading**: Implemented a Zero-Latency loading strategy (Tiny -> Preview -> Master) for high-resolution Unsplash assets.
 - **Tactical Search Engine**: Integrated Unsplash API with Edge Caching and strict rate-limiting for optimized resource management.
 - **Social Export Pipeline**: Engineered a client-side WebP export (1200px) optimized for high-impact Open Graph and social banners.

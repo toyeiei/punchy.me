@@ -1,12 +1,12 @@
 import { Env } from '../core/types';
-import { PICASSO_HTML } from '../ui/picasso';
+import { FREYA_HTML } from '../ui/freya';
 import { checkRateLimit } from '../services/security';
 
-export async function handlePicassoGet(): Promise<Response> {
-	return new Response(PICASSO_HTML, { headers: { 'Content-Type': 'text/html' } });
+export async function handleFreyaGet(): Promise<Response> {
+	return new Response(FREYA_HTML, { headers: { 'Content-Type': 'text/html' } });
 }
 
-export async function handlePicassoSearch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
+export async function handleFreyaSearch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 	try {
 		const url = new URL(request.url);
 		const query = url.searchParams.get('q');
@@ -50,11 +50,13 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 			return new Response(JSON.stringify({ error: 'Failed to fetch from Unsplash.' }), { status: 500 });
 		}
 
-		const rawData = await res.json();
+		type UnsplashImage = { id: string; urls: { raw?: string; regular: string }; alt_description: string; user?: { name: string } };
+
+		const rawData = await res.json() as { results?: UnsplashImage[] } | UnsplashImage[];
 		// Unsplash returns results in .results for search, but as a top-level array for random
-		const results = (isSearch ? rawData.results : rawData) || [];
+		const results = (isSearch ? (rawData as { results?: UnsplashImage[] }).results : (rawData as UnsplashImage[])) || [];
 		
-		const sanitizedImages = results.map((img: any) => {
+		const sanitizedImages = results.map((img: UnsplashImage) => {
 			const baseUrl = img.urls.raw || img.urls.regular;
 			const joiner = baseUrl.includes('?') ? '&' : '?';
 
@@ -81,7 +83,7 @@ export async function handlePicassoSearch(request: Request, env: Env, ctx: Execu
 
 		return response;
 	} catch (e) {
-		console.error("PICASSO SEARCH ERROR:", e);
+		console.error("FREYA SEARCH ERROR:", e);
 		return new Response(JSON.stringify({ error: 'Internal server error during search.' }), { status: 500 });
 	}
 }

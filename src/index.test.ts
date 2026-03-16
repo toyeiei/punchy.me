@@ -662,11 +662,11 @@ Hope this helps!`
     });
   });
 
-  describe("PICASSO Feature (Image Editor)", () => {
-    it("serves the PICASSO HUD page", async () => {
-      const res = await SELF.fetch("http://localhost/picasso");
+  describe("FREYA Feature (Image Editor)", () => {
+    it("serves the FREYA HUD page", async () => {
+      const res = await SELF.fetch("http://localhost/freya");
       expect(res.status).toBe(200);
-      expect(await res.text()).toContain("PICASSO");
+      expect(await res.text()).toContain("FREYA");
     });
 
     it("proxies Unsplash API searches securely and returns sanitized JSON", async () => {
@@ -684,7 +684,7 @@ Hope this helps!`
         return originalFetch(input, init);
       });
 
-      const res = await SELF.fetch("http://localhost/picasso/search?q=office", {
+      const res = await SELF.fetch("http://localhost/freya/search?q=office", {
         method: "GET",
         headers: { "cf-connecting-ip": "1.1.1.1" },
       });
@@ -693,7 +693,7 @@ Hope this helps!`
       const data = await res.json() as Record<string, unknown>;
       
       expect(Array.isArray(data.images)).toBe(true);
-      const images = data.images as Record<string, any>[];
+      const images = data.images as Record<string, unknown>[];
       expect(images.length).toBe(2);
       // Verify sanitized URL structure (optimized for webp)
       expect(images[0].url).toContain("w=1200");
@@ -721,12 +721,12 @@ Hope this helps!`
         return originalFetch(input, init);
       });
 
-      const res = await SELF.fetch("http://localhost/picasso/search?q=", {
+      const res = await SELF.fetch("http://localhost/freya/search?q=", {
         method: "GET",
       });
       
       expect(res.status).toBe(200);
-      const data = await res.json() as any;
+      const data = await res.json() as { images: Array<{ id: string }> };
       expect(data.images[0].id).toBe("rand1");
       
       const fetchCall = fetchSpy.mock.calls.find(call => {
@@ -755,18 +755,18 @@ Hope this helps!`
         return originalFetch(input, init);
       });
       
-      const ip = "picasso-rl-ip-" + Date.now();
+      const ip = "freya-rl-ip-" + Date.now();
       // Using an empty query (q=) triggers 'random' mode, bypassing the Cache API 
       // which prevents ctx.waitUntil hanging in the Vitest simulator during loop requests.
       for (let i = 0; i < 10; i++) {
-        const r = await SELF.fetch(`http://localhost/picasso/search?q=&i=${i}`, {
+        const r = await SELF.fetch(`http://localhost/freya/search?q=&i=${i}`, {
           method: "GET",
           headers: { "cf-connecting-ip": ip },
         });
         expect(r.status).toBe(200);
       }
 
-      const res = await SELF.fetch(`http://localhost/picasso/search?q=&i=11`, {
+      const res = await SELF.fetch(`http://localhost/freya/search?q=&i=11`, {
         method: "GET",
         headers: { "cf-connecting-ip": ip },
       });
@@ -782,7 +782,7 @@ Hope this helps!`
     it("verifies all professional tools are reachable from the homepage", async () => {
       const res = await SELF.fetch("http://localhost/");
       const html = await res.text();
-      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/picasso"];
+      const tools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/freya"];
       for (const tool of tools) {
         expect(html).toContain(`href="${tool}"`);
       }
@@ -798,7 +798,7 @@ Hope this helps!`
       expect(html).toContain("PUNCHY.ME");
       
       // Verify all 6 Tools are in the portal
-      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/picasso"];
+      const portalTools = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/freya"];
       for (const tool of portalTools) {
         // Look for the specific link structure used in the portal switcher
         expect(html).toContain(`href="${tool}"`);
