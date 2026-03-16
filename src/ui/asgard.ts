@@ -9,6 +9,7 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=Outfit:wght@200;400;700&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🌌%3C/text%3E%3C/svg%3E">
+    <link rel="preload" href="${bgUrl}" as="image">
     <style>
         :root {
             --text-main: #f8fafc;
@@ -30,29 +31,35 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            position: relative;
+        }
+
+        /* The Cinematic Background Layer */
+        .bg-layer {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
             background-image: url('${bgUrl}');
             background-size: cover;
             background-position: center;
             background-repeat: no-repeat;
-            position: relative;
+            z-index: 0;
+            opacity: 0;
+            transform: scale(1.1);
+            animation: cinematicFade 2.5s cubic-bezier(0.22, 1, 0.36, 1) forwards;
         }
 
-        /* The Fog of Midgard Entrance Animation */
+        @keyframes cinematicFade {
+            0% { opacity: 0; transform: scale(1.1); }
+            100% { opacity: 1; transform: scale(1.0); }
+        }
+
+        /* Tactical Overlay (60% Dim) */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: #000;
-            backdrop-filter: blur(20px);
-            -webkit-backdrop-filter: blur(20px);
+            background: rgba(0, 0, 0, 0.6);
             z-index: 1;
             pointer-events: none;
-            animation: evaporateFog 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        @keyframes evaporateFog {
-            0% { background: #000; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
-            30% { background: rgba(0,0,0,0.9); }
-            100% { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
         }
 
         /* Clock and Greeting */
@@ -217,6 +224,7 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    <div class="bg-layer"></div>
     <div class="overlay"></div>
 
     <div class="time-container">
