@@ -37,13 +37,22 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             position: relative;
         }
 
-        /* Subtle gradient overlay to ensure text readability */
+        /* The Fog of Midgard Entrance Animation */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: #000;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             z-index: 1;
             pointer-events: none;
+            animation: evaporateFog 2s cubic-bezier(0.22, 1, 0.36, 1) forwards;
+        }
+
+        @keyframes evaporateFog {
+            0% { background: #000; backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); }
+            30% { background: rgba(0,0,0,0.9); }
+            100% { background: rgba(0, 0, 0, 0.5); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px); }
         }
 
         /* Clock and Greeting */
@@ -55,11 +64,12 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             text-align: center;
             z-index: 10;
             text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
-            animation: fadeIn 2s ease-out forwards;
+            opacity: 0;
+            animation: fadeInUI 1.5s ease-out 0.8s forwards;
         }
 
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translate(-50%, 20px); }
+        @keyframes fadeInUI {
+            from { opacity: 0; transform: translate(-50%, 10px); }
             to { opacity: 1; transform: translate(-50%, 0); }
         }
 
@@ -108,6 +118,8 @@ export const ASGARD_HTML = (bgUrl: string) => `<!DOCTYPE html>
             gap: 10px;
             height: 80px; /* Fixed height for dock */
             transition: all 0.3s ease;
+            opacity: 0;
+            animation: fadeInUI 1.5s ease-out 1.2s forwards;
         }
 
         .dock-item {
