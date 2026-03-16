@@ -9,6 +9,7 @@ import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
 import { handleLokiGet, handleLokiTimeline, handleLokiSupport } from './handlers/loki';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
+import { handleAsgardGet } from './handlers/asgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -35,6 +36,7 @@ export default {
 		if (path === '/shorten' && method === 'POST') return handleShorten(request, env);
 
 		// 3. GET Tool Routes
+		if (path === '/asgard' && method === 'GET') return handleAsgardGet(request, env, ctx);
 		if (path === '/bazuka' && method === 'GET') return handleBazukaGet();
 		if (path === '/anakin' && method === 'GET') return handleAnakinGet();
 		if (path === '/musashi' && method === 'GET') return handleMusashiGet();

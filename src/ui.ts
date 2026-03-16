@@ -6,4 +6,5 @@ export * from './ui/yaiba';
 export * from './ui/loki';
 export * from './ui/odin';
 export * from './ui/freya';
+export * from './ui/asgard';
 export * from './ui/portal';

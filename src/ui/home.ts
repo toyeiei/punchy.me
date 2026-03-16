@@ -553,6 +553,14 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Ultra-Fast Image Editor. Edge-native Unsplash integration.</div>
             </a>
+            <a href="/asgard" class="feature-card">
+                <span class="feature-icon">🌌</span>
+                <div class="feature-title">
+                    ASGARD
+                    <span class="coming-soon-badge">NEW</span>
+                </div>
+                <div class="feature-tagline">The Supreme Workspace. A distraction-free desktop environment.</div>
+            </a>
         </div>
     </section>
 
