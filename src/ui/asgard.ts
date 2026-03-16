@@ -106,11 +106,11 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             transform: scale(1.0);
         }
 
-        /* Tactical Overlay (50% Dim) */
+        /* Tactical Overlay (42% Dim) */
         .overlay {
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.5);
+            background: rgba(0, 0, 0, 0.42);
             z-index: 1;
             pointer-events: none;
         }
@@ -125,13 +125,6 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             z-index: 10;
             width: 90%;
             text-shadow: 0 4px 30px rgba(0, 0, 0, 0.8);
-            opacity: 0;
-            animation: fadeInUI 1.5s ease-out 0.8s forwards;
-        }
-
-        @keyframes fadeInUI {
-            from { opacity: 0; transform: translate(-50%, -45%); }
-            to { opacity: 1; transform: translate(-50%, -50%); }
         }
 
         .clock {
@@ -141,6 +134,9 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             line-height: 1;
             letter-spacing: -2px;
             margin-bottom: 0.5rem;
+            opacity: 0;
+            transform: translateY(-10px);
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .date-display {
@@ -151,6 +147,8 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 4px;
             margin-bottom: 1.5rem;
+            opacity: 0;
+            transition: all 1.2s cubic-bezier(0.22, 1, 0.36, 1);
         }
 
         .greeting {
@@ -158,6 +156,9 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             font-weight: 400;
             letter-spacing: 1px;
             color: #fff;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         /* The Mac-Style Dock */
@@ -165,7 +166,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             position: absolute;
             bottom: 2rem;
             left: 50%;
-            transform: translateX(-50%);
+            transform: translateX(-50%) translateY(20px);
             z-index: 10;
             padding: 10px 20px;
             background: rgba(255, 255, 255, 0.05);
@@ -178,9 +179,23 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             align-items: flex-end;
             gap: 10px;
             height: 80px; /* Fixed height for dock */
-            transition: all 0.3s ease;
             opacity: 0;
-            animation: fadeInUI 1.5s ease-out 1.2s forwards;
+            transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Entrance Trigger States */
+        body.loaded-ui .clock,
+        body.loaded-ui .date-display {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        body.loaded-ui .greeting {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        body.loaded-ui .dock-container {
+            opacity: 1;
+            transform: translateX(-50%) translateY(0);
         }
 
         .dock-item {
@@ -246,12 +261,13 @@ export const ASGARD_HTML = `<!DOCTYPE html>
         }
 
         /* Extremely subtle branding */
-        /* Spotlight Search */
+        /* Spotlight Search Overlay - Frosted White */
         .spotlight-overlay {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.4);
-            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
             z-index: 100;
             display: none;
             align-items: center;
@@ -261,11 +277,13 @@ export const ASGARD_HTML = `<!DOCTYPE html>
         .spotlight-search-box {
             width: 600px;
             max-width: 90%;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid #fff;
             border-radius: 12px;
             padding: 1.5rem;
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.15);
             transform: translateY(-50px);
             transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
         }
@@ -275,13 +293,13 @@ export const ASGARD_HTML = `<!DOCTYPE html>
             background: transparent;
             border: none;
             outline: none;
-            color: #fff;
+            color: #000;
             font-size: 1.5rem;
             font-family: var(--font-display);
         }
         .spotlight-hint {
             font-size: 0.7rem;
-            color: var(--text-dim);
+            color: rgba(0, 0, 0, 0.5);
             margin-top: 1rem;
             text-transform: uppercase;
             letter-spacing: 1px;
@@ -318,9 +336,14 @@ export const ASGARD_HTML = `<!DOCTYPE html>
         }
 
         /* Total Stealth (Zen Mode) */
-        body.zen-mode .dock-container,
         body.zen-mode .greeting {
             opacity: 0 !important;
+            transform: translateY(20px);
+            pointer-events: none !important;
+        }
+        body.zen-mode .dock-container {
+            opacity: 0 !important;
+            transform: translateX(-50%) translateY(20px) !important;
             pointer-events: none !important;
         }
         body.zen-mode .pomodoro-container {
@@ -581,6 +604,13 @@ export const ASGARD_HTML = `<!DOCTYPE html>
                 isSoundOn = true;
             }
         }
+
+        // --- ENTRANCE SEQUENCE ---
+        window.addEventListener('load', () => {
+            setTimeout(() => {
+                document.body.classList.add('loaded-ui');
+            }, 500);
+        });
     </script>
 </body>
 </html>`;
