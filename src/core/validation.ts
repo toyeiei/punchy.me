@@ -6,8 +6,8 @@
 /** IDs that would shadow application routes and become unreachable as short links */
 const RESERVED_IDS = new Set([
 	'shorten', 'bazuka', 'anakin', 'musashi', 'yaiba', 'ragnar',
-	'odin', 'freya', 'asgard', 'y', 'favicon.ico', 'favicon.svg',
-	'robots.txt', 'sitemap.xml',
+	'odin', 'freya', 'asgard', 'thor', 'poll', 'ares', 'marcus',
+	'y', 'favicon.ico', 'favicon.svg', 'robots.txt', 'sitemap.xml',
 ]);
 
 export function isReservedId(id: string): boolean {
@@ -309,6 +309,142 @@ export function validateThorRequest(body: unknown): ValidationResult<{ url: stri
 		success: true,
 		data: {
 			url: payload.url,
+			hp_field: payload.hp_field as string | undefined,
+		}
+	};
+}
+
+/**
+ * Validates Poll create request payload
+ */
+export function validatePollCreateRequest(body: unknown): ValidationResult<{ question: string; options: string[]; hp_field?: string }> {
+	if (!body || typeof body !== 'object') {
+		return { success: false, error: 'Invalid request body' };
+	}
+
+	const payload = body as Record<string, unknown>;
+
+	if (!isNonEmptyString(payload.question)) {
+		return { success: false, error: 'Question is required' };
+	}
+
+	if (payload.question.length > 200) {
+		return { success: false, error: 'Question must be 200 characters or less' };
+	}
+
+	if (!Array.isArray(payload.options)) {
+		return { success: false, error: 'Options must be an array' };
+	}
+
+	if (payload.options.length < 2 || payload.options.length > 4) {
+		return { success: false, error: 'Poll must have 2-4 options' };
+	}
+
+	const validOptions = payload.options.filter((opt): opt is string => typeof opt === 'string' && opt.trim().length > 0);
+	if (validOptions.length !== payload.options.length) {
+		return { success: false, error: 'All options must be non-empty strings' };
+	}
+
+	return {
+		success: true,
+		data: {
+			question: payload.question.trim(),
+			options: validOptions.map(o => o.trim()),
+			hp_field: payload.hp_field as string | undefined,
+		}
+	};
+}
+
+/**
+ * Validates Poll vote request payload
+ */
+export function validatePollVoteRequest(body: unknown): ValidationResult<{ optionIndex: number; hp_field?: string }> {
+	if (!body || typeof body !== 'object') {
+		return { success: false, error: 'Invalid request body' };
+	}
+
+	const payload = body as Record<string, unknown>;
+
+	if (!isNumber(payload.optionIndex)) {
+		return { success: false, error: 'optionIndex is required and must be a number' };
+	}
+
+	if (payload.optionIndex < 0 || payload.optionIndex > 3) {
+		return { success: false, error: 'Invalid option index' };
+	}
+
+	return {
+		success: true,
+		data: {
+			optionIndex: payload.optionIndex,
+			hp_field: payload.hp_field as string | undefined,
+		}
+	};
+}
+
+/**
+ * Validates Ares idea generation request payload
+ */
+export function validateAresRequest(body: unknown): ValidationResult<{ product: string; customer: string; hp_field?: string }> {
+	if (!body || typeof body !== 'object') {
+		return { success: false, error: 'Invalid request body' };
+	}
+
+	const payload = body as Record<string, unknown>;
+
+	if (!isNonEmptyString(payload.product)) {
+		return { success: false, error: 'Product description is required' };
+	}
+
+	if (payload.product.length > 500) {
+		return { success: false, error: 'Product description must be 500 characters or less' };
+	}
+
+	if (!isNonEmptyString(payload.customer)) {
+		return { success: false, error: 'Target customer is required' };
+	}
+
+	if (payload.customer.length > 200) {
+		return { success: false, error: 'Target customer must be 200 characters or less' };
+	}
+
+	return {
+		success: true,
+		data: {
+			product: payload.product.trim(),
+			customer: payload.customer.trim(),
+			hp_field: payload.hp_field as string | undefined,
+		}
+	};
+}
+
+/**
+ * Validates Marcus R analysis request payload
+ */
+export function validateMarcusRequest(body: unknown): ValidationResult<{ template: string; data: string; hp_field?: string }> {
+	if (!body || typeof body !== 'object') {
+		return { success: false, error: 'Invalid request body' };
+	}
+
+	const payload = body as Record<string, unknown>;
+
+	if (!isNonEmptyString(payload.template)) {
+		return { success: false, error: 'Analysis template is required' };
+	}
+
+	if (!isNonEmptyString(payload.data)) {
+		return { success: false, error: 'Data is required' };
+	}
+
+	if (payload.data.length > 10000) {
+		return { success: false, error: 'Data too large. Maximum 10,000 characters.' };
+	}
+
+	return {
+		success: true,
+		data: {
+			template: payload.template.trim(),
+			data: payload.data.trim(),
 			hp_field: payload.hp_field as string | undefined,
 		}
 	};
