@@ -71,40 +71,17 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             padding: 0;
             overflow-y: auto;
         }
-        .pixel-bg {
+        .bg-image {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 1;
-            pointer-events: none;
-            overflow: hidden;
+            inset: 0;
+            background: url('/og-images/og-image-bazuka.webp') center / cover no-repeat;
+            z-index: -2;
         }
-
-        .grid-bg {
+        .bg-overlay {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px), linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        .pixel {
-            position: absolute;
-            width: 3px; height: 3px;
-            background: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-            animation: drift var(--duration) linear infinite;
-            top: var(--top); left: -10px;
-            z-index: 1;
-        }
-
-        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
-
-        @keyframes drift {
-            0% { transform: translateX(0); opacity: 0; }
-            5% { opacity: 1; }
-            95% { opacity: 1; }
-            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+            inset: 0;
+            background: linear-gradient(160deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.60) 50%, rgba(0,0,0,0.80) 100%);
+            z-index: -1;
         }
 
         .container {
@@ -291,8 +268,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div class="grid-bg"></div>
-    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
 
     <div id="modal-overlay">
         <div class="modal">
@@ -331,21 +308,6 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
     </div>
 
     <script>
-        const bg = document.getElementById('pixel-bg');
-        function createPixel() {
-            const pixel = document.createElement('div');
-            pixel.className = 'pixel';
-            if (Math.random() > 0.7) pixel.classList.add('green');
-            const top = Math.random() * 100;
-            const duration = 5 + Math.random() * 10;
-            pixel.style.setProperty('--top', top + '%');
-            pixel.style.setProperty('--duration', duration + 's');
-            bg.appendChild(pixel);
-            setTimeout(() => pixel.remove(), duration * 1000);
-        }
-        setInterval(createPixel, 300);
-        for(let i=0; i<20; i++) createPixel();
-
         const form = document.getElementById('bazuka-form');
         const submitBtn = document.getElementById('bazuka-btn');
 
@@ -488,28 +450,17 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
             padding: 0;
             overflow-y: auto;
         }
-        .pixel-bg {
+        .bg-image {
             position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            z-index: 0;
-            pointer-events: none;
-            overflow: hidden;
+            inset: 0;
+            background: url('/og-images/og-image-bazuka.webp') center / cover no-repeat;
+            z-index: -2;
         }
-        .pixel {
-            position: absolute;
-            width: 3px; height: 3px;
-            background: rgba(255, 255, 255, 0.4);
-            box-shadow: 0 0 5px rgba(255, 255, 255, 0.2);
-            animation: drift var(--duration) linear infinite;
-            top: var(--top); left: -10px;
-            z-index: 1;
-        }
-        .pixel.green { background: var(--accent); box-shadow: 0 0 5px var(--accent); opacity: 0.6; }
-        @keyframes drift {
-            0% { transform: translateX(0); opacity: 0; }
-            5% { opacity: 1; }
-            95% { opacity: 1; }
-            100% { transform: translateX(calc(100vw + 20px)); opacity: 0; }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(0,0,0,0.90) 0%, rgba(0,0,0,0.70) 50%, rgba(0,0,0,0.85) 100%);
+            z-index: -1;
         }
 
         .card-container {
@@ -614,8 +565,8 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
 </head>
 <body>
     ${PUNCHY_PORTAL_HTML}
-    <div class="grid-bg"></div>
-    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
 
     <div class="card-container">
         <div class="card">
@@ -639,20 +590,6 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         </div>
     </div>
     <script>
-        const bg = document.getElementById('pixel-bg');
-        function createPixel() {
-            const pixel = document.createElement('div');
-            pixel.className = 'pixel';
-            if (Math.random() > 0.7) pixel.classList.add('green');
-            const top = Math.random() * 100;
-            const duration = 5 + Math.random() * 10;
-            pixel.style.setProperty('--top', top + '%');
-            pixel.style.setProperty('--duration', duration + 's');
-            bg.appendChild(pixel);
-            setTimeout(() => pixel.remove(), duration * 1000);
-        }
-        setInterval(createPixel, 300);
-        for(let i=0; i<20; i++) createPixel();
     </script>
 </body>
 </html>`;

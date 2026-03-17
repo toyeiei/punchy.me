@@ -381,9 +381,8 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 </head>
 <body>
     ${PUNCHY_PORTAL_HTML}
-    <div class="grid-bg"></div>
-    <div class="scan-line"></div>
-    <div class="pixel-bg" id="pixel-bg"></div>
+    <div class="bg-image"></div>
+    <div class="bg-overlay"></div>
     
     <div class="container">
         <div class="title-container" style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
@@ -428,7 +427,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             const jobInput = document.getElementById('job-description');
             const intelOutput = document.getElementById('intel-output');
             const charCounter = document.getElementById('char-counter');
-            const bg = document.getElementById('pixel-bg');
 
             jobInput.addEventListener('input', () => {
                 const count = jobInput.value.length;
@@ -499,19 +497,6 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
                     forgeBtn.disabled = false;
                 }
             };
-
-            function createPixel() {
-                const pixel = document.createElement('div');
-                pixel.className = 'pixel';
-                const top = Math.random() * 100;
-                const duration = 5 + Math.random() * 10;
-                pixel.style.setProperty('--top', top + '%');
-                pixel.style.setProperty('--duration', duration + 's');
-                bg.appendChild(pixel);
-                setTimeout(() => pixel.remove(), duration * 1000);
-            }
-            setInterval(createPixel, 300);
-            for(let i=0; i<20; i++) createPixel();
         };
 
         window.switchView = (mode) => {
