@@ -62,12 +62,12 @@ export const PUNCHY_PORTAL_HTML = `
         <div class="portal-tools">
             <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
             <a href="/anakin" class="portal-tool-link" title="ANAKIN">🪨</a>
-            <a href="/thor" class="portal-tool-link" title="THOR">⚡</a>
             <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
             <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
             <a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a>
             <a href="/ragnar" class="portal-tool-link" title="RAGNAR">🛡️</a>
             <a href="/freya" class="portal-tool-link" title="FREYA">🌠</a>
+            <a href="/thor" class="portal-tool-link" title="THOR">⚡</a>
             <a href="/asgard" class="portal-tool-link" title="ASGARD">🌌</a>
         </div>
     </div>
