@@ -65,7 +65,7 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
         .bg-image {
             position: fixed;
             inset: 0;
-            background: url('/backgrounds/ragnar.webp') center / cover no-repeat;
+            background: url('/og-images/og-image-ragnar.webp') center / cover no-repeat;
             z-index: -2;
         }
         .bg-overlay {
