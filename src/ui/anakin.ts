@@ -212,12 +212,40 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             color: var(--text-dim);
             font-size: 0.9rem;
-            margin-bottom: 2.5rem;
+            margin-bottom: 1.5rem;
             line-height: 1.5;
             letter-spacing: 0.5px;
             max-width: 700px;
             margin-left: auto;
             margin-right: auto;
+        }
+
+        .quote-box {
+            margin-top: 0.5rem;
+            border-left: 2px solid var(--accent);
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            background: rgba(34, 197, 94, 0.03);
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 2rem;
+        }
+
+        .quote-text {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .quote-author {
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
         }
 
         .input-group {
@@ -352,6 +380,12 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             <span class="beta-badge">BETA</span>
         </div>
         <p class="punchy-desc">Harnessing Llama 3 to forge elite professional resumes. Transform your raw data into career-winning impact.</p>
+
+        <div class="quote-box">
+            <p class="quote-text">"Every stone was once part of a mountain. Forge yourself into something unbreakable."</p>
+            <p class="quote-author">— ANAKIN, The Solid Foundation</p>
+        </div>
+
         <form id="anakin-form">
             <div class="input-group">
                 <div class="form-grid">

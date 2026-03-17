@@ -84,6 +84,33 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             z-index: -1;
         }
 
+        /* Pulse Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .scan-line {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100px;
+            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.1), transparent);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+            z-index: 0;
+            animation: scan 4s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes scan {
+            0% { transform: translateY(-100px); }
+            100% { transform: translateY(100vh); }
+        }
+
         .container {
             width: 100%;
             max-width: 500px;
@@ -129,8 +156,36 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             font-family: var(--font-mono);
             color: var(--text-dim);
             font-size: 0.9rem;
-            margin-bottom: 2rem;
+            margin-bottom: 1.5rem;
             line-height: 1.5;
+        }
+
+        .quote-box {
+            margin-top: 0.5rem;
+            border-left: 2px solid var(--accent);
+            padding: 0.75rem 1.5rem;
+            text-align: left;
+            background: rgba(34, 197, 94, 0.03);
+            max-width: 500px;
+            margin-left: auto;
+            margin-right: auto;
+            margin-bottom: 1.5rem;
+        }
+
+        .quote-text {
+            color: var(--text-main);
+            font-size: 0.95rem;
+            font-style: italic;
+            line-height: 1.5;
+            margin-bottom: 0.5rem;
+        }
+
+        .quote-author {
+            color: var(--accent);
+            font-weight: 700;
+            text-transform: uppercase;
+            font-size: 0.75rem;
+            letter-spacing: 1px;
         }
 
         .input-group {
@@ -270,6 +325,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 <body>
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
+    <div class="grid-bg"></div>
+    <div class="scan-line"></div>
 
     <div id="modal-overlay">
         <div class="modal">
@@ -292,6 +349,12 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             <span class="beta-badge">BETA</span>
         </div>
         <p class="punchy-desc">Forging high-impact digital presence in seconds.</p>
+
+        <div class="quote-box">
+            <p class="quote-text">"A name spoken is a spell cast. Let your identity strike before you arrive."</p>
+            <p class="quote-author">— BAZUKA, The Explosive Identity</p>
+        </div>
+
         <form id="bazuka-form">
             <div class="input-group">
                 <input type="text" id="hp_field" style="display: none;" tabindex="-1" autocomplete="off">
