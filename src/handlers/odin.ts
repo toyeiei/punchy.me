@@ -2,14 +2,18 @@ import { Env } from '../core/types';
 import { ODIN_HTML } from '../ui';
 import { verifyTurnstile } from '../services/security';
 import { validateOdinRequest } from '../core/validation';
-import { htmlPage } from '../core/utils';
+import { htmlPage, parseAIResponse } from '../core/utils';
 import { AI_MAX_TOKENS_STANDARD } from '../core/constants';
 import { handleAIRequest } from '../core/middleware';
-import { AuthenticationError } from '../core/errors';
+import { AIError, AuthenticationError } from '../core/errors';
 import { ODIN_SYSTEM_PROMPT, buildOdinUserPrompt } from '../prompts/odin';
+import { CSP_POLICY_ODIN } from '../core/security-headers';
 
 export async function handleOdinGet(): Promise<Response> {
-    return htmlPage(ODIN_HTML);
+	const response = htmlPage(ODIN_HTML);
+	const headers = new Headers(response.headers);
+	headers.set('Content-Security-Policy', CSP_POLICY_ODIN);
+	return new Response(response.body, { status: response.status, statusText: response.statusText, headers });
 }
 
 export async function handleOdinAnalyze(request: Request, env: Env): Promise<Response> {
@@ -22,15 +26,19 @@ export async function handleOdinAnalyze(request: Request, env: Env): Promise<Res
 				throw new AuthenticationError('Security check failed.');
 			}
 			
-			const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-				max_tokens: AI_MAX_TOKENS_STANDARD, temperature: 0.2, response_format: { type: 'json_object' },
-				messages: [
-					{ role: 'system', content: ODIN_SYSTEM_PROMPT },
-					{ role: 'user', content: buildOdinUserPrompt(data.columns, data.numRows, data.sample) }
-				]
-			}) as { response: string | Record<string, unknown> };
-			
-			return typeof aiResponse.response === 'string' ? JSON.parse(aiResponse.response) : aiResponse.response;
+			let aiResponse: { response: string | Record<string, unknown> };
+			try {
+				aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+					max_tokens: AI_MAX_TOKENS_STANDARD, temperature: 0.2, response_format: { type: 'json_object' },
+					messages: [
+						{ role: 'system', content: ODIN_SYSTEM_PROMPT },
+						{ role: 'user', content: buildOdinUserPrompt(data.columns, data.numRows, data.sample) }
+					]
+				}) as { response: string | Record<string, unknown> };
+			} catch (_e) {
+				throw new AIError('AI service unavailable');
+			}
+			return parseAIResponse(aiResponse.response);
 		},
 		'odin',
 		5

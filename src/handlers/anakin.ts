@@ -5,7 +5,7 @@ import { validateAnakinRequest, isReservedId } from '../core/validation';
 import { TTL_3_DAYS, AI_MAX_TOKENS_STANDARD } from '../core/constants';
 import { handleValidatedRequest } from '../core/middleware';
 import { ANAKIN_SYSTEM_PROMPT, buildAnakinUserPrompt } from '../prompts/anakin';
-import { ValidationError, NotFoundError, handleError } from '../core/errors';
+import { AIError, ValidationError, NotFoundError, handleError } from '../core/errors';
 
 export async function handleAnakinGet(): Promise<Response> {
     return htmlPage(ANAKIN_FORM_HTML);
@@ -50,13 +50,18 @@ export async function handleAnakinHydrate(request: Request, env: Env, path: stri
 			return jsonResponse(data);
 		}
 		
-		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-			max_tokens: AI_MAX_TOKENS_STANDARD, temperature: 0.4, response_format: { type: 'json_object' },
-			messages: [
-				{ role: 'system', content: ANAKIN_SYSTEM_PROMPT },
-				{ role: 'user', content: buildAnakinUserPrompt(data.job, data.experience, data.skills) }
-			]
-		}) as { response: string | Record<string, unknown> };
+		let aiResponse: { response: string | Record<string, unknown> };
+		try {
+			aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+				max_tokens: AI_MAX_TOKENS_STANDARD, temperature: 0.4, response_format: { type: 'json_object' },
+				messages: [
+					{ role: 'system', content: ANAKIN_SYSTEM_PROMPT },
+					{ role: 'user', content: buildAnakinUserPrompt(data.job, data.experience, data.skills) }
+				]
+			}) as { response: string | Record<string, unknown> };
+		} catch (_e) {
+			throw new AIError('AI service unavailable');
+		}
 		
 		const result = parseAIResponse(aiResponse.response);
 

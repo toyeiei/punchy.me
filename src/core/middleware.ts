@@ -32,7 +32,7 @@ export async function handleValidatedRequest<T, R>(
 		let body: unknown;
 		try {
 			body = await request.json();
-		} catch (parseError) {
+		} catch (_e) {
 			throw new ValidationError('Invalid request');
 		}
 		

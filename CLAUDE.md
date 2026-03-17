@@ -83,7 +83,11 @@ Single test file: `src/index.test.ts` (~940 lines). Tests run against real Cloud
 ## Workflow Constraints
 
 - **TDD-first**: Write failing tests before implementation. New tests must fail while existing tests stay green.
-- **Validation sequence after any change**: `npx tsc --noEmit && npm run lint && npm test`
+- **Efficient validation loop**:
+  - During iteration (each small change): `npx tsc --noEmit`
+  - Frequently (when TypeScript is green): `npm run lint`
+  - Milestones / before handoff: `npm test`
+  - Always run the full gate before finishing a batch of fixes: `npx tsc --noEmit && npm run lint && npm test`
 - **Full test suite required** for any change touching `src/ui/` or `src/index.ts` — isolated tests are insufficient for UI template integrity.
 - **Template literal hazard**: UI files use nested template literals. Never use backticks inside inner HTML — use single quotes and string concatenation instead. After modifying any `src/ui/*.ts` file, verify the template termination points.
 - **Design freeze during test/lint cycles**: Do not make UI aesthetic changes while fixing tests or lint. Validation phases are for correctness only.

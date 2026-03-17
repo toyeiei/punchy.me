@@ -3,18 +3,30 @@
  * Centralized security hardening configuration
  */
 
-export const CSP_POLICY = [
-	"default-src 'self'",
-	"script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
-	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
-	"font-src 'self' https://fonts.gstatic.com",
-	"img-src 'self' https://images.unsplash.com https://*.unsplash.com data:",
-	"connect-src 'self' https://challenges.cloudflare.com",
-	"frame-src https://challenges.cloudflare.com",
-	"frame-ancestors 'none'",
-	"base-uri 'self'",
-	"form-action 'self'",
-].join('; ');
+function buildCspPolicy(options?: { allowUnsafeEval?: boolean }): string {
+	const scriptSrc = options?.allowUnsafeEval
+		? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com"
+		: "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+
+	return [
+		"default-src 'self'",
+		scriptSrc,
+		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+		"font-src 'self' https://fonts.gstatic.com",
+		"img-src 'self' https://images.unsplash.com https://*.unsplash.com data:",
+		"connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+		"frame-src https://challenges.cloudflare.com",
+		"frame-ancestors 'none'",
+		"base-uri 'self'",
+		"form-action 'self'",
+	].join('; ');
+}
+
+export const CSP_POLICY = buildCspPolicy();
+
+// ODIN uses a terminal-like query field that evaluates expressions via `new Function(...)`.
+// That requires `script-src 'unsafe-eval'`.
+export const CSP_POLICY_ODIN = buildCspPolicy({ allowUnsafeEval: true });
 
 /**
  * Complete security headers set
@@ -42,6 +54,7 @@ export function withSecurityHeaders(response: Response): Response {
 	const headers = new Headers(response.headers);
 	
 	for (const [key, value] of Object.entries(SECURITY_HEADERS)) {
+		if (key === 'Content-Security-Policy' && headers.has('Content-Security-Policy')) continue;
 		headers.set(key, value);
 	}
 	

@@ -1,3 +1,5 @@
+import { AIError } from './errors';
+
 export function escapeHTML(str: string): string {
 	if (!str) return '';
 	return str
@@ -68,7 +70,11 @@ export function parseAIResponse(response: string | Record<string, unknown>): Rec
 				} else if (cleanText[i] === '}') {
 					depth--;
 					if (depth === 0 && objStart !== -1) {
-						return JSON.parse(cleanText.substring(objStart, i + 1));
+						try {
+							return JSON.parse(cleanText.substring(objStart, i + 1));
+						} catch (_e2) {
+							throw new AIError('Failed to parse AI response.');
+						}
 					}
 				}
 			}
@@ -76,5 +82,10 @@ export function parseAIResponse(response: string | Record<string, unknown>): Rec
 	}
 	
 	// Final fallback: try parsing the entire cleaned string
-	return JSON.parse(cleanText);
+	try {
+		if (!cleanText) throw new AIError('AI Forge failed.');
+		return JSON.parse(cleanText);
+	} catch (_e) {
+		throw new AIError('Failed to parse AI response.');
+	}
 }

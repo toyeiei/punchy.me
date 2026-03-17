@@ -5,7 +5,7 @@ import { validateRagnarRequest } from '../core/validation';
 import { TTL_3_DAYS, AI_MAX_TOKENS_RAGNAR } from '../core/constants';
 import { handleValidatedRequest } from '../core/middleware';
 import { RAGNAR_SYSTEM_PROMPT, buildRagnarUserPrompt } from '../prompts/ragnar';
-import { AIError, ValidationError } from '../core/errors';
+import { AIError } from '../core/errors';
 
 const VALID_SLIDE_TYPES = new Set<RagnarSlide['type']>(['list', 'quote', 'bigtext', 'comparison', 'opening', 'points', 'challenge', 'solution', 'action', 'closing']);
 
@@ -19,22 +19,21 @@ export async function handleRagnarForge(request: Request, env: Env) {
 		env,
 		validateRagnarRequest,
 		async (data: { title: string; audience: string; details: string }, _ip: string, env: Env) => {
-			const aiResponse = await env.AI.run('@cf/mistralai/mistral-small-3.1-24b-instruct', {
-				messages: [
-					{ role: 'system', content: RAGNAR_SYSTEM_PROMPT },
-					{ role: 'user', content: buildRagnarUserPrompt(data.title, data.audience, data.details) }
-				],
-				max_tokens: AI_MAX_TOKENS_RAGNAR,
-				temperature: 0.3
-			}) as { response: string };
-
-			let parsed: Record<string, unknown>;
+			let aiResponse: { response: string };
 			try {
-				parsed = parseAIResponse(aiResponse.response);
-			} catch (parseError) {
-				console.error('Ragnar parse failure:', parseError);
-				throw new AIError('Failed to parse AI response. The forge is confused.');
+				aiResponse = await env.AI.run('@cf/mistralai/mistral-small-3.1-24b-instruct', {
+					messages: [
+						{ role: 'system', content: RAGNAR_SYSTEM_PROMPT },
+						{ role: 'user', content: buildRagnarUserPrompt(data.title, data.audience, data.details) }
+					],
+					max_tokens: AI_MAX_TOKENS_RAGNAR,
+					temperature: 0.3
+				}) as { response: string };
+			} catch (_e) {
+				throw new AIError('AI service unavailable');
 			}
+
+			const parsed = parseAIResponse(aiResponse.response);
 
 			if (!Array.isArray(parsed.slides) || parsed.slides.length === 0) {
 				throw new AIError('The forge returned no slides. The gods are testing us.');
