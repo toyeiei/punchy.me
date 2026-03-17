@@ -91,6 +91,33 @@ export interface ThorReport {
 	intelligence: ThorIntelligence;
 }
 
+export interface PollData {
+	type: 'poll';
+	question: string;
+	options: string[];
+	votes: number[];
+	createdAt: number;
+}
+
+export interface AresResult {
+	type: 'ares';
+	product: string;
+	customer: string;
+	keywords: string[];
+	panels: {
+		imageUrl: string;
+		thumbUrl: string;
+		imageColor: string;
+		copy: {
+			problem: string;
+			agitate: string;
+			solution: string;
+		};
+		colors: string[];
+	}[];
+	createdAt: number;
+}
+
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;

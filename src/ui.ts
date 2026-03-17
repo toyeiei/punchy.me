@@ -8,4 +8,5 @@ export * from './ui/ragnar_slides';
 export * from './ui/odin';
 export * from './ui/freya';
 export * from './ui/asgard';
+export * from './ui/poll';
 export * from './ui/portal';
