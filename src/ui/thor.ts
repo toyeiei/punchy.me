@@ -76,6 +76,18 @@ export const THOR_UI_HTML = `
             margin-top: 2rem;
         }
 
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
         input {
             width: 100%;
             background: var(--glass);
@@ -144,6 +156,7 @@ export const THOR_UI_HTML = `
             
             <div class="input-group">
                 <input type="url" id="target-url" placeholder="https://example.com" required>
+                <input type="text" id="hp_field" class="visually-hidden" tabindex="-1" autocomplete="off">
                 <button id="forge-btn">Forge Intelligence</button>
             </div>
         </div>
@@ -165,6 +178,7 @@ export const THOR_UI_HTML = `
         const forgeBtn = document.getElementById('forge-btn');
         const logOutput = document.getElementById('log-output');
         const statusTag = document.getElementById('status-tag');
+        const hpField = document.getElementById('hp_field');
 
         function addLog(msg, type = 'info') {
             const entry = document.createElement('div');
@@ -186,7 +200,7 @@ export const THOR_UI_HTML = `
                 const res = await fetch('/thor/forge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ url, hp_field: hpField.value })
                 });
 
                 const data = await res.json();
@@ -195,11 +209,16 @@ export const THOR_UI_HTML = `
 
                 addLog('Title: ' + data.title, 'success');
                 addLog('Links Found: ' + data.links.length);
-                addLog('Status: ' + data.status, 'success');
-                addLog('Intelligence Core updated.', 'success');
+                addLog('Storage: ' + (data.storage && data.storage.persisted ? 'ONLINE' : 'DEGRADED'), data.storage && data.storage.persisted ? 'success' : 'error');
+                addLog('Semantic Memory: ' + (data.intelligence && data.intelligence.semantic ? 'SYNCED' : 'PARTIAL'), data.intelligence && data.intelligence.semantic ? 'success' : 'error');
+                addLog('Status: ' + data.status, data.status === 'completed' ? 'success' : 'info');
+                if (data.intelligence && data.intelligence.truncated) {
+                    addLog('Large page detected. Intelligence payload was capped.', 'info');
+                }
                 
             } catch (err) {
-                addLog('Error: ' + err.message, 'error');
+                const message = err instanceof Error ? err.message : 'Unknown error';
+                addLog('Error: ' + message, 'error');
             } finally {
                 forgeBtn.disabled = false;
                 statusTag.textContent = 'READY';

@@ -1121,4 +1121,67 @@ Hope this helps!`
     });
   });
 
+  describe("THOR Feature (Web Intelligence)", () => {
+    it("serves the THOR intelligence page", async () => {
+      const res = await SELF.fetch("http://localhost/thor");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("THOR");
+      expect(html).toContain("Web Intelligence");
+    });
+
+    it("rejects bot submissions on THOR forge via honeypot", async () => {
+      const res = await SELF.fetch("http://localhost/thor/forge", {
+        method: "POST",
+        body: JSON.stringify({ url: "https://example.com", hp_field: "I am a bot" }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(res.status).toBe(403);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("Bot detected");
+    });
+
+    it("enforces tactical cooldown for THOR forge requests", async () => {
+      const originalFetch = globalThis.fetch;
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+        if (typeof input === 'string' && input.includes('/browser-rendering/markdown')) {
+          return new Response(JSON.stringify({
+            success: true,
+            result: { markdown: '# THOR\nEdge intelligence online.' }
+          }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        return originalFetch(input, init);
+      });
+
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({ data: [[0.1, 0.2]] } as never);
+      const ip = '7.7.7.7';
+
+      for (let i = 0; i < 5; i++) {
+        const res = await SELF.fetch("http://localhost/thor/forge", {
+          method: "POST",
+          body: JSON.stringify({ url: `https://example.com/page-${i}` }),
+          headers: { "Content-Type": "application/json", "cf-connecting-ip": ip },
+        });
+        expect([200, 500]).toContain(res.status);
+      }
+
+      const finalRes = await SELF.fetch("http://localhost/thor/forge", {
+        method: "POST",
+        body: JSON.stringify({ url: "https://example.com/one-too-many" }),
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": ip },
+      });
+
+      expect(finalRes.status).toBe(429);
+      const data = await finalRes.json() as { error: string };
+      expect(data.error).toContain("Tactical cooling");
+
+      aiSpy.mockRestore();
+      fetchSpy.mockRestore();
+    });
+  });
+
 });
