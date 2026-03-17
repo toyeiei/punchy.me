@@ -91,6 +91,65 @@ export interface ThorReport {
 	intelligence: ThorIntelligence;
 }
 
+export interface PollData {
+	type: 'poll';
+	question: string;
+	options: string[];
+	votes: number[];
+	createdAt: number;
+}
+
+export interface AresResult {
+	type: 'ares';
+	product: string;
+	customer: string;
+	keywords: string[];
+	panels: {
+		imageUrl: string;
+		thumbUrl: string;
+		imageColor: string;
+		copy: {
+			problem: string;
+			agitate: string;
+			solution: string;
+		};
+		colors: string[];
+	}[];
+	createdAt: number;
+}
+
+export interface MarcusSession {
+	type: 'marcus';
+	template: string;
+	dataSummary: string;
+	analysisResult: string;
+	plots: string[];
+	aiExplanation: string;
+	createdAt: number;
+}
+
+export interface ZeusSimulation {
+	type: 'zeus';
+	inputs: {
+		age: number;
+		income: number;
+		savingsRate: number;
+		currentSavings: number;
+		returnRate: number;
+		inflationRate: number;
+		retirementTarget: number;
+	};
+	results: {
+		iterations: number[][];
+		medianFinal: number;
+		p10: number;
+		p90: number;
+		successProbability: number;
+		medianYearsToFire: number;
+	};
+	createdAt: number;
+}
+
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;

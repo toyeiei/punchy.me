@@ -12,6 +12,10 @@ import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleThorGet, handleThorForge, handleThorPdf } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
+import { handlePollGet, handlePollCreate, handlePollVote, handlePollView } from './handlers/poll';
+import { handleAresGet, handleAresForge } from './handlers/ares';
+import { handleMarcusGet, handleMarcusExplain } from './handlers/marcus';
+import { handleZeusGet, handleZeusSimulate } from './handlers/zeus';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -44,6 +48,11 @@ const ROUTES: Route[] = [
 	{ method: 'GET', path: '/odin', handler: pureHandler(handleOdinGet) },
 	{ method: 'GET', path: '/freya', handler: pureHandler(handleFreyaGet) },
 	{ method: 'GET', path: '/thor', handler: pureHandler(handleThorGet) },
+	{ method: 'GET', path: '/poll', handler: pureHandler(handlePollGet) },
+	{ method: 'GET', path: '/ares', handler: pureHandler(handleAresGet) },
+	{ method: 'GET', path: '/marcus', handler: pureHandler(handleMarcusGet) },
+	{ method: 'GET', path: '/zeus', handler: pureHandler(handleZeusGet) },
+	{ method: 'GET', path: /^\/poll\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handlePollView(req, env, path.replace('/poll/', '')) },
 	
 	// Tool APIs (POST) - More specific routes MUST come before general ones
 	{ method: 'POST', path: '/bazuka', handler: staticHandler(handleBazukaPost) },
@@ -54,6 +63,11 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/ragnar/forge', handler: staticHandler(handleRagnarForge) },
 	{ method: 'POST', path: '/odin/analyze', handler: staticHandler(handleOdinAnalyze) },
 	{ method: 'POST', path: '/thor/forge', handler: staticHandler(handleThorForge) },
+	{ method: 'POST', path: '/poll/create', handler: staticHandler(handlePollCreate) },
+	{ method: 'POST', path: /^\/poll\/vote\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handlePollVote(req, env, path.replace('/poll/vote/', '')) },
+	{ method: 'POST', path: '/ares/forge', handler: staticHandler(handleAresForge) },
+	{ method: 'POST', path: '/marcus/explain', handler: staticHandler(handleMarcusExplain) },
+	{ method: 'POST', path: '/zeus/simulate', handler: staticHandler(handleZeusSimulate) },
 	{ method: 'GET', path: /^\/thor\/pdf\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handleThorPdf(req, env, path) },
 	
 	// Freya search (special GET with query params)
