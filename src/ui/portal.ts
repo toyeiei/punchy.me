@@ -68,6 +68,9 @@ export const PUNCHY_PORTAL_HTML = `
             <a href="/ragnar" class="portal-tool-link" title="RAGNAR">🛡️</a>
             <a href="/freya" class="portal-tool-link" title="FREYA">🌠</a>
             <a href="/thor" class="portal-tool-link" title="THOR">⚡</a>
+            <a href="/poll" class="portal-tool-link" title="POLL PUNCH">🗳️</a>
+            <a href="/ares" class="portal-tool-link" title="ARES">🎯</a>
+            <a href="/marcus" class="portal-tool-link" title="MARCUS">📊</a>
             <a href="/asgard" class="portal-tool-link" title="ASGARD">🌌</a>
         </div>
     </div>
