@@ -75,25 +75,12 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             z-index: -1;
         }
 
-        /* Pulse Grid Background */
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
-        /* Scan line effect */
         .scan-line {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100px;
             background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.1), transparent);
             border-bottom: 1px solid rgba(34, 197, 94, 0.2);
-            z-index: 0;
+            z-index: 9999;
             animation: scan 4s linear infinite;
             pointer-events: none;
         }
@@ -556,7 +543,6 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
     ${PUNCHY_PORTAL_HTML}
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
-    <div class="grid-bg"></div>
     <div class="scan-line"></div>
 
     <div class="container">

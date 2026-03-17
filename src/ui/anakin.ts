@@ -81,23 +81,12 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             overflow: hidden;
         }
 
-        .grid-bg {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-image: 
-                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
-            background-size: 40px 40px;
-            z-index: 0;
-            pointer-events: none;
-        }
-
         .scan-line {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100px;
-            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.08), transparent);
-            border-bottom: 1px solid rgba(34, 197, 94, 0.15);
-            z-index: 1;
+            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.1), transparent);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
+            z-index: 9999;
             animation: scan 4s linear infinite;
             pointer-events: none;
         }
