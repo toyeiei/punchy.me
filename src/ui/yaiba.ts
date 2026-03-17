@@ -193,7 +193,9 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
             .preview-pane { display: block !important; width: 100% !important; height: auto !important; padding: 0 !important; background: #fff !important; color: #000 !important; overflow: visible !important; position: static !important; }
             .preview-content { max-width: 100% !important; margin: 0 !important; padding: 0 !important; display: block !important; color: #000 !important; }
             .preview-content h1, .preview-content h2, .preview-content h3 { color: #000 !important; border: none !important; margin-top: 1.5rem !important; font-weight: 400 !important; page-break-after: avoid; }
-            .preview-content p, .preview-content pre, .preview-content blockquote, .preview-content li::before { page-break-inside: avoid; color: #000 !important; opacity: 1 !important; }
+            .preview-content p, .preview-content pre, .preview-content blockquote { page-break-inside: avoid; color: #000 !important; opacity: 1 !important; }
+            .preview-content ul { list-style: disc !important; padding-left: 2rem !important; }
+            .preview-content li::before { display: none !important; }
             .preview-content pre { background: #f5f5f5 !important; border: 1px solid #ddd !important; color: #000 !important; }
             .preview-content pre code { color: #000 !important; }
             .preview-content th, .preview-content td { border: 1px solid #ccc !important; color: #000 !important; }
@@ -502,7 +504,9 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
             #content { color: #000 !important; font-size: 12pt !important; overflow: visible !important; display: block !important; position: static !important; }
             #content h1:first-child, #content p:first-child { margin-top: 0 !important; }
             #content h1, #content h2, #content h3 { color: #000 !important; border: none !important; margin-top: 1.5rem; page-break-after: avoid; font-weight: 400 !important; }
-            #content p, #content pre, #content blockquote, #content li::before { page-break-inside: avoid; color: #000 !important; opacity: 1 !important; }
+            #content p, #content pre, #content blockquote { page-break-inside: avoid; color: #000 !important; opacity: 1 !important; }
+            #content ul { list-style: disc !important; padding-left: 2rem !important; }
+            #content li::before { display: none !important; }
             .print-only { display: block !important; font-family: var(--font-mono); text-transform: uppercase; }
             .print-header { color: #999 !important; font-size: 8pt; margin-bottom: 2rem; border-bottom: 1px solid #eee; padding-bottom: 5px; }
             .print-footer { color: #666 !important; font-size: 9pt; margin-top: 4rem; border-top: 1px solid #eee; padding-top: 1rem; text-align: center; font-weight: 700; letter-spacing: 1px; }
