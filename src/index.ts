@@ -10,7 +10,7 @@ import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
 import { handleRagnarGet, handleRagnarForge } from './handlers/ragnar';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
-import { handleThorGet, handleThorForge } from './handlers/thor';
+import { handleThorGet, handleThorForge, handleThorQuery } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';

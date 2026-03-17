@@ -1,5 +1,5 @@
 import { Env, BrowserRenderingResponse } from '../core/types';
-import { generateUniqueId, htmlPage, chunkText } from '../core/utils';
+import { generateUniqueId, htmlPage, chunkText, jsonResponse } from '../core/utils';
 import { validateThorRequest } from '../core/validation';
 import { THOR_UI_HTML } from '../ui/thor';
 import { handleValidatedRequest } from '../core/middleware';
