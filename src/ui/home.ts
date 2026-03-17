@@ -1,3 +1,5 @@
+import { PUNCHY_PORTAL_HTML } from './portal';
+
 export const HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -486,6 +488,7 @@ export const HTML = `<!DOCTYPE html>
 <body>
     <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
+    ${PUNCHY_PORTAL_HTML}
     
     <section class="hero-section">
         <div class="container">
@@ -710,6 +713,7 @@ export const HTML = `<!DOCTYPE html>
         <body>
         <div class="grid-bg"></div>
         <div class="pixel-bg" id="pixel-bg"></div>
+        ${PUNCHY_PORTAL_HTML}
         <div class="container">
         <h1>404</h1>
         <p>This link doesn't exist or has expired. Short links are deleted after 72 hours.</p>

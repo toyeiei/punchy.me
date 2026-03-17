@@ -345,9 +345,8 @@ export const ODIN_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div class="scan-line"></div>
-    
     ${PUNCHY_PORTAL_HTML}
+    <div class="scan-line"></div>
 
     <header class="global-header">
         <div class="brand-block">

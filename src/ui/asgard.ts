@@ -1,3 +1,5 @@
+import { PUNCHY_PORTAL_HTML } from './portal';
+
 export const ASGARD_HTML = `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -391,6 +393,7 @@ export const ASGARD_HTML = `<!DOCTYPE html>
 <body>
     <div id="bg-layer"></div>
     <div class="overlay"></div>
+    ${PUNCHY_PORTAL_HTML}
 
     <div class="time-container">
         <div class="clock" id="clock">00:00</div>

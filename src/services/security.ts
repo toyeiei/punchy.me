@@ -1,5 +1,6 @@
 import { Env } from '../core/types';
 import { MAX_PAYLOAD_SIZE } from '../core/constants';
+import { PayloadTooLargeError, errorResponse } from '../core/errors';
 
 /**
  * KV-based rate limiting with known race condition limitations.
@@ -54,18 +55,12 @@ export async function validatePayloadSize(request: Request): Promise<Response | 
 		// Fast-fail on honest Content-Length
 		const contentLength = request.headers.get('content-length');
 		if (contentLength && parseInt(contentLength, 10) > MAX_PAYLOAD_SIZE) {
-			return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), {
-				status: 413,
-				headers: { 'Content-Type': 'application/json' }
-			});
+			return errorResponse(new PayloadTooLargeError());
 		}
 		// Verify actual body size (Content-Length can be omitted or spoofed)
 		const body = await request.clone().arrayBuffer();
 		if (body.byteLength > MAX_PAYLOAD_SIZE) {
-			return new Response(JSON.stringify({ error: 'Payload too large (Limit: 1MB).' }), {
-				status: 413,
-				headers: { 'Content-Type': 'application/json' }
-			});
+			return errorResponse(new PayloadTooLargeError());
 		}
 	}
 	return null;

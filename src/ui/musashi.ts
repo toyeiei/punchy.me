@@ -380,11 +380,10 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    ${PUNCHY_PORTAL_HTML}
     <div class="grid-bg"></div>
     <div class="scan-line"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
-
-    ${PUNCHY_PORTAL_HTML}
     
     <div class="container">
         <div class="title-container" style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">

@@ -1,4 +1,5 @@
 import { Env } from './core/types';
+import { matchRoute, pureHandler, staticHandler, simpleHandler, Route } from './core/router';
 
 // Handlers
 import { handleShorten } from './handlers/shorten';
@@ -15,19 +16,45 @@ import { handleRender } from './handlers/render';
 
 // Services
 import { validatePayloadSize } from './services/security';
+import { withSecurityHeaders } from './core/security-headers';
 
-const CSP_POLICY = [
-	"default-src 'self'",
-	"script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
-	"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
-	"font-src 'self' https://fonts.gstatic.com",
-	"img-src 'self' https://images.unsplash.com https://*.unsplash.com data:",
-	"connect-src 'self' https://challenges.cloudflare.com",
-	"frame-src https://challenges.cloudflare.com",
-	"frame-ancestors 'none'",
-	"base-uri 'self'",
-	"form-action 'self'",
-].join('; ');
+/**
+ * Declarative Route Table
+ * Self-documenting, maintainable routing configuration
+ */
+const ROUTES: Route[] = [
+	// Static assets
+	{ method: 'GET', path: '/', handler: pureHandler(handleHome) },
+	{ method: 'GET', path: '/favicon.ico', handler: pureHandler(handleFavicon) },
+	{ method: 'GET', path: '/favicon.svg', handler: pureHandler(handleFavicon) },
+	{ method: 'GET', path: '/robots.txt', handler: pureHandler(handleRobots) },
+	{ method: 'GET', path: '/sitemap.xml', handler: pureHandler(handleSitemap) },
+	
+	// Shortener
+	{ method: 'POST', path: '/shorten', handler: staticHandler(handleShorten) },
+	
+	// Tool pages (GET)
+	{ method: 'GET', path: '/asgard', handler: simpleHandler(handleAsgardGet) },
+	{ method: 'GET', path: '/bazuka', handler: pureHandler(handleBazukaGet) },
+	{ method: 'GET', path: '/anakin', handler: pureHandler(handleAnakinGet) },
+	{ method: 'GET', path: '/musashi', handler: pureHandler(handleMusashiGet) },
+	{ method: 'GET', path: '/yaiba', handler: pureHandler(handleYaibaGet) },
+	{ method: 'GET', path: '/ragnar', handler: pureHandler(handleRagnarGet) },
+	{ method: 'GET', path: '/odin', handler: pureHandler(handleOdinGet) },
+	{ method: 'GET', path: '/freya', handler: pureHandler(handleFreyaGet) },
+	
+	// Tool APIs (POST) - More specific routes MUST come before general ones
+	{ method: 'POST', path: '/bazuka', handler: staticHandler(handleBazukaPost) },
+	{ method: 'POST', path: /^\/anakin\/hydrate\/[a-zA-Z0-9-]+$/, handler: (req, env, _ctx, path) => handleAnakinHydrate(req, env, path) },
+	{ method: 'POST', path: '/anakin', handler: staticHandler(handleAnakinPost) },
+	{ method: 'POST', path: '/musashi/forge', handler: staticHandler(handleMusashiForge) },
+	{ method: 'POST', path: '/yaiba/publish', handler: staticHandler(handleYaibaPublish) },
+	{ method: 'POST', path: '/ragnar/forge', handler: staticHandler(handleRagnarForge) },
+	{ method: 'POST', path: '/odin/analyze', handler: staticHandler(handleOdinAnalyze) },
+	
+	// Freya search (special GET with query params)
+	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },
+];
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
@@ -35,57 +62,17 @@ export default {
 		const path = url.pathname;
 		const method = request.method;
 
-		// 0. Global Security Hardening
+		// Global Security Hardening
 		const payloadError = await validatePayloadSize(request);
 		if (payloadError) return payloadError;
 
-		// Route to handler
-		const response = await route(request, env, ctx, path, method);
+		// Route matching
+		const handler = matchRoute(ROUTES, method, path);
+		const response = handler 
+			? await handler(request, env, ctx, path)
+			: (path.length > 1 ? await handleRender(request, env, path) : new Response("Not Found", { status: 404 }));
 
-		// Inject CSP on all HTML responses
-		if (response.headers.get('Content-Type')?.includes('text/html')) {
-			const headers = new Headers(response.headers);
-			headers.set('Content-Security-Policy', CSP_POLICY);
-			headers.set('X-Content-Type-Options', 'nosniff');
-			return new Response(response.body, { status: response.status, headers });
-		}
-
-		return response;
+		// Apply security headers to HTML responses
+		return withSecurityHeaders(response);
 	},
 };
-
-async function route(request: Request, env: Env, ctx: ExecutionContext, path: string, method: string): Promise<Response> {
-	// 1. Static Routes
-	if (path === '/' && method === 'GET') return handleHome();
-	if (path === '/favicon.ico' || path === '/favicon.svg') return handleFavicon();
-	if (path === '/robots.txt') return handleRobots();
-	if (path === '/sitemap.xml') return handleSitemap();
-
-	// 2. Shortener API
-	if (path === '/shorten' && method === 'POST') return handleShorten(request, env);
-
-	// 3. GET Tool Routes
-	if (path === '/asgard' && method === 'GET') return handleAsgardGet(request, env, ctx);
-	if (path === '/bazuka' && method === 'GET') return handleBazukaGet();
-	if (path === '/anakin' && method === 'GET') return handleAnakinGet();
-	if (path === '/musashi' && method === 'GET') return handleMusashiGet();
-	if (path === '/yaiba' && method === 'GET') return handleYaibaGet();
-	if (path === '/ragnar' && method === 'GET') return handleRagnarGet();
-	if (path === '/odin' && method === 'GET') return handleOdinGet();
-	if (path === '/freya' && method === 'GET') return handleFreyaGet();
-
-	// 4. POST APIs & Dynamic Routes
-	if (path === '/bazuka' && method === 'POST') return handleBazukaPost(request, env);
-	if (path === '/anakin' && method === 'POST') return handleAnakinPost(request, env);
-	if (path.startsWith('/anakin/hydrate/') && method === 'POST') return handleAnakinHydrate(request, env, path);
-	if (path === '/musashi/forge' && method === 'POST') return handleMusashiForge(request, env);
-	if (path === '/yaiba/publish' && method === 'POST') return handleYaibaPublish(request, env);
-	if (path === '/ragnar/forge' && method === 'POST') return handleRagnarForge(request, env);
-	if (path === '/odin/analyze' && method === 'POST') return handleOdinAnalyze(request, env);
-	if (path === '/freya/search' && method === 'GET') return handleFreyaSearch(request, env, ctx);
-
-	// 5. Dynamic Redirection & Rendering
-	if (path.length > 1) return handleRender(request, env, path);
-
-	return new Response("Not Found", { status: 404 });
-}

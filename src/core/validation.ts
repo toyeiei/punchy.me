@@ -18,6 +18,7 @@ export interface ValidationResult<T> {
 	success: boolean;
 	data?: T;
 	error?: string;
+	requiresAuth?: boolean; // Signals that error should be 403 instead of 400
 }
 
 /**
@@ -272,7 +273,7 @@ export function validateOdinRequest(body: unknown): ValidationResult<{ columns: 
 	}
 
 	if (!isNonEmptyString(payload.turnstileToken)) {
-		return { success: false, error: 'Security handshake required.' };
+		return { success: false, error: 'Security handshake required.', requiresAuth: true };
 	}
 
 	return {

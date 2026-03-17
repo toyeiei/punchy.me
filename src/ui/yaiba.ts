@@ -208,9 +208,8 @@ export const YAIBA_EDITOR_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
-
     ${PUNCHY_PORTAL_HTML}
+    <div class="print-only print-header">FORGED VIA YAIBA | ELITE ZEN EDITOR ON THE EDGE</div>
 
     <header class="tactical-header">
         <div class="brand-block">

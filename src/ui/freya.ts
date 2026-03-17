@@ -198,13 +198,12 @@ export const FREYA_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
-    <div class="mobile-only-notice">
-        <h1>DESKTOP ONLY</h1>
-        <p>FREYA is a precision tactical tool optimized for high-resolution displays. Please switch to a desktop environment to continue forging.</p>
-        <a href="/" class="btn" style="margin-top: 2rem; width: auto;">Return to Base</a>
-    </div>
-
     ${PUNCHY_PORTAL_HTML}
+    
+    <div class="mobile-only-notice">
+        <h1>🌠 FREYA</h1>
+        <p>FREYA Image Editor requires a desktop browser for optimal tactical operations. Please access from a larger screen.</p>
+    </div>
 
     <header class="tactical-header">
         <div class="brand-text-wrapper">

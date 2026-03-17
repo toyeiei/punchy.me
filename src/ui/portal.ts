@@ -8,39 +8,62 @@ export const PUNCHY_PORTAL_HTML = `
     <!-- ECOSYSTEM PORTAL -->
     <style>
         .punchy-portal {
-            position: fixed; bottom: 24px; right: 24px; display: flex; flex-direction: row-reverse; align-items: center;
-            background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(10px); border: 1px solid rgba(34, 197, 94, 0.2);
-            border-radius: 12px; padding: 8px; gap: 0; overflow: hidden;
-            width: auto; max-width: 44px; height: 44px;
-            transition: max-width 0.4s cubic-bezier(0.4, 0, 0.2, 1), gap 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease;
-            z-index: 9999; cursor: pointer; text-decoration: none; font-size: 16px;
+            position: fixed !important; bottom: 24px !important; right: 24px !important; 
+            display: flex !important; flex-direction: row-reverse !important; align-items: center !important;
+            background: rgba(0, 0, 0, 0.85) !important; backdrop-filter: blur(24px) !important; 
+            border: 1px solid rgba(34, 197, 94, 0.2) !important;
+            border-radius: 12px !important; padding: 8px !important; gap: 0 !important; overflow: hidden !important;
+            width: 44px !important; height: 44px !important;
+            transition: width 0.4s cubic-bezier(0.4, 0, 0.2, 1), gap 0.4s cubic-bezier(0.4, 0, 0.2, 1), border-color 0.3s ease, box-shadow 0.3s ease !important;
+            z-index: 9999 !important; text-decoration: none !important; font-size: 16px !important;
+            box-sizing: border-box !important;
         }
-        .punchy-portal:hover { max-width: 600px; gap: 16px; border-color: #22c55e; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2); }
-        .portal-trigger { font-size: 19px; min-width: 28px; text-align: center; display: flex; align-items: center; justify-content: center; }
-        .portal-brand { color: #22c55e; font-weight: 700; font-size: 13px; white-space: nowrap; opacity: 0; transition: opacity 0.3s ease; font-family: 'JetBrains Mono', monospace; }
-        .punchy-portal:hover .portal-brand { opacity: 1; }
-        .portal-tools { display: flex; gap: 13px; opacity: 0; transition: opacity 0.3s ease; }
-        .punchy-portal:hover .portal-tools { opacity: 1; }
-        .portal-tool-link { text-decoration: none; font-size: 18px; transition: transform 0.2s ease; filter: grayscale(1); }
-        .portal-tool-link:hover { transform: scale(1.3); filter: grayscale(0); }
+        .punchy-portal:hover { width: 520px !important; gap: 16px !important; border-color: #22c55e !important; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2) !important; }
+        
+        .portal-trigger { 
+            font-size: 19px !important; min-width: 28px !important; text-align: center !important; display: flex !important; align-items: center !important; justify-content: center !important; 
+            text-decoration: none !important; color: #fff !important; transition: transform 0.3s ease !important;
+            margin: 0 !important; padding: 0 !important; flex-shrink: 0 !important;
+        }
+        .punchy-portal:hover .portal-trigger { transform: rotate(15deg); }
+
+        .portal-brand { 
+            color: #22c55e !important; font-weight: 700 !important; font-size: 13px !important; white-space: nowrap !important; opacity: 0 !important; 
+            transition: opacity 0.3s ease !important; font-family: 'JetBrains Mono', monospace !important; 
+            pointer-events: none !important; margin: 0 !important; padding: 0 !important;
+        }
+        .punchy-portal:hover .portal-brand { opacity: 1 !important; }
+
+        .portal-tools { 
+            display: flex !important; gap: 13px !important; opacity: 0 !important; transition: opacity 0.3s ease !important;
+            margin: 0 !important; padding: 0 !important;
+        }
+        .punchy-portal:hover .portal-tools { opacity: 1 !important; }
+
+        .portal-tool-link { 
+            text-decoration: none !important; font-size: 18px !important; transition: transform 0.2s ease !important; 
+            filter: grayscale(1) !important; display: block !important; width: auto !important; height: auto !important;
+            margin: 0 !important; padding: 0 !important; line-height: 1 !important;
+        }
+        .portal-tool-link:hover { transform: scale(1.3) !important; filter: grayscale(0) !important; }
 
         @media (max-width: 1024px) {
             .punchy-portal { display: none !important; }
         }
     </style>
 
-    <a href="/" class="punchy-portal">
-        <div class="portal-trigger">⚡</div>
+    <div class="punchy-portal">
+        <a href="/" class="portal-trigger" title="GO HOME">⚡</a>
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
-            <object><a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a></object>
-            <object><a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a></object>
-            <object><a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a></object>
-            <object><a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a></object>
-            <object><a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a></object>
-            <object><a href="/ragnar" class="portal-tool-link" title="RAGNAR">🛡️</a></object>
-            <object><a href="/freya" class="portal-tool-link" title="FREYA">🌠</a></object>
-            <object><a href="/asgard" class="portal-tool-link" title="ASGARD">🌌</a></object>
+            <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
+            <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
+            <a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a>
+            <a href="/ragnar" class="portal-tool-link" title="RAGNAR">🛡️</a>
+            <a href="/freya" class="portal-tool-link" title="FREYA">🌠</a>
+            <a href="/asgard" class="portal-tool-link" title="ASGARD">🌌</a>
         </div>
-    </a>
+    </div>
 `;

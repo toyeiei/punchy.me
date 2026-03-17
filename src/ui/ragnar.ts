@@ -288,9 +288,9 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    ${PUNCHY_PORTAL_HTML}
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
-    ${PUNCHY_PORTAL_HTML}
 
     <div class="container">
         <div class="title-container">

@@ -599,10 +599,9 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
     </style>
 </head>
 <body>
+    ${PUNCHY_PORTAL_HTML}
     <div class="grid-bg"></div>
     <div class="pixel-bg" id="pixel-bg"></div>
-
-    ${PUNCHY_PORTAL_HTML}
 
     <div class="card-container">
         <div class="card">

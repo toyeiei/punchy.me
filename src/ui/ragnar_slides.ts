@@ -1,3 +1,5 @@
+import { PUNCHY_PORTAL_HTML } from './portal';
+
 export const RAGNAR_SLIDE_HEADER = `<!DOCTYPE html>
 <html lang="en" data-theme="dark">
 <head>
@@ -202,7 +204,7 @@ export const RAGNAR_SLIDE_HEADER = `<!DOCTYPE html>
             position: fixed;
             bottom: 20px;
             left: 20px;
-            z-index: 1000;
+            z-index: 2000;
             display: flex;
             align-items: center;
             gap: 0.5rem;
@@ -235,7 +237,7 @@ export const RAGNAR_SLIDE_HEADER = `<!DOCTYPE html>
                 width: 1920px !important;
                 height: 1080px !important;
             }
-            .theme-toggle { display: none !important; }
+            .theme-toggle, .punchy-portal { display: none !important; }
             .reveal h1, .reveal h2, .reveal h3 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
             .reveal p, .reveal li { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
         }
@@ -246,6 +248,7 @@ export const RAGNAR_SLIDE_HEADER = `<!DOCTYPE html>
         <span class="theme-toggle-icon" id="toggle-icon">☀️</span>
         <span id="toggle-label">Light</span>
     </button>
+    ${PUNCHY_PORTAL_HTML}
     <div class="reveal">
         <div class="slides">
             <section>
