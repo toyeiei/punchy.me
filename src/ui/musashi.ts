@@ -51,7 +51,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
         
         html, body {
             height: 100%;
-            background-color: var(--bg);
+            background-color: transparent;
         }
 
         body {

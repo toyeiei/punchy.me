@@ -48,7 +48,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
         }
 
         body {
-            background-color: var(--bg);
+            background-color: transparent;
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
@@ -575,7 +575,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
-        html, body { background-color: var(--bg); }
+        html, body { background-color: transparent; }
 
         body {
             color: var(--text-main);

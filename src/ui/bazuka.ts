@@ -57,7 +57,7 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
         html, body {
             height: 100%;
-            background-color: var(--bg);
+            background-color: transparent;
         }
 
         body {
@@ -437,7 +437,7 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        html, body { height: 100%; background-color: var(--bg); }
+        html, body { height: 100%; background-color: transparent; }
 
         body {
             color: var(--text-main);
