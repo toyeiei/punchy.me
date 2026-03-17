@@ -68,6 +68,19 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
             padding: 0;
         }
 
+        .bg-image {
+            position: fixed;
+            inset: 0;
+            background: url('/og-images/og-image-musashi.webp') center / cover no-repeat;
+            z-index: -2;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.60) 50%, rgba(0,0,0,0.80) 100%);
+            z-index: -1;
+        }
+
         /* Pulse Grid Background */
         .grid-bg {
             position: fixed;

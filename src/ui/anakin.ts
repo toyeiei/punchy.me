@@ -60,6 +60,19 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
             -webkit-overflow-scrolling: touch;
         }
 
+        .bg-image {
+            position: fixed;
+            inset: 0;
+            background: url('/og-images/og-image-anakin.webp') center / cover no-repeat;
+            z-index: -2;
+        }
+        .bg-overlay {
+            position: fixed;
+            inset: 0;
+            background: linear-gradient(160deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.60) 50%, rgba(0,0,0,0.80) 100%);
+            z-index: -1;
+        }
+
         .pixel-bg {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100%;
