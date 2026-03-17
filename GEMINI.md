@@ -122,6 +122,7 @@ When given an instruction, the AI agent MUST ALWAYS respond with a structured pl
 - **Narrative Constraints**: Strict word counts and tone (Senior-level, result-focused).
 
 ## Roadmap (Planned High-Impact Features)
+- **THOR | Web Intelligence Engine**: ✅ LAUNCHED - AI-powered web scraping and intelligence extraction (2026-03-18)
 - **MUSASHI | Dual-Blade Portfolio Hub**: Unified tactical dashboard.
 - **Cold Attack Engine**: AI-powered outreach strategist.
 - **Edge Tactical Analytics**: Real-time world-map visualization.
