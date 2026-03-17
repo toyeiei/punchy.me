@@ -72,6 +72,15 @@ export class InternalError extends AppError {
 	}
 }
 
+export class ExternalServiceError extends AppError {
+	readonly statusCode = 502;
+	readonly errorType = 'external_service_error';
+
+	constructor(message: string = 'External service unavailable') {
+		super(message);
+	}
+}
+
 /**
  * Converts AppError to JSON Response with proper status code
  */

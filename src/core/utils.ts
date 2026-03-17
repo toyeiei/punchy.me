@@ -89,3 +89,20 @@ export function parseAIResponse(response: string | Record<string, unknown>): Rec
 		throw new AIError('Failed to parse AI response.');
 	}
 }
+
+/**
+ * Chunks text into overlapping segments for AI processing
+ */
+export function chunkText(text: string, size: number = 1200, overlap: number = 200): string[] {
+	const chunks: string[] = [];
+	if (!text) return chunks;
+	
+	if (text.length <= size) return [text];
+
+	for (let i = 0; i < text.length; i += (size - overlap)) {
+		chunks.push(text.substring(i, i + size));
+		if (i + size >= text.length) break;
+	}
+	
+	return chunks;
+}

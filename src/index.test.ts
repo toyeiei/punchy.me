@@ -1121,4 +1121,76 @@ Hope this helps!`
     });
   });
 
+  describe("THOR Feature (Web Intelligence V2)", () => {
+    it("serves the THOR intelligence page", async () => {
+      const res = await SELF.fetch("http://localhost/thor");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("THOR");
+      expect(html).toContain("Web Intelligence");
+      expect(html).toContain("One-click analysis");
+    });
+
+    it("rejects bot submissions on THOR forge via honeypot", async () => {
+      const res = await SELF.fetch("http://localhost/thor/forge", {
+        method: "POST",
+        body: JSON.stringify({ url: "https://example.com", hp_field: "I am a bot" }),
+        headers: { "Content-Type": "application/json" },
+      });
+
+      expect(res.status).toBe(403);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("Bot detected");
+    });
+
+    it("enforces tactical cooldown for THOR forge requests", async () => {
+      const originalFetch = globalThis.fetch;
+      const fetchSpy = vi.spyOn(globalThis, 'fetch').mockImplementation(async (input, init) => {
+        if (typeof input === 'string' && input.includes('/browser-rendering/markdown')) {
+          return new Response(JSON.stringify({
+            success: true,
+            result: '# THOR V2\nSimple but mighty intelligence.'
+          }), {
+            status: 200,
+            headers: { 'Content-Type': 'application/json' }
+          });
+        }
+        return originalFetch(input, init);
+      });
+
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({
+          title: 'THOR V2',
+          seo: { ogTitle: null, ogDescription: null, ogImage: null, metaTitle: 'THOR', metaDescription: null, metaKeywords: [], canonical: null, robots: null },
+          structure: { h1Count: 1, h2Count: 0, h3Count: 0, h1Texts: ['THOR V2'], linkCount: 0, imageCount: 0, notableImages: [] },
+          content: { summary: 'Simple but mighty intelligence.', topics: ['intelligence'], contentType: 'other', targetAudience: 'Developers', keyEntities: [], readingTime: 1, wordCount: 50 },
+          technical: { hasSchema: false, schemaTypes: [], ogScore: 0 }
+        })
+      } as never);
+      const ip = '7.7.7.7';
+
+      for (let i = 0; i < 5; i++) {
+        const res = await SELF.fetch("http://localhost/thor/forge", {
+          method: "POST",
+          body: JSON.stringify({ url: `https://example.com/page-${i}` }),
+          headers: { "Content-Type": "application/json", "cf-connecting-ip": ip },
+        });
+        expect([200, 500]).toContain(res.status);
+      }
+
+      const finalRes = await SELF.fetch("http://localhost/thor/forge", {
+        method: "POST",
+        body: JSON.stringify({ url: "https://example.com/one-too-many" }),
+        headers: { "Content-Type": "application/json", "cf-connecting-ip": ip },
+      });
+
+      expect(finalRes.status).toBe(429);
+      const data = await finalRes.json() as { error: string };
+      expect(data.error).toContain("Tactical cooling");
+
+      aiSpy.mockRestore();
+      fetchSpy.mockRestore();
+    });
+  });
+
 });

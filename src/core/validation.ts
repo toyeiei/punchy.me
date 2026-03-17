@@ -286,3 +286,30 @@ export function validateOdinRequest(body: unknown): ValidationResult<{ columns: 
 		}
 	};
 }
+
+/**
+ * Validates Thor web intelligence request payload
+ */
+export function validateThorRequest(body: unknown): ValidationResult<{ url: string; hp_field?: string }> {
+	if (!body || typeof body !== 'object') {
+		return { success: false, error: 'Invalid request body' };
+	}
+
+	const payload = body as Record<string, unknown>;
+
+	if (!isNonEmptyString(payload.url)) {
+		return { success: false, error: 'URL is required and must be a non-empty string' };
+	}
+
+	if (payload.hp_field !== undefined && !isString(payload.hp_field)) {
+		return { success: false, error: 'hp_field must be a string' };
+	}
+
+	return {
+		success: true,
+		data: {
+			url: payload.url,
+			hp_field: payload.hp_field as string | undefined,
+		}
+	};
+}
