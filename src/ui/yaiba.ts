@@ -495,7 +495,8 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
         .footer a:hover { color: var(--accent); }
 
         @media print {
-            .footer, .secure-lock, .expiry-badge, .punchy-portal { display: none !important; }
+            .punchy-portal { display: none !important; visibility: hidden !important; opacity: 0 !important; }
+            .footer, .secure-lock, .expiry-badge { display: none !important; }
             html, body { background: #fff !important; color: #000 !important; height: auto !important; min-height: auto !important; overflow: visible !important; padding: 0 !important; position: static !important; }
             .container { background: #fff !important; border: none !important; box-shadow: none !important; max-width: 100% !important; padding: 0 !important; margin: 0 !important; position: static !important; display: block !important; backdrop-filter: none !important; }
             #content { color: #000 !important; font-size: 12pt !important; overflow: visible !important; display: block !important; position: static !important; }
