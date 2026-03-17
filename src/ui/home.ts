@@ -572,14 +572,6 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Ultra-Fast Image Editor. Edge-native Unsplash integration.</div>
             </a>
-            <a href="/asgard" class="feature-card" style="--bg-img: url('/og-images/og-image-asgard.webp')" onmouseover="const l=document.createElement('link');l.rel='prefetch';l.href='/asgard';document.head.appendChild(l);this.onmouseover=null;">
-                <span class="feature-icon">🌌</span>
-                <div class="feature-title">
-                    ASGARD
-                    <span class="coming-soon-badge">NEW</span>
-                </div>
-                <div class="feature-tagline">The Supreme Workspace. A distraction-free desktop environment.</div>
-            </a>
             <a href="/thor" class="feature-card" style="--bg-img: url('/og-images/og-image-thor.webp')">
                 <span class="feature-icon">⚡</span>
                 <div class="feature-title">
@@ -587,6 +579,14 @@ export const HTML = `<!DOCTYPE html>
                     <span class="coming-soon-badge">BETA</span>
                 </div>
                 <div class="feature-tagline">Web Intelligence Engine. One-click URL analysis powered by AI.</div>
+            </a>
+            <a href="/asgard" class="feature-card" style="--bg-img: url('/og-images/og-image-asgard.webp')" onmouseover="const l=document.createElement('link');l.rel='prefetch';l.href='/asgard';document.head.appendChild(l);this.onmouseover=null;">
+                <span class="feature-icon">🌌</span>
+                <div class="feature-title">
+                    ASGARD
+                    <span class="coming-soon-badge">NEW</span>
+                </div>
+                <div class="feature-tagline">The Supreme Workspace. A distraction-free desktop environment.</div>
             </a>
         </div>
     </section>
