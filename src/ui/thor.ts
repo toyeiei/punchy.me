@@ -7,20 +7,20 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>THOR | Web Intelligence Engine | PUNCHY.ME</title>
     <link rel="canonical" href="https://punchy.me/thor" />
-    <meta name="description" content="THOR Web Intelligence: One-click web page analysis. Extract SEO data, content structure, and AI-powered insights instantly.">
+    <meta name="description" content="THOR Web Intelligence: AI-powered one-click web page analysis. Extract SEO metadata, content structure, key topics, and actionable insights from any URL instantly.">
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
 
     <!-- Open Graph / Social -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/thor">
     <meta property="og:title" content="THOR | Web Intelligence Engine | PUNCHY.ME">
-    <meta property="og:description" content="One-click web page analysis. Extract SEO data, content structure, and AI-powered insights instantly.">
+    <meta property="og:description" content="AI-powered one-click web page analysis. Extract SEO metadata, content structure, and actionable insights instantly.">
     <meta property="og:image" content="https://punchy.me/og-images/og-image-thor.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="THOR | Web Intelligence Engine | PUNCHY.ME">
-    <meta name="twitter:description" content="One-click web page analysis. Extract SEO data, content structure, and AI-powered insights instantly.">
+    <meta name="twitter:description" content="AI-powered one-click web page analysis. Extract SEO metadata, content structure, and actionable insights instantly.">
     <meta name="twitter:image" content="https://punchy.me/og-images/og-image-thor.webp">
 
     <!-- JSON-LD Schema -->
@@ -32,7 +32,7 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
       "operatingSystem": "Any",
       "applicationCategory": "UtilitiesApplication",
       "url": "https://punchy.me/thor",
-      "description": "AI-powered web intelligence engine. Extracts SEO data, content structure, and generates actionable insights from any URL.",
+      "description": "AI-powered web intelligence engine. Uses Cloudflare Browser Rendering and Mistral 24B to extract SEO data, content structure, key topics, and generate actionable insights from any URL.",
       "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
     </script>
@@ -65,24 +65,36 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
         .bg-image {
             position: fixed;
             inset: 0;
-            background: linear-gradient(135deg, #0a0a0a 0%, #111 50%, #0a0a0a 100%);
+            background: url('/og-images/og-image-thor.webp') center / cover no-repeat;
             z-index: -2;
         }
         .bg-overlay {
             position: fixed;
             inset: 0;
-            background: radial-gradient(ellipse at top, rgba(34, 197, 94, 0.08) 0%, transparent 50%);
+            background: linear-gradient(160deg, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.60) 50%, rgba(0,0,0,0.80) 100%);
             z-index: -1;
+        }
+
+        /* Pulse Grid Background */
+        .grid-bg {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-image: 
+                linear-gradient(rgba(34, 197, 94, 0.08) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(34, 197, 94, 0.08) 1px, transparent 1px);
+            background-size: 40px 40px;
+            z-index: 0;
+            pointer-events: none;
         }
 
         /* Scan line effect */
         .scan-line {
             position: fixed;
             top: 0; left: 0; width: 100%; height: 100px;
-            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.05), transparent);
-            border-bottom: 1px solid rgba(34, 197, 94, 0.1);
+            background: linear-gradient(to bottom, transparent, rgba(34, 197, 94, 0.1), transparent);
+            border-bottom: 1px solid rgba(34, 197, 94, 0.2);
             z-index: 0;
-            animation: scan 6s linear infinite;
+            animation: scan 4s linear infinite;
             pointer-events: none;
         }
 
@@ -93,9 +105,10 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
 
         .container {
             z-index: 10;
-            max-width: 900px;
+            max-width: 1100px;
             width: 100%;
             text-align: center;
+            position: relative;
         }
 
         .title-container {
@@ -113,7 +126,16 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             line-height: 0.8;
             letter-spacing: -3px;
             text-transform: uppercase;
-            text-shadow: 0 2px 30px rgba(0, 0, 0, 0.8);
+            position: relative;
+            animation: main-glitch 5s infinite;
+            text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+
+        @keyframes main-glitch {
+            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; }
+            81% { transform: skew(2deg); text-shadow: 1px 0 #ff00ff; }
+            82% { transform: skew(-2deg); text-shadow: -1px 0 #00ffff; }
+            83% { transform: skew(0deg); text-shadow: none; }
         }
 
         .beta-badge {
@@ -125,13 +147,19 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             border-radius: 6px;
             text-transform: uppercase;
             letter-spacing: 1px;
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
+            box-shadow: 0 0 15px rgba(34, 197, 94, 0.6);
+            animation: pulse 2s infinite alternate;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.05); opacity: 1; }
         }
 
         .desc {
             color: var(--text-dim);
             font-size: 1rem;
-            margin-bottom: 3rem;
+            margin-bottom: 1.5rem;
             max-width: 600px;
             margin-left: auto;
             margin-right: auto;
@@ -139,7 +167,7 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
         }
 
         .quote-box {
-            margin-bottom: 3rem;
+            margin-bottom: 2rem;
             border-left: 2px solid var(--accent);
             padding: 0.75rem 1.5rem;
             text-align: left;
@@ -176,6 +204,31 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             text-transform: uppercase;
             letter-spacing: 1px;
             margin-left: 0.5rem;
+            box-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+        }
+
+        /* Feature highlights */
+        .features-row {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .feature-tag {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: var(--accent);
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
         }
 
         .thor-grid {
@@ -183,6 +236,7 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             grid-template-columns: 1fr;
             gap: 2rem;
             width: 100%;
+            margin-top: 2rem;
         }
 
         @media (min-width: 900px) {
@@ -190,19 +244,18 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
         }
 
         .panel {
-            background: rgba(0, 0, 0, 0.55);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
-            border: 1px solid rgba(255, 255, 255, 0.10);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
             padding: 2.5rem;
             border-radius: 24px;
             text-align: left;
-            transition: border-color 0.3s ease, box-shadow 0.3s ease;
+            transition: all 0.3s ease;
         }
 
         .panel:hover {
-            border-color: rgba(34, 197, 94, 0.4);
-            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.6);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
         }
 
         label {
@@ -503,6 +556,7 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
     ${PUNCHY_PORTAL_HTML}
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
+    <div class="grid-bg"></div>
     <div class="scan-line"></div>
 
     <div class="container">
@@ -511,11 +565,19 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             <span class="beta-badge">BETA</span>
         </div>
 
-        <p class="desc">The Web Intelligence Engine. One-click analysis transforms any URL into actionable insights.</p>
+        <p class="desc">The Web Intelligence Engine. One-click analysis transforms any URL into actionable insights powered by browser rendering and Mistral 24B AI.</p>
 
         <div class="quote-box">
             <p class="quote-text">"Knowledge is power. Intelligence is the ability to use it."</p>
             <p class="quote-author">— THOR, God of Thunder & Wisdom</p>
+        </div>
+
+        <div class="features-row">
+            <span class="feature-tag">SEO Metadata</span>
+            <span class="feature-tag">Content Structure</span>
+            <span class="feature-tag">Topic Extraction</span>
+            <span class="feature-tag">Key Entities</span>
+            <span class="feature-tag">PDF Reports</span>
         </div>
 
         <div class="thor-grid">
