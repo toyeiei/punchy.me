@@ -153,7 +153,11 @@ export interface ZeusSimulation {
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
-	BROWSER: any; // Puppeteer/Browser binding
+	BROWSER: {
+		connect: (sessionId: string) => Promise<unknown>;
+		disconnect: (sessionId: string) => Promise<void>;
+		[key: string]: unknown;
+	};
 	THOR_API_TOKEN?: string;
 	CLOUDFLARE_ACCOUNT_ID?: string;
 	TURNSTILE_SITE_KEY: string;

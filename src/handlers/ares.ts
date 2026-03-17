@@ -6,6 +6,7 @@ import { jsonResponse, htmlPage, generateUniqueId, parseAIResponse } from '../co
 import { checkRateLimit } from '../services/security';
 import { AIError } from '../core/errors';
 import { AI_MAX_TOKENS_STANDARD } from '../core/constants';
+import { KEYWORD_EXTRACTION_PROMPT, PAS_COPY_PROMPT } from '../prompts/ares';
 
 type UnsplashSearchResult = {
 	results: Array<{
@@ -33,26 +34,6 @@ export async function handleAresGet(): Promise<Response> {
 	return htmlPage(ARES_HTML);
 }
 
-const KEYWORD_PROMPT = `You are a keyword extraction expert. Extract exactly 2 keywords that best represent a product for marketing purposes.
-Return JSON format: { "keywords": ["keyword1", "keyword2"] }
-Keywords should be single words or short phrases ideal for image search.`;
-
-const COPY_PROMPT = `You are a world-class marketing copywriter. Create PAS (Problem-Agitate-Solution) framework copy for a marketing campaign.
-
-Given:
-- Product: {{PRODUCT}}
-- Target Customer: {{CUSTOMER}}
-- Image context: {{IMAGE_CONTEXT}}
-
-Write compelling PAS copy. Return JSON format:
-{
-  "problem": "One sentence about the pain point",
-  "agitate": "One sentence intensifying the emotional impact",
-  "solution": "One sentence presenting the product as the answer"
-}
-
-Keep each part under 120 characters. Be punchy, persuasive, and action-oriented.`;
-
 export async function handleAresForge(request: Request, env: Env): Promise<Response> {
 	return handleValidatedRequest(
 		request,
@@ -70,7 +51,7 @@ export async function handleAresForge(request: Request, env: Env): Promise<Respo
 				max_tokens: 100,
 				temperature: 0.3,
 				messages: [
-					{ role: 'system', content: KEYWORD_PROMPT },
+					{ role: 'system', content: KEYWORD_EXTRACTION_PROMPT },
 					{ role: 'user', content: `Product: ${data.product}\nTarget Customer: ${data.customer}` }
 				]
 			}) as { response: string };
@@ -107,7 +88,7 @@ export async function handleAresForge(request: Request, env: Env): Promise<Respo
 			const panels: AresResult['panels'] = [];
 
 			for (const img of images) {
-				const copyPrompt = COPY_PROMPT
+				const copyPrompt = PAS_COPY_PROMPT
 					.replace('{{PRODUCT}}', data.product)
 					.replace('{{CUSTOMER}}', data.customer)
 					.replace('{{IMAGE_CONTEXT}}', img.alt_description || 'Professional marketing imagery');
@@ -174,23 +155,23 @@ export async function handleAresForge(request: Request, env: Env): Promise<Respo
 
 /**
  * Generate a 5-color palette from a base color
+ * @param baseColor - Hex color string (e.g., "#22c55e")
+ * @returns Array of 5 hex color strings
  */
-function generateColorPalette(baseColor: string): string[] {
+export function generateColorPalette(baseColor: string): string[] {
 	// Parse hex color
 	const hex = baseColor.replace('#', '');
-	const r = parseInt(hex.substring(0, 2), 16);
-	const g = parseInt(hex.substring(2, 4), 16);
-	const b = parseInt(hex.substring(4, 6), 16);
+	const r = parseInt(hex.substring(0, 2), 16) || 0;
+	const g = parseInt(hex.substring(2, 4), 16) || 0;
+	const b = parseInt(hex.substring(4, 6), 16) || 0;
 
-	const palette: string[] = [baseColor];
-
-	// Generate 4 variations: lighter, darker, complementary, muted
-	palette.push(adjustBrightness(r, g, b, 1.3)); // Lighter
-	palette.push(adjustBrightness(r, g, b, 0.7)); // Darker
-	palette.push(complementaryColor(r, g, b));    // Complementary
-	palette.push(mutedColor(r, g, b));            // Muted
-
-	return palette;
+	return [
+		baseColor,
+		adjustBrightness(r, g, b, 1.3),
+		adjustBrightness(r, g, b, 0.7),
+		complementaryColor(r, g, b),
+		mutedColor(r, g, b)
+	];
 }
 
 function adjustBrightness(r: number, g: number, b: number, factor: number): string {
@@ -200,13 +181,11 @@ function adjustBrightness(r: number, g: number, b: number, factor: number): stri
 
 function complementaryColor(r: number, g: number, b: number): string {
 	const clamp = (v: number) => Math.min(255, Math.max(0, Math.round(v)));
-	// Rotate hue by 180 degrees (simplified)
 	return '#' + [255 - r, 255 - g, 255 - b].map(v => clamp(v).toString(16).padStart(2, '0')).join('');
 }
 
 function mutedColor(r: number, g: number, b: number): string {
 	const clamp = (v: number) => Math.min(255, Math.max(0, Math.round(v)));
-	// Desaturate by averaging with gray
 	const gray = 128;
 	return '#' + [r, g, b].map(v => clamp((v + gray) / 2).toString(16).padStart(2, '0')).join('');
 }
