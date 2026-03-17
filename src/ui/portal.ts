@@ -50,6 +50,10 @@ export const PUNCHY_PORTAL_HTML = `
         @media screen and (max-width: 1024px), screen and (max-height: 500px) {
             .punchy-portal { display: none !important; pointer-events: none !important; opacity: 0 !important; }
         }
+
+        @media print {
+            .punchy-portal { display: none !important; }
+        }
     </style>
 
     <div class="punchy-portal">
