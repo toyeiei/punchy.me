@@ -152,6 +152,13 @@ To ensure consistent and high-quality professional narratives, the ANAKIN engine
 
 ## Progress & Architectural Milestones
 
+### Version 5.1.0 - SEO Mastery & Cinematic UI Polish (2026-03-17)
+- **Ecosystem SEO Overhaul**: Implemented robust metadata (`title`, `description`, `canonical`) and specific Open Graph / Twitter Cards for every individual tool landing page. Added `application/ld+json` (SoftwareApplication, ProfilePage) schemas to relevant pages to build high search authority.
+- **Cinematic Visual Identity**: Removed performance-heavy CSS/JS animated backgrounds (pixel, grid, scanline) from ANAKIN, BAZUKA, and MUSASHI forms. Replaced them with a unified "Cinematic Overlay" system (`.bg-image` and `.bg-overlay`), utilizing high-quality static assets served directly from `@public/og-images/`.
+- **Ecosystem Portal Optimization**: Refactored the `PUNCHY_PORTAL_HTML` (The Fast-Switcher). It is now correctly hidden on mobile breakpoints, surgically removed from the ASGARD workspace, and uses dynamic `max-width` CSS transitions for a perfect icon-hugging fit. Fixed print overrides to definitively strip the portal from all PDF outputs (especially YAIBA and ANAKIN).
+- **Home Page Polish**: Dimmed the `.feature-card:hover` backgrounds to a 50% opacity to ensure the rich background images pop without overwhelming the text, which is now explicitly set to high-contrast white. Rebranded Musashi's tagline to "Strategic Intelligence."
+- **Execution Protocol Enforced**: Added "Mandatory Execution Protocol (Plan First)" to the Engineering Philosophy. The AI must now explicitly outline its plan and seek user permission before executing commands or modifying files.
+
 ### Version 5.0.0 - RAGNAR Intelligence & UX Overhaul (2026-03-17)
 - **Richer AI Content**: Expanded system prompt word targets per slide — `bigtext` 40-60w, `list` 25-40w/bullet, `quote` 50-70w, `comparison` 30-50w/side. Updated full example output to anchor AI output length.
 - **Professional Tone Calibration**: Lowered temperature `0.6 → 0.3` for cleaner, more authoritative business language. Raised `max_tokens` `4000 → 6000` to prevent truncation on dense decks.
