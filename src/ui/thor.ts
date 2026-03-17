@@ -410,6 +410,36 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             line-height: 1.5;
         }
 
+        /* Source header styles */
+        .source-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            background: rgba(34, 197, 94, 0.08);
+            border: 1px solid rgba(34, 197, 94, 0.2);
+            border-radius: 8px;
+        }
+
+        .source-domain {
+            font-size: 1rem;
+            font-weight: 700;
+            color: var(--accent);
+            word-break: break-all;
+        }
+
+        .source-link {
+            font-size: 0.75rem;
+            color: var(--text-dim);
+            text-decoration: none;
+            white-space: nowrap;
+            padding-left: 1rem;
+        }
+
+        .source-link:hover {
+            color: var(--accent);
+        }
+
         .og-score {
             display: flex;
             align-items: center;
@@ -579,7 +609,23 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             const intel = data.intelligence;
             intelOutput.classList.add('active', 'fade-in-up');
 
+            // Extract domain from URL
+            let domain = '';
+            try {
+                const urlObj = new URL(data.url);
+                domain = urlObj.hostname;
+            } catch (e) {
+                domain = data.url;
+            }
+
             let html = '';
+
+            // Source header with domain
+            html += '<div class="intel-block" style="margin-bottom: 1.25rem;">';
+            html += '<div class="source-header">';
+            html += '<div class="source-domain">' + escapeHtml(domain) + '</div>';
+            html += '<a href="' + escapeHtml(data.url) + '" target="_blank" class="source-link">Visit Source ↗</a>';
+            html += '</div></div>';
 
             // Summary - clean and prominent
             html += '<div class="intel-block" style="border-bottom: 1px solid rgba(34, 197, 94, 0.2); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">';
