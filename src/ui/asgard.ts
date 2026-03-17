@@ -418,7 +418,8 @@ export const ASGARD_HTML = `<!DOCTYPE html>
     <div class="dock-container">
         <a href="/" class="dock-item" data-title="HOME">✨</a>
         <a href="/bazuka" class="dock-item" data-title="BAZUKA">👤</a>
-        <a href="/anakin" class="dock-item" data-title="ANAKIN">⚡</a>
+        <a href="/anakin" class="dock-item" data-title="ANAKIN">🪨</a>
+        <a href="/thor" class="dock-item" data-title="THOR">⚡</a>
         <a href="/musashi" class="dock-item" data-title="MUSASHI">⚔️</a>
         <a href="/odin" class="dock-item" data-title="ODIN">🐦‍⬛</a>
         <a href="/yaiba" class="dock-item" data-title="YAIBA">✒️</a>

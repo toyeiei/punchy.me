@@ -61,7 +61,8 @@ export const PUNCHY_PORTAL_HTML = `
         <div class="portal-brand">PUNCHY.ME</div>
         <div class="portal-tools">
             <a href="/bazuka" class="portal-tool-link" title="BAZUKA">👤</a>
-            <a href="/anakin" class="portal-tool-link" title="ANAKIN">⚡</a>
+            <a href="/anakin" class="portal-tool-link" title="ANAKIN">🪨</a>
+            <a href="/thor" class="portal-tool-link" title="THOR">⚡</a>
             <a href="/musashi" class="portal-tool-link" title="MUSASHI">⚔️</a>
             <a href="/odin" class="portal-tool-link" title="ODIN">🐦‍⬛</a>
             <a href="/yaiba" class="portal-tool-link" title="YAIBA">✒️</a>

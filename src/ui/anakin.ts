@@ -8,7 +8,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
     <title>ANAKIN | AI-Powered Professional Resumes | PUNCHY.ME</title>
     <meta name="description" content="Generate a high-impact, AI-refined digital resume in seconds with ANAKIN. Built for speed and professional career impact.">
     <link rel="canonical" href="https://punchy.me/anakin" />
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🪨%3C/text%3E%3C/svg%3E">
     
     <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website">
@@ -559,7 +559,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="title-tag">Professional Resume | PUNCHY.ME</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🪨%3C/text%3E%3C/svg%3E">
     
     <!-- Open Graph -->
     <meta property="og:type" content="website">

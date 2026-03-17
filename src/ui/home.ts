@@ -525,7 +525,7 @@ export const HTML = `<!DOCTYPE html>
                 <div class="feature-tagline">Instant Digital Identity. Professional cards that explode with style.</div>
             </a>
             <a href="/anakin" class="feature-card" style="--bg-img: url('/og-images/og-image-anakin.webp')">
-                <span class="feature-icon">⚡</span>
+                <span class="feature-icon">🪨</span>
                 <div class="feature-title">
                     ANAKIN
                     <span class="coming-soon-badge">BETA</span>
@@ -555,6 +555,14 @@ export const HTML = `<!DOCTYPE html>
                     <span class="coming-soon-badge">BETA</span>
                 </div>
                 <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
+            </a>
+            <a href="/thor" class="feature-card" style="--bg-img: url('/og-images/og-image-thor.webp')">
+                <span class="feature-icon">⚡</span>
+                <div class="feature-title">
+                    THOR
+                    <span class="coming-soon-badge">BETA</span>
+                </div>
+                <div class="feature-tagline">Web Intelligence Engine. One-click URL analysis powered by AI.</div>
             </a>
             <a href="/ragnar" class="feature-card" style="--bg-img: url('/og-images/og-image-ragnar.webp')">
                 <span class="feature-icon">🛡️</span>
