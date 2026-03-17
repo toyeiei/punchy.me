@@ -54,6 +54,7 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/ragnar/forge', handler: staticHandler(handleRagnarForge) },
 	{ method: 'POST', path: '/odin/analyze', handler: staticHandler(handleOdinAnalyze) },
 	{ method: 'POST', path: '/thor/forge', handler: staticHandler(handleThorForge) },
+	{ method: 'POST', path: '/thor/query', handler: staticHandler(handleThorQuery) },
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },

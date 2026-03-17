@@ -39,7 +39,7 @@ export const THOR_UI_HTML = `
         }
 
         .side-panel {
-            width: 400px;
+            width: 450px;
             background: rgba(0, 0, 0, 0.5);
             border-left: 1px solid var(--border);
             backdrop-filter: blur(20px);
@@ -74,18 +74,16 @@ export const THOR_UI_HTML = `
         .input-group {
             position: relative;
             margin-top: 2rem;
+            text-align: left;
         }
 
-        .visually-hidden {
-            position: absolute;
-            width: 1px;
-            height: 1px;
-            padding: 0;
-            margin: -1px;
-            overflow: hidden;
-            clip: rect(0, 0, 0, 0);
-            white-space: nowrap;
-            border: 0;
+        label {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: #64748b;
+            display: block;
+            margin-bottom: 0.5rem;
         }
 
         input {
@@ -102,7 +100,7 @@ export const THOR_UI_HTML = `
         input:focus { border-color: var(--accent); }
 
         button {
-            margin-top: 1.5rem;
+            margin-top: 1rem;
             width: 100%;
             background: var(--accent);
             color: #000;
@@ -117,6 +115,13 @@ export const THOR_UI_HTML = `
 
         button:hover { opacity: 0.9; }
         button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+        .divider {
+            height: 1px;
+            background: var(--border);
+            width: 100%;
+            margin: 2rem 0;
+        }
 
         /* Intelligence Log */
         .log-header {
@@ -138,10 +143,11 @@ export const THOR_UI_HTML = `
             line-height: 1.6;
         }
 
-        .log-entry { margin-bottom: 0.5rem; }
+        .log-entry { margin-bottom: 0.8rem; border-bottom: 1px solid rgba(255,255,255,0.02); padding-bottom: 0.5rem; }
         .log-entry.success { color: var(--accent); }
         .log-entry.info { color: #60a5fa; }
         .log-entry.error { color: #ef4444; }
+        .log-entry small { display: block; font-size: 0.7rem; color: #475569; margin-top: 0.2rem; }
 
         ${PUNCHY_PORTAL_HTML}
     </style>
@@ -152,19 +158,29 @@ export const THOR_UI_HTML = `
     <main class="main-deck">
         <div class="forge-container">
             <h1>Web Intelligence</h1>
-            <p style="color: #64748b;">Transform any website into a queryable database.</p>
+            <p style="color: #64748b;">Turn any website into a queryable database.</p>
             
+            <!-- Writer (Ingestion) -->
             <div class="input-group">
+                <label>1. INGEST TARGET URL</label>
                 <input type="url" id="target-url" placeholder="https://example.com" required>
-                <input type="text" id="hp_field" class="visually-hidden" tabindex="-1" autocomplete="off">
                 <button id="forge-btn">Forge Intelligence</button>
+            </div>
+
+            <div class="divider"></div>
+
+            <!-- Reader (Semantic Search) -->
+            <div class="input-group">
+                <label>2. QUERY KNOWLEDGE BASE</label>
+                <input type="text" id="query-input" placeholder="What are their core services?">
+                <button id="query-btn" style="background: #60a5fa;">Execute Semantic Query</button>
             </div>
         </div>
     </main>
 
     <aside class="side-panel">
         <div class="log-header">
-            <span>INTELLIGENCE LOG</span>
+            <span>INTELLIGENCE HUD</span>
             <span id="status-tag">READY</span>
         </div>
         <div id="log-output">
@@ -176,16 +192,17 @@ export const THOR_UI_HTML = `
     <script>
         const urlInput = document.getElementById('target-url');
         const forgeBtn = document.getElementById('forge-btn');
+        const queryInput = document.getElementById('query-input');
+        const queryBtn = document.getElementById('query-btn');
         const logOutput = document.getElementById('log-output');
         const statusTag = document.getElementById('status-tag');
-        const hpField = document.getElementById('hp_field');
 
-        function addLog(msg, type = 'info') {
+        function addLog(msg, type = 'info', subtitle = '') {
             const entry = document.createElement('div');
             entry.className = 'log-entry ' + type;
-            entry.textContent = '> ' + msg;
-            logOutput.appendChild(entry);
-            logOutput.scrollTop = logOutput.scrollHeight;
+            entry.innerHTML = '> ' + msg + (subtitle ? '<small>' + subtitle + '</small>' : '');
+            logOutput.prepend(entry);
+            logOutput.scrollTop = 0;
         }
 
         forgeBtn.addEventListener('click', async () => {
@@ -193,34 +210,60 @@ export const THOR_UI_HTML = `
             if (!url) return;
 
             forgeBtn.disabled = true;
-            statusTag.textContent = 'WORKING';
+            statusTag.textContent = 'FORGING';
             addLog('Initializing extraction for: ' + url);
 
             try {
                 const res = await fetch('/thor/forge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url, hp_field: hpField.value })
+                    body: JSON.stringify({ url })
                 });
 
                 const data = await res.json();
-
                 if (!res.ok) throw new Error(data.error || 'Extraction failed');
 
                 addLog('Title: ' + data.title, 'success');
-                addLog('Links Found: ' + data.links.length);
-                addLog('Storage: ' + (data.storage && data.storage.persisted ? 'ONLINE' : 'DEGRADED'), data.storage && data.storage.persisted ? 'success' : 'error');
-                addLog('Semantic Memory: ' + (data.intelligence && data.intelligence.semantic ? 'SYNCED' : 'PARTIAL'), data.intelligence && data.intelligence.semantic ? 'success' : 'error');
-                addLog('Status: ' + data.status, data.status === 'completed' ? 'success' : 'info');
-                if (data.intelligence && data.intelligence.truncated) {
-                    addLog('Large page detected. Intelligence payload was capped.', 'info');
+                addLog('Intelligence Core updated.', 'success', 'Chunks: ' + data.intelligence.chunks + ' | Words: ' + data.wordCount);
+                
+            } catch (err) {
+                addLog('Error: ' + err.message, 'error');
+            } finally {
+                forgeBtn.disabled = false;
+                statusTag.textContent = 'READY';
+            }
+        });
+
+        queryBtn.addEventListener('click', async () => {
+            const query = queryInput.value.trim();
+            if (!query) return;
+
+            queryBtn.disabled = true;
+            statusTag.textContent = 'QUERYING';
+            addLog('Executing query: "' + query + '"');
+
+            try {
+                const res = await fetch('/thor/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query })
+                });
+
+                const data = await res.json();
+                if (!res.ok) throw new Error(data.error || 'Query failed');
+
+                if (data.results.length === 0) {
+                    addLog('No intelligence matches found.', 'error');
+                } else {
+                    data.results.forEach(match => {
+                        addLog('Match (Score: ' + match.score.toFixed(4) + ')', 'success', match.text + '...');
+                    });
                 }
                 
             } catch (err) {
-                const message = err instanceof Error ? err.message : 'Unknown error';
-                addLog('Error: ' + message, 'error');
+                addLog('Error: ' + err.message, 'error');
             } finally {
-                forgeBtn.disabled = false;
+                queryBtn.disabled = false;
                 statusTag.textContent = 'READY';
             }
         });

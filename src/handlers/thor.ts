@@ -53,6 +53,51 @@ export const handleThorForge = async (request: Request, env: Env): Promise<Respo
 	);
 };
 
+/**
+ * Thor Intelligence Query Handler
+ * Performs semantic search against Vectorize index.
+ */
+export const handleThorQuery = async (request: Request, env: Env): Promise<Response> => {
+	const body = await request.json() as { query: string };
+	if (!body.query || typeof body.query !== 'string') {
+		throw new ValidationError('Query is required');
+	}
+
+	try {
+		// 1. Generate query embedding
+		const queryVector = await env.AI.run('@cf/baai/bge-small-en-v1.5', {
+			text: [body.query]
+		}) as { data: number[][] };
+
+		if (!queryVector.data?.[0]) throw new Error('Query embedding failed');
+
+		// 2. Search Vectorize
+		const matches = await env.THOR_MEMORY.query(queryVector.data[0], {
+			topK: 3,
+			returnValues: true,
+			returnMetadata: true
+		});
+
+		// 3. Extract and format results
+		const results = matches.matches.map(m => ({
+			score: m.score,
+			url: m.metadata?.url,
+			title: m.metadata?.title,
+			text: m.metadata?.text
+		}));
+
+		return jsonResponse({
+			query: body.query,
+			results,
+			count: results.length
+		});
+
+	} catch (err) {
+		console.error('[THOR] Query Error:', err);
+		throw new InternalError('Failed to query intelligence core');
+	}
+};
+
 async function forgeThorUrl(url: string, env: Env): Promise<ThorForgeResult> {
 	const parsedUrl = validateThorTarget(url);
 	const accountId = env.CLOUDFLARE_ACCOUNT_ID;
