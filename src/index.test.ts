@@ -1149,7 +1149,7 @@ Hope this helps!`
         if (typeof input === 'string' && input.includes('/browser-rendering/markdown')) {
           return new Response(JSON.stringify({
             success: true,
-            result: { markdown: '# THOR V2\nSimple but mighty intelligence.' }
+            result: '# THOR V2\nSimple but mighty intelligence.'
           }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }

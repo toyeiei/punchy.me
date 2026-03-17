@@ -374,6 +374,42 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             letter-spacing: 1px;
         }
 
+        /* Inline metrics style */
+        .metrics-line {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 1.25rem;
+            font-size: 0.85rem;
+        }
+
+        .metric {
+            color: var(--text-dim);
+        }
+
+        .metric-label {
+            color: var(--text-dim);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .metric-val {
+            color: var(--text-main);
+            font-weight: 600;
+        }
+
+        .topics-inline, .entities-inline {
+            color: var(--text-main);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
+        .audience-text {
+            color: var(--text-main);
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+
         .og-score {
             display: flex;
             align-items: center;
@@ -545,46 +581,60 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
 
             let html = '';
 
-            // Summary section
-            html += '<div class="intel-block">';
-            html += '<div class="intel-title"><span>📡</span> Content Summary</div>';
-            html += '<div class="summary-box">' + escapeHtml(intel.content.summary) + '</div>';
-            html += '<div class="topic-tags">';
-            intel.content.topics.forEach(function(t) {
-                html += '<span class="topic-tag">' + escapeHtml(t) + '</span>';
-            });
+            // Summary - clean and prominent
+            html += '<div class="intel-block" style="border-bottom: 1px solid rgba(34, 197, 94, 0.2); padding-bottom: 1.5rem; margin-bottom: 1.5rem;">';
+            html += '<div class="intel-title" style="font-size: 0.7rem; margin-bottom: 0.5rem;">SUMMARY</div>';
+            html += '<div class="summary-box" style="background: transparent; border: none; padding: 0; font-size: 0.95rem;">' + escapeHtml(intel.content.summary) + '</div>';
+            html += '</div>';
+
+            // Key Metrics - compact inline format
+            html += '<div class="intel-block" style="margin-bottom: 1.25rem;">';
+            html += '<div class="intel-title" style="font-size: 0.7rem;">KEY METRICS</div>';
+            html += '<div class="metrics-line">';
+            html += '<span class="metric"><span class="metric-label">Content Type:</span> <span class="metric-val">' + escapeHtml(intel.content.contentType) + '</span></span>';
+            html += '<span class="metric"><span class="metric-label">Word Count:</span> <span class="metric-val">~' + intel.content.wordCount.toLocaleString() + '</span></span>';
+            html += '<span class="metric"><span class="metric-label">Reading Time:</span> <span class="metric-val">~' + intel.content.readingTime + ' min</span></span>';
+            html += '</div>';
+            html += '<div class="metrics-line" style="margin-top: 0.5rem;">';
+            html += '<span class="metric"><span class="metric-label">Structure:</span> <span class="metric-val">' + intel.structure.h1Count + ' H1, ' + intel.structure.h2Count + ' H2, ' + intel.structure.h3Count + ' H3</span></span>';
+            html += '<span class="metric"><span class="metric-label">Links:</span> <span class="metric-val">' + intel.structure.linkCount + '</span></span>';
+            html += '<span class="metric"><span class="metric-label">Images:</span> <span class="metric-val">' + intel.structure.imageCount + '</span></span>';
             html += '</div></div>';
 
-            // Content Intelligence
-            html += '<div class="intel-block">';
-            html += '<div class="intel-title"><span>⚡</span> Content Intelligence</div>';
-            html += '<div class="stat-grid">';
-            html += '<div class="stat-item"><div class="stat-label">Content Type</div><div class="stat-value">' + escapeHtml(intel.content.contentType) + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label">Target Audience</div><div class="stat-value">' + escapeHtml(intel.content.targetAudience) + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label">Word Count</div><div class="stat-value">' + intel.content.wordCount.toLocaleString() + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label">Reading Time</div><div class="stat-value">~' + intel.content.readingTime + ' min</div></div>';
+            // Topics - inline tags
+            html += '<div class="intel-block" style="margin-bottom: 1.25rem;">';
+            html += '<div class="intel-title" style="font-size: 0.7rem;">TOPICS EXTRACTED</div>';
+            html += '<div class="topics-inline">' + intel.content.topics.map(function(t) { return escapeHtml(t); }).join(' • ') + '</div>';
+            html += '</div>';
+
+            // Target Audience
+            html += '<div class="intel-block" style="margin-bottom: 1.25rem;">';
+            html += '<div class="intel-title" style="font-size: 0.7rem;">TARGET AUDIENCE</div>';
+            html += '<div class="audience-text">' + escapeHtml(intel.content.targetAudience) + '</div>';
+            html += '</div>';
+
+            // Key Entities (if any)
+            if (intel.content.keyEntities && intel.content.keyEntities.length > 0) {
+                html += '<div class="intel-block" style="margin-bottom: 1.25rem;">';
+                html += '<div class="intel-title" style="font-size: 0.7rem;">KEY ENTITIES</div>';
+                html += '<div class="entities-inline">' + intel.content.keyEntities.slice(0, 8).map(function(e) { return escapeHtml(e); }).join(' • ') + '</div>';
+                html += '</div>';
+            }
+
+            // SEO & Technical - compact
+            html += '<div class="intel-block" style="margin-bottom: 1.25rem;">';
+            html += '<div class="intel-title" style="font-size: 0.7rem;">TECHNICAL SIGNALS</div>';
+            html += '<div class="metrics-line">';
+            html += '<span class="metric"><span class="metric-label">OG Score:</span> <span class="metric-val">' + intel.technical.ogScore + '/100</span></span>';
+            html += '<span class="metric"><span class="metric-label">JSON-LD Schema:</span> <span class="metric-val">' + (intel.technical.hasSchema ? 'Present' : 'Not detected') + '</span></span>';
             html += '</div></div>';
 
-            // Page Structure
-            html += '<div class="intel-block">';
-            html += '<div class="intel-title"><span>🏗️</span> Page Structure</div>';
-            html += '<div class="stat-grid">';
-            html += '<div class="stat-item"><div class="stat-label">H1 Headings</div><div class="stat-value">' + intel.structure.h1Count + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label">H2 Headings</div><div class="stat-value">' + intel.structure.h2Count + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label">Links</div><div class="stat-value">' + intel.structure.linkCount + '</div></div>';
-            html += '<div class="stat-item"><div class="stat-label">Images</div><div class="stat-value">' + intel.structure.imageCount + '</div></div>';
+            // Report ID + PDF link
+            html += '<div class="intel-block" style="border-top: 1px solid rgba(34, 197, 94, 0.2); padding-top: 1.25rem; margin-bottom: 0;">';
+            html += '<div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem;">';
+            html += '<div><span class="metric-label" style="font-size: 0.65rem; display: block; margin-bottom: 0.25rem;">REPORT ID</span><code style="color: var(--accent); font-size: 0.85rem;">' + data.id + '</code></div>';
+            html += '<a href="/thor/pdf/' + data.id + '" class="download-btn" target="_blank" style="margin-top: 0;">Download PDF Report</a>';
             html += '</div></div>';
-
-            // SEO Score
-            html += '<div class="intel-block">';
-            html += '<div class="intel-title"><span>🎯</span> Open Graph Score</div>';
-            html += '<div class="og-score">';
-            html += '<div class="og-bar"><div class="og-fill" style="width: ' + intel.technical.ogScore + '%"></div></div>';
-            html += '<div class="og-value">' + intel.technical.ogScore + '/100</div>';
-            html += '</div></div>';
-
-            // PDF Download
-            html += '<a href="/thor/pdf/' + data.id + '" class="download-btn" target="_blank">Download PDF Report</a>';
 
             intelOutput.innerHTML = html;
         }

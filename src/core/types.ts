@@ -41,9 +41,7 @@ export interface RagnarData {
 }
 
 export interface BrowserRenderingResponse {
-	result: {
-		markdown: string;
-	};
+	result: string; // Markdown content directly
 	success: boolean;
 	errors: string[];
 	messages: string[];

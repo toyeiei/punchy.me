@@ -86,7 +86,7 @@ Workers on the edge. Fast, secure, scalable.
       ok: true,
       json: async () => ({
         success: true,
-        result: { markdown: mockMarkdown }
+        result: mockMarkdown
       })
     });
 
@@ -176,7 +176,7 @@ Workers on the edge. Fast, secure, scalable.
       ok: true,
       json: async () => ({
         success: true,
-        result: { markdown: '# Test Page\nSome content here.' }
+        result: '# Test Page\nSome content here.'
       })
     });
 

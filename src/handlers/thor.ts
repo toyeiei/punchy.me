@@ -135,11 +135,11 @@ async function fetchThorMarkdown(url: string, accountId: string, apiToken: strin
 		throw new ExternalServiceError('Invalid response from browser rendering');
 	}
 
-	if (!responseData.success || !responseData.result?.markdown) {
+	if (!responseData.success || !responseData.result) {
 		throw new ExternalServiceError('Empty result from browser rendering');
 	}
 
-	return responseData.result.markdown;
+	return responseData.result;
 }
 
 async function analyzeWithMistral(markdown: string, url: string, env: Env): Promise<ThorIntelligence> {
