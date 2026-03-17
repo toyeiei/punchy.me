@@ -16,14 +16,14 @@ export const ODIN_HTML = `<!DOCTYPE html>
     <meta property="og:url" content="https://punchy.me/odin">
     <meta property="og:title" content="ODIN | Tactical Terminal Data Command">
     <meta property="og:description" content="Crunch intel at the edge with ODIN. The supreme data command center for professional impact.">
-    <meta property="og:image" content="https://punchy.me/og-image.webp">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-odin.webp">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
     <meta property="twitter:url" content="https://punchy.me/odin">
     <meta property="twitter:title" content="ODIN | Tactical Terminal Data Command">
     <meta property="twitter:description" content="Crunch intel at the edge with ODIN. The supreme data command center for professional impact.">
-    <meta property="twitter:image" content="https://punchy.me/og-image.webp">
+    <meta property="twitter:image" content="https://punchy.me/og-images/og-image-odin.webp">
 
     <!-- Structured Data -->
     <script type="application/ld+json">

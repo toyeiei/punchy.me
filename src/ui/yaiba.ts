@@ -412,7 +412,21 @@ export const YAIBA_VIEW_HTML = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="title-tag">YAIBA | Professional Markdown View | PUNCHY.ME</title>
-        <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✒️%3C/text%3E%3C/svg%3E">
+    <meta name="description" id="meta-description" content="Securely view this Zen Markdown document on PUNCHY.ME.">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="og-title" content="YAIBA | Markdown View | PUNCHY.ME">
+    <meta property="og:description" id="og-description" content="Securely view this Zen Markdown document on PUNCHY.ME.">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter-title" content="YAIBA | Markdown View | PUNCHY.ME">
+    <meta name="twitter:description" id="twitter-description" content="Securely view this Zen Markdown document on PUNCHY.ME.">
+    <meta name="twitter:image" content="https://punchy.me/og-image.webp">
+
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E✒️%3C/text%3E%3C/svg%3E">
 
         <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>

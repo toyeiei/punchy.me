@@ -5,20 +5,20 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MUSASHI | Cold Attack Engine | PUNCHY.ME</title>
+    <title>MUSASHI | AI-Powered Strategic Intelligence | PUNCHY.ME</title>
     <link rel="canonical" href="https://punchy.me/musashi" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚔️%3C/text%3E%3C/svg%3E">
 
     <!-- Open Graph / Social -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/musashi">
-    <meta property="og:title" content="MUSASHI | Cold Attack Engine | PUNCHY.ME">
+    <meta property="og:title" content="MUSASHI | AI-Powered Strategic Intelligence | PUNCHY.ME">
     <meta property="og:description" content="AI-powered job intel extraction and interview strike-path generator. Built for career-winning precision.">
     <meta property="og:image" content="https://punchy.me/og-images/og-image-musashi.webp">
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="MUSASHI | Cold Attack Engine | PUNCHY.ME">
+    <meta name="twitter:title" content="MUSASHI | AI-Powered Strategic Intelligence | PUNCHY.ME">
     <meta name="twitter:description" content="AI-powered job intel extraction and interview strike-path generator. Built for career-winning precision.">
     <meta name="twitter:image" content="https://punchy.me/og-images/og-image-musashi.webp">
 
@@ -27,7 +27,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     {
       "@context": "https://schema.org",
       "@type": "SoftwareApplication",
-      "name": "MUSASHI Cold Attack Engine",
+      "name": "MUSASHI Strategic Intelligence",
       "operatingSystem": "Any",
       "applicationCategory": "BusinessApplication",
       "url": "https://punchy.me/musashi",

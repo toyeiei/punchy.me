@@ -17,11 +17,11 @@ export const RAGNAR_HTML = `<!DOCTYPE html>
     <meta property="og:description" content="Transform your strategic vision into elite 6-slide presentations in seconds. Powered by Mistral 24B AI.">
     <meta property="og:image" content="https://punchy.me/og-images/og-image-ragnar.webp">
 
-    <!-- Twitter -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="RAGNAR | Legendary AI Slide Forge | PUNCHY.ME">
-    <meta name="twitter:description" content="Transform your strategic vision into elite 6-slide presentations in seconds. Powered by Mistral 24B AI.">
-    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-ragnar.webp">
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="RAGNAR | Legendary AI Slide Forge | PUNCHY.ME">
+        <meta name="twitter:description" content="Transform your strategic vision into elite 6-slide presentations in seconds. Powered by Mistral 24B AI.">
+        <meta name="twitter:image" content="https://punchy.me/og-images/og-image-ragnar.webp">
 
     <!-- JSON-LD Schema -->
     <script type="application/ld+json">

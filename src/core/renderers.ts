@@ -162,6 +162,11 @@ export function renderNotFound(): Response {
  * Yaiba-specific resyncing page (eventual consistency retry)
  */
 export function renderYaibaResyncing(): Response {
-	const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"><title>RESYNCING | YAIBA</title><style>body{background:#000;color:#22c55e;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;} .msg{letter-spacing:2px; animation:pulse 1.5s infinite alternate;} @keyframes pulse{from{opacity:0.4} to{opacity:1}}</style><script>setTimeout(()=>location.reload(), 1500)</script></head><body><div class="msg">[ RESYNCING SHADOW NODE... ]</div></body></html>`;
+	const html = `<!DOCTYPE html><html><head><meta charset="UTF-8">
+	<title>RESYNCING | YAIBA</title>
+	<meta name="description" content="Synchronizing your Zen document with the edge.">
+	<meta property="og:title" content="RESYNCING | YAIBA">
+	<meta property="og:image" content="https://punchy.me/og-images/og-image-yaiba.webp">
+	<style>body{background:#000;color:#22c55e;font-family:monospace;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;} .msg{letter-spacing:2px; animation:pulse 1.5s infinite alternate;} @keyframes pulse{from{opacity:0.4} to{opacity:1}}</style><script>setTimeout(()=>location.reload(), 1500)</script></head><body><div class="msg">[ RESYNCING SHADOW NODE... ]</div></body></html>`;
 	return new Response(html, { status: 404, headers: { 'Content-Type': 'text/html' } });
 }

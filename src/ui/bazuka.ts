@@ -19,8 +19,8 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
 
     <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="BAZUKA | Instant Digital Business Cards | PUNCHY.ME">
-    <meta name="twitter:description" content="Generate your high-impact digital business card in seconds. Free, stylish, and edge-native.">
+    <meta name="twitter:title" content="BAZUKA | Digital Business Cards | PUNCHY.ME">
+    <meta name="twitter:description" content="Create a high-impact digital business card in seconds. Fast, stylish, and free.">
     <meta name="twitter:image" content="https://punchy.me/og-images/og-image-bazuka.webp">
 
     <!-- JSON-LD Schema -->
@@ -449,6 +449,20 @@ export const BAZUKA_CARD_TEMPLATE = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title id="title-tag">Business Card | PUNCHY.ME</title>
+    <meta name="description" id="meta-description" content="View this digital business card on PUNCHY.ME. Instant, stylish, and professional.">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" id="og-title" content="Digital Business Card | PUNCHY.ME">
+    <meta property="og:description" id="og-description" content="View this digital business card on PUNCHY.ME. Instant, stylish, and professional.">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" id="twitter-title" content="Digital Business Card | PUNCHY.ME">
+    <meta name="twitter:description" id="twitter-description" content="View this digital business card on PUNCHY.ME. Instant, stylish, and professional.">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-bazuka.webp">
+
     <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {

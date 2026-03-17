@@ -278,6 +278,9 @@ export const HTML = `<!DOCTYPE html>
 
         .feature-card {
             background: rgba(255, 255, 255, 0.03);
+            background-image: linear-gradient(rgba(0,0,0,0.8), rgba(0,0,0,0.8)), var(--bg-img);
+            background-size: cover;
+            background-position: center;
             border: 1px solid rgba(255, 255, 255, 0.08);
             border-radius: 20px;
             padding: 2rem;
@@ -293,10 +296,15 @@ export const HTML = `<!DOCTYPE html>
         }
 
         .feature-card:hover {
-            background: rgba(34, 197, 94, 0.05);
+            background-color: rgba(34, 197, 94, 0.05);
+            background-image: linear-gradient(rgba(0, 0, 0, 0.50), rgba(0, 0, 0, 0.50)), var(--bg-img);
             border-color: var(--accent);
             transform: translateY(-5px);
             box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .feature-card:hover .feature-tagline {
+            color: #ffffff;
         }
 
         .feature-icon {
@@ -508,7 +516,7 @@ export const HTML = `<!DOCTYPE html>
 
     <section class="feature-section">
         <div class="suite-grid">
-            <a href="/bazuka" class="feature-card">
+            <a href="/bazuka" class="feature-card" style="--bg-img: url('/og-images/og-image-bazuka.webp')">
                 <span class="feature-icon">👤</span>
                 <div class="feature-title">
                     BAZUKA
@@ -516,7 +524,7 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Instant Digital Identity. Professional cards that explode with style.</div>
             </a>
-            <a href="/anakin" class="feature-card">
+            <a href="/anakin" class="feature-card" style="--bg-img: url('/og-images/og-image-anakin.webp')">
                 <span class="feature-icon">⚡</span>
                 <div class="feature-title">
                     ANAKIN
@@ -524,15 +532,15 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Elite AI Resumes. Forged by Llama 3 for career-winning impact.</div>
             </a>
-            <a href="/musashi" class="feature-card">
+            <a href="/musashi" class="feature-card" style="--bg-img: url('/og-images/og-image-musashi.webp')">
                 <span class="feature-icon">⚔️</span>
                 <div class="feature-title">
                     MUSASHI
                     <span class="coming-soon-badge">BETA</span>
                 </div>
-                <div class="feature-tagline">Cold Attack Engine. AI-powered extraction of job intel and interview strike-paths.</div>
+                <div class="feature-tagline">AI-powered job intel and interview strike-paths.</div>
             </a>
-            <a href="/odin" class="feature-card">
+            <a href="/odin" class="feature-card" style="--bg-img: url('/og-images/og-image-odin.webp')">
                 <span class="feature-icon">🐦‍⬛</span>
                 <div class="feature-title">
                     ODIN
@@ -540,7 +548,7 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Tactical Data Command. Supreme edge-native analytics HUD.</div>
             </a>
-            <a href="/yaiba" class="feature-card">
+            <a href="/yaiba" class="feature-card" style="--bg-img: url('/og-images/og-image-yaiba.webp')">
                 <span class="feature-icon">✒️</span>
                 <div class="feature-title">
                     YAIBA
@@ -548,7 +556,7 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Zen Markdown Editor. Elite focus-mode writing on the edge.</div>
             </a>
-            <a href="/ragnar" class="feature-card">
+            <a href="/ragnar" class="feature-card" style="--bg-img: url('/og-images/og-image-ragnar.webp')">
                 <span class="feature-icon">🛡️</span>
                 <div class="feature-title">
                     RAGNAR
@@ -556,7 +564,7 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Legendary Slide Forge. Elite 10-page decks forged by AI in seconds.</div>
             </a>
-            <a href="/freya" class="feature-card">
+            <a href="/freya" class="feature-card" style="--bg-img: url('/og-images/og-image-freya.webp')">
                 <span class="feature-icon">🌠</span>
                 <div class="feature-title">
                     FREYA
@@ -564,7 +572,7 @@ export const HTML = `<!DOCTYPE html>
                 </div>
                 <div class="feature-tagline">Ultra-Fast Image Editor. Edge-native Unsplash integration.</div>
             </a>
-            <a href="/asgard" class="feature-card" onmouseover="const l=document.createElement('link');l.rel='prefetch';l.href='/asgard';document.head.appendChild(l);this.onmouseover=null;">
+            <a href="/asgard" class="feature-card" style="--bg-img: url('/og-images/og-image-asgard.webp')" onmouseover="const l=document.createElement('link');l.rel='prefetch';l.href='/asgard';document.head.appendChild(l);this.onmouseover=null;">
                 <span class="feature-icon">🌌</span>
                 <div class="feature-title">
                     ASGARD
@@ -576,7 +584,7 @@ export const HTML = `<!DOCTYPE html>
     </section>
 
     <div class="footer-credits">
-        Built with ⚡ by Toy & Gemini CLI
+        Built with ⚡ by Toy & Gemini CLI + DROID
     </div>
 
     <div id="modal-overlay">
@@ -694,6 +702,20 @@ export const HTML = `<!DOCTYPE html>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>NOT FOUND | PUNCHY.ME</title>
+        <meta name="description" content="This link doesn't exist or has expired. Short links on PUNCHY.ME are temporary and expire after 72 hours.">
+        
+        <!-- Open Graph / Social -->
+        <meta property="og:type" content="website">
+        <meta property="og:title" content="LINK NOT FOUND | PUNCHY.ME">
+        <meta property="og:description" content="This link doesn't exist or has expired. Return to PUNCHY.ME to forge a new one.">
+        <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+        <!-- Twitter -->
+        <meta name="twitter:card" content="summary_large_image">
+        <meta name="twitter:title" content="LINK NOT FOUND | PUNCHY.ME">
+        <meta name="twitter:description" content="This link doesn't exist or has expired. Return to PUNCHY.ME to forge a new one.">
+        <meta name="twitter:image" content="https://punchy.me/og-image.webp">
+
         <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
         <style>
         :root { --bg: #000000; --accent: #22c55e; --text: #f8fafc; --font-brand: 'Bitcount Prop Double', cursive; --font-mono: 'JetBrains Mono', monospace; }

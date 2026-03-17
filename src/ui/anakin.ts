@@ -568,7 +568,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
     <meta property="og:type" content="website">
     <meta property="og:title" id="og-title" content="AI Refined Resume | PUNCHY.ME">
     <meta property="og:description" id="og-description" content="View my professional digital resume. Part of the PUNCHY.ME ecosystem.">
-    <meta property="og:image" content="https://punchy.me/og-images/og-image-anakin.webp">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image">
@@ -916,7 +916,7 @@ export const ANAKIN_RESUME_TEMPLATE = `<!DOCTYPE html>
         </div>
 
         <div class="print-footer">
-            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI • Expires in 3 days
+            FORGED BY ANAKIN AI • POWERED BY PUNCHY.ME • Built with ⚡ by Toy & Gemini CLI + DROID • Expires in 3 days
         </div>
     </div>
 

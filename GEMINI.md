@@ -62,6 +62,9 @@ Before implementing complex roadmap items (e.g., MUSASHI blades), demand **Techn
 - Ask for 3 implementation paths.
 - Evaluate the Pros/Cons of each (Speed vs. Complexity vs. Cost).
 
+### 4. Mandatory Execution Protocol (Plan First)
+When given an instruction, the AI agent MUST ALWAYS respond with a structured plan and its understanding of the task. The agent MUST ask for explicit permission from the user BEFORE proceeding with any implementation or tool execution. THIS IS A STRICT PROTOCOL AND MUST NOT BE BROKEN.
+
 ## Approach
 - **Research:** Map the codebase and validate assumptions through empirical data.
 - **Strategy:** Formulate grounded, step-by-step plans for every implementation.

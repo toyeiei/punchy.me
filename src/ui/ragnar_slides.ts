@@ -6,6 +6,20 @@ export const RAGNAR_SLIDE_HEADER = `<!DOCTYPE html>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>{{TITLE}} | RAGNAR | PUNCHY.ME</title>
+    <meta name="description" content="View this AI-forged presentation deck. Professional, tactical, and edge-delivered via RAGNAR.">
+    
+    <!-- Open Graph / Social -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{TITLE}} | RAGNAR Presentation">
+    <meta property="og:description" content="View this AI-forged presentation deck. Professional, tactical, and edge-delivered via RAGNAR.">
+    <meta property="og:image" content="https://punchy.me/og-image.webp">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{TITLE}} | RAGNAR Presentation">
+    <meta name="twitter:description" content="View this AI-forged presentation deck. Professional, tactical, and edge-delivered via RAGNAR.">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-ragnar.webp">
+
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E🛡️%3C/text%3E%3C/svg%3E">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/reveal.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/reveal.js/4.5.0/theme/dracula.min.css">

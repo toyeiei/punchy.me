@@ -15,11 +15,11 @@ export const ASGARD_HTML = `<!DOCTYPE html>
     <meta property="og:description" content="A world-class, distraction-free desktop environment for the elite creator. Ultra-fast, edge-native, and beautifully minimal.">
     <meta property="og:url" content="https://punchy.me/asgard">
     <meta property="og:type" content="website">
-    <meta property="og:image" content="https://punchy.me/og-image-asgard.webp">
+    <meta property="og:image" content="https://punchy.me/og-images/og-image-asgard.webp">
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:title" content="ASGARD | The Supreme Workspace">
     <meta name="twitter:description" content="Maximize your focus with the Asgardian desktop launchpad. Integrated Spotlight search, Pomodoro, and Zen mode.">
-    <meta name="twitter:image" content="https://punchy.me/og-image-asgard.webp">
+    <meta name="twitter:image" content="https://punchy.me/og-images/og-image-asgard.webp">
 
     <!-- Structured Data: WebApplication -->
     <script type="application/ld+json">
