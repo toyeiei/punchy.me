@@ -361,6 +361,7 @@ export const ANAKIN_FORM_HTML = `<!DOCTYPE html>
 <body>
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
+    <div class="scan-line"></div>
     ${PUNCHY_PORTAL_HTML}
 
     <div class="container">

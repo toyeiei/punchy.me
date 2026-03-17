@@ -384,6 +384,7 @@ export const MUSASHI_FORM_HTML = `<!DOCTYPE html>
     ${PUNCHY_PORTAL_HTML}
     <div class="bg-image"></div>
     <div class="bg-overlay"></div>
+    <div class="scan-line"></div>
     
     <div class="container">
         <div class="title-container" style="display: flex; align-items: center; justify-content: center; gap: 1.5rem;">
