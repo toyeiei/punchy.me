@@ -10,7 +10,7 @@ import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
 import { handleRagnarGet, handleRagnarForge } from './handlers/ragnar';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
-import { handleThorGet, handleThorForge, handleThorQuery } from './handlers/thor';
+import { handleThorGet, handleThorForge, handleThorPdf } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
@@ -54,7 +54,7 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/ragnar/forge', handler: staticHandler(handleRagnarForge) },
 	{ method: 'POST', path: '/odin/analyze', handler: staticHandler(handleOdinAnalyze) },
 	{ method: 'POST', path: '/thor/forge', handler: staticHandler(handleThorForge) },
-	{ method: 'POST', path: '/thor/query', handler: staticHandler(handleThorQuery) },
+	{ method: 'GET', path: /^\/thor\/pdf\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handleThorPdf(req, env, path) },
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },

@@ -49,21 +49,53 @@ export interface BrowserRenderingResponse {
 	messages: string[];
 }
 
-export interface ThorMetadata {
+export interface ThorIntelligence {
+	seo: {
+		ogTitle: string | null;
+		ogDescription: string | null;
+		ogImage: string | null;
+		metaTitle: string | null;
+		metaDescription: string | null;
+		metaKeywords: string[];
+		canonical: string | null;
+		robots: string | null;
+	};
+	structure: {
+		h1Count: number;
+		h2Count: number;
+		h3Count: number;
+		h1Texts: string[];
+		linkCount: number;
+		imageCount: number;
+		notableImages: { src: string; alt: string }[];
+	};
+	content: {
+		summary: string;
+		topics: string[];
+		contentType: string;
+		targetAudience: string;
+		keyEntities: string[];
+		readingTime: number;
+		wordCount: number;
+	};
+	technical: {
+		hasSchema: boolean;
+		schemaTypes: string[];
+		ogScore: number;
+	};
+}
+
+export interface ThorReport {
 	id: string;
 	url: string;
 	title: string;
-	description: string;
-	word_count: number;
-	last_scraped: string;
-	status: 'pending' | 'processing' | 'completed' | 'error';
+	scrapedAt: string;
+	intelligence: ThorIntelligence;
 }
 
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
-	THOR_STORAGE: D1Database;
-	THOR_MEMORY: VectorizeIndex;
 	BROWSER: any; // Puppeteer/Browser binding
 	THOR_API_TOKEN?: string;
 	CLOUDFLARE_ACCOUNT_ID?: string;

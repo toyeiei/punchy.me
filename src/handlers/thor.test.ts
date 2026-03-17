@@ -1,66 +1,43 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { handleThorForge } from './thor';
+import { handleThorForge, handleThorPdf } from './thor';
 import { Env } from '../core/types';
 
 const mockFetch = vi.fn();
 (globalThis as { fetch: typeof fetch }).fetch = mockFetch as unknown as typeof fetch;
 
 function createMockEnv() {
-  const selectFirst = vi.fn().mockResolvedValue(null);
-  const upsertFirst = vi.fn().mockResolvedValue({ id: 'thor-new-id' });
-  const updateRun = vi.fn().mockResolvedValue({ success: true });
-
-  const mockD1 = {
-    prepare: vi.fn((sql: string) => {
-      if (sql.includes('SELECT id, content FROM thor_metadata')) {
-        return {
-          bind: vi.fn(() => ({ first: selectFirst }))
-        };
-      }
-
-      if (sql.includes('INSERT INTO thor_metadata')) {
-        return {
-          bind: vi.fn(() => ({ first: upsertFirst }))
-        };
-      }
-
-      if (sql.includes('UPDATE thor_metadata SET status = ?')) {
-        return {
-          bind: vi.fn(() => ({ run: updateRun }))
-        };
-      }
-
-      throw new Error(`Unexpected SQL in test: ${sql}`);
-    })
-  };
+  const kvPut = vi.fn().mockResolvedValue(undefined);
+  const kvGet = vi.fn().mockResolvedValue(null);
 
   const mockEnv: Partial<Env> = {
-    SHORT_LINKS: { get: vi.fn(), put: vi.fn() } as unknown as KVNamespace,
+    SHORT_LINKS: {
+      get: kvGet,
+      put: kvPut
+    } as unknown as KVNamespace,
     CLOUDFLARE_ACCOUNT_ID: 'test-account',
     THOR_API_TOKEN: 'test-token',
-    THOR_STORAGE: mockD1 as unknown as D1Database,
     AI: {
-      run: vi.fn().mockResolvedValue({ data: [[0.1, 0.2]] })
-    } as unknown as Ai,
-    THOR_MEMORY: {
-      upsert: vi.fn().mockResolvedValue({ success: true }),
-      deleteByIds: vi.fn().mockResolvedValue({ success: true })
-    } as unknown as VectorizeIndex
+      run: vi.fn().mockResolvedValue({
+        response: JSON.stringify({
+          title: 'Test Page',
+          seo: { ogTitle: 'Test OG Title', ogDescription: 'Test OG Desc', ogImage: null, metaTitle: 'Test Meta', metaDescription: null, metaKeywords: ['test'], canonical: null, robots: null },
+          structure: { h1Count: 1, h2Count: 2, h3Count: 0, h1Texts: ['Main Heading'], linkCount: 5, imageCount: 3, notableImages: [] },
+          content: { summary: 'This is a test page summary.', topics: ['testing', 'demo'], contentType: 'blog', targetAudience: 'Developers', keyEntities: ['Cloudflare'], readingTime: 5, wordCount: 1000 },
+          technical: { hasSchema: false, schemaTypes: [], ogScore: 66 }
+        })
+      })
+    } as unknown as Ai
   };
 
   return {
     mockEnv,
-    mockD1,
-    selectFirst,
-    upsertFirst,
-    updateRun,
-    aiRun: mockEnv.AI!.run as ReturnType<typeof vi.fn>,
-    memoryUpsert: mockEnv.THOR_MEMORY!.upsert as ReturnType<typeof vi.fn>,
-    memoryDeleteByIds: mockEnv.THOR_MEMORY!.deleteByIds as ReturnType<typeof vi.fn>,
+    kvPut,
+    kvGet,
+    aiRun: mockEnv.AI!.run as ReturnType<typeof vi.fn>
   };
 }
 
-describe('Thor Web Intelligence Handler', () => {
+describe('Thor V2 Web Intelligence Handler', () => {
   beforeEach(() => {
     mockFetch.mockReset();
     vi.clearAllMocks();
@@ -95,17 +72,14 @@ describe('Thor Web Intelligence Handler', () => {
     expect(mockFetch).not.toHaveBeenCalled();
   });
 
-  it('should persist canonical ids, resolve relative links, and batch embeddings', async () => {
-    const { mockEnv, upsertFirst, aiRun, memoryUpsert, memoryDeleteByIds } = createMockEnv();
+  it('should scrape page, analyze with AI, and return structured intelligence', async () => {
+    const { mockEnv, aiRun, kvPut } = createMockEnv();
     const mockMarkdown = `---
 title: "Cloudflare Docs"
 description: "Build on the edge."
 ---
 # Welcome to Cloudflare
-${'Workers on the edge. '.repeat(90)}
-[Docs](/docs)
-[Docs](/docs)
-[API](https://api.cloudflare.com)
+Workers on the edge. Fast, secure, scalable.
 `;
 
     mockFetch.mockResolvedValueOnce({
@@ -115,9 +89,6 @@ ${'Workers on the edge. '.repeat(90)}
         result: { markdown: mockMarkdown }
       })
     });
-
-    upsertFirst.mockResolvedValueOnce({ id: 'thor-canonical-id' });
-    aiRun.mockResolvedValueOnce({ data: [[0.1, 0.2], [0.3, 0.4]] });
 
     const request = new Request('https://punchy.me/thor', {
       method: 'POST',
@@ -129,33 +100,43 @@ ${'Workers on the edge. '.repeat(90)}
     expect(response.status).toBe(200);
 
     const data = await response.json() as {
-      title: string;
-      links: string[];
       id: string;
-      status: string;
-      storage: { persisted: boolean };
-      intelligence: { semantic: boolean; chunks: number };
+      url: string;
+      title: string;
+      intelligence: {
+        seo: { ogTitle: string };
+        content: { summary: string; topics: string[] };
+        technical: { ogScore: number };
+      };
     };
 
-    expect(data.title).toBe('Cloudflare Docs');
-    expect(data.links).toEqual([
-      'https://developers.cloudflare.com/docs',
-      'https://api.cloudflare.com/'
-    ]);
-    expect(data.id).toBe('thor-canonical-id');
-    expect(data.status).toBe('completed');
-    expect(data.storage.persisted).toBe(true);
-    expect(data.intelligence.semantic).toBe(true);
-    expect(data.intelligence.chunks).toBe(2);
+    expect(data.id).toBeDefined();
+    expect(data.id.length).toBe(8);
+    expect(data.url).toBe('https://developers.cloudflare.com');
+    expect(data.title).toBeDefined();
+    expect(data.intelligence).toBeDefined();
+    expect(data.intelligence.content.summary).toContain('test page');
+    expect(data.intelligence.content.topics).toContain('testing');
+    expect(data.intelligence.technical.ogScore).toBe(66);
 
-    expect(aiRun).toHaveBeenCalledWith('@cf/baai/bge-small-en-v1.5', {
-      text: expect.arrayContaining([expect.any(String), expect.any(String)])
-    });
-    expect(memoryUpsert).toHaveBeenCalledWith([
-      expect.objectContaining({ id: 'thor-canonical-id-c0' }),
-      expect.objectContaining({ id: 'thor-canonical-id-c1' })
-    ]);
-    expect(memoryDeleteByIds).not.toHaveBeenCalled();
+    // Verify AI was called with Mistral
+    expect(aiRun).toHaveBeenCalledWith('@cf/mistralai/mistral-small-3.1-24b-instruct', expect.objectContaining({
+      messages: expect.arrayContaining([
+        expect.objectContaining({ role: 'system' }),
+        expect.objectContaining({ role: 'user' })
+      ]),
+      max_tokens: 1500,
+      temperature: 0.2
+    }));
+
+    // Verify report was cached for PDF access
+    expect(kvPut).toHaveBeenCalledWith(
+      expect.stringContaining('thor:'),
+      expect.any(String),
+      expect.objectContaining({ expirationTtl: 3600 })
+    );
+
+    // Verify browser rendering was called
     expect(mockFetch).toHaveBeenCalledWith(
       expect.stringContaining('test-account/browser-rendering/markdown'),
       expect.objectContaining({
@@ -166,55 +147,36 @@ ${'Workers on the edge. '.repeat(90)}
     );
   });
 
-  it('should reuse the existing canonical id and remove stale vectors on re-scrape', async () => {
-    const { mockEnv, selectFirst, upsertFirst, aiRun, memoryDeleteByIds } = createMockEnv();
-    selectFirst.mockResolvedValueOnce({
-      id: 'thor-existing-id',
-      content: 'legacy '.repeat(1400)
-    });
-    upsertFirst.mockResolvedValueOnce({ id: 'thor-existing-id' });
-    aiRun.mockResolvedValueOnce({ data: [[0.9, 0.1]] });
+  it('should handle browser rendering failures gracefully', async () => {
+    const { mockEnv, aiRun } = createMockEnv();
 
     mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        success: true,
-        result: { markdown: '# Smaller page\nShort content now.' }
-      })
+      ok: false,
+      text: async () => 'Internal Server Error'
     });
 
     const request = new Request('https://punchy.me/thor', {
       method: 'POST',
-      body: JSON.stringify({ url: 'https://example.com/docs' }),
+      body: JSON.stringify({ url: 'https://example.com' }),
       headers: { 'Content-Type': 'application/json' }
     });
 
     const response = await handleThorForge(request, mockEnv as Env);
-    expect(response.status).toBe(200);
-    const data = await response.json() as { id: string };
-    expect(data.id).toBe('thor-existing-id');
-    expect(memoryDeleteByIds).toHaveBeenCalledWith([
-      'thor-existing-id-c1',
-      'thor-existing-id-c2',
-      'thor-existing-id-c3',
-      'thor-existing-id-c4',
-      'thor-existing-id-c5',
-      'thor-existing-id-c6',
-      'thor-existing-id-c7',
-      'thor-existing-id-c8',
-      'thor-existing-id-c9'
-    ]);
+    expect(response.status).toBe(502);
+    const data = await response.json() as { error: string };
+    expect(data.error).toContain('Browser rendering');
+    expect(aiRun).not.toHaveBeenCalled();
   });
 
-  it('should return partial status and skip vectorization when D1 persistence fails', async () => {
-    const { mockEnv, upsertFirst, aiRun, memoryUpsert } = createMockEnv();
-    upsertFirst.mockRejectedValueOnce(new Error('D1 unavailable'));
+  it('should handle AI analysis failures gracefully', async () => {
+    const { mockEnv, aiRun } = createMockEnv();
+    aiRun.mockRejectedValueOnce(new Error('AI service unavailable'));
 
     mockFetch.mockResolvedValueOnce({
       ok: true,
       json: async () => ({
         success: true,
-        result: { markdown: '# Cloudflare\nPersistent storage failed.' }
+        result: { markdown: '# Test Page\nSome content here.' }
       })
     });
 
@@ -225,54 +187,81 @@ ${'Workers on the edge. '.repeat(90)}
     });
 
     const response = await handleThorForge(request, mockEnv as Env);
-    expect(response.status).toBe(200);
-    const data = await response.json() as {
-      id: string | null;
-      status: string;
-      storage: { persisted: boolean };
-      intelligence: { semantic: boolean };
-    };
-
-    expect(data.id).toBeNull();
-    expect(data.status).toBe('partial');
-    expect(data.storage.persisted).toBe(false);
-    expect(data.intelligence.semantic).toBe(false);
-    expect(aiRun).not.toHaveBeenCalled();
-    expect(memoryUpsert).not.toHaveBeenCalled();
+    expect(response.status).toBe(502);
+    const data = await response.json() as { error: string };
+    expect(data.error).toContain('analyze');
   });
 
-  it('should return partial status when vectorization fails', async () => {
-    const { mockEnv, memoryUpsert } = createMockEnv();
-    memoryUpsert.mockRejectedValueOnce(new Error('Vectorize unavailable'));
+  it('should return PDF report when valid ID provided', async () => {
+    const { mockEnv, kvGet } = createMockEnv();
 
-    mockFetch.mockResolvedValueOnce({
-      ok: true,
-      json: async () => ({
-        success: true,
-        result: { markdown: '# Cloudflare\nVector indexing failed.' }
-      })
-    });
+    const cachedReport = {
+      id: 'test1234',
+      url: 'https://example.com',
+      title: 'Test Page',
+      scrapedAt: new Date().toISOString(),
+      intelligence: {
+        seo: { ogTitle: null, ogDescription: null, ogImage: null, metaTitle: 'Test', metaDescription: null, metaKeywords: [], canonical: null, robots: null },
+        structure: { h1Count: 1, h2Count: 0, h3Count: 0, h1Texts: ['Test'], linkCount: 0, imageCount: 0, notableImages: [] },
+        content: { summary: 'Test summary', topics: [], contentType: 'other', targetAudience: 'Unknown', keyEntities: [], readingTime: 1, wordCount: 100 },
+        technical: { hasSchema: false, schemaTypes: [], ogScore: 0 }
+      }
+    };
 
+    kvGet.mockResolvedValueOnce(JSON.stringify(cachedReport));
+
+    const request = new Request('https://punchy.me/thor/pdf/test1234');
+    const response = await handleThorPdf(request, mockEnv as Env, '/thor/pdf/test1234');
+
+    expect(response.status).toBe(200);
+    const html = await response.text();
+    expect(html).toContain('THOR INTELLIGENCE REPORT');
+    expect(html).toContain('Test Page');
+    expect(html).toContain('example.com');
+  });
+
+  it('should reject invalid PDF IDs', async () => {
+    const { mockEnv } = createMockEnv();
+
+    const request = new Request('https://punchy.me/thor/pdf/abc');
+    await expect(handleThorPdf(request, mockEnv as Env, '/thor/pdf/abc')).rejects.toThrow('Invalid report ID');
+  });
+
+  it('should return error for expired PDF reports', async () => {
+    const { mockEnv, kvGet } = createMockEnv();
+    kvGet.mockResolvedValueOnce(null);
+
+    const request = new Request('https://punchy.me/thor/pdf/notfound');
+    await expect(handleThorPdf(request, mockEnv as Env, '/thor/pdf/notfound')).rejects.toThrow('not found');
+  });
+
+  it('should reject URLs with embedded credentials', async () => {
+    const { mockEnv } = createMockEnv();
+    // Test URL format that should be rejected for security reasons
+    const maliciousUrl = 'https://' + 'admin:s3cr3t' + '@example.com/secret';
     const request = new Request('https://punchy.me/thor', {
       method: 'POST',
-      body: JSON.stringify({ url: 'https://example.com/vector' }),
+      body: JSON.stringify({ url: maliciousUrl }),
       headers: { 'Content-Type': 'application/json' }
     });
 
     const response = await handleThorForge(request, mockEnv as Env);
-    expect(response.status).toBe(200);
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error).toContain('credentials');
+  });
 
-    const data = await response.json() as {
-      id: string;
-      status: string;
-      storage: { persisted: boolean };
-      intelligence: { semantic: boolean; chunks: number };
-    };
+  it('should reject .local and .internal domains', async () => {
+    const { mockEnv } = createMockEnv();
+    const request = new Request('https://punchy.me/thor', {
+      method: 'POST',
+      body: JSON.stringify({ url: 'https://myapp.local/dashboard' }),
+      headers: { 'Content-Type': 'application/json' }
+    });
 
-    expect(data.id).toBe('thor-new-id');
-    expect(data.status).toBe('partial');
-    expect(data.storage.persisted).toBe(true);
-    expect(data.intelligence.semantic).toBe(false);
-    expect(data.intelligence.chunks).toBe(0);
+    const response = await handleThorForge(request, mockEnv as Env);
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error.toLowerCase()).toContain('private');
   });
 });

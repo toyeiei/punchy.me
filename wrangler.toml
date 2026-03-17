@@ -18,14 +18,5 @@ id = "e5c2bbb9a5f04d409e42350fc025ea2d"
 binding = "AI"
 remote = true
 
-[[d1_databases]]
-binding = "THOR_STORAGE"
-database_name = "THOR_STORAGE"
-database_id = "your-d1-id-placeholder"
-
-[[vectorize]]
-binding = "THOR_MEMORY"
-index_name = "THOR_MEMORY"
-
 [browser]
 binding = "BROWSER"

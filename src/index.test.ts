@@ -1121,13 +1121,14 @@ Hope this helps!`
     });
   });
 
-  describe("THOR Feature (Web Intelligence)", () => {
+  describe("THOR Feature (Web Intelligence V2)", () => {
     it("serves the THOR intelligence page", async () => {
       const res = await SELF.fetch("http://localhost/thor");
       expect(res.status).toBe(200);
       const html = await res.text();
       expect(html).toContain("THOR");
       expect(html).toContain("Web Intelligence");
+      expect(html).toContain("One-click analysis");
     });
 
     it("rejects bot submissions on THOR forge via honeypot", async () => {
@@ -1148,7 +1149,7 @@ Hope this helps!`
         if (typeof input === 'string' && input.includes('/browser-rendering/markdown')) {
           return new Response(JSON.stringify({
             success: true,
-            result: { markdown: '# THOR\nEdge intelligence online.' }
+            result: { markdown: '# THOR V2\nSimple but mighty intelligence.' }
           }), {
             status: 200,
             headers: { 'Content-Type': 'application/json' }
@@ -1157,7 +1158,15 @@ Hope this helps!`
         return originalFetch(input, init);
       });
 
-      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({ data: [[0.1, 0.2]] } as never);
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({
+          title: 'THOR V2',
+          seo: { ogTitle: null, ogDescription: null, ogImage: null, metaTitle: 'THOR', metaDescription: null, metaKeywords: [], canonical: null, robots: null },
+          structure: { h1Count: 1, h2Count: 0, h3Count: 0, h1Texts: ['THOR V2'], linkCount: 0, imageCount: 0, notableImages: [] },
+          content: { summary: 'Simple but mighty intelligence.', topics: ['intelligence'], contentType: 'other', targetAudience: 'Developers', keyEntities: [], readingTime: 1, wordCount: 50 },
+          technical: { hasSchema: false, schemaTypes: [], ogScore: 0 }
+        })
+      } as never);
       const ip = '7.7.7.7';
 
       for (let i = 0; i < 5; i++) {
