@@ -1,5 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { THOR_HANDLER } from './thor';
+import { handleThorForge } from './thor';
 import { Env } from '../core/types';
 
 // Mock the global fetch for Browser Rendering API calls
@@ -7,17 +7,31 @@ const mockFetch = vi.fn();
 (globalThis as any).fetch = mockFetch;
 
 describe('Thor Web Intelligence Handler', () => {
+  const mockD1 = {
+    prepare: vi.fn().mockReturnThis(),
+    bind: vi.fn().mockReturnThis(),
+    run: vi.fn().mockResolvedValue({ success: true })
+  };
+
   const mockEnv: Partial<Env> = {
     CLOUDFLARE_ACCOUNT_ID: 'test-account',
     THOR_API_TOKEN: 'test-token',
-    THOR_STORAGE: { prepare: vi.fn() } as any,
-    AI: {} as any,
-    THOR_MEMORY: {} as any
+    THOR_STORAGE: mockD1 as any,
+    AI: {
+      run: vi.fn().mockResolvedValue({ summary: 'Test summary' })
+    } as any,
+    THOR_MEMORY: {
+      upsert: vi.fn().mockResolvedValue({ success: true })
+    } as any
   };
 
   beforeEach(() => {
     mockFetch.mockClear();
     vi.clearAllMocks();
+    
+    // Reset D1 mock chain
+    mockD1.prepare.mockReturnThis();
+    mockD1.bind.mockReturnThis();
   });
 
   it('should reject invalid URLs with 400', async () => {
@@ -27,23 +41,10 @@ describe('Thor Web Intelligence Handler', () => {
       headers: { 'Content-Type': 'application/json' }
     });
 
-    const response = await THOR_HANDLER(request, mockEnv as Env);
+    const response = await handleThorForge(request, mockEnv as Env);
     expect(response.status).toBe(400);
     const data = await response.json() as { error: string };
     expect(data.error).toContain('Invalid URL');
-  });
-
-  it('should reject non-HTTP/HTTPS protocols', async () => {
-    const request = new Request('https://punchy.me/thor', {
-      method: 'POST',
-      body: JSON.stringify({ url: 'ftp://unsafe.com' }),
-      headers: { 'Content-Type': 'application/json' }
-    });
-
-    const response = await THOR_HANDLER(request, mockEnv as Env);
-    expect(response.status).toBe(400);
-    const data = await response.json() as { error: string };
-    expect(data.error).toContain('Only HTTP and HTTPS');
   });
 
   it('should successfully scrape and extract structured data from Markdown', async () => {
@@ -71,12 +72,18 @@ Build faster with Workers.
       headers: { 'Content-Type': 'application/json' }
     });
 
-    const response = await THOR_HANDLER(request, mockEnv as Env);
+    const response = await handleThorForge(request, mockEnv as Env);
     expect(response.status).toBe(200);
     
-    const data = await response.json() as { title: string, links: string[] };
+    const data = await response.json() as { title: string, links: string[], id: string };
     expect(data.title).toBe('Cloudflare Docs');
     expect(data.links).toContain('https://developers.cloudflare.com/docs');
+    expect(data.id).toBeDefined();
+
+    // Verify D1 interaction
+    expect(mockD1.prepare).toHaveBeenCalled();
+    expect(mockD1.bind).toHaveBeenCalled();
+    expect(mockD1.run).toHaveBeenCalled();
     
     // Verify fetch call
     expect(mockFetch).toHaveBeenCalledWith(

@@ -10,6 +10,7 @@ import { handleYaibaGet, handleYaibaPublish } from './handlers/yaiba';
 import { handleRagnarGet, handleRagnarForge } from './handlers/ragnar';
 import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
+import { handleThorGet, handleThorForge } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
@@ -42,6 +43,7 @@ const ROUTES: Route[] = [
 	{ method: 'GET', path: '/ragnar', handler: pureHandler(handleRagnarGet) },
 	{ method: 'GET', path: '/odin', handler: pureHandler(handleOdinGet) },
 	{ method: 'GET', path: '/freya', handler: pureHandler(handleFreyaGet) },
+	{ method: 'GET', path: '/thor', handler: pureHandler(handleThorGet) },
 	
 	// Tool APIs (POST) - More specific routes MUST come before general ones
 	{ method: 'POST', path: '/bazuka', handler: staticHandler(handleBazukaPost) },
@@ -51,6 +53,7 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/yaiba/publish', handler: staticHandler(handleYaibaPublish) },
 	{ method: 'POST', path: '/ragnar/forge', handler: staticHandler(handleRagnarForge) },
 	{ method: 'POST', path: '/odin/analyze', handler: staticHandler(handleOdinAnalyze) },
+	{ method: 'POST', path: '/thor/forge', handler: staticHandler(handleThorForge) },
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },

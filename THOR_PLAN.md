@@ -21,19 +21,19 @@ To build a simple, ultra-fast solution using Cloudflare Browser AI that scrapes 
 ## Implementation Protocol (The Thor Forge)
 
 ### Phase 1: The Blueprint
-- [ ] Define the `THOR_STORAGE` KV/D1 schema.
-- [ ] Map the UI for the Thor control center (Tactical HUD).
-- [ ] Implement a stateless scraper service using the Browser Rendering `/markdown` REST API.
+- [x] Define the `THOR_STORAGE` KV/D1 schema.
+- [x] Map the UI for the Thor control center (Tactical HUD).
+- [x] Implement a stateless scraper service using the Browser Rendering `/markdown` REST API.
 
 ### Phase 2: The Vanguard (TDD)
-- [ ] Create `src/handlers/thor.test.ts`.
-- [ ] Mock the `/browser-rendering/markdown` API responses.
-- [ ] Add tests for link discovery within the Markdown output.
+- [x] Create `src/handlers/thor.test.ts`.
+- [x] Mock the `/browser-rendering/markdown` API responses.
+- [x] Add tests for link discovery within the Markdown output.
 
 ### Phase 3: The Forge (Implementation)
-- [ ] `src/handlers/thor.ts`: Core scraping and recursive discovery logic using the REST API.
-- [ ] `src/services/intelligence.ts`: AI summarization and embedding pipeline.
-- [ ] `src/ui/thor.ts`: Matte Black tactical interface for the Thor tool.
+- [x] `src/handlers/thor.ts`: Core scraping and recursive discovery logic using the REST API.
+- [x] `src/services/intelligence.ts`: AI summarization and embedding pipeline.
+- [x] `src/ui/thor.ts`: Matte Black tactical interface for the Thor tool.
 
 ### Phase 4: The Crucible (Validation)
 - [ ] `npm test` -> 100% pass.
