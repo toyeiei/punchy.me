@@ -29,6 +29,98 @@ const createRequest = (body?: unknown): Request => {
 	});
 };
 
+describe('ZEUS Realism Suite (NEW - should fail before implementation)', () => {
+	let env: Env;
+	beforeEach(() => { env = createMockEnv(); vi.clearAllMocks(); });
+
+	it('should include ruinProbability in response', async () => {
+		const request = createRequest({
+			age: 58, income: 100000, savingsRate: 10, currentSavings: 300000,
+			returnRate: 5, inflationRate: 3, retirementTarget: 10000000,
+			salaryGrowth: 0, crisisEvents: 0,
+			monthlyExpenses: 80000, healthcareBase: 10000, healthcareGrowth: 0.08, lifeEvents: [],
+		});
+		const response = await handleZeusSimulate(request, env);
+		expect(response.status).toBe(200);
+		const data = await response.json() as { ruinProbability: number };
+		expect(data.ruinProbability).toBeDefined();
+		expect(data.ruinProbability).toBeGreaterThanOrEqual(0);
+		expect(data.ruinProbability).toBeLessThanOrEqual(1);
+	});
+
+	it('high monthly expenses should raise ruin probability vs no expenses', async () => {
+		const base = { age: 55, income: 200000, savingsRate: 20, currentSavings: 1000000, returnRate: 6, inflationRate: 3, retirementTarget: 5000000, salaryGrowth: 0, crisisEvents: 0 };
+		const [r1, r2] = await Promise.all([
+			handleZeusSimulate(createRequest({ ...base, monthlyExpenses: 0, healthcareBase: 0, healthcareGrowth: 0, lifeEvents: [] }), env),
+			handleZeusSimulate(createRequest({ ...base, monthlyExpenses: 80000, healthcareBase: 0, healthcareGrowth: 0, lifeEvents: [] }), env),
+		]);
+		const [d1, d2] = await Promise.all([r1.json(), r2.json()]) as [{ ruinProbability: number }, { ruinProbability: number }];
+		expect(d2.ruinProbability).toBeGreaterThanOrEqual(d1.ruinProbability);
+	});
+
+	it('healthcare escalator should reduce median final wealth', async () => {
+		const base = { age: 50, income: 150000, savingsRate: 20, currentSavings: 800000, returnRate: 6, inflationRate: 3, retirementTarget: 3000000, salaryGrowth: 0, crisisEvents: 0, monthlyExpenses: 30000, lifeEvents: [] };
+		const [r1, r2] = await Promise.all([
+			handleZeusSimulate(createRequest({ ...base, healthcareBase: 0, healthcareGrowth: 0 }), env),
+			handleZeusSimulate(createRequest({ ...base, healthcareBase: 10000, healthcareGrowth: 0.10 }), env),
+		]);
+		const [d1, d2] = await Promise.all([r1.json(), r2.json()]) as [{ medianFinal: number }, { medianFinal: number }];
+		expect(d2.medianFinal).toBeLessThan(d1.medianFinal);
+	});
+
+	it('life event should reduce median final wealth', async () => {
+		const base = { age: 28, income: 80000, savingsRate: 20, currentSavings: 100000, returnRate: 7, inflationRate: 3, retirementTarget: 5000000, salaryGrowth: 5, crisisEvents: 0, monthlyExpenses: 0, healthcareBase: 0, healthcareGrowth: 0 };
+		const [r1, r2] = await Promise.all([
+			handleZeusSimulate(createRequest({ ...base, lifeEvents: [] }), env),
+			handleZeusSimulate(createRequest({ ...base, lifeEvents: [{ age: 35, amount: 3000000, label: 'Buy House' }] }), env),
+		]);
+		const [d1, d2] = await Promise.all([r1.json(), r2.json()]) as [{ medianFinal: number }, { medianFinal: number }];
+		expect(d2.medianFinal).toBeLessThan(d1.medianFinal);
+	});
+
+	it('old API (no new fields) stays backward-compatible with ruinProbability=0', async () => {
+		const request = createRequest({ age: 35, income: 100000, savingsRate: 25, currentSavings: 50000, returnRate: 7, inflationRate: 3, retirementTarget: 1000000, salaryGrowth: 5, crisisEvents: 0 });
+		const response = await handleZeusSimulate(request, env);
+		expect(response.status).toBe(200);
+		const data = await response.json() as { ruinProbability: number };
+		expect(data.ruinProbability).toBe(0);
+	});
+
+	it('should reject negative monthlyExpenses', async () => {
+		const request = createRequest({ age: 35, income: 100000, savingsRate: 25, currentSavings: 50000, returnRate: 7, inflationRate: 3, retirementTarget: 1000000, salaryGrowth: 5, crisisEvents: 0, monthlyExpenses: -5000, healthcareBase: 0, healthcareGrowth: 0, lifeEvents: [] });
+		const response = await handleZeusSimulate(request, env);
+		expect(response.status).toBe(400);
+	});
+
+	it('should reject more than 4 life events', async () => {
+		const request = createRequest({ age: 30, income: 100000, savingsRate: 20, currentSavings: 0, returnRate: 7, inflationRate: 3, retirementTarget: 1000000, salaryGrowth: 5, crisisEvents: 0, monthlyExpenses: 0, healthcareBase: 0, healthcareGrowth: 0, lifeEvents: [
+			{ age: 28, amount: 500000, label: 'Wedding' },
+			{ age: 32, amount: 3000000, label: 'House' },
+			{ age: 35, amount: 800000, label: 'Car' },
+			{ age: 40, amount: 2000000, label: 'Kids' },
+			{ age: 45, amount: 1000000, label: 'Fifth' },
+		]});
+		const response = await handleZeusSimulate(request, env);
+		expect(response.status).toBe(400);
+	});
+
+	it('should reject life event with invalid age', async () => {
+		const request = createRequest({ age: 30, income: 100000, savingsRate: 20, currentSavings: 0, returnRate: 7, inflationRate: 3, retirementTarget: 1000000, salaryGrowth: 5, crisisEvents: 0, monthlyExpenses: 0, healthcareBase: 0, healthcareGrowth: 0, lifeEvents: [{ age: 200, amount: 500000, label: 'Invalid' }] });
+		const response = await handleZeusSimulate(request, env);
+		expect(response.status).toBe(400);
+	});
+
+	it('should include new input controls in page HTML', async () => {
+		const response = await handleZeusGet();
+		const html = await response.text();
+		expect(html).toContain('id="monthlyExpenses"');
+		expect(html).toContain('id="healthcareBase"');
+		expect(html).toContain('id="healthcareGrowth"');
+		expect(html).toContain('lifeEvents');
+		expect(html).toContain('Ruin Probability');
+	});
+});
+
 describe('ZEUS Handler', () => {
 	let env: Env;
 

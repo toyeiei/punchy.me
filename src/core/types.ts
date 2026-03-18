@@ -128,6 +128,12 @@ export interface MarcusSession {
 	createdAt: number;
 }
 
+export interface LifeEvent {
+	age: number;
+	amount: number;
+	label: string;
+}
+
 export interface ZeusSimulation {
 	type: 'zeus';
 	inputs: {
@@ -140,6 +146,10 @@ export interface ZeusSimulation {
 		retirementTarget: number;
 		salaryGrowth: number;
 		crisisEvents: number;
+		monthlyExpenses: number;
+		healthcareBase: number;
+		healthcareGrowth: number;
+		lifeEvents: LifeEvent[];
 	};
 	results: {
 		iterations: number[][];
@@ -149,6 +159,7 @@ export interface ZeusSimulation {
 		p90: number;
 		successProbability: number;
 		medianYearsToFire: number;
+		ruinProbability: number;
 		successProbabilityNoCrisis?: number;
 		crisisYears?: number[];
 	};

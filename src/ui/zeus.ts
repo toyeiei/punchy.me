@@ -415,6 +415,36 @@ export const ZEUS_HTML = `<!DOCTYPE html>
             to { opacity: 1; transform: translateY(0); }
         }
         .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        .event-preset-btn {
+            background: rgba(167, 139, 250, 0.1);
+            border: 1px solid rgba(167, 139, 250, 0.3);
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 0.7rem;
+            color: #a78bfa;
+            cursor: pointer;
+            font-family: var(--font-mono);
+            transition: all 0.2s;
+        }
+        .event-preset-btn:hover {
+            background: rgba(167, 139, 250, 0.2);
+            border-color: rgba(167, 139, 250, 0.5);
+        }
+        .event-remove-btn {
+            background: rgba(239, 68, 68, 0.15);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            border-radius: 4px;
+            padding: 3px 8px;
+            cursor: pointer;
+            color: #ef4444;
+            font-size: 0.7rem;
+            font-family: var(--font-mono);
+            flex-shrink: 0;
+        }
+        .stat-box.danger .stat-value { color: #ef4444; }
+        .stat-box.warning .stat-value { color: #f97316; }
+        .stat-box.safe .stat-value { color: #22c55e; }
     </style>
 </head>
 <body>
@@ -507,11 +537,50 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                     </div>
                 </div>
 
+                <!-- Retirement Spending Section -->
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label style="color: #22c55e;">Retirement Spending</label>
+                    <div class="input-group">
+                        <label>Monthly Expenses After Retirement (฿) <span style="font-size:0.75em;color:#94a3b8;">(age 60+)</span></label>
+                        <input type="number" id="monthlyExpenses" value="30000" min="0" step="1000">
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem;">Withdrawn from savings each month after retiring</div>
+                    </div>
+                    <div class="input-group">
+                        <div class="slider-header">
+                            <label style="margin-bottom: 0;">Healthcare/Month at Age 60 (฿)</label>
+                            <span class="slider-value" id="healthcareBase-value">฿3,000</span>
+                        </div>
+                        <input type="range" id="healthcareBase" min="0" max="20000" value="3000" step="500" oninput="updateHealthcareSlider()">
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem;">Escalates with age — doubles roughly every 10 yrs</div>
+                    </div>
+                    <div class="input-group">
+                        <div class="slider-header">
+                            <label style="margin-bottom: 0;">Healthcare Cost Growth/Year</label>
+                            <span class="slider-value" id="healthcareGrowth-value">7%</span>
+                        </div>
+                        <input type="range" id="healthcareGrowth" min="0" max="15" value="7" step="0.5" oninput="updateSlider('healthcareGrowth', '%')">
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem;">Thailand medical inflation ~7–10%/yr</div>
+                    </div>
+                </div>
+
+                <!-- Life Events Section -->
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label style="color: #a78bfa;">Life Events</label>
+                    <div style="font-size: 0.65rem; color: var(--text-dim); margin-bottom: 0.75rem;">One-time costs at specific ages — max 4 events</div>
+                    <div id="life-events-list"></div>
+                    <div style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button class="event-preset-btn" onclick="addLifeEvent(30, 500000, 'Wedding')">+ Wedding</button>
+                        <button class="event-preset-btn" onclick="addLifeEvent(35, 3000000, 'Buy House')">+ House</button>
+                        <button class="event-preset-btn" onclick="addLifeEvent(33, 800000, 'Buy Car')">+ Car</button>
+                        <button class="event-preset-btn" onclick="addLifeEvent(28, 2000000, 'Children')">+ Children</button>
+                    </div>
+                </div>
+
                 <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 0.75rem; margin-top: 1rem; font-size: 0.7rem; color: var(--text-dim);">
-                    <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">You'll see:</div>
+                    <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">You will see:</div>
                     <div>• 1000 simulated futures</div>
                     <div>• Probability of reaching FIRE</div>
-                    <div>• Years until retirement</div>
+                    <div>• Ruin probability in retirement</div>
                 </div>
 
                 <button class="btn-simulate" id="simulate-btn" onclick="runSimulation()">Run 1000 Simulations</button>
@@ -560,12 +629,61 @@ export const ZEUS_HTML = `<!DOCTYPE html>
     <script>
         let simulationChart = null;
         let distributionChart = null;
+        let lifeEvents = [];
 
-        window.updateSlider = function(id, suffix = '') {
+        window.updateSlider = function(id, suffix) {
+            suffix = suffix || '';
             const slider = document.getElementById(id);
             const display = document.getElementById(id + '-value');
             display.textContent = slider.value + suffix;
         };
+
+        window.updateHealthcareSlider = function() {
+            const val = parseInt(document.getElementById('healthcareBase').value);
+            document.getElementById('healthcareBase-value').textContent = '฿' + val.toLocaleString();
+        };
+
+        window.addLifeEvent = function(defaultAge, defaultAmount, defaultLabel) {
+            if (lifeEvents.length >= 4) {
+                alert('Maximum 4 life events allowed.');
+                return;
+            }
+            lifeEvents.push({ age: defaultAge, amount: defaultAmount, label: defaultLabel });
+            renderLifeEvents();
+        };
+
+        window.removeLifeEvent = function(idx) {
+            lifeEvents.splice(idx, 1);
+            renderLifeEvents();
+        };
+
+        window.updateLifeEvent = function(idx, field, value) {
+            if (field === 'age' || field === 'amount') {
+                lifeEvents[idx][field] = parseFloat(value) || 0;
+            } else {
+                lifeEvents[idx][field] = value;
+            }
+        };
+
+        function renderLifeEvents() {
+            const container = document.getElementById('life-events-list');
+            container.innerHTML = '';
+            lifeEvents.forEach(function(event, idx) {
+                const row = document.createElement('div');
+                row.style.cssText = 'display:flex;gap:0.4rem;align-items:center;margin-bottom:0.5rem;flex-wrap:wrap;';
+                row.innerHTML =
+                    '<span style="color:var(--text-dim);font-size:0.7rem;flex-shrink:0;">Age</span>' +
+                    '<input type="number" value="' + event.age + '" min="18" max="80" ' +
+                    'style="width:55px;" onchange="updateLifeEvent(' + idx + ', &quot;age&quot;, this.value)">' +
+                    '<input type="text" value="' + event.label + '" placeholder="Label" ' +
+                    'style="flex:1;min-width:80px;" onchange="updateLifeEvent(' + idx + ', &quot;label&quot;, this.value)">' +
+                    '<span style="color:var(--accent-secondary);font-size:0.75rem;flex-shrink:0;">฿</span>' +
+                    '<input type="number" value="' + event.amount + '" min="0" step="50000" ' +
+                    'style="width:110px;" onchange="updateLifeEvent(' + idx + ', &quot;amount&quot;, this.value)">' +
+                    '<button class="event-remove-btn" onclick="removeLifeEvent(' + idx + ')">×</button>';
+                container.appendChild(row);
+            });
+        }
 
         // Initialize displays
         updateSlider('age');
@@ -574,6 +692,8 @@ export const ZEUS_HTML = `<!DOCTYPE html>
         updateSlider('inflationRate', '%');
         updateSlider('salaryGrowth', '%');
         updateSlider('crisisEvents');
+        updateSlider('healthcareGrowth', '%');
+        updateHealthcareSlider();
 
         window.runSimulation = async function() {
             const btn = document.getElementById('simulate-btn');
@@ -589,6 +709,10 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 retirementTarget: parseFloat(document.getElementById('retirementTarget').value) || 0,
                 salaryGrowth: parseFloat(document.getElementById('salaryGrowth').value) / 100,
                 crisisEvents: parseInt(document.getElementById('crisisEvents').value) || 0,
+                monthlyExpenses: parseFloat(document.getElementById('monthlyExpenses').value) || 0,
+                healthcareBase: parseFloat(document.getElementById('healthcareBase').value) || 0,
+                healthcareGrowth: parseFloat(document.getElementById('healthcareGrowth').value) / 100,
+                lifeEvents: lifeEvents,
             };
 
             if (inputs.income <= 0) {
@@ -630,16 +754,19 @@ export const ZEUS_HTML = `<!DOCTYPE html>
             const statsGrid = document.getElementById('stats-grid');
             statsGrid.innerHTML = '';
             
+            const ruinPct = (data.ruinProbability * 100).toFixed(1) + '%';
+            const ruinClass = data.ruinProbability > 0.3 ? 'danger' : (data.ruinProbability > 0.1 ? 'warning' : 'safe');
             const stats = [
-                { value: formatCurrency(data.medianFinal), label: 'Median Outcome' },
-                { value: formatCurrency(data.p10), label: '10th Percentile' },
-                { value: formatCurrency(data.p90), label: '90th Percentile' },
-                { value: data.medianYearsToFire + ' yrs', label: 'Years to FIRE' }
+                { value: formatCurrency(data.medianFinal), label: 'Median Outcome', cls: '' },
+                { value: formatCurrency(data.p10), label: '10th Percentile', cls: '' },
+                { value: formatCurrency(data.p90), label: '90th Percentile', cls: '' },
+                { value: data.medianYearsToFire + ' yrs', label: 'Years to FIRE', cls: '' },
+                { value: ruinPct, label: 'Ruin Probability', cls: ruinClass },
             ];
-            
-            stats.forEach((stat, i) => {
+
+            stats.forEach(function(stat, i) {
                 const box = document.createElement('div');
-                box.className = 'stat-box fade-in-up';
+                box.className = 'stat-box fade-in-up' + (stat.cls ? ' ' + stat.cls : '');
                 box.style.animationDelay = (i * 0.1) + 's';
                 box.innerHTML = '<div class="stat-value">' + stat.value + '</div><div class="stat-label">' + stat.label + '</div>';
                 statsGrid.appendChild(box);
@@ -736,10 +863,33 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 label: 'Target'
             };
 
-            // Combine: faded paths, median, crisis markers (if any), target
-            const datasets = crisisMarkerDataset 
-                ? [...fadedPaths, medianDataset, crisisMarkerDataset, targetDataset]
-                : [...fadedPaths, medianDataset, targetDataset];
+            // Life event markers (purple triangles at event ages)
+            const lifeEventDatasets = inputs.lifeEvents
+                ? inputs.lifeEvents.map(function(event) {
+                    const eventIdx = event.age - inputs.age;
+                    const y = data.medianPath && eventIdx >= 0 && eventIdx < data.medianPath.length
+                        ? data.medianPath[eventIdx] : 0;
+                    return {
+                        data: [{ x: event.age, y: y }],
+                        borderColor: 'rgba(167, 139, 250, 1)',
+                        backgroundColor: 'rgba(167, 139, 250, 0.9)',
+                        borderWidth: 2,
+                        pointRadius: 7,
+                        pointStyle: 'triangle',
+                        showLine: false,
+                        label: event.label
+                    };
+                })
+                : [];
+
+            // Combine: faded paths, median, crisis markers, life events, target
+            const datasets = [
+                ...fadedPaths,
+                medianDataset,
+                ...(crisisMarkerDataset ? [crisisMarkerDataset] : []),
+                ...lifeEventDatasets,
+                targetDataset
+            ];
 
             simulationChart = new Chart(ctx1, {
                 type: 'line',
@@ -821,12 +971,18 @@ export const ZEUS_HTML = `<!DOCTYPE html>
             const fireAge = inputs.age + yearsToFire;
             const successPct = (data.successProbability * 100).toFixed(0);
             
+            const ruinPctNum = (data.ruinProbability * 100).toFixed(0);
+            const ruinNote = data.ruinProbability > 0.3
+                ? ' Warning: ' + ruinPctNum + '% of scenarios deplete savings before age 100 — consider reducing expenses or increasing your target.'
+                : data.ruinProbability > 0.05
+                ? ' Note: ' + ruinPctNum + '% ruin risk — a small buffer above your target would make retirement more secure.'
+                : '';
             if (data.successProbability > 0.8) {
-                insightText.textContent = 'Strong position! ' + successPct + '% of simulations hit your target by age ' + fireAge + '. Consider increasing savings rate to retire even earlier or build a larger safety margin.';
+                insightText.textContent = 'Strong position! ' + successPct + '% of simulations hit your target by age ' + fireAge + '. Consider a larger safety margin to cover rising healthcare costs.' + ruinNote;
             } else if (data.successProbability > 0.5) {
-                insightText.textContent = 'You\\'re on track but not guaranteed. ' + successPct + '% of scenarios succeed. Consider bumping your savings rate a few percentage points for better odds.';
+                insightText.textContent = 'On track but not guaranteed. ' + successPct + '% of scenarios succeed. Bumping savings rate or reducing post-retirement spending improves your odds.' + ruinNote;
             } else {
-                insightText.textContent = 'Challenging path ahead. Only ' + successPct + '% of simulations reach your goal. Consider: higher savings rate, longer timeline, or adjusting your target.';
+                insightText.textContent = 'Challenging path ahead. Only ' + successPct + '% of simulations reach your goal. Try: higher savings rate, longer timeline, or a lower retirement target.' + ruinNote;
             }
         }
 

@@ -463,6 +463,10 @@ export function validateZeusRequest(body: unknown): ValidationResult<{
 	retirementTarget: number;
 	salaryGrowth: number;
 	crisisEvents: number;
+	monthlyExpenses: number;
+	healthcareBase: number;
+	healthcareGrowth: number;
+	lifeEvents: { age: number; amount: number; label: string }[];
 	hp_field?: string;
 }> {
 	if (!body || typeof body !== 'object') {
@@ -507,6 +511,47 @@ export function validateZeusRequest(body: unknown): ValidationResult<{
 		return { success: false, error: 'Crisis events must be between 0 and 20' };
 	}
 
+	// Optional new fields — default to 0 for backward compatibility
+	const monthlyExpenses = payload.monthlyExpenses !== undefined ? payload.monthlyExpenses : 0;
+	if (!isNumber(monthlyExpenses) || monthlyExpenses < 0) {
+		return { success: false, error: 'Monthly expenses must be 0 or more' };
+	}
+
+	const healthcareBase = payload.healthcareBase !== undefined ? payload.healthcareBase : 0;
+	if (!isNumber(healthcareBase) || healthcareBase < 0) {
+		return { success: false, error: 'Healthcare base cost must be 0 or more' };
+	}
+
+	const healthcareGrowth = payload.healthcareGrowth !== undefined ? payload.healthcareGrowth : 0;
+	if (!isNumber(healthcareGrowth) || healthcareGrowth < 0 || healthcareGrowth > 1) {
+		return { success: false, error: 'Healthcare growth rate must be between 0 and 1' };
+	}
+
+	// Validate life events array (optional, max 4)
+	const lifeEvents: { age: number; amount: number; label: string }[] = [];
+	if (payload.lifeEvents !== undefined && payload.lifeEvents !== null) {
+		if (!Array.isArray(payload.lifeEvents)) {
+			return { success: false, error: 'Life events must be an array' };
+		}
+		if (payload.lifeEvents.length > 4) {
+			return { success: false, error: 'Maximum 4 life events allowed' };
+		}
+		for (const raw of payload.lifeEvents) {
+			if (!raw || typeof raw !== 'object') {
+				return { success: false, error: 'Each life event must be an object' };
+			}
+			const e = raw as Record<string, unknown>;
+			if (!isNumber(e.age) || e.age < 18 || e.age > 100) {
+				return { success: false, error: 'Life event age must be between 18 and 100' };
+			}
+			if (!isNumber(e.amount) || e.amount < 0) {
+				return { success: false, error: 'Life event amount must be 0 or more' };
+			}
+			const label = typeof e.label === 'string' ? e.label.substring(0, 50) : 'Event';
+			lifeEvents.push({ age: e.age, amount: e.amount, label });
+		}
+	}
+
 	return {
 		success: true,
 		data: {
@@ -519,6 +564,10 @@ export function validateZeusRequest(body: unknown): ValidationResult<{
 			retirementTarget: payload.retirementTarget,
 			salaryGrowth: payload.salaryGrowth,
 			crisisEvents: payload.crisisEvents,
+			monthlyExpenses,
+			healthcareBase,
+			healthcareGrowth,
+			lifeEvents,
 			hp_field: payload.hp_field as string | undefined,
 		}
 	};

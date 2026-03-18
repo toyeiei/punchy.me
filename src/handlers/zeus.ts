@@ -39,7 +39,11 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				inflationRate,
 				retirementTarget,
 				salaryGrowth,
-				crisisEvents
+				crisisEvents,
+				monthlyExpenses,
+				healthcareBase,
+				healthcareGrowth,
+				lifeEvents
 			} = data;
 
 			// Calculate years to simulate (up to age 100)
@@ -49,14 +53,19 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			const realReturnMean = returnRate - inflationRate;
 			const volatility = 0.15; // 15% standard deviation (typical market volatility)
 
+			// Annual post-retirement costs (expenses + healthcare at age 60)
+			const annualExpensesBase = monthlyExpenses * 12;
+			const annualHealthcareBase = healthcareBase * 12;
+
 			// Run 1000 Monte Carlo iterations
 			const iterations: number[][] = [];
 			const finalValues: number[] = [];
 			const yearsToFire: number[] = [];
-			
+			const ruinedFlags: boolean[] = [];
+
 			// Track crisis data for visualization
 			const crisisYearFrequency: Map<number, number> = new Map();
-			
+
 			// Parallel tracking for comparison (without crises)
 			const finalValuesNoCrisis: number[] = [];
 			const yearsToFireNoCrisis: number[] = [];
@@ -65,8 +74,9 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				const path: number[] = [currentSavings];
 				let balance = currentSavings;
 				let fireYear = -1;
+				let ruined = false;
 				let currentIncome = income;
-				
+
 				// Parallel path WITHOUT crises (for comparison)
 				let balanceNoCrisis = currentSavings;
 				let fireYearNoCrisis = -1;
@@ -93,41 +103,61 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					// Thai retirement age: income stops at 60
 					const currentAge = age + year;
 					const isRetired = currentAge >= 60;
-					
-					// Calculate this year's savings (income grows with salary growth until retirement)
+
+					// Salary growth pre-retirement
 					if (year > 0 && salaryGrowth > 0 && !isRetired) {
 						currentIncome = currentIncome * (1 + salaryGrowth);
 						currentIncomeNoCrisis = currentIncomeNoCrisis * (1 + salaryGrowth);
 					}
-					
-					// No income/savings after retirement age 60
+
+					// Annual savings (pre-retirement only)
 					const annualSavings = isRetired ? 0 : currentIncome * savingsRate;
 					const annualSavingsNoCrisis = isRetired ? 0 : currentIncomeNoCrisis * savingsRate;
-					
-					// Generate random return using Box-Muller transform
+
+					// Post-retirement withdrawals: living expenses + escalating healthcare
+					const yearsRetired = isRetired ? currentAge - 60 : 0;
+					const annualHealthcare = isRetired
+						? annualHealthcareBase * Math.pow(1 + healthcareGrowth, yearsRetired)
+						: 0;
+					const totalWithdrawal = isRetired ? annualExpensesBase + annualHealthcare : 0;
+
+					// Box-Muller random return
 					const u1 = Math.random();
 					const u2 = Math.random();
 					const z = Math.sqrt(-2 * Math.log(u1)) * Math.cos(2 * Math.PI * u2);
-					
-					// Apply random return with mean and volatility
 					const yearlyReturn = realReturnMean + volatility * z;
-					
+
 					// WITH crises path
 					balance = balance * (1 + yearlyReturn);
 					if (crisisYearSet.has(year)) {
 						const severity = crisisSeverityMap.get(year) || 0.30;
 						balance = balance * (1 - severity);
 					}
-					balance = balance + annualSavings;
+					balance = balance + annualSavings - totalWithdrawal;
+					// Life event deductions (deterministic, apply to both paths)
+					for (const event of lifeEvents) {
+						if (event.age === currentAge) {
+							balance -= event.amount;
+						}
+					}
 					balance = Math.max(0, balance);
 					path.push(balance);
 					if (fireYear === -1 && balance >= retirementTarget) {
 						fireYear = year + 1;
 					}
-					
-					// WITHOUT crises path (parallel simulation)
+					// Track ruin: went bankrupt during retirement
+					if (isRetired && !ruined && balance <= 0) {
+						ruined = true;
+					}
+
+					// WITHOUT crises path (parallel)
 					balanceNoCrisis = balanceNoCrisis * (1 + yearlyReturn);
-					balanceNoCrisis = balanceNoCrisis + annualSavingsNoCrisis;
+					balanceNoCrisis = balanceNoCrisis + annualSavingsNoCrisis - totalWithdrawal;
+					for (const event of lifeEvents) {
+						if (event.age === currentAge) {
+							balanceNoCrisis -= event.amount;
+						}
+					}
 					balanceNoCrisis = Math.max(0, balanceNoCrisis);
 					if (fireYearNoCrisis === -1 && balanceNoCrisis >= retirementTarget) {
 						fireYearNoCrisis = year + 1;
@@ -137,7 +167,8 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				iterations.push(path);
 				finalValues.push(balance);
 				yearsToFire.push(fireYear === -1 ? yearsToSimulate : fireYear);
-				
+				ruinedFlags.push(ruined);
+
 				// Track no-crisis results
 				finalValuesNoCrisis.push(balanceNoCrisis);
 				yearsToFireNoCrisis.push(fireYearNoCrisis === -1 ? yearsToSimulate : fireYearNoCrisis);
@@ -153,6 +184,7 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			const medianYearsToFire = calculatePercentile(yearsToFire.filter(y => y < yearsToSimulate), 50) || yearsToSimulate;
 			const successCount = yearsToFire.filter(y => y < yearsToSimulate).length;
 			const successProbability = successCount / NUM_ITERATIONS;
+			const ruinProbability = ruinedFlags.filter(r => r).length / NUM_ITERATIONS;
 
 			// Calculate statistics (WITHOUT crises - for comparison)
 			finalValuesNoCrisis.sort((a, b) => a - b);
@@ -190,7 +222,11 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					inflationRate,
 					retirementTarget,
 					salaryGrowth,
-					crisisEvents
+					crisisEvents,
+					monthlyExpenses,
+					healthcareBase,
+					healthcareGrowth,
+					lifeEvents
 				},
 				results: {
 					iterations,
@@ -200,6 +236,7 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					p90,
 					successProbability,
 					medianYearsToFire,
+					ruinProbability,
 					successProbabilityNoCrisis,
 					crisisYears: topCrisisYears
 				},
@@ -216,6 +253,7 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				p10,
 				p90,
 				successProbability,
+				ruinProbability,
 				successProbabilityNoCrisis,
 				medianYearsToFire,
 				medianPath,
