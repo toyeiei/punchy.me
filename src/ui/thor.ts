@@ -572,7 +572,7 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
                 <input type="url" id="target-url" placeholder="https://example.com" required>
                 <button class="btn-forge" id="forge-btn">Forge Intelligence</button>
                 <div class="processing-notice" id="processing-notice">
-                    ⚡ Extracting & Analyzing... This takes 5-10 seconds
+                    ⚡ Extracting & Analyzing... This takes ~15 seconds
                 </div>
                 <div class="terminal-log" id="terminal-log"></div>
             </div>
@@ -628,11 +628,18 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             }, 800);
 
             try {
+                // Add timeout controller (30 seconds max)
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 30000);
+
                 const res = await fetch('/thor/forge', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ url })
+                    body: JSON.stringify({ url }),
+                    signal: controller.signal
                 });
+
+                clearTimeout(timeoutId);
 
                 const data = await res.json();
                 if (!res.ok) throw new Error(data.error || 'Forge failed');
@@ -644,7 +651,10 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
                 renderIntelligence(data);
             } catch (err) {
                 clearInterval(logInterval);
-                alert('Forge failed: ' + err.message);
+                const errorMsg = err.name === 'AbortError' 
+                    ? 'Request timed out (30s). The page may be too large or slow to render.'
+                    : 'Forge failed: ' + err.message;
+                intelOutput.innerHTML = '<div style="color: #ef4444; padding: 1rem;">' + escapeHtml(errorMsg) + '</div>';
                 processingNotice.style.display = 'none';
                 terminalLog.style.display = 'none';
             } finally {

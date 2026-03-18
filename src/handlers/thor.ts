@@ -114,7 +114,13 @@ async function fetchThorMarkdown(url: string, accountId: string, apiToken: strin
 				'Authorization': `Bearer ${apiToken}`,
 				'Content-Type': 'application/json'
 			},
-			body: JSON.stringify({ url })
+			body: JSON.stringify({ 
+				url,
+				gotoOptions: {
+					waitUntil: 'networkidle2',
+					timeout: 60000
+				}
+			})
 		});
 	} catch (error) {
 		console.error('[THOR] Browser Rendering Network Error:', error);
