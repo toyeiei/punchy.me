@@ -7,6 +7,9 @@ export default defineWorkersConfig({
         wrangler: { configPath: "./wrangler.toml" },
         miniflare: {
           globals: { VITEST: true },
+          bindings: {
+            RESEND_API_KEY: "re_test_123"
+          }
         },
       },
     },

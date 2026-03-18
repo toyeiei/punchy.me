@@ -166,6 +166,23 @@ export interface ZeusSimulation {
 	createdAt: number;
 }
 
+export interface ZinsserSubscriber {
+	type: 'zinsser:sub';
+	email: string;
+	status: 'pending' | 'active' | 'unsubscribed';
+	token: string;
+	subscribedAt: number;
+	confirmedAt?: number;
+}
+
+export interface ZinsserPost {
+	type: 'zinsser:post';
+	id: string;
+	title: string;
+	content: string;
+	publishedAt: number;
+}
+
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
@@ -176,6 +193,8 @@ export interface Env {
 	};
 	THOR_API_TOKEN?: string;
 	CLOUDFLARE_ACCOUNT_ID?: string;
+	RESEND_API_KEY?: string;
+	ZINSSER_ADMIN_KEY?: string;
 	TURNSTILE_SITE_KEY: string;
 	TURNSTILE_SECRET_KEY: string;
 	UNSPLASH_ACCESS_KEY: string;

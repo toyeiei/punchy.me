@@ -16,6 +16,7 @@ import { handlePollGet, handlePollCreate, handlePollVote, handlePollView } from 
 import { handleAresGet, handleAresForge } from './handlers/ares';
 import { handleMarcusGet, handleMarcusExplain } from './handlers/marcus';
 import { handleZeusGet, handleZeusSimulate } from './handlers/zeus';
+import { handleZinsserGet, handleZinsserSubscribe, handleZinsserConfirm, handleZinsserUnsubscribe, handleZinsserBroadcast } from './handlers/zinsser';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -52,6 +53,7 @@ const ROUTES: Route[] = [
 	{ method: 'GET', path: '/ares', handler: pureHandler(handleAresGet) },
 	{ method: 'GET', path: '/marcus', handler: pureHandler(handleMarcusGet) },
 	{ method: 'GET', path: '/zeus', handler: pureHandler(handleZeusGet) },
+	{ method: 'GET', path: '/zinsser', handler: simpleHandler(handleZinsserGet) },
 	{ method: 'GET', path: /^\/poll\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handlePollView(req, env, path.replace('/poll/', '')) },
 	
 	// Tool APIs (POST) - More specific routes MUST come before general ones
@@ -68,6 +70,10 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/ares/forge', handler: staticHandler(handleAresForge) },
 	{ method: 'POST', path: '/marcus/explain', handler: staticHandler(handleMarcusExplain) },
 	{ method: 'POST', path: '/zeus/simulate', handler: staticHandler(handleZeusSimulate) },
+	{ method: 'POST', path: '/zinsser/subscribe', handler: staticHandler(handleZinsserSubscribe) },
+	{ method: 'POST', path: '/zinsser/broadcast', handler: staticHandler(handleZinsserBroadcast) },
+	{ method: 'GET', path: '/zinsser/confirm', handler: staticHandler(handleZinsserConfirm) },
+	{ method: 'GET', path: '/zinsser/unsubscribe', handler: staticHandler(handleZinsserUnsubscribe) },
 	{ method: 'GET', path: /^\/thor\/pdf\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handleThorPdf(req, env, path) },
 	
 	// Freya search (special GET with query params)
