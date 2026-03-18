@@ -6,6 +6,7 @@ import { htmlPage, generateUniqueId } from '../core/utils';
 
 const NUM_ITERATIONS = 1000;
 const MAX_YEARS = 60;
+const CRISIS_IMPACT = 0.30; // 30% wealth reduction per crisis
 
 export async function handleZeusGet(): Promise<Response> {
 	return htmlPage(ZEUS_HTML);
@@ -14,6 +15,10 @@ export async function handleZeusGet(): Promise<Response> {
 /**
  * Run Monte Carlo simulation for retirement planning
  * Uses Box-Muller transform for generating normally distributed returns
+ * 
+ * Features:
+ * - Salary growth: Income compounds annually at specified rate
+ * - Crisis events: Random wealth drops simulating market crashes, pandemics, etc.
  */
 export async function handleZeusSimulate(request: Request, env: Env): Promise<Response> {
 	return handleValidatedRequest(
@@ -28,14 +33,13 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				currentSavings,
 				returnRate,
 				inflationRate,
-				retirementTarget
+				retirementTarget,
+				salaryGrowth,
+				crisisEvents
 			} = data;
 
 			// Calculate years to simulate (up to age 100)
 			const yearsToSimulate = Math.min(100 - age, MAX_YEARS);
-			
-			// Annual savings amount
-			const annualSavings = income * savingsRate;
 			
 			// Real return rate (adjusted for inflation volatility)
 			const realReturnMean = returnRate - inflationRate;
@@ -50,8 +54,25 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				const path: number[] = [currentSavings];
 				let balance = currentSavings;
 				let fireYear = -1;
+				let currentIncome = income;
+				
+				// Generate crisis years for this iteration (if any)
+				const crisisYears = new Set<number>();
+				if (crisisEvents > 0) {
+					const availableYears = Array.from({ length: yearsToSimulate }, (_, i) => i);
+					shuffleArray(availableYears);
+					for (let c = 0; c < Math.min(crisisEvents, yearsToSimulate); c++) {
+						crisisYears.add(availableYears[c]);
+					}
+				}
 
 				for (let year = 0; year < yearsToSimulate; year++) {
+					// Calculate this year's savings (income grows with salary growth)
+					if (year > 0 && salaryGrowth > 0) {
+						currentIncome = currentIncome * (1 + salaryGrowth);
+					}
+					const annualSavings = currentIncome * savingsRate;
+					
 					// Generate random return using Box-Muller transform
 					const u1 = Math.random();
 					const u2 = Math.random();
@@ -60,8 +81,16 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					// Apply random return with mean and volatility
 					const yearlyReturn = realReturnMean + volatility * z;
 					
-					// Grow balance with return, add savings
-					balance = balance * (1 + yearlyReturn) + annualSavings;
+					// Grow balance with return
+					balance = balance * (1 + yearlyReturn);
+					
+					// Apply crisis if this is a crisis year (BEFORE adding savings)
+					if (crisisYears.has(year)) {
+						balance = balance * (1 - CRISIS_IMPACT);
+					}
+					
+					// Add annual savings
+					balance = balance + annualSavings;
 					
 					// Ensure non-negative
 					balance = Math.max(0, balance);
@@ -103,7 +132,9 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					currentSavings,
 					returnRate,
 					inflationRate,
-					retirementTarget
+					retirementTarget,
+					salaryGrowth,
+					crisisEvents
 				},
 				results: {
 					iterations,
@@ -141,4 +172,14 @@ function calculatePercentile(sortedArray: number[], percentile: number): number 
 	if (sortedArray.length === 0) return 0;
 	const index = Math.floor((percentile / 100) * sortedArray.length);
 	return sortedArray[Math.min(index, sortedArray.length - 1)];
+}
+
+/**
+ * Fisher-Yates shuffle for random crisis year selection
+ */
+function shuffleArray<T>(array: T[]): void {
+	for (let i = array.length - 1; i > 0; i--) {
+		const j = Math.floor(Math.random() * (i + 1));
+		[array[i], array[j]] = [array[j], array[i]];
+	}
 }

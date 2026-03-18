@@ -461,6 +461,8 @@ export function validateZeusRequest(body: unknown): ValidationResult<{
 	returnRate: number;
 	inflationRate: number;
 	retirementTarget: number;
+	salaryGrowth: number;
+	crisisEvents: number;
 	hp_field?: string;
 }> {
 	if (!body || typeof body !== 'object') {
@@ -497,6 +499,14 @@ export function validateZeusRequest(body: unknown): ValidationResult<{
 		return { success: false, error: 'Retirement target must be a positive number' };
 	}
 
+	if (!isNumber(payload.salaryGrowth) || payload.salaryGrowth < 0 || payload.salaryGrowth > 100) {
+		return { success: false, error: 'Salary growth must be between 0% and 100%' };
+	}
+
+	if (!isNumber(payload.crisisEvents) || payload.crisisEvents < 0 || payload.crisisEvents > 20) {
+		return { success: false, error: 'Crisis events must be between 0 and 20' };
+	}
+
 	return {
 		success: true,
 		data: {
@@ -507,6 +517,8 @@ export function validateZeusRequest(body: unknown): ValidationResult<{
 			returnRate: payload.returnRate,
 			inflationRate: payload.inflationRate,
 			retirementTarget: payload.retirementTarget,
+			salaryGrowth: payload.salaryGrowth,
+			crisisEvents: payload.crisisEvents,
 			hp_field: payload.hp_field as string | undefined,
 		}
 	};

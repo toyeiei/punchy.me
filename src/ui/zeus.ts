@@ -483,6 +483,37 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                     <input type="number" id="retirementTarget" value="1000000" min="0" step="50000">
                 </div>
 
+                <div style="margin-top: 1.5rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label style="color: var(--accent-secondary);">Income Projection</label>
+                    <div class="input-group">
+                        <div class="slider-header">
+                            <label style="margin-bottom: 0;">Salary Growth/Year</label>
+                            <span class="slider-value" id="salaryGrowth-value">5%</span>
+                        </div>
+                        <input type="range" id="salaryGrowth" min="0" max="20" value="5" step="1" oninput="updateSlider('salaryGrowth', '%')">
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem;">Raises compound over time</div>
+                    </div>
+                </div>
+
+                <div style="margin-top: 1rem; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.1);">
+                    <label style="color: #ef4444;">Crisis Simulation</label>
+                    <div class="input-group">
+                        <div class="slider-header">
+                            <label style="margin-bottom: 0;">Crisis Events</label>
+                            <span class="slider-value" id="crisisEvents-value">0</span>
+                        </div>
+                        <input type="range" id="crisisEvents" min="0" max="10" value="0" step="1" oninput="updateSlider('crisisEvents')">
+                        <div style="font-size: 0.65rem; color: var(--text-dim); margin-top: 0.3rem;">Random 30% wealth drops (recession, pandemic, etc)</div>
+                    </div>
+                </div>
+
+                <div style="background: rgba(251, 191, 36, 0.08); border: 1px solid rgba(251, 191, 36, 0.2); border-radius: 8px; padding: 0.75rem; margin-top: 1rem; font-size: 0.7rem; color: var(--text-dim);">
+                    <div style="color: var(--accent); font-weight: 700; margin-bottom: 0.25rem;">You'll see:</div>
+                    <div>• 1000 simulated futures</div>
+                    <div>• Probability of reaching FIRE</div>
+                    <div>• Years until retirement</div>
+                </div>
+
                 <button class="btn-simulate" id="simulate-btn" onclick="runSimulation()">Run 1000 Simulations</button>
             </div>
 
@@ -537,6 +568,8 @@ export const ZEUS_HTML = `<!DOCTYPE html>
         updateSlider('savingsRate', '%');
         updateSlider('returnRate', '%');
         updateSlider('inflationRate', '%');
+        updateSlider('salaryGrowth', '%');
+        updateSlider('crisisEvents');
 
         window.runSimulation = async function() {
             const btn = document.getElementById('simulate-btn');
@@ -550,6 +583,8 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 returnRate: parseFloat(document.getElementById('returnRate').value) / 100,
                 inflationRate: parseFloat(document.getElementById('inflationRate').value) / 100,
                 retirementTarget: parseFloat(document.getElementById('retirementTarget').value) || 0,
+                salaryGrowth: parseFloat(document.getElementById('salaryGrowth').value) / 100,
+                crisisEvents: parseInt(document.getElementById('crisisEvents').value) || 0,
             };
 
             if (inputs.income <= 0) {

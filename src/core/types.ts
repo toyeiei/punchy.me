@@ -138,6 +138,8 @@ export interface ZeusSimulation {
 		returnRate: number;
 		inflationRate: number;
 		retirementTarget: number;
+		salaryGrowth: number;
+		crisisEvents: number;
 	};
 	results: {
 		iterations: number[][];

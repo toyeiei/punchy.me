@@ -153,7 +153,7 @@ describe('POLL PUNCH Handler', () => {
 				.mockResolvedValueOnce(null);
 
 			const request = createRequest({ optionIndex: 0 }, { 'cf-connecting-ip': '1.2.3.4' });
-			const response = await handlePollVote(request, env, 'abc123');
+			await handlePollVote(request, env, 'abc123');
 
 			// Verify vote was stored
 			expect(env.SHORT_LINKS.put).toHaveBeenCalled();

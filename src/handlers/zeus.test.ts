@@ -60,6 +60,18 @@ describe('ZEUS Handler', () => {
 			expect(html).toContain('id="savingsRate"');
 		});
 
+		it('should include salary growth slider', async () => {
+			const response = await handleZeusGet();
+			const html = await response.text();
+			expect(html).toContain('id="salaryGrowth"');
+		});
+
+		it('should include crisis events slider', async () => {
+			const response = await handleZeusGet();
+			const html = await response.text();
+			expect(html).toContain('id="crisisEvents"');
+		});
+
 		it('should include Monte Carlo badge', async () => {
 			const response = await handleZeusGet();
 			const html = await response.text();
@@ -77,6 +89,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 1000000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 			});
 
 			const response = await handleZeusSimulate(request, env);
@@ -100,6 +114,43 @@ describe('ZEUS Handler', () => {
 			expect(data.iterations.length).toBeGreaterThan(0);
 		});
 
+		it('should run simulation with crisis events', async () => {
+			const request = createRequest({
+				age: 35,
+				income: 100000,
+				savingsRate: 25,
+				currentSavings: 50000,
+				returnRate: 7,
+				inflationRate: 3,
+				retirementTarget: 1000000,
+				salaryGrowth: 5,
+				crisisEvents: 3,
+			});
+
+			const response = await handleZeusSimulate(request, env);
+			expect(response.status).toBe(200);
+
+			const data = await response.json() as { successProbability: number };
+			expect(data.successProbability).toBeGreaterThanOrEqual(0);
+		});
+
+		it('should run simulation with salary growth', async () => {
+			const request = createRequest({
+				age: 30,
+				income: 80000,
+				savingsRate: 20,
+				currentSavings: 30000,
+				returnRate: 7,
+				inflationRate: 3,
+				retirementTarget: 500000,
+				salaryGrowth: 10,
+				crisisEvents: 0,
+			});
+
+			const response = await handleZeusSimulate(request, env);
+			expect(response.status).toBe(200);
+		});
+
 		it('should store result in KV', async () => {
 			const request = createRequest({
 				age: 30,
@@ -109,6 +160,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 500000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 			});
 
 			await handleZeusSimulate(request, env);
@@ -124,6 +177,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 100000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 			});
 
 			const response = await handleZeusSimulate(request, env);
@@ -139,6 +194,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 100000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 			});
 
 			const response = await handleZeusSimulate(request, env);
@@ -154,6 +211,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 100000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 			});
 
 			const response = await handleZeusSimulate(request, env);
@@ -169,6 +228,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 100000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 			});
 
 			const response = await handleZeusSimulate(request, env);
@@ -184,6 +245,42 @@ describe('ZEUS Handler', () => {
 				returnRate: 60,
 				inflationRate: 3,
 				retirementTarget: 100000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
+			});
+
+			const response = await handleZeusSimulate(request, env);
+			expect(response.status).toBe(400);
+		});
+
+		it('should reject invalid salary growth', async () => {
+			const request = createRequest({
+				age: 35,
+				income: 100000,
+				savingsRate: 25,
+				currentSavings: 50000,
+				returnRate: 7,
+				inflationRate: 3,
+				retirementTarget: 1000000,
+				salaryGrowth: 150,
+				crisisEvents: 0,
+			});
+
+			const response = await handleZeusSimulate(request, env);
+			expect(response.status).toBe(400);
+		});
+
+		it('should reject too many crisis events', async () => {
+			const request = createRequest({
+				age: 35,
+				income: 100000,
+				savingsRate: 25,
+				currentSavings: 50000,
+				returnRate: 7,
+				inflationRate: 3,
+				retirementTarget: 1000000,
+				salaryGrowth: 5,
+				crisisEvents: 50,
 			});
 
 			const response = await handleZeusSimulate(request, env);
@@ -199,6 +296,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 1000000,
+				salaryGrowth: 5,
+				crisisEvents: 0,
 				hp_field: 'bot-fill',
 			});
 
@@ -216,6 +315,8 @@ describe('ZEUS Handler', () => {
 				returnRate: 7,
 				inflationRate: 3,
 				retirementTarget: 1000000,
+				salaryGrowth: 5,
+				crisisEvents: 2,
 			});
 
 			const response = await handleZeusSimulate(request, env);
