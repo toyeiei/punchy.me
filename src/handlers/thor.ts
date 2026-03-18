@@ -119,12 +119,7 @@ async function fetchThorMarkdown(url: string, accountId: string, apiToken: strin
 				gotoOptions: {
 					waitUntil: 'networkidle2',
 					timeout: 30000
-				},
-				// Block unnecessary resources for speed (we only need text content)
-				rejectRequestPattern: [
-					/^.*\.(css|png|jpg|jpeg|gif|svg|webp|ico|woff|woff2|ttf|eot)$/i,
-					/google-analytics|googletagmanager|facebook\.com|tracking|analytics|ads/i
-				]
+				}
 			})
 		});
 	} catch (error) {
