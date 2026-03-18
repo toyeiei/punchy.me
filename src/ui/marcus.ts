@@ -430,23 +430,23 @@ export const MARCUS_HTML = `<!DOCTYPE html>
             <div class="panel">
                 <label>Choose Analysis</label>
                 <div class="template-list">
-                    <button class="template-btn active" data-template="summary" onclick="selectTemplate('summary')">
+                    <button class="template-btn active" data-template="summary">
                         <div class="template-title">📊 Quick Summary</div>
                         <div class="template-desc">Mean, median, range, outliers</div>
                     </button>
-                    <button class="template-btn" data-template="compare" onclick="selectTemplate('compare')">
+                    <button class="template-btn" data-template="compare">
                         <div class="template-title">⚖️ Compare Groups</div>
                         <div class="template-desc">Are two groups different?</div>
                     </button>
-                    <button class="template-btn" data-template="trend" onclick="selectTemplate('trend')">
+                    <button class="template-btn" data-template="trend">
                         <div class="template-title">📈 Find Trend</div>
                         <div class="template-desc">Is there a pattern?</div>
                     </button>
-                    <button class="template-btn" data-template="correlation" onclick="selectTemplate('correlation')">
+                    <button class="template-btn" data-template="correlation">
                         <div class="template-title">🔗 Test Relationship</div>
                         <div class="template-desc">Do these relate to each other?</div>
                     </button>
-                    <button class="template-btn" data-template="distribution" onclick="selectTemplate('distribution')">
+                    <button class="template-btn" data-template="distribution">
                         <div class="template-title">🎯 See Distribution</div>
                         <div class="template-desc">How is data spread out?</div>
                     </button>
@@ -458,16 +458,16 @@ export const MARCUS_HTML = `<!DOCTYPE html>
                 <div style="display: none;"><input type="text" id="hp_field" tabindex="-1" autocomplete="off"></div>
                 <textarea id="data-input" placeholder="Paste your data here (CSV format)&#10;&#10;Example:&#10;name,sales,region&#10;Alice,1200,North&#10;Bob,980,South&#10;Carol,1450,North"></textarea>
                 <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; margin-bottom: 0.5rem;">
-                    <button class="btn-sample" onclick="loadSampleData()" style="flex:1;background:rgba(139, 92, 246, 0.15);border:1px solid rgba(139, 92, 246, 0.4);color:#8b5cf6;padding:0.75rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;font-weight:700;transition:all 0.2s;">
+                    <button class="btn-sample" style="flex:1;background:rgba(139, 92, 246, 0.15);border:1px solid rgba(139, 92, 246, 0.4);color:#8b5cf6;padding:0.75rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;font-weight:700;transition:all 0.2s;">
                         📋 Load Sample Data
                     </button>
-                    <button class="btn-clear" onclick="clearData()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-dim);padding:0.75rem 1rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;transition:all 0.2s;">
+                    <button class="btn-clear" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-dim);padding:0.75rem 1rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;transition:all 0.2s;">
                         Clear
                     </button>
                 </div>
                 <p class="data-hint">First row = column names. Comma-separated. Works with numbers, text, or mixed data.</p>
                 
-                <button class="btn-run" id="run-btn" onclick="runAnalysis()">Analyze My Data</button>
+                <button class="btn-run" id="run-btn">Analyze My Data</button>
                 
                 <div class="loading-bar" id="loading">
                     <div class="loading-text">Running R analysis in your browser...</div>
@@ -544,7 +544,7 @@ export const MARCUS_HTML = `<!DOCTYPE html>
                 correlation: 'Paste two columns to compare\\n\\nExample:\\nprice,sales\\n10,500\\n15,420\\n20,380',
                 distribution: 'Paste values to see spread\\n\\nExample:\\nscore\\n85\\n90\\n78\\n92\\n88\\n95'
             };
-            input.placeholder = placeholders[template] || placeholders.summary;
+            input.placeholder = placeholders[currentTemplate] || placeholders.summary;
         }
 
         window.runAnalysis = async function() {
@@ -625,82 +625,74 @@ export const MARCUS_HTML = `<!DOCTYPE html>
             const escapedData = csvData.replace(/"/g, '\\\\"').replace(/\\n/g, '\\\\n');
             
             const templates = {
-                summary: \`
-data <- read.csv(text="\${escapedData}", stringsAsFactors=FALSE)
-nums <- sapply(data, is.numeric)
-if(any(nums)) {
-    cat("=== SUMMARY STATISTICS ===\\\\n")
-    print(summary(data[, nums]))
-    cat("\\\\n=== STANDARD DEVIATION ===\\\\n")
-    print(sapply(data[, nums], sd, na.rm=TRUE))
-} else {
-    cat("=== DATA PREVIEW ===\\\\n")
-    print(head(data))
-    cat("\\\\n=== STRUCTURE ===\\\\n")
-    str(data)
-}
-\`,
-                compare: \`
-data <- read.csv(text="\${escapedData}", stringsAsFactors=FALSE)
-cat("=== GROUP COMPARISON ===\\\\n")
-if(ncol(data) >= 2) {
-    groups <- unique(data[,1])
-    cat("Groups found:", length(groups), "\\\\n")
-    print(by(data[,2], data[,1], summary))
-    if(length(groups) == 2) {
-        cat("\\\\n=== T-TEST ===\\\\n")
-        g1 <- data[data[,1] == groups[1], 2]
-        g2 <- data[data[,1] == groups[2], 2]
-        print(t.test(g1, g2))
-    }
-} else {
-    print(summary(data))
-}
-\`,
-                trend: \`
-data <- read.csv(text="\${escapedData}", stringsAsFactors=FALSE)
-cat("=== TREND ANALYSIS ===\\\\n")
-if(ncol(data) >= 2) {
-    x <- 1:nrow(data)
-    y <- as.numeric(data[,2])
-    model <- lm(y ~ x)
-    cat("Direction:", ifelse(coef(model)[2] > 0, "UPWARD ↑", "DOWNWARD ↓"), "\\\\n")
-    cat("Slope:", round(coef(model)[2], 3), "\\\\n")
-    cat("\\\\n=== MODEL SUMMARY ===\\\\n")
-    print(summary(model))
-}
-\`,
-                correlation: \`
-data <- read.csv(text="\${escapedData}", stringsAsFactors=FALSE)
-cat("=== CORRELATION ANALYSIS ===\\\\n")
-if(ncol(data) >= 2) {
-    x <- as.numeric(data[,1])
-    y <- as.numeric(data[,2])
-    r <- cor(x, y, use="complete.obs")
-    cat("Correlation (r):", round(r, 3), "\\\\n")
-    strength <- ifelse(abs(r) > 0.7, "STRONG", ifelse(abs(r) > 0.4, "MODERATE", "WEAK"))
-    direction <- ifelse(r > 0, "positive", "negative")
-    cat("Interpretation:", strength, direction, "relationship\\\\n")
-    cat("\\\\n=== TEST SIGNIFICANCE ===\\\\n")
-    print(cor.test(x, y))
-}
-\`,
-                distribution: \`
-data <- read.csv(text="\${escapedData}", stringsAsFactors=FALSE)
-cat("=== DISTRIBUTION ANALYSIS ===\\\\n")
-vals <- as.numeric(data[,1])
-cat("Count:", length(vals), "\\\\n")
-cat("Range:", min(vals, na.rm=TRUE), "to", max(vals, na.rm=TRUE), "\\\\n")
-cat("IQR:", IQR(vals, na.rm=TRUE), "\\\\n")
-cat("\\\\n=== QUARTILES ===\\\\n")
-print(quantile(vals, na.rm=TRUE))
-cat("\\\\n=== SKEWNESS CHECK ===\\\\n")
-mean_val <- mean(vals, na.rm=TRUE)
-median_val <- median(vals, na.rm=TRUE)
-skew <- ifelse(mean_val > median_val, "Right-skewed →", 
-         ifelse(mean_val < median_val, "Left-skewed ←", "Symmetric"))
-cat("Mean:", round(mean_val, 2), "| Median:", median_val, "|", skew, "\\\\n")
-\`
+                summary: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
+                    'nums <- sapply(data, is.numeric)\\n' +
+                    'if(any(nums)) {\\n' +
+                    '    cat("=== SUMMARY STATISTICS ===\\\\n")\\n' +
+                    '    print(summary(data[, nums]))\\n' +
+                    '    cat("\\\\n=== STANDARD DEVIATION ===\\\\n")\\n' +
+                    '    print(sapply(data[, nums], sd, na.rm=TRUE))\\n' +
+                    '} else {\\n' +
+                    '    cat("=== DATA PREVIEW ===\\\\n")\\n' +
+                    '    print(head(data))\\n' +
+                    '    cat("\\\\n=== STRUCTURE ===\\\\n")\\n' +
+                    '    str(data)\\n' +
+                    '}',
+                    
+                compare: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
+                    'cat("=== GROUP COMPARISON ===\\\\n")\\n' +
+                    'if(ncol(data) >= 2) {\\n' +
+                    '    groups <- unique(data[,1])\\n' +
+                    '    cat("Groups found:", length(groups), "\\\\n")\\n' +
+                    '    print(by(data[,2], data[,1], summary))\\n' +
+                    '    if(length(groups) == 2) {\\n' +
+                    '        cat("\\\\n=== T-TEST ===\\\\n")\\n' +
+                    '        g1 <- data[data[,1] == groups[1], 2]\\n' +
+                    '        g2 <- data[data[,1] == groups[2], 2]\\n' +
+                    '        print(t.test(g1, g2))\\n' +
+                    '    }\\n' +
+                    '} else { print(summary(data)) }',
+                    
+                trend: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
+                    'cat("=== TREND ANALYSIS ===\\\\n")\\n' +
+                    'if(ncol(data) >= 2) {\\n' +
+                    '    x <- 1:nrow(data)\\n' +
+                    '    y <- as.numeric(data[,2])\\n' +
+                    '    model <- lm(y ~ x)\\n' +
+                    '    cat("Direction:", ifelse(coef(model)[2] > 0, "UPWARD", "DOWNWARD"), "\\\\n")\\n' +
+                    '    cat("Slope:", round(coef(model)[2], 3), "\\\\n")\\n' +
+                    '    cat("\\\\n=== MODEL SUMMARY ===\\\\n")\\n' +
+                    '    print(summary(model))\\n' +
+                    '}',
+                    
+                correlation: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
+                    'cat("=== CORRELATION ANALYSIS ===\\\\n")\\n' +
+                    'if(ncol(data) >= 2) {\\n' +
+                    '    x <- as.numeric(data[,1])\\n' +
+                    '    y <- as.numeric(data[,2])\\n' +
+                    '    r <- cor(x, y, use="complete.obs")\\n' +
+                    '    cat("Correlation (r):", round(r, 3), "\\\\n")\\n' +
+                    '    strength <- ifelse(abs(r) > 0.7, "STRONG", ifelse(abs(r) > 0.4, "MODERATE", "WEAK"))\\n' +
+                    '    direction <- ifelse(r > 0, "positive", "negative")\\n' +
+                    '    cat("Interpretation:", strength, direction, "relationship\\\\n")\\n' +
+                    '    cat("\\\\n=== TEST SIGNIFICANCE ===\\\\n")\\n' +
+                    '    print(cor.test(x, y))\\n' +
+                    '}',
+                    
+                distribution: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
+                    'cat("=== DISTRIBUTION ANALYSIS ===\\\\n")\\n' +
+                    'vals <- as.numeric(data[,1])\\n' +
+                    'cat("Count:", length(vals), "\\\\n")\\n' +
+                    'cat("Range:", min(vals, na.rm=TRUE), "to", max(vals, na.rm=TRUE), "\\\\n")\\n' +
+                    'cat("IQR:", IQR(vals, na.rm=TRUE), "\\\\n")\\n' +
+                    'cat("\\\\n=== QUARTILES ===\\\\n")\\n' +
+                    'print(quantile(vals, na.rm=TRUE))\\n' +
+                    'cat("\\\\n=== SKEWNESS CHECK ===\\\\n")\\n' +
+                    'mean_val <- mean(vals, na.rm=TRUE)\\n' +
+                    'median_val <- median(vals, na.rm=TRUE)\\n' +
+                    'skew <- ifelse(mean_val > median_val, "Right-skewed",\\n' +
+                    '         ifelse(mean_val < median_val, "Left-skewed", "Symmetric"))\\n' +
+                    'cat("Mean:", round(mean_val, 2), "| Median:", median_val, "|", skew, "\\\\n")'
             };
             
             return templates[template] || templates.summary;
@@ -735,6 +727,15 @@ cat("Mean:", round(mean_val, 2), "| Median:", median_val, "|", skew, "\\\\n")
 
         // Initialize placeholder
         updatePlaceholder();
+        
+        // Add event listeners (modules load async, so inline onclick won't work)
+        document.querySelectorAll('.template-btn').forEach(btn => {
+            btn.addEventListener('click', () => selectTemplate(btn.dataset.template));
+        });
+        
+        document.querySelector('.btn-sample')?.addEventListener('click', loadSampleData);
+        document.querySelector('.btn-clear')?.addEventListener('click', clearData);
+        document.querySelector('.btn-run')?.addEventListener('click', runAnalysis);
     </script>
 </body>
 </html>`;
