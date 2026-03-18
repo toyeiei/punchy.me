@@ -104,6 +104,8 @@ describe('ZEUS Handler', () => {
 				successProbability: number;
 				medianYearsToFire: number;
 				medianPath: number[];
+				successProbabilityNoCrisis?: number;
+				crisisYears?: number[];
 				iterations: number[][];
 			};
 
@@ -133,8 +135,15 @@ describe('ZEUS Handler', () => {
 			const response = await handleZeusSimulate(request, env);
 			expect(response.status).toBe(200);
 
-			const data = await response.json() as { successProbability: number };
+			const data = await response.json() as { 
+				successProbability: number;
+				successProbabilityNoCrisis?: number;
+				crisisYears?: number[];
+			};
 			expect(data.successProbability).toBeGreaterThanOrEqual(0);
+			expect(data.successProbabilityNoCrisis).toBeDefined();
+			expect(data.crisisYears).toBeDefined();
+			expect(data.crisisYears?.length).toBe(3);
 		});
 
 		it('should run simulation with salary growth', async () => {
@@ -328,6 +337,7 @@ describe('ZEUS Handler', () => {
 				p10: number; 
 				p90: number;
 				successProbability: number;
+				successProbabilityNoCrisis?: number;
 			};
 
 			// Verify percentiles are in correct order
@@ -337,6 +347,10 @@ describe('ZEUS Handler', () => {
 			// Verify probability is valid
 			expect(data.successProbability).toBeGreaterThanOrEqual(0);
 			expect(data.successProbability).toBeLessThanOrEqual(1);
+			
+			// Crisis comparison: without crises should be >= with crises
+			expect(data.successProbabilityNoCrisis).toBeDefined();
+			expect(data.successProbabilityNoCrisis).toBeGreaterThanOrEqual(data.successProbability);
 		});
 	});
 });

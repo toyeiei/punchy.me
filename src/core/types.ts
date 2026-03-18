@@ -149,6 +149,8 @@ export interface ZeusSimulation {
 		p90: number;
 		successProbability: number;
 		medianYearsToFire: number;
+		successProbabilityNoCrisis?: number;
+		crisisYears?: number[];
 	};
 	createdAt: number;
 }

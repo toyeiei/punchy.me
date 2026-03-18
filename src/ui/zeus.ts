@@ -545,6 +545,10 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                     </div>
                 </div>
 
+                <div class="crisis-comparison" id="crisis-info" style="display:none;background:rgba(239,68,68,0.1);border:1px solid rgba(239,68,68,0.3);border-radius:8px;padding:16px;margin:16px 0;">
+                    <!-- Filled by JS when crisis events > 0 -->
+                </div>
+
                 <div class="insight-box" id="insight">
                     <h4>💡 Key Insight</h4>
                     <p id="insight-text">Run the simulation to see your personalized analysis.</p>
@@ -649,6 +653,30 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 probFill.style.width = (data.successProbability * 100) + '%';
             }, 100);
 
+            // Crisis comparison display
+            if (inputs.crisisEvents > 0 && data.successProbabilityNoCrisis !== undefined) {
+                const crisisDiff = data.successProbabilityNoCrisis - data.successProbability;
+                const crisisInfo = document.getElementById('crisis-info');
+                if (crisisInfo) {
+                    crisisInfo.innerHTML = 
+                        '<div style="display:flex;justify-content:space-between;margin-bottom:8px;">' +
+                        '<span style="color:#22c55e;">Without crises:</span>' +
+                        '<span style="color:#22c55e;font-weight:bold;">' + (data.successProbabilityNoCrisis * 100).toFixed(1) + '%</span>' +
+                        '</div>' +
+                        '<div style="display:flex;justify-content:space-between;">' +
+                        '<span style="color:#fbbf24;">With ' + inputs.crisisEvents + ' crisis(ies):</span>' +
+                        '<span style="color:#fbbf24;font-weight:bold;">' + (data.successProbability * 100).toFixed(1) + '%</span>' +
+                        '</div>' +
+                        '<div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,0.1);text-align:center;font-size:0.85rem;color:#f87171;">' +
+                        'Crisis impact: -' + (crisisDiff * 100).toFixed(1) + '% success rate' +
+                        '</div>';
+                    crisisInfo.style.display = 'block';
+                }
+            } else {
+                const crisisInfo = document.getElementById('crisis-info');
+                if (crisisInfo) crisisInfo.style.display = 'none';
+            }
+
             // Line chart - all iterations
             const yearsToSimulate = 65 - inputs.age;
             const labels = Array.from({ length: yearsToSimulate }, (_, i) => inputs.age + i);
@@ -678,6 +706,25 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 label: 'Median Path'
             };
 
+            // Crisis markers (red dots on median path at crisis years)
+            let crisisMarkerDataset = null;
+            if (data.crisisYears && data.crisisYears.length > 0) {
+                const crisisPoints = data.crisisYears.map(crisisYearIdx => ({
+                    x: inputs.age + crisisYearIdx,
+                    y: data.medianPath ? data.medianPath[crisisYearIdx] : 0
+                }));
+                crisisMarkerDataset = {
+                    data: crisisPoints,
+                    borderColor: 'rgba(239, 68, 68, 1)',
+                    backgroundColor: 'rgba(239, 68, 68, 0.8)',
+                    borderWidth: 2,
+                    pointRadius: 6,
+                    pointStyle: 'circle',
+                    showLine: false,
+                    label: 'Crisis'
+                };
+            }
+
             // Target line
             const targetDataset = {
                 data: Array(yearsToSimulate).fill(inputs.retirementTarget),
@@ -689,8 +736,10 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 label: 'Target'
             };
 
-            // Combine: faded paths first, then median (bold), then target
-            const datasets = [...fadedPaths, medianDataset, targetDataset];
+            // Combine: faded paths, median, crisis markers (if any), target
+            const datasets = crisisMarkerDataset 
+                ? [...fadedPaths, medianDataset, crisisMarkerDataset, targetDataset]
+                : [...fadedPaths, medianDataset, targetDataset];
 
             simulationChart = new Chart(ctx1, {
                 type: 'line',

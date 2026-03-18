@@ -6,7 +6,10 @@ import { htmlPage, generateUniqueId } from '../core/utils';
 
 const NUM_ITERATIONS = 1000;
 const MAX_YEARS = 60;
-const CRISIS_IMPACT = 0.30; // 30% wealth reduction per crisis
+
+// Crisis severity bounds (20-40% wealth reduction)
+const CRISIS_SEVERITY_MIN = 0.20;
+const CRISIS_SEVERITY_MAX = 0.40;
 
 export async function handleZeusGet(): Promise<Response> {
 	return htmlPage(ZEUS_HTML);
@@ -18,7 +21,8 @@ export async function handleZeusGet(): Promise<Response> {
  * 
  * Features:
  * - Salary growth: Income compounds annually at specified rate
- * - Crisis events: Random wealth drops simulating market crashes, pandemics, etc.
+ * - Crisis events: Random wealth drops (20-40% severity) simulating market crashes
+ * - Comparison: Shows success probability with vs without crises
  */
 export async function handleZeusSimulate(request: Request, env: Env): Promise<Response> {
 	return handleValidatedRequest(
@@ -49,6 +53,13 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			const iterations: number[][] = [];
 			const finalValues: number[] = [];
 			const yearsToFire: number[] = [];
+			
+			// Track crisis data for visualization
+			const crisisYearFrequency: Map<number, number> = new Map();
+			
+			// Parallel tracking for comparison (without crises)
+			const finalValuesNoCrisis: number[] = [];
+			const yearsToFireNoCrisis: number[] = [];
 
 			for (let i = 0; i < NUM_ITERATIONS; i++) {
 				const path: number[] = [currentSavings];
@@ -56,20 +67,33 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				let fireYear = -1;
 				let currentIncome = income;
 				
-				// Generate crisis years for this iteration (if any)
-				const crisisYears = new Set<number>();
+				// Parallel path WITHOUT crises (for comparison)
+				let balanceNoCrisis = currentSavings;
+				let fireYearNoCrisis = -1;
+				let currentIncomeNoCrisis = income;
+				
+				// Generate crisis years and severities for this iteration
+				const crisisData: { year: number; severity: number }[] = [];
 				if (crisisEvents > 0) {
-					const availableYears = Array.from({ length: yearsToSimulate }, (_, i) => i);
+					const availableYears = Array.from({ length: yearsToSimulate }, (_, idx) => idx);
 					shuffleArray(availableYears);
 					for (let c = 0; c < Math.min(crisisEvents, yearsToSimulate); c++) {
-						crisisYears.add(availableYears[c]);
+						const crisisYear = availableYears[c];
+						const severity = CRISIS_SEVERITY_MIN + Math.random() * (CRISIS_SEVERITY_MAX - CRISIS_SEVERITY_MIN);
+						crisisData.push({ year: crisisYear, severity });
+						
+						// Track crisis year frequency
+						crisisYearFrequency.set(crisisYear, (crisisYearFrequency.get(crisisYear) || 0) + 1);
 					}
 				}
+				const crisisYearSet = new Set(crisisData.map(c => c.year));
+				const crisisSeverityMap = new Map(crisisData.map(c => [c.year, c.severity]));
 
 				for (let year = 0; year < yearsToSimulate; year++) {
 					// Calculate this year's savings (income grows with salary growth)
 					if (year > 0 && salaryGrowth > 0) {
 						currentIncome = currentIncome * (1 + salaryGrowth);
+						currentIncomeNoCrisis = currentIncomeNoCrisis * (1 + salaryGrowth);
 					}
 					const annualSavings = currentIncome * savingsRate;
 					
@@ -81,34 +105,38 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					// Apply random return with mean and volatility
 					const yearlyReturn = realReturnMean + volatility * z;
 					
-					// Grow balance with return
+					// WITH crises path
 					balance = balance * (1 + yearlyReturn);
-					
-					// Apply crisis if this is a crisis year (BEFORE adding savings)
-					if (crisisYears.has(year)) {
-						balance = balance * (1 - CRISIS_IMPACT);
+					if (crisisYearSet.has(year)) {
+						const severity = crisisSeverityMap.get(year) || 0.30;
+						balance = balance * (1 - severity);
 					}
-					
-					// Add annual savings
 					balance = balance + annualSavings;
-					
-					// Ensure non-negative
 					balance = Math.max(0, balance);
-					
 					path.push(balance);
-
-					// Check if FIRE target reached
 					if (fireYear === -1 && balance >= retirementTarget) {
 						fireYear = year + 1;
+					}
+					
+					// WITHOUT crises path (parallel simulation)
+					balanceNoCrisis = balanceNoCrisis * (1 + yearlyReturn);
+					balanceNoCrisis = balanceNoCrisis + annualSavings;
+					balanceNoCrisis = Math.max(0, balanceNoCrisis);
+					if (fireYearNoCrisis === -1 && balanceNoCrisis >= retirementTarget) {
+						fireYearNoCrisis = year + 1;
 					}
 				}
 
 				iterations.push(path);
 				finalValues.push(balance);
 				yearsToFire.push(fireYear === -1 ? yearsToSimulate : fireYear);
+				
+				// Track no-crisis results
+				finalValuesNoCrisis.push(balanceNoCrisis);
+				yearsToFireNoCrisis.push(fireYearNoCrisis === -1 ? yearsToSimulate : fireYearNoCrisis);
 			}
 
-			// Calculate statistics
+			// Calculate statistics (WITH crises)
 			finalValues.sort((a, b) => a - b);
 			yearsToFire.sort((a, b) => a - b);
 
@@ -116,16 +144,30 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			const p10 = calculatePercentile(finalValues, 10);
 			const p90 = calculatePercentile(finalValues, 90);
 			const medianYearsToFire = calculatePercentile(yearsToFire.filter(y => y < yearsToSimulate), 50) || yearsToSimulate;
-
-			// Success probability (reached target within simulation period)
 			const successCount = yearsToFire.filter(y => y < yearsToSimulate).length;
 			const successProbability = successCount / NUM_ITERATIONS;
+
+			// Calculate statistics (WITHOUT crises - for comparison)
+			finalValuesNoCrisis.sort((a, b) => a - b);
+			yearsToFireNoCrisis.sort((a, b) => a - b);
+			const successCountNoCrisis = yearsToFireNoCrisis.filter(y => y < yearsToSimulate).length;
+			const successProbabilityNoCrisis = successCountNoCrisis / NUM_ITERATIONS;
 
 			// Calculate median path (year-by-year median across all iterations)
 			const medianPath: number[] = [currentSavings];
 			for (let year = 1; year <= yearsToSimulate; year++) {
 				const yearValues = iterations.map(it => it[year]).sort((a, b) => a - b);
 				medianPath.push(calculatePercentile(yearValues, 50));
+			}
+
+			// Find top crisis years (most frequently occurring across iterations)
+			const topCrisisYears: number[] = [];
+			if (crisisEvents > 0) {
+				const sortedYears = Array.from(crisisYearFrequency.entries())
+					.sort((a, b) => b[1] - a[1])
+					.slice(0, crisisEvents)
+					.map(([year]) => year);
+				topCrisisYears.push(...sortedYears);
 			}
 
 			// Store result for potential sharing
@@ -145,11 +187,14 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				},
 				results: {
 					iterations,
+					medianPath,
 					medianFinal,
 					p10,
 					p90,
 					successProbability,
-					medianYearsToFire
+					medianYearsToFire,
+					successProbabilityNoCrisis,
+					crisisYears: topCrisisYears
 				},
 				createdAt: Date.now()
 			};
@@ -157,16 +202,18 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			// Store for 1 day (optional - can be stateless)
 			await env.SHORT_LINKS.put(id, JSON.stringify(result), { expirationTtl: 86400 });
 
-			// Return results (without all iterations to keep response size manageable)
+			// Return results
 			return {
 				id,
 				medianFinal,
 				p10,
 				p90,
 				successProbability,
+				successProbabilityNoCrisis,
 				medianYearsToFire,
 				medianPath,
-				iterations: iterations.slice(0, 200) // Return 200 sample paths for charting
+				crisisYears: topCrisisYears,
+				iterations: iterations.slice(0, 200)
 			};
 		},
 		{ rateLimit: { key: 'zeus', limit: 10, ttl: 60 } }
