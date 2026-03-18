@@ -457,6 +457,14 @@ export const MARCUS_HTML = `<!DOCTYPE html>
                 <label>Your Data<span class="ai-badge">AI Explained</span></label>
                 <div style="display: none;"><input type="text" id="hp_field" tabindex="-1" autocomplete="off"></div>
                 <textarea id="data-input" placeholder="Paste your data here (CSV format)&#10;&#10;Example:&#10;name,sales,region&#10;Alice,1200,North&#10;Bob,980,South&#10;Carol,1450,North"></textarea>
+                <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; margin-bottom: 0.5rem;">
+                    <button class="btn-sample" onclick="loadSampleData()" style="flex:1;background:rgba(139, 92, 246, 0.15);border:1px solid rgba(139, 92, 246, 0.4);color:#8b5cf6;padding:0.75rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;font-weight:700;transition:all 0.2s;">
+                        📋 Load Sample Data
+                    </button>
+                    <button class="btn-clear" onclick="clearData()" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-dim);padding:0.75rem 1rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;transition:all 0.2s;">
+                        Clear
+                    </button>
+                </div>
                 <p class="data-hint">First row = column names. Comma-separated. Works with numbers, text, or mixed data.</p>
                 
                 <button class="btn-run" id="run-btn" onclick="runAnalysis()">Analyze My Data</button>
@@ -498,6 +506,33 @@ export const MARCUS_HTML = `<!DOCTYPE html>
                 btn.classList.toggle('active', btn.dataset.template === template);
             });
             updatePlaceholder();
+        };
+
+        // Generate sample retail sales data (100 records)
+        window.loadSampleData = function() {
+            const regions = ['North', 'South', 'East', 'West', 'Central'];
+            const products = ['Laptop', 'Phone', 'Tablet', 'Headphones', 'Monitor', 'Keyboard', 'Mouse', 'Webcam'];
+            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            
+            let csv = 'transaction_id,date,product,region,quantity,unit_price,total_sale,profit_margin\\n';
+            
+            for (let i = 1; i <= 100; i++) {
+                const month = months[Math.floor(Math.random() * 12)];
+                const product = products[Math.floor(Math.random() * products.length)];
+                const region = regions[Math.floor(Math.random() * regions.length)];
+                const quantity = Math.floor(Math.random() * 10) + 1;
+                const unitPrice = Math.floor(Math.random() * 500) + 50;
+                const totalSale = quantity * unitPrice;
+                const profitMargin = (Math.random() * 0.4 + 0.1).toFixed(2);
+                
+                csv += 'TXN' + String(i).padStart(3, '0') + ',' + month + ' 2026,' + product + ',' + region + ',' + quantity + ',' + unitPrice + ',' + totalSale + ',' + profitMargin + '\\n';
+            }
+            
+            document.getElementById('data-input').value = csv;
+        };
+
+        window.clearData = function() {
+            document.getElementById('data-input').value = '';
         };
 
         function updatePlaceholder() {
