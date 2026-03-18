@@ -90,12 +90,19 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				const crisisSeverityMap = new Map(crisisData.map(c => [c.year, c.severity]));
 
 				for (let year = 0; year < yearsToSimulate; year++) {
-					// Calculate this year's savings (income grows with salary growth)
-					if (year > 0 && salaryGrowth > 0) {
+					// Thai retirement age: income stops at 60
+					const currentAge = age + year;
+					const isRetired = currentAge >= 60;
+					
+					// Calculate this year's savings (income grows with salary growth until retirement)
+					if (year > 0 && salaryGrowth > 0 && !isRetired) {
 						currentIncome = currentIncome * (1 + salaryGrowth);
 						currentIncomeNoCrisis = currentIncomeNoCrisis * (1 + salaryGrowth);
 					}
-					const annualSavings = currentIncome * savingsRate;
+					
+					// No income/savings after retirement age 60
+					const annualSavings = isRetired ? 0 : currentIncome * savingsRate;
+					const annualSavingsNoCrisis = isRetired ? 0 : currentIncomeNoCrisis * savingsRate;
 					
 					// Generate random return using Box-Muller transform
 					const u1 = Math.random();
@@ -120,7 +127,7 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 					
 					// WITHOUT crises path (parallel simulation)
 					balanceNoCrisis = balanceNoCrisis * (1 + yearlyReturn);
-					balanceNoCrisis = balanceNoCrisis + annualSavings;
+					balanceNoCrisis = balanceNoCrisis + annualSavingsNoCrisis;
 					balanceNoCrisis = Math.max(0, balanceNoCrisis);
 					if (fireYearNoCrisis === -1 && balanceNoCrisis >= retirementTarget) {
 						fireYearNoCrisis = year + 1;

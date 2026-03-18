@@ -5,16 +5,16 @@ export const ZEUS_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ZEUS | Monte Carlo Retirement Simulator | PUNCHY.ME</title>
-    <meta name="description" content="Monte Carlo simulation for retirement planning. Visualize 1000 scenarios of your financial future. See your probability of reaching FIRE.">
+    <title>ZEUS | Monte Carlo Retirement Simulator (THB) | PUNCHY.ME</title>
+    <meta name="description" content="Monte Carlo simulation for retirement planning in Thai Baht. Visualize 1000 scenarios of your financial future. Income stops at age 60 (Thai retirement).">
     <link rel="canonical" href="https://punchy.me/zeus" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E⚡%3C/text%3E%3C/svg%3E">
 
     <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/zeus">
-    <meta property="og:title" content="ZEUS | Monte Carlo Retirement Simulator | PUNCHY.ME">
-    <meta property="og:description" content="Visualize 1000 scenarios of your financial future. See your probability of reaching FIRE.">
+    <meta property="og:title" content="ZEUS | Monte Carlo Retirement Simulator (THB) | PUNCHY.ME">
+    <meta property="og:description" content="Visualize 1000 scenarios of your financial future in Thai Baht. Income stops at age 60 (Thai retirement).">
     <meta property="og:image" content="https://punchy.me/og-images/og-image-zeus.webp">
 
     <!-- Twitter -->
@@ -429,7 +429,7 @@ export const ZEUS_HTML = `<!DOCTYPE html>
             <span class="beta-badge">BETA</span>
         </div>
         
-        <p class="desc">Monte Carlo Retirement Simulator. Visualize 1000 scenarios of your financial future. See your probability of reaching FIRE.</p>
+        <p class="desc">Monte Carlo Retirement Simulator (Thai Baht). Visualize 1000 scenarios of your financial future. Income stops at age 60 (Thai retirement).</p>
 
         <div class="main-grid">
             <div class="panel">
@@ -445,7 +445,7 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 </div>
 
                 <div class="input-group">
-                    <label>Annual Income ($)</label>
+                    <label>Annual Income (฿) <span style="font-size:0.75em;color:#94a3b8;">(stops at age 60)</span></label>
                     <input type="number" id="income" value="100000" min="0" step="5000">
                 </div>
 
@@ -458,7 +458,7 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 </div>
 
                 <div class="input-group">
-                    <label>Current Savings ($)</label>
+                    <label>Current Savings (฿)</label>
                     <input type="number" id="currentSavings" value="50000" min="0" step="5000">
                 </div>
 
@@ -479,7 +479,7 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 </div>
 
                 <div class="input-group">
-                    <label>Retirement Target ($)</label>
+                    <label>Retirement Target (฿)</label>
                     <input type="number" id="retirementTarget" value="1000000" min="0" step="50000">
                 </div>
 
@@ -762,9 +762,9 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                             ticks: {
                                 color: '#94a3b8',
                                 font: { size: 10 },
-                                callback: v => '$' + (v / 1000) + 'k'
+                                callback: v => '฿' + (v / 1000) + 'k'
                             },
-                            title: { display: true, text: 'Wealth ($)', color: '#94a3b8', font: { size: 11 } }
+                            title: { display: true, text: 'Wealth (฿)', color: '#94a3b8', font: { size: 11 } }
                         }
                     }
                 }
@@ -831,14 +831,14 @@ export const ZEUS_HTML = `<!DOCTYPE html>
         }
 
         function formatCurrency(n) {
-            if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
-            if (n >= 1000) return '$' + (n / 1000).toFixed(0) + 'k';
-            return '$' + n.toFixed(0);
+            if (n >= 1000000) return '฿' + (n / 1000000).toFixed(1) + 'M';
+            if (n >= 1000) return '฿' + (n / 1000).toFixed(0) + 'k';
+            return '฿' + n.toFixed(0);
         }
 
         function formatCurrencyShort(n) {
-            if (n >= 1000000) return '$' + (n / 1000000).toFixed(1) + 'M';
-            return '$' + (n / 1000).toFixed(0) + 'k';
+            if (n >= 1000000) return '฿' + (n / 1000000).toFixed(1) + 'M';
+            return '฿' + (n / 1000).toFixed(0) + 'k';
         }
 
         function createHistogram(values, numBins) {
