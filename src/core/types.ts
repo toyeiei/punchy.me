@@ -143,6 +143,7 @@ export interface ZeusSimulation {
 	};
 	results: {
 		iterations: number[][];
+		medianPath: number[];
 		medianFinal: number;
 		p10: number;
 		p90: number;

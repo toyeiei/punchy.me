@@ -657,18 +657,29 @@ export const ZEUS_HTML = `<!DOCTYPE html>
             
             const ctx1 = document.getElementById('simulationChart').getContext('2d');
             
-            // Prepare datasets - show median line prominently, others faded
-            const datasets = data.iterations.slice(0, 200).map((iteration, i) => ({
+            // Prepare datasets - faded paths first (so they're behind the median)
+            const fadedPaths = data.iterations.slice(0, 200).map((iteration, i) => ({
                 data: iteration.slice(0, yearsToSimulate),
-                borderColor: i === 0 ? 'rgba(251, 191, 36, 1)' : 'rgba(251, 191, 36, 0.08)',
-                borderWidth: i === 0 ? 3 : 1,
+                borderColor: 'rgba(251, 191, 36, 0.08)',
+                borderWidth: 1,
                 pointRadius: 0,
                 fill: false,
                 tension: 0.1
             }));
 
-            // Add target line
-            datasets.push({
+            // Bold MEDIAN path (typical outcome)
+            const medianDataset = {
+                data: data.medianPath ? data.medianPath.slice(0, yearsToSimulate) : [],
+                borderColor: 'rgba(251, 191, 36, 1)',
+                borderWidth: 3,
+                pointRadius: 0,
+                fill: false,
+                tension: 0.1,
+                label: 'Median Path'
+            };
+
+            // Target line
+            const targetDataset = {
                 data: Array(yearsToSimulate).fill(inputs.retirementTarget),
                 borderColor: 'rgba(34, 197, 94, 0.8)',
                 borderWidth: 2,
@@ -676,7 +687,10 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                 pointRadius: 0,
                 fill: false,
                 label: 'Target'
-            });
+            };
+
+            // Combine: faded paths first, then median (bold), then target
+            const datasets = [...fadedPaths, medianDataset, targetDataset];
 
             simulationChart = new Chart(ctx1, {
                 type: 'line',
@@ -691,7 +705,8 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                     scales: {
                         x: {
                             grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: 'Age', color: '#94a3b8', font: { size: 11 } }
                         },
                         y: {
                             grid: { color: 'rgba(255,255,255,0.05)' },
@@ -699,7 +714,8 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                                 color: '#94a3b8',
                                 font: { size: 10 },
                                 callback: v => '$' + (v / 1000) + 'k'
-                            }
+                            },
+                            title: { display: true, text: 'Wealth ($)', color: '#94a3b8', font: { size: 11 } }
                         }
                     }
                 }
@@ -738,11 +754,13 @@ export const ZEUS_HTML = `<!DOCTYPE html>
                     scales: {
                         x: {
                             grid: { display: false },
-                            ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 45 }
+                            ticks: { color: '#94a3b8', font: { size: 9 }, maxRotation: 45 },
+                            title: { display: true, text: 'Final Wealth', color: '#94a3b8', font: { size: 11 } }
                         },
                         y: {
                             grid: { color: 'rgba(255,255,255,0.05)' },
-                            ticks: { color: '#94a3b8', font: { size: 10 } }
+                            ticks: { color: '#94a3b8', font: { size: 10 } },
+                            title: { display: true, text: 'Scenarios', color: '#94a3b8', font: { size: 11 } }
                         }
                     }
                 }

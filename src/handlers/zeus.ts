@@ -121,6 +121,13 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			const successCount = yearsToFire.filter(y => y < yearsToSimulate).length;
 			const successProbability = successCount / NUM_ITERATIONS;
 
+			// Calculate median path (year-by-year median across all iterations)
+			const medianPath: number[] = [currentSavings];
+			for (let year = 1; year <= yearsToSimulate; year++) {
+				const yearValues = iterations.map(it => it[year]).sort((a, b) => a - b);
+				medianPath.push(calculatePercentile(yearValues, 50));
+			}
+
 			// Store result for potential sharing
 			const id = generateUniqueId(6);
 			const result: ZeusSimulation = {
@@ -158,6 +165,7 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 				p90,
 				successProbability,
 				medianYearsToFire,
+				medianPath,
 				iterations: iterations.slice(0, 200) // Return 200 sample paths for charting
 			};
 		},

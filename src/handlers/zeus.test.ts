@@ -103,6 +103,7 @@ describe('ZEUS Handler', () => {
 				p90: number;
 				successProbability: number;
 				medianYearsToFire: number;
+				medianPath: number[];
 				iterations: number[][];
 			};
 
@@ -112,6 +113,8 @@ describe('ZEUS Handler', () => {
 			expect(data.successProbability).toBeGreaterThanOrEqual(0);
 			expect(data.successProbability).toBeLessThanOrEqual(1);
 			expect(data.iterations.length).toBeGreaterThan(0);
+			expect(data.medianPath).toBeDefined();
+			expect(data.medianPath.length).toBeGreaterThan(0);
 		});
 
 		it('should run simulation with crisis events', async () => {
