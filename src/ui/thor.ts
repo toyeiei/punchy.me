@@ -564,12 +564,16 @@ export const THOR_UI_HTML = `<!DOCTYPE html>
             <span class="feature-tag">Topic Extraction</span>
             <span class="feature-tag">Key Entities</span>
             <span class="feature-tag">PDF Reports</span>
+            <span class="feature-tag" style="background: rgba(251, 191, 36, 0.1); border-color: rgba(251, 191, 36, 0.3); color: #fbbf24;">English Only (MVP)</span>
         </div>
 
         <div class="thor-grid">
             <div class="panel">
                 <label>Target URL <span class="ai-badge">AI</span></label>
                 <input type="url" id="target-url" placeholder="https://example.com" required>
+                <div style="font-size: 0.75rem; color: #fbbf24; margin: 8px 0; padding: 8px; background: rgba(251, 191, 36, 0.1); border-radius: 6px;">
+                    ⚠️ <strong>MVP Limitation:</strong> THOR currently supports English content only. Non-English pages may be rejected.
+                </div>
                 <button class="btn-forge" id="forge-btn">Forge Intelligence</button>
                 <div class="processing-notice" id="processing-notice">
                     ⚡ Extracting & Analyzing... This takes ~15 seconds

@@ -50,7 +50,10 @@ async function forgeThorIntelligence(url: string, env: Env): Promise<ThorReport>
 	// 1. Validate URL
 	const parsedUrl = validateThorTarget(url);
 
-	// 2. Check credentials
+	// 2. Check if URL appears to be non-English (MVP limitation)
+	validateEnglishUrl(parsedUrl);
+
+	// 3. Check credentials
 	const accountId = env.CLOUDFLARE_ACCOUNT_ID;
 	const apiToken = env.THOR_API_TOKEN;
 	if (!accountId || !apiToken) {
@@ -58,16 +61,19 @@ async function forgeThorIntelligence(url: string, env: Env): Promise<ThorReport>
 		throw new InternalError('Intelligence engine configuration incomplete');
 	}
 
-	// 3. Scrape via Browser Rendering
+	// 4. Scrape via Browser Rendering
 	const markdown = await fetchThorMarkdown(url, accountId, apiToken);
 	if (!markdown.trim()) {
 		throw new ExternalServiceError('Empty result from browser rendering');
 	}
 
-	// 4. Analyze with Mistral
+	// 5. Check if content is English (MVP limitation)
+	validateEnglishContent(markdown);
+
+	// 6. Analyze with Mistral
 	const intelligence = await analyzeWithMistral(markdown, url, env);
 
-	// 5. Build and cache report
+	// 7. Build and cache report
 	const report: ThorReport = {
 		id: generateUniqueId(8),
 		url,
@@ -103,6 +109,88 @@ function validateThorTarget(url: string): URL {
 	}
 
 	return parsedUrl;
+}
+
+/**
+ * Validate URL appears to target English content (MVP limitation)
+ * Checks: TLD, hostname language indicators, path segments
+ */
+function validateEnglishUrl(url: URL): void {
+	const hostname = url.hostname.toLowerCase();
+	const path = url.pathname.toLowerCase();
+	
+	// Common non-English TLDs and domain patterns
+	const nonEnglishPatterns = [
+		/\.th$/i,           // Thailand
+		/\.cn$/i,           // China
+		/\.jp$/i,           // Japan
+		/\.kr$/i,           // Korea
+		/\.ru$/i,           // Russia
+		/\.vn$/i,           // Vietnam
+		/\.id$/i,           // Indonesia
+		/\.sa$/i,           // Saudi Arabia
+		/\.ir$/i,           // Iran
+		/\.eg$/i,           // Egypt
+		/\.in$/i,           // India (often English but can be Hindi)
+		/\.tw$/i,           // Taiwan
+		/\.hk$/i,           // Hong Kong
+		/\.my$/i,           // Malaysia
+		/\.ph$/i,           // Philippines
+		/\/th\//i,          // Thai path
+		/\/th-\//i,         // Thai path variant
+		/\/ja\//i,          // Japanese path
+		/\/zh\//i,          // Chinese path
+		/\/ko\//i,          // Korean path
+		/\/vi\//i,          // Vietnamese path
+		/\/ar\//i,          // Arabic path
+		/\/ru\//i,          // Russian path
+	];
+	
+	for (const pattern of nonEnglishPatterns) {
+		if (pattern.test(hostname) || pattern.test(path)) {
+			throw new ValidationError(
+				'THOR MVP currently supports English content only. ' +
+				'The URL appears to target non-English content. ' +
+				'Try an English version of the page or a different URL.'
+			);
+		}
+	}
+}
+
+/**
+ * Validate scraped content is primarily English (MVP limitation)
+ * Uses basic heuristics: common English words ratio
+ */
+function validateEnglishContent(markdown: string): void {
+	// Sample first 2000 chars for speed
+	const sample = markdown.slice(0, 2000).toLowerCase();
+	
+	// Count common English words
+	const englishWords = [
+		'the', 'and', 'is', 'in', 'to', 'of', 'a', 'for', 'on', 'with',
+		'are', 'be', 'this', 'that', 'from', 'or', 'by', 'at', 'as', 'an',
+		'we', 'you', 'your', 'our', 'their', 'it', 'was', 'were', 'have', 'has'
+	];
+	
+	let englishCount = 0;
+	for (const word of englishWords) {
+		const regex = new RegExp(`\\b${word}\\b`, 'gi');
+		const matches = sample.match(regex);
+		if (matches) englishCount += matches.length;
+	}
+	
+	// Check for non-English character ranges
+	const nonEnglishChars = sample.match(/[\u0E00-\u0E7F\u4E00-\u9FFF\u3040-\u30FF\uAC00-\uD7AF\u0600-\u06FF\u0400-\u04FF]/g);
+	const nonEnglishRatio = nonEnglishChars ? nonEnglishChars.length / sample.length : 0;
+	
+	// If >15% non-English chars OR <3 English words found, likely non-English
+	if (nonEnglishRatio > 0.15 || (englishCount < 3 && sample.length > 100)) {
+		throw new ValidationError(
+			'THOR MVP currently supports English content only. ' +
+			'The page content appears to be primarily non-English. ' +
+			'Try an English version of the page or a different URL.'
+		);
+	}
 }
 
 async function fetchThorMarkdown(url: string, accountId: string, apiToken: string): Promise<string> {
