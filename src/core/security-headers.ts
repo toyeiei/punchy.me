@@ -3,23 +3,36 @@
  * Centralized security hardening configuration
  */
 
-function buildCspPolicy(options?: { allowUnsafeEval?: boolean }): string {
-	const scriptSrc = options?.allowUnsafeEval
-		? "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com"
-		: "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+function buildCspPolicy(options?: { allowUnsafeEval?: boolean; allowWebR?: boolean }): string {
+	let scriptSrc = "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+	let connectSrc = "connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+	let workerSrc = "worker-src 'self'";
+	
+	if (options?.allowUnsafeEval) {
+		scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+	}
+	
+	if (options?.allowWebR) {
+		scriptSrc += " https://webr.r-wasm.org blob: 'wasm-unsafe-eval'";
+		connectSrc += " https://webr.r-wasm.org https://cdn.jsdelivr.net blob: data:";
+		workerSrc = "worker-src 'self' blob: https://webr.r-wasm.org data:";
+	}
 
-	return [
+	const parts = [
 		"default-src 'self'",
 		scriptSrc,
 		"style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
 		"font-src 'self' https://fonts.gstatic.com",
 		"img-src 'self' https://images.unsplash.com https://*.unsplash.com data:",
-		"connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com",
+		connectSrc,
+		workerSrc,
 		"frame-src https://challenges.cloudflare.com",
 		"frame-ancestors 'none'",
 		"base-uri 'self'",
 		"form-action 'self'",
-	].join('; ');
+	];
+
+	return parts.join('; ');
 }
 
 export const CSP_POLICY = buildCspPolicy();
@@ -27,6 +40,9 @@ export const CSP_POLICY = buildCspPolicy();
 // ODIN uses a terminal-like query field that evaluates expressions via `new Function(...)`.
 // That requires `script-src 'unsafe-eval'`.
 export const CSP_POLICY_ODIN = buildCspPolicy({ allowUnsafeEval: true });
+
+// MARCUS uses WebR which needs to load from webr.r-wasm.org and fetch WASM files
+export const CSP_POLICY_MARCUS = buildCspPolicy({ allowWebR: true });
 
 /**
  * Complete security headers set

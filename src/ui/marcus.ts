@@ -5,26 +5,23 @@ export const MARCUS_HTML = `<!DOCTYPE html>
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MARCUS | R Analytics for Everyone | PUNCHY.ME</title>
-    <meta name="description" content="Run R statistical analysis in your browser. No coding required. Pre-built templates for comparing groups, finding trends, and spotting outliers. AI-powered explanations.">
+    <title>MARCUS | R Terminal | PUNCHY.ME</title>
+    <meta name="description" content="R Analytics Terminal. Write and execute R code directly in your browser. WebR-powered statistical analysis.">
     <link rel="canonical" href="https://punchy.me/marcus" />
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E📊%3C/text%3E%3C/svg%3E">
 
-    <!-- Open Graph -->
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://punchy.me/marcus">
-    <meta property="og:title" content="MARCUS | R Analytics for Everyone | PUNCHY.ME">
-    <meta property="og:description" content="Run R statistical analysis in your browser. No coding required. Pre-built templates for everyone.">
+    <meta property="og:title" content="MARCUS | R Terminal | PUNCHY.ME">
+    <meta property="og:description" content="R Analytics Terminal. Write and execute R code in your browser.">
     <meta property="og:image" content="https://punchy.me/og-images/og-image-marcus.webp">
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@punchyme">
-    <meta name="twitter:title" content="MARCUS | R Analytics for Everyone">
-    <meta name="twitter:description" content="Run R statistical analysis in your browser. No coding required.">
+    <meta name="twitter:title" content="MARCUS | R Terminal">
+    <meta name="twitter:description" content="R Analytics Terminal. Write and execute R code in your browser.">
     <meta name="twitter:image" content="https://punchy.me/og-images/og-image-marcus.webp">
 
-    <!-- JSON-LD Schema -->
     <script type="application/ld+json">
     {
       "@context": "https://schema.org",
@@ -33,709 +30,720 @@ export const MARCUS_HTML = `<!DOCTYPE html>
       "operatingSystem": "Any",
       "applicationCategory": "DataAnalysisApplication",
       "url": "https://punchy.me/marcus",
-      "description": "Run R statistical analysis in your browser. No coding required. Pre-built templates for comparing groups, finding trends, and spotting outliers.",
-      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
-      "featureList": ["T-test", "Correlation", "Regression", "Summary Statistics", "Visualization"]
+      "description": "R Analytics Terminal. Write and execute R code in your browser.",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
     }
     </script>
 
-    <link href="https://fonts.googleapis.com/css2?family=Bitcount+Prop+Double:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --bg: #000000;
+            --bg: #0a0a0a;
+            --terminal-bg: #0d0d0d;
             --accent: #22c55e;
-            --accent-hover: #4ade80;
-            --text-main: #f8fafc;
-            --text-dim: #94a3b8;
-            --font-brand: 'Bitcount Prop Double', cursive;
+            --accent-dim: #166534;
+            --purple: #8b5cf6;
+            --text-main: #e5e5e5;
+            --text-dim: #737373;
+            --border: #1a1a1a;
             --font-mono: 'JetBrains Mono', monospace;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         
-        html, body { height: 100%; background-color: #000; }
+        html, body { height: 100%; background-color: var(--bg); }
 
         body {
             color: var(--text-main);
             font-family: var(--font-mono);
             display: flex;
             flex-direction: column;
-            align-items: center;
             min-height: 100vh;
-            overflow-y: auto;
-            overflow-x: hidden;
-            text-align: center;
-            position: relative;
-            padding: 0;
+            overflow: hidden;
         }
 
-        .bg-image {
-            position: fixed;
-            inset: 0;
-            background: linear-gradient(135deg, #0a0a0a 0%, #0d1117 50%, #0a0a0a 100%);
-            z-index: -2;
-        }
-        .bg-overlay {
-            position: fixed;
-            inset: 0;
-            background: radial-gradient(ellipse at 20% 0%, rgba(139, 92, 246, 0.06) 0%, transparent 50%),
-                        radial-gradient(ellipse at 80% 100%, rgba(34, 197, 94, 0.05) 0%, transparent 50%);
-            z-index: -1;
-        }
-
-        .scan-line {
-            position: fixed;
-            top: 0; left: 0; width: 100%; height: 100px;
-            background: linear-gradient(to bottom, transparent, rgba(139, 92, 246, 0.08), transparent);
-            border-bottom: 1px solid rgba(139, 92, 246, 0.15);
-            z-index: 9999;
-            animation: scan 5s linear infinite;
-            pointer-events: none;
-        }
-
-        @keyframes scan {
-            0% { transform: translateY(-100px); }
-            100% { transform: translateY(100vh); }
-        }
-        
-        .container { 
-            z-index: 10; 
-            padding: 5rem 2rem 2rem; 
-            position: relative; 
-            max-width: 1100px; 
-            width: 100%;
-            flex-grow: 1;
-        }
-        
-        .title-container {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 1.5rem;
-            margin-bottom: 1.5rem;
-        }
-
-        h1 {
-            font-family: var(--font-brand); font-size: clamp(3rem, 10vw, 90px); font-weight: 400;
-            line-height: 0.85;
-            color: var(--text-main);
-            letter-spacing: -3px;
-            text-transform: uppercase;
-            animation: main-glitch 5s infinite;
-        }
-
-        @keyframes main-glitch {
-            0%, 80%, 100% { transform: skew(0deg); text-shadow: none; }
-            81% { transform: skew(1.5deg); text-shadow: 2px 0 #ff00ff, -2px 0 #00ffff; }
-            82% { transform: skew(-1.5deg); text-shadow: -2px 0 #ff00ff, 2px 0 #00ffff; }
-            83% { transform: skew(0deg); text-shadow: none; }
-        }
-
-        .beta-badge {
-            background: linear-gradient(135deg, #22c55e 0%, #8b5cf6 100%);
-            color: #000;
-            font-size: 0.75rem;
-            font-weight: 900;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-family: var(--font-mono);
-            box-shadow: 0 0 15px rgba(34, 197, 94, 0.5);
-            animation: pulse 2s infinite alternate;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.85; }
-            100% { transform: scale(1.05); opacity: 1; }
-        }
-
-        .desc {
-            color: var(--text-dim);
-            font-size: 0.95rem;
-            line-height: 1.6;
-            margin-bottom: 0.5rem;
-            max-width: 600px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .ai-badge {
-            display: inline-block;
-            background: var(--accent);
-            color: #000;
-            font-size: 0.6rem;
-            font-weight: 900;
-            padding: 2px 6px;
-            border-radius: 4px;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-left: 0.5rem;
-        }
-
-        .main-grid {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 2rem;
-            margin-top: 2.5rem;
-        }
-
-        @media (min-width: 900px) {
-            .main-grid { grid-template-columns: 300px 1fr; }
-        }
-
-        .panel {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
-            padding: 2rem;
-            border-radius: 24px;
-            transition: all 0.3s ease;
-            text-align: left;
-        }
-        .panel:hover {
-            border-color: rgba(139, 92, 246, 0.3);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4);
-        }
-
-        .template-list {
+        .terminal-container {
+            flex: 1;
             display: flex;
             flex-direction: column;
-            gap: 0.75rem;
-        }
-
-        .template-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1rem 1.25rem;
-            text-align: left;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            font-family: var(--font-mono);
-            color: var(--text-main);
-        }
-        .template-btn:hover {
-            background: rgba(139, 92, 246, 0.1);
-            border-color: rgba(139, 92, 246, 0.4);
-            transform: translateX(4px);
-        }
-        .template-btn.active {
-            background: rgba(139, 92, 246, 0.15);
-            border-color: #8b5cf6;
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.2);
-        }
-        .template-title {
-            font-weight: 700;
-            font-size: 0.9rem;
-            margin-bottom: 0.25rem;
-        }
-        .template-desc {
-            font-size: 0.75rem;
-            color: var(--text-dim);
-        }
-
-        label { 
-            color: var(--text-dim); 
-            font-size: 0.75rem; 
-            text-transform: uppercase; 
-            font-weight: 700; 
-            letter-spacing: 1px; 
-            margin-bottom: 0.75rem; 
-            display: block; 
-        }
-
-        textarea {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 1rem 1.2rem;
-            border-radius: 12px;
-            color: var(--text-main);
-            font-family: var(--font-mono);
+            max-width: 1200px;
             width: 100%;
-            min-height: 150px;
-            outline: none;
-            resize: vertical;
-            transition: all 0.2s;
-        }
-        textarea:focus {
-            border-color: #8b5cf6;
-            background: rgba(255, 255, 255, 0.08);
-            box-shadow: 0 0 10px rgba(139, 92, 246, 0.1);
+            margin: 0 auto;
+            padding: 1rem;
         }
 
-        .btn-run {
-            margin-top: 1.5rem;
-            background: linear-gradient(135deg, #8b5cf6 0%, #22c55e 100%);
-            color: #000;
-            border: none;
-            padding: 1.1rem;
-            border-radius: 12px;
-            font-weight: 900;
-            width: 100%;
-            cursor: pointer;
-            text-transform: uppercase;
-            font-family: var(--font-mono);
-            letter-spacing: 1px;
-            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-            box-shadow: 0 0 15px rgba(139, 92, 246, 0.3);
-        }
-        .btn-run:hover {
-            transform: scale(1.02);
-            box-shadow: 0 0 25px rgba(139, 92, 246, 0.5);
-        }
-        .btn-run:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .output-section {
-            display: none;
-            margin-top: 2rem;
-        }
-
-        .output-header {
+        .terminal-header {
             display: flex;
             align-items: center;
             justify-content: space-between;
-            margin-bottom: 1rem;
-        }
-        .output-header h3 {
-            font-family: var(--font-brand);
-            font-size: 1.3rem;
-            color: #8b5cf6;
-            text-transform: uppercase;
-            letter-spacing: 2px;
+            padding: 0.75rem 1rem;
+            background: var(--terminal-bg);
+            border: 1px solid var(--border);
+            border-bottom: none;
+            border-radius: 12px 12px 0 0;
         }
 
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 1rem;
-            margin-bottom: 1.5rem;
-        }
-        .stat-box {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 12px;
-            padding: 1rem;
-            text-align: center;
-        }
-        .stat-value {
-            font-size: 1.5rem;
-            font-weight: 900;
-            color: #8b5cf6;
-        }
-        .stat-label {
-            font-size: 0.7rem;
-            color: var(--text-dim);
-            text-transform: uppercase;
-            margin-top: 0.25rem;
-        }
-
-        .console-output {
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid rgba(139, 92, 246, 0.2);
-            border-radius: 12px;
-            padding: 1.25rem;
-            font-family: var(--font-mono);
-            font-size: 0.8rem;
-            color: var(--accent);
-            white-space: pre-wrap;
-            overflow-x: auto;
-            line-height: 1.6;
-            max-height: 300px;
-            overflow-y: auto;
-        }
-
-        .ai-explanation {
-            background: rgba(139, 92, 246, 0.08);
-            border: 1px solid rgba(139, 92, 246, 0.3);
-            border-radius: 12px;
-            padding: 1.5rem;
-            margin-top: 1.5rem;
-        }
-        .ai-explanation h4 {
-            color: #8b5cf6;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 0.75rem;
+        .terminal-title {
             display: flex;
             align-items: center;
             gap: 0.5rem;
-        }
-        .ai-explanation p {
-            color: var(--text-main);
+            font-weight: 700;
             font-size: 0.9rem;
-            line-height: 1.6;
+            color: var(--accent);
         }
 
-        .loading-bar {
+        .terminal-dots {
+            display: flex;
+            gap: 6px;
+        }
+        .terminal-dots span {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+        .terminal-dots span:nth-child(1) { background: #ef4444; }
+        .terminal-dots span:nth-child(2) { background: #eab308; }
+        .terminal-dots span:nth-child(3) { background: #22c55e; }
+
+        .status-badge {
+            font-size: 0.65rem;
+            padding: 3px 8px;
+            border-radius: 4px;
+            background: var(--accent-dim);
+            color: var(--accent);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        .status-badge.loading {
+            background: rgba(139, 92, 246, 0.2);
+            color: var(--purple);
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .loading-bar-container {
+            background: var(--terminal-bg);
+            border: 1px solid var(--border);
+            border-top: none;
+            padding: 0.75rem 1rem;
             display: none;
-            margin-top: 1.5rem;
-            text-align: center;
+        }
+        .loading-bar-container.active {
+            display: block;
+        }
+        .loading-bar-wrapper {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 4px;
+            height: 8px;
+            overflow: hidden;
+            position: relative;
+        }
+        .loading-bar {
+            background: linear-gradient(90deg, var(--purple), var(--accent));
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s ease;
+            border-radius: 4px;
         }
         .loading-text {
-            color: #8b5cf6;
-            font-size: 0.85rem;
-            margin-bottom: 0.75rem;
-        }
-        .progress-bar {
-            height: 4px;
-            background: rgba(139, 92, 246, 0.2);
-            border-radius: 2px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: linear-gradient(90deg, #8b5cf6, #22c55e);
-            animation: progress 2s ease-in-out infinite;
-        }
-        @keyframes progress {
-            0% { width: 0%; margin-left: 0; }
-            50% { width: 50%; margin-left: 25%; }
-            100% { width: 0%; margin-left: 100%; }
-        }
-
-        .data-hint {
             font-size: 0.7rem;
             color: var(--text-dim);
-            margin-top: 0.5rem;
-            margin-bottom: 1rem;
+            margin-bottom: 0.5rem;
+            display: flex;
+            justify-content: space-between;
+        }
+        .loading-percentage {
+            color: var(--purple);
+            font-weight: 700;
         }
 
-        @keyframes fadeInUp {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+        .terminal-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background: var(--terminal-bg);
+            border: 1px solid var(--border);
+            border-radius: 0 0 12px 12px;
+            overflow: hidden;
         }
-        .fade-in-up { animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards; }
+
+        .output-area {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+            font-size: 0.8rem;
+            line-height: 1.6;
+            background: #000;
+        }
+
+        .output-line {
+            margin-bottom: 0.25rem;
+            white-space: pre-wrap;
+            word-break: break-word;
+        }
+        .output-line.prompt {
+            color: var(--accent);
+        }
+        .output-line.command {
+            color: var(--text-main);
+        }
+        .output-line.result {
+            color: #a3a3a3;
+        }
+        .output-line.error {
+            color: #ef4444;
+        }
+        .output-line.info {
+            color: var(--purple);
+        }
+        .output-line.success {
+            color: var(--accent);
+        }
+
+        .input-area {
+            display: flex;
+            align-items: center;
+            border-top: 1px solid var(--border);
+            background: #050505;
+        }
+
+        .prompt-symbol {
+            color: var(--accent);
+            font-weight: 700;
+            padding: 1rem 0.75rem;
+            font-size: 0.85rem;
+            user-select: none;
+        }
+
+        #r-input {
+            flex: 1;
+            background: transparent;
+            border: none;
+            color: var(--text-main);
+            font-family: var(--font-mono);
+            font-size: 0.85rem;
+            padding: 1rem 0.5rem;
+            outline: none;
+        }
+
+        #r-input::placeholder {
+            color: var(--text-dim);
+        }
+
+        .sidebar {
+            width: 280px;
+            background: var(--terminal-bg);
+            border-left: 1px solid var(--border);
+            padding: 1rem;
+            overflow-y: auto;
+            display: none;
+        }
+        @media (min-width: 900px) {
+            .sidebar { display: block; }
+        }
+
+        .sidebar h3 {
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 0.75rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .snippet-list {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
+
+        .snippet-btn {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            border-radius: 8px;
+            padding: 0.75rem;
+            text-align: left;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+            font-size: 0.75rem;
+            color: var(--text-main);
+        }
+        .snippet-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+        }
+        .snippet-btn .name {
+            font-weight: 700;
+            color: var(--purple);
+            margin-bottom: 0.25rem;
+        }
+        .snippet-btn .desc {
+            color: var(--text-dim);
+            font-size: 0.65rem;
+        }
+
+        .flex-row {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        .main-terminal {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .toolbar {
+            display: flex;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: #080808;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .toolbar-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 6px;
+            padding: 0.5rem 0.75rem;
+            font-size: 0.7rem;
+            color: var(--text-dim);
+            cursor: pointer;
+            transition: all 0.2s;
+            font-family: var(--font-mono);
+        }
+        .toolbar-btn:hover {
+            background: rgba(139, 92, 246, 0.1);
+            border-color: rgba(139, 92, 246, 0.3);
+            color: var(--text-main);
+        }
+
+        .hidden { display: none; }
     </style>
 </head>
 <body>
     ${PUNCHY_PORTAL_HTML}
-    <div class="bg-image"></div>
-    <div class="bg-overlay"></div>
-    <div class="scan-line"></div>
     
-    <div class="container">
-        <div class="title-container">
-            <h1>MARCUS</h1>
-            <span class="beta-badge">BETA</span>
+    <div class="terminal-container">
+        <div class="terminal-header">
+            <div class="terminal-title">
+                <span>📊</span> MARCUS R Terminal
+            </div>
+            <div class="terminal-dots">
+                <span></span><span></span><span></span>
+            </div>
+            <span class="status-badge loading" id="status">LOADING R...</span>
         </div>
         
-        <p class="desc">R Analytics for Everyone. Run statistical analysis in your browser. No coding required.</p>
-
-        <div class="main-grid">
-            <div class="panel">
-                <label>Choose Analysis</label>
-                <div class="template-list">
-                    <button class="template-btn active" data-template="summary">
-                        <div class="template-title">📊 Quick Summary</div>
-                        <div class="template-desc">Mean, median, range, outliers</div>
-                    </button>
-                    <button class="template-btn" data-template="compare">
-                        <div class="template-title">⚖️ Compare Groups</div>
-                        <div class="template-desc">Are two groups different?</div>
-                    </button>
-                    <button class="template-btn" data-template="trend">
-                        <div class="template-title">📈 Find Trend</div>
-                        <div class="template-desc">Is there a pattern?</div>
-                    </button>
-                    <button class="template-btn" data-template="correlation">
-                        <div class="template-title">🔗 Test Relationship</div>
-                        <div class="template-desc">Do these relate to each other?</div>
-                    </button>
-                    <button class="template-btn" data-template="distribution">
-                        <div class="template-title">🎯 See Distribution</div>
-                        <div class="template-desc">How is data spread out?</div>
-                    </button>
+        <div class="loading-bar-container active" id="loading-container">
+            <div class="loading-text">
+                <span id="loading-message">Initializing WebR...</span>
+                <span class="loading-percentage" id="loading-percent">0%</span>
+            </div>
+            <div class="loading-bar-wrapper">
+                <div class="loading-bar" id="loading-bar"></div>
+            </div>
+        </div>
+        
+        <div class="flex-row">
+            <div class="main-terminal">
+                <div class="toolbar">
+                    <button class="toolbar-btn" id="btn-clear">Clear Output</button>
+                    <button class="toolbar-btn" id="btn-sample">Load Sample Data</button>
+                    <button class="toolbar-btn" id="btn-help">Show Commands</button>
+                </div>
+                <div class="terminal-body">
+                    <div class="output-area" id="output">
+                        <div class="output-line info">[MARCUS] R Terminal v1.0</div>
+                        <div class="output-line info">[MARCUS] Powered by WebR - R running in your browser via WebAssembly</div>
+                        <div class="output-line result"></div>
+                        <div class="output-line info">[MARCUS] Loading R environment (~30MB, may take 10-30s on first visit)...</div>
+                        <div class="output-line result"></div>
+                        <div class="output-line info">[MARCUS] While waiting, you can use Clear/Help buttons.</div>
+                    </div>
+                    <div class="input-area">
+                        <span class="prompt-symbol">❯</span>
+                        <input type="text" id="r-input" placeholder="Enter R code or :help for commands..." autocomplete="off" spellcheck="false">
+                    </div>
                 </div>
             </div>
-
-            <div class="panel">
-                <label>Your Data<span class="ai-badge">AI Explained</span></label>
-                <div style="display: none;"><input type="text" id="hp_field" tabindex="-1" autocomplete="off"></div>
-                <textarea id="data-input" placeholder="Paste your data here (CSV format)&#10;&#10;Example:&#10;name,sales,region&#10;Alice,1200,North&#10;Bob,980,South&#10;Carol,1450,North"></textarea>
-                <div style="display: flex; gap: 0.75rem; margin-top: 0.75rem; margin-bottom: 0.5rem;">
-                    <button class="btn-sample" style="flex:1;background:rgba(139, 92, 246, 0.15);border:1px solid rgba(139, 92, 246, 0.4);color:#8b5cf6;padding:0.75rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;font-weight:700;transition:all 0.2s;">
-                        📋 Load Sample Data
+            
+            <div class="sidebar">
+                <h3>Quick Snippets</h3>
+                <div class="snippet-list">
+                    <button class="snippet-btn" data-code="summary(data)">
+                        <div class="name">summary()</div>
+                        <div class="desc">Statistical summary of data</div>
                     </button>
-                    <button class="btn-clear" style="background:rgba(255,255,255,0.05);border:1px solid rgba(255,255,255,0.1);color:var(--text-dim);padding:0.75rem 1rem;border-radius:8px;cursor:pointer;font-family:var(--font-mono);font-size:0.8rem;transition:all 0.2s;">
-                        Clear
+                    <button class="snippet-btn" data-code="mean(x)">
+                        <div class="name">mean()</div>
+                        <div class="desc">Calculate mean of vector x</div>
                     </button>
-                </div>
-                <p class="data-hint">First row = column names. Comma-separated. Works with numbers, text, or mixed data.</p>
-                
-                <button class="btn-run" id="run-btn">Analyze My Data</button>
-                
-                <div class="loading-bar" id="loading">
-                    <div class="loading-text">Running R analysis in your browser...</div>
-                    <div class="progress-bar"><div class="progress-fill"></div></div>
-                </div>
-
-                <div class="output-section" id="output">
-                    <div class="output-header">
-                        <h3>Results</h3>
-                    </div>
-                    
-                    <div class="stats-grid" id="stats"></div>
-                    
-                    <label>R Console Output</label>
-                    <div class="console-output" id="console"></div>
-                    
-                    <div class="ai-explanation" id="explanation">
-                        <h4>✨ What This Means</h4>
-                        <p id="ai-text">Analyzing your results...</p>
-                    </div>
+                    <button class="snippet-btn" data-code="sd(x)">
+                        <div class="name">sd()</div>
+                        <div class="desc">Standard deviation</div>
+                    </button>
+                    <button class="snippet-btn" data-code="hist(x)">
+                        <div class="name">hist()</div>
+                        <div class="desc">Histogram of values</div>
+                    </button>
+                    <button class="snippet-btn" data-code="cor(x, y)">
+                        <div class="name">cor()</div>
+                        <div class="desc">Correlation between x and y</div>
+                    </button>
+                    <button class="snippet-btn" data-code="t.test(g1, g2)">
+                        <div class="name">t.test()</div>
+                        <div class="desc">Compare two groups</div>
+                    </button>
+                    <button class="snippet-btn" data-code="lm(y ~ x)">
+                        <div class="name">lm()</div>
+                        <div class="desc">Linear regression model</div>
+                    </button>
+                    <button class="snippet-btn" data-code="plot(x, y)">
+                        <div class="name">plot()</div>
+                        <div class="desc">Scatter plot</div>
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <script src="https://webr.r-wasm.org/v0.4.0/webr.mjs" type="module"></script>
     <script type="module">
-        import { WebR } from 'https://webr.r-wasm.org/v0.4.0/webr.mjs';
+        import { WebR } from 'https://webr.r-wasm.org/latest/webr.mjs';
 
+        const output = document.getElementById('output');
+        const input = document.getElementById('r-input');
+        const status = document.getElementById('status');
+        const btnClear = document.getElementById('btn-clear');
+        const btnSample = document.getElementById('btn-sample');
+        const btnHelp = document.getElementById('btn-help');
+        const loadingContainer = document.getElementById('loading-container');
+        const loadingBar = document.getElementById('loading-bar');
+        const loadingPercent = document.getElementById('loading-percent');
+        const loadingMessage = document.getElementById('loading-message');
+
+        let isReady = false;
         let webR = null;
-        let currentTemplate = 'summary';
+        let shelter = null;
+        let commandHistory = [];
+        let historyIndex = -1;
 
-        window.selectTemplate = function(template) {
-            currentTemplate = template;
-            document.querySelectorAll('.template-btn').forEach(btn => {
-                btn.classList.toggle('active', btn.dataset.template === template);
-            });
-            updatePlaceholder();
-        };
-
-        // Generate sample retail sales data (100 records)
-        window.loadSampleData = function() {
-            const regions = ['North', 'South', 'East', 'West', 'Central'];
-            const products = ['Laptop', 'Phone', 'Tablet', 'Headphones', 'Monitor', 'Keyboard', 'Mouse', 'Webcam'];
-            const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
-            
-            let csv = 'transaction_id,date,product,region,quantity,unit_price,total_sale,profit_margin\\n';
-            
-            for (let i = 1; i <= 100; i++) {
-                const month = months[Math.floor(Math.random() * 12)];
-                const product = products[Math.floor(Math.random() * products.length)];
-                const region = regions[Math.floor(Math.random() * regions.length)];
-                const quantity = Math.floor(Math.random() * 10) + 1;
-                const unitPrice = Math.floor(Math.random() * 500) + 50;
-                const totalSale = quantity * unitPrice;
-                const profitMargin = (Math.random() * 0.4 + 0.1).toFixed(2);
-                
-                csv += 'TXN' + String(i).padStart(3, '0') + ',' + month + ' 2026,' + product + ',' + region + ',' + quantity + ',' + unitPrice + ',' + totalSale + ',' + profitMargin + '\\n';
-            }
-            
-            document.getElementById('data-input').value = csv;
-        };
-
-        window.clearData = function() {
-            document.getElementById('data-input').value = '';
-        };
-
-        function updatePlaceholder() {
-            const input = document.getElementById('data-input');
-            const placeholders = {
-                summary: 'Paste your data here (CSV format)\\n\\nExample:\\nsales\\n1200\\n980\\n1450\\n1100\\n890',
-                compare: 'Paste grouped data (CSV)\\n\\nExample:\\ngroup,value\\nA,120\\nA,135\\nB,98\\nB,105',
-                trend: 'Paste time series data\\n\\nExample:\\nmonth,revenue\\nJan,10000\\nFeb,12000\\nMar,11500',
-                correlation: 'Paste two columns to compare\\n\\nExample:\\nprice,sales\\n10,500\\n15,420\\n20,380',
-                distribution: 'Paste values to see spread\\n\\nExample:\\nscore\\n85\\n90\\n78\\n92\\n88\\n95'
-            };
-            input.placeholder = placeholders[currentTemplate] || placeholders.summary;
+        function addOutput(text, type = 'result') {
+            const line = document.createElement('div');
+            line.className = 'output-line ' + type;
+            line.textContent = text;
+            output.appendChild(line);
+            output.scrollTop = output.scrollHeight;
         }
 
-        window.runAnalysis = async function() {
-            const data = document.getElementById('data-input').value.trim();
-            if (!data) {
-                alert('Please paste some data to analyze.');
+        function setStatus(text, isLoading = false) {
+            status.textContent = text;
+            if (isLoading) {
+                status.classList.add('loading');
+            } else {
+                status.classList.remove('loading');
+            }
+        }
+
+        function updateLoadingProgress(percent, message) {
+            loadingBar.style.width = percent + '%';
+            loadingPercent.textContent = percent + '%';
+            loadingMessage.textContent = message;
+        }
+
+        async function initWebR() {
+            let progressInterval;
+            try {
+                addOutput('[MARCUS] Initializing WebR...', 'info');
+                setStatus('LOADING', true);
+                updateLoadingProgress(5, 'Loading WebR core...');
+
+                // Simulate progress while loading (WebR doesn't expose actual progress)
+                let progress = 5;
+                progressInterval = setInterval(() => {
+                    if (isReady) {
+                        clearInterval(progressInterval);
+                        return;
+                    }
+                    
+                    progress += Math.random() * 10;
+                    if (progress > 95) progress = 95;
+                    
+                    let msg = 'Loading R packages...';
+                    if (progress < 30) msg = 'Downloading WebAssembly (~15MB)...';
+                    else if (progress < 60) msg = 'Initializing R runtime...';
+                    else if (progress < 85) msg = 'Loading base packages...';
+                    
+                    updateLoadingProgress(Math.floor(progress), msg);
+                }, 500);
+
+                addOutput('[MARCUS] Step 1: Creating WebR instance...', 'info');
+                console.log('[MARCUS DEBUG] About to create WebR instance');
+                
+                // Use PostMessage channel
+                addOutput('[MARCUS] Using PostMessage communication channel...', 'info');
+                addOutput('[MARCUS] Location: ' + window.location.href, 'info');
+                console.log('[MARCUS DEBUG] Current URL:', window.location.href);
+                
+                webR = new WebR({
+                    baseUrl: 'https://webr.r-wasm.org/latest/',
+                    serviceWorkerUrl: '',
+                    channelType: 'PostMessage',
+                    homedir: '/home/web_user',
+                });
+                
+                addOutput('[MARCUS] Step 2: WebR instance created', 'success');
+                console.log('[MARCUS DEBUG] WebR instance created:', webR);
+                
+                addOutput('[MARCUS] Step 3: Initializing R environment...', 'info');
+                addOutput('[MARCUS] (Downloading ~15MB, may take 30-90 seconds)', 'info');
+                console.log('[MARCUS DEBUG] Starting webR.init()...');
+                console.log('[MARCUS DEBUG] If this hangs, check console for errors');
+                
+                // Add promise wrapper to catch silent failures
+                try {
+                    await new Promise((resolve, reject) => {
+                        webR.init()
+                            .then(() => {
+                                console.log('[MARCUS DEBUG] webR.init() resolved successfully!');
+                                resolve(true);
+                            })
+                            .catch((err) => {
+                                console.error('[MARCUS DEBUG] webR.init() rejected:', err);
+                                reject(err);
+                            });
+                        
+                        // Log progress every 5 seconds
+                        let elapsed = 0;
+                        const progressLogger = setInterval(() => {
+                            elapsed += 5;
+                            console.log('[MARCUS DEBUG] Still initializing... (' + elapsed + 's elapsed)');
+                            if (elapsed >= 120) {
+                                clearInterval(progressLogger);
+                                reject(new Error('Initialization timeout - WebR may not be compatible with Edge. Try Chrome or Firefox.'));
+                            }
+                        }, 5000);
+                    });
+                } catch (initError) {
+                    console.error('[MARCUS DEBUG] Init error caught:', initError);
+                    throw initError;
+                }
+                
+                addOutput('[MARCUS] Step 4: R initialized!', 'success');
+                console.log('[MARCUS DEBUG] webR.init() completed successfully');
+                
+                // Create a shelter for managing R objects
+                addOutput('[MARCUS] Step 5: Creating R shelter...', 'info');
+                shelter = await new webR.Shelter();
+                
+                addOutput('[MARCUS] Step 6: R runtime ready!', 'success');
+                console.log('[MARCUS DEBUG] Shelter created, R is fully ready');
+                
+                // Stop progress simulation
+                if (progressInterval) clearInterval(progressInterval);
+                
+                updateLoadingProgress(100, 'R ready!');
+                setStatus('READY', false);
+                isReady = true;
+                
+                setTimeout(() => {
+                    loadingContainer.classList.remove('active');
+                }, 500);
+
+                addOutput('[MARCUS] R environment ready!', 'success');
+                addOutput('', 'result');
+                addOutput('[MARCUS] Quick start commands:', 'info');
+                addOutput('  x <- c(1, 2, 3, 4, 5)    # Create vector', 'result');
+                addOutput('  mean(x)                 # Calculate mean', 'result');
+                addOutput('  summary(x)              # Summary stats', 'result');
+                addOutput('', 'result');
+                input.focus();
+
+            } catch (err) {
+                if (progressInterval) clearInterval(progressInterval);
+                setStatus('ERROR', false);
+                loadingContainer.classList.remove('active');
+                addOutput('[ERROR] Failed to initialize WebR: ' + (err.message || String(err)), 'error');
+                addOutput('[ERROR] Error type: ' + err.constructor.name, 'error');
+                if (err.stack) {
+                    addOutput('[ERROR] Stack: ' + err.stack.substring(0, 500), 'error');
+                }
+                addOutput('[MARCUS] Troubleshooting:', 'info');
+                addOutput('[MARCUS] 1. Check browser console (F12) for detailed errors', 'info');
+                addOutput('[MARCUS] 2. Try Chrome/Firefox if Edge has issues', 'info');
+                addOutput('[MARCUS] 3. Check internet connection to webr.r-wasm.org', 'info');
+                console.error('[MARCUS] WebR init error (full):', err);
+                console.error('[MARCUS] Error details:', {
+                    message: err.message,
+                    name: err.name,
+                    stack: err.stack
+                });
+            }
+        }
+
+        async function executeR(code) {
+            if (!isReady || !webR) {
+                addOutput('[ERROR] R not ready. Status: ' + status.textContent, 'error');
+                addOutput('[ERROR] Please wait for READY status.', 'error');
                 return;
             }
 
-            const runBtn = document.getElementById('run-btn');
-            const loading = document.getElementById('loading');
-            const output = document.getElementById('output');
-            const consoleEl = document.getElementById('console');
-            const statsEl = document.getElementById('stats');
-            const aiText = document.getElementById('ai-text');
-
-            runBtn.disabled = true;
-            runBtn.textContent = 'ANALYZING...';
-            loading.style.display = 'block';
-            output.style.display = 'none';
+            addOutput('> ' + code, 'command');
+            commandHistory.push(code);
+            historyIndex = commandHistory.length;
 
             try {
-                // Initialize webR if not already done
-                if (!webR) {
-                    webR = new WebR();
-                    await webR.init();
+                // Handle special commands
+                if (code.startsWith(':')) {
+                    handleSpecialCommand(code);
+                    return;
                 }
 
-                // Parse CSV data and run analysis
-                const rCode = generateRCode(data, currentTemplate);
-                const result = await webR.evalRString(rCode);
-                
-                // Display results
-                consoleEl.textContent = result;
-                
-                // Parse key stats from output
-                const stats = parseStats(result, currentTemplate);
-                statsEl.innerHTML = stats.map(s => 
-                    '<div class="stat-box"><div class="stat-value">' + s.value + '</div><div class="stat-label">' + s.label + '</div></div>'
-                ).join('');
-
-                // Get AI explanation
-                output.style.display = 'block';
-                output.classList.add('fade-in-up');
-                
-                // Call backend for AI explanation
-                const hp_field = document.getElementById('hp_field').value;
-                const explainRes = await fetch('/marcus/explain', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        template: currentTemplate, 
-                        output: result,
-                        data: data.substring(0, 500),
-                        hp_field 
-                    })
+                // Capture R output
+                const result = await shelter.captureR(code, {
+                    withAutoprint: true,
+                    captureStreams: true,
+                    captureConditions: false
                 });
                 
-                if (explainRes.ok) {
-                    const { explanation } = await explainRes.json();
-                    aiText.textContent = explanation;
+                // Display captured output
+                if (result.output && result.output.length > 0) {
+                    result.output.forEach(out => {
+                        if (out.type === 'stdout') {
+                            addOutput(out.data, 'result');
+                        } else if (out.type === 'stderr') {
+                            addOutput(out.data, 'error');
+                        }
+                    });
                 } else {
-                    aiText.textContent = 'Analysis complete. Check the R output above for detailed statistics.';
+                    // Silent execution (like assignment)
+                    addOutput('', 'result');
                 }
-
-            } catch (error) {
-                consoleEl.textContent = 'Error: ' + error.message;
-                statsEl.innerHTML = '<div class="stat-box"><div class="stat-value">❌</div><div class="stat-label">Error</div></div>';
-                output.style.display = 'block';
-            } finally {
-                runBtn.disabled = false;
-                runBtn.textContent = 'Analyze My Data';
-                loading.style.display = 'none';
+            } catch (err) {
+                addOutput('Error: ' + (err.message || String(err)), 'error');
             }
-        };
-
-        function generateRCode(csvData, template) {
-            const escapedData = csvData.replace(/"/g, '\\\\"').replace(/\\n/g, '\\\\n');
-            
-            const templates = {
-                summary: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
-                    'nums <- sapply(data, is.numeric)\\n' +
-                    'if(any(nums)) {\\n' +
-                    '    cat("=== SUMMARY STATISTICS ===\\\\n")\\n' +
-                    '    print(summary(data[, nums]))\\n' +
-                    '    cat("\\\\n=== STANDARD DEVIATION ===\\\\n")\\n' +
-                    '    print(sapply(data[, nums], sd, na.rm=TRUE))\\n' +
-                    '} else {\\n' +
-                    '    cat("=== DATA PREVIEW ===\\\\n")\\n' +
-                    '    print(head(data))\\n' +
-                    '    cat("\\\\n=== STRUCTURE ===\\\\n")\\n' +
-                    '    str(data)\\n' +
-                    '}',
-                    
-                compare: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
-                    'cat("=== GROUP COMPARISON ===\\\\n")\\n' +
-                    'if(ncol(data) >= 2) {\\n' +
-                    '    groups <- unique(data[,1])\\n' +
-                    '    cat("Groups found:", length(groups), "\\\\n")\\n' +
-                    '    print(by(data[,2], data[,1], summary))\\n' +
-                    '    if(length(groups) == 2) {\\n' +
-                    '        cat("\\\\n=== T-TEST ===\\\\n")\\n' +
-                    '        g1 <- data[data[,1] == groups[1], 2]\\n' +
-                    '        g2 <- data[data[,1] == groups[2], 2]\\n' +
-                    '        print(t.test(g1, g2))\\n' +
-                    '    }\\n' +
-                    '} else { print(summary(data)) }',
-                    
-                trend: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
-                    'cat("=== TREND ANALYSIS ===\\\\n")\\n' +
-                    'if(ncol(data) >= 2) {\\n' +
-                    '    x <- 1:nrow(data)\\n' +
-                    '    y <- as.numeric(data[,2])\\n' +
-                    '    model <- lm(y ~ x)\\n' +
-                    '    cat("Direction:", ifelse(coef(model)[2] > 0, "UPWARD", "DOWNWARD"), "\\\\n")\\n' +
-                    '    cat("Slope:", round(coef(model)[2], 3), "\\\\n")\\n' +
-                    '    cat("\\\\n=== MODEL SUMMARY ===\\\\n")\\n' +
-                    '    print(summary(model))\\n' +
-                    '}',
-                    
-                correlation: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
-                    'cat("=== CORRELATION ANALYSIS ===\\\\n")\\n' +
-                    'if(ncol(data) >= 2) {\\n' +
-                    '    x <- as.numeric(data[,1])\\n' +
-                    '    y <- as.numeric(data[,2])\\n' +
-                    '    r <- cor(x, y, use="complete.obs")\\n' +
-                    '    cat("Correlation (r):", round(r, 3), "\\\\n")\\n' +
-                    '    strength <- ifelse(abs(r) > 0.7, "STRONG", ifelse(abs(r) > 0.4, "MODERATE", "WEAK"))\\n' +
-                    '    direction <- ifelse(r > 0, "positive", "negative")\\n' +
-                    '    cat("Interpretation:", strength, direction, "relationship\\\\n")\\n' +
-                    '    cat("\\\\n=== TEST SIGNIFICANCE ===\\\\n")\\n' +
-                    '    print(cor.test(x, y))\\n' +
-                    '}',
-                    
-                distribution: 'data <- read.csv(text="' + escapedData + '", stringsAsFactors=FALSE)\\n' +
-                    'cat("=== DISTRIBUTION ANALYSIS ===\\\\n")\\n' +
-                    'vals <- as.numeric(data[,1])\\n' +
-                    'cat("Count:", length(vals), "\\\\n")\\n' +
-                    'cat("Range:", min(vals, na.rm=TRUE), "to", max(vals, na.rm=TRUE), "\\\\n")\\n' +
-                    'cat("IQR:", IQR(vals, na.rm=TRUE), "\\\\n")\\n' +
-                    'cat("\\\\n=== QUARTILES ===\\\\n")\\n' +
-                    'print(quantile(vals, na.rm=TRUE))\\n' +
-                    'cat("\\\\n=== SKEWNESS CHECK ===\\\\n")\\n' +
-                    'mean_val <- mean(vals, na.rm=TRUE)\\n' +
-                    'median_val <- median(vals, na.rm=TRUE)\\n' +
-                    'skew <- ifelse(mean_val > median_val, "Right-skewed",\\n' +
-                    '         ifelse(mean_val < median_val, "Left-skewed", "Symmetric"))\\n' +
-                    'cat("Mean:", round(mean_val, 2), "| Median:", median_val, "|", skew, "\\\\n")'
-            };
-            
-            return templates[template] || templates.summary;
         }
 
-        function parseStats(output, template) {
-            const stats = [];
-            
-            // Extract common stats from R output
-            const meanMatch = output.match(/Mean\\s*:?\\s*([\\d.-]+)/i);
-            const medianMatch = output.match(/Median\\s*:?\\s*([\\d.-]+)/i);
-            const corrMatch = output.match(/Correlation.*?:\\s*([\\d.-]+)/i);
-            const pValMatch = output.match(/p-value[\\s:]+([\\d.e-]+)/i);
-            
-            if (meanMatch) stats.push({ label: 'Mean', value: meanMatch[1] });
-            if (medianMatch) stats.push({ label: 'Median', value: medianMatch[1] });
-            if (corrMatch) stats.push({ label: 'Correlation', value: corrMatch[1] });
-            if (pValMatch) {
-                const p = parseFloat(pValMatch[1]);
-                stats.push({ 
-                    label: 'P-value', 
-                    value: p < 0.001 ? '<0.001' : p.toFixed(3) 
-                });
+        function handleSpecialCommand(cmd) {
+            const parts = cmd.slice(1).split(' ');
+            const command = parts[0].toLowerCase();
+
+            switch (command) {
+                case 'help':
+                    addOutput('[HELP] Available commands:', 'info');
+                    addOutput('  :help          - Show this help', 'result');
+                    addOutput('  :clear         - Clear terminal output', 'result');
+                    addOutput('  :sample        - Load sample dataset', 'result');
+                    addOutput('  :vars          - List defined variables', 'result');
+                    addOutput('', 'result');
+                    addOutput('[HELP] R functions: summary, mean, median, sd, var, cor, t.test, lm, hist', 'info');
+                    break;
+                case 'clear':
+                    output.innerHTML = '';
+                    addOutput('[MARCUS] Terminal cleared.', 'info');
+                    break;
+                case 'sample':
+                    loadSampleData();
+                    break;
+                case 'vars':
+                    executeR('ls()');
+                    break;
+                default:
+                    addOutput('[ERROR] Unknown command: ' + command, 'error');
             }
-            
-            if (stats.length === 0) {
-                stats.push({ label: 'Analysis', value: '✓' });
-            }
-            
-            return stats;
         }
 
-        // Initialize placeholder
-        updatePlaceholder();
-        
-        // Add event listeners (modules load async, so inline onclick won't work)
-        document.querySelectorAll('.template-btn').forEach(btn => {
-            btn.addEventListener('click', () => selectTemplate(btn.dataset.template));
+        async function loadSampleData() {
+            if (!isReady || !webR) {
+                addOutput('[ERROR] R not ready. Please wait.', 'error');
+                return;
+            }
+            
+            addOutput('[MARCUS] Loading sample retail sales data...', 'info');
+            
+            try {
+                // Create sample data frame
+                await webR.evalRVoid('retail_sales <- data.frame(' +
+                    'transaction_id = sprintf("TXN%03d", 1:100),' +
+                    'product = sample(c("Laptop","Phone","Tablet","Headphones","Monitor"), 100, replace=TRUE),' +
+                    'region = sample(c("North","South","East","West"), 100, replace=TRUE),' +
+                    'quantity = sample(1:10, 100, replace=TRUE),' +
+                    'unit_price = sample(50:500, 100, replace=TRUE)' +
+                    ')');
+                    
+                await webR.evalRVoid('retail_sales$revenue <- retail_sales$quantity * retail_sales$unit_price');
+                
+                addOutput('[MARCUS] Sample data loaded! 100 retail sales records created.', 'success');
+                addOutput('[MARCUS] Try: head(retail_sales) or summary(retail_sales$revenue)', 'info');
+            } catch (err) {
+                addOutput('[ERROR] Failed to load sample data: ' + (err.message || String(err)), 'error');
+            }
+        }
+
+        // Clear Output button - works even while loading
+        btnClear.addEventListener('click', () => {
+            output.innerHTML = '';
+            addOutput('[MARCUS] Terminal cleared.', 'info');
+            if (!isReady) {
+                addOutput('[MARCUS] R still loading... Status: ' + status.textContent, 'info');
+            }
+            input.focus();
         });
-        
-        document.querySelector('.btn-sample')?.addEventListener('click', loadSampleData);
-        document.querySelector('.btn-clear')?.addEventListener('click', clearData);
-        document.querySelector('.btn-run')?.addEventListener('click', runAnalysis);
+
+        // Load Sample button
+        btnSample.addEventListener('click', () => {
+            if (!isReady) {
+                addOutput('[MARCUS] R still loading. Please wait for READY status.', 'info');
+                return;
+            }
+            loadSampleData();
+        });
+
+        // Help button
+        btnHelp.addEventListener('click', () => {
+            handleSpecialCommand(':help');
+        });
+
+        // Input keydown handler
+        input.addEventListener('keydown', async (e) => {
+            if (e.key === 'Enter' && input.value.trim()) {
+                await executeR(input.value.trim());
+                input.value = '';
+            } else if (e.key === 'ArrowUp') {
+                e.preventDefault();
+                if (historyIndex > 0) {
+                    historyIndex--;
+                    input.value = commandHistory[historyIndex] || '';
+                }
+            } else if (e.key === 'ArrowDown') {
+                e.preventDefault();
+                if (historyIndex < commandHistory.length - 1) {
+                    historyIndex++;
+                    input.value = commandHistory[historyIndex] || '';
+                } else {
+                    historyIndex = commandHistory.length;
+                    input.value = '';
+                }
+            }
+        });
+
+        // Sidebar snippets
+        document.querySelectorAll('.snippet-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const code = btn.dataset.code;
+                input.value = code;
+                input.focus();
+            });
+        });
+
+        // Start initialization
+        initWebR();
     </script>
 </body>
 </html>`;

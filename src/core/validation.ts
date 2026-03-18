@@ -421,7 +421,7 @@ export function validateAresRequest(body: unknown): ValidationResult<{ product: 
 /**
  * Validates Marcus R analysis request payload
  */
-export function validateMarcusRequest(body: unknown): ValidationResult<{ template: string; data: string; hp_field?: string }> {
+export function validateMarcusRequest(body: unknown): ValidationResult<{ template: string; output: string; data?: string; hp_field?: string }> {
 	if (!body || typeof body !== 'object') {
 		return { success: false, error: 'Invalid request body' };
 	}
@@ -432,19 +432,20 @@ export function validateMarcusRequest(body: unknown): ValidationResult<{ templat
 		return { success: false, error: 'Analysis template is required' };
 	}
 
-	if (!isNonEmptyString(payload.data)) {
-		return { success: false, error: 'Data is required' };
+	if (!isNonEmptyString(payload.output)) {
+		return { success: false, error: 'R output is required' };
 	}
 
-	if (payload.data.length > 10000) {
-		return { success: false, error: 'Data too large. Maximum 10,000 characters.' };
+	if (payload.output.length > 10000) {
+		return { success: false, error: 'Output too large. Maximum 10,000 characters.' };
 	}
 
 	return {
 		success: true,
 		data: {
 			template: payload.template.trim(),
-			data: payload.data.trim(),
+			output: payload.output.trim(),
+			data: isString(payload.data) ? payload.data.trim() : undefined,
 			hp_field: payload.hp_field as string | undefined,
 		}
 	};

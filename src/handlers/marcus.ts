@@ -6,9 +6,19 @@ import { jsonResponse, htmlPage } from '../core/utils';
 import { checkRateLimit } from '../services/security';
 import { AI_MAX_TOKENS_STANDARD } from '../core/constants';
 import { parseAIResponse } from '../core/utils';
+import { CSP_POLICY_MARCUS } from '../core/security-headers';
 
 export async function handleMarcusGet(): Promise<Response> {
-	return htmlPage(MARCUS_HTML);
+	const response = htmlPage(MARCUS_HTML);
+	const headers = new Headers(response.headers);
+	headers.set('Content-Security-Policy', CSP_POLICY_MARCUS);
+	// PostMessage channel doesn't need COEP/COOP headers
+	
+	return new Response(response.body, {
+		status: response.status,
+		statusText: response.statusText,
+		headers
+	});
 }
 
 const EXPLANATION_PROMPTS: Record<string, string> = {
@@ -58,7 +68,7 @@ export async function handleMarcusExplain(request: Request, env: Env): Promise<R
 				temperature: 0.4,
 				messages: [
 					{ role: 'system', content: systemPrompt },
-					{ role: 'user', content: `R Output:\n${data.data}\n\nData sample: ${data.template}` }
+					{ role: 'user', content: `R Output:\n${data.output}\n\nData sample: ${data.data || 'not provided'}` }
 				]
 			}) as { response: string };
 
