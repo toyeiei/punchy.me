@@ -4,12 +4,12 @@
  */
 
 function buildCspPolicy(options?: { allowUnsafeEval?: boolean; allowWebR?: boolean }): string {
-	let scriptSrc = "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
-	let connectSrc = "connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+	let scriptSrc = "script-src 'self' 'unsafe-inline' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://static.cloudflareinsights.com";
+	let connectSrc = "connect-src 'self' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://cloudflareinsights.com";
 	let workerSrc = "worker-src 'self'";
 	
 	if (options?.allowUnsafeEval) {
-		scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com";
+		scriptSrc = "script-src 'self' 'unsafe-inline' 'unsafe-eval' https://challenges.cloudflare.com https://cdn.jsdelivr.net https://cdnjs.cloudflare.com https://static.cloudflareinsights.com";
 	}
 	
 	if (options?.allowWebR) {
