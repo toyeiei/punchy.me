@@ -12,6 +12,8 @@ import { handleOdinGet, handleOdinAnalyze } from './handlers/odin';
 import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleThorGet, handleThorForge, handleThorPdf } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
+import { handleMarcusGet, handleMarcusPostGet, handleMarcusTagGet, handleMarcusRss } from './handlers/marcus';
+import { handleMidgardGet, handleMidgardPublish, handleMidgardList } from './handlers/midgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -44,6 +46,10 @@ const ROUTES: Route[] = [
 	{ method: 'GET', path: '/odin', handler: pureHandler(handleOdinGet) },
 	{ method: 'GET', path: '/freya', handler: pureHandler(handleFreyaGet) },
 	{ method: 'GET', path: '/thor', handler: pureHandler(handleThorGet) },
+	{ method: 'GET', path: '/marcus', handler: simpleHandler(handleMarcusGet) },
+	{ method: 'GET', path: '/marcus/rss', handler: simpleHandler(handleMarcusRss) },
+	{ method: 'GET', path: '/midgard', handler: simpleHandler(handleMidgardGet) },
+	{ method: 'GET', path: '/midgard/posts', handler: simpleHandler(handleMidgardList) },
 	
 	// Tool APIs (POST) - More specific routes MUST come before general ones
 	{ method: 'POST', path: '/bazuka', handler: staticHandler(handleBazukaPost) },
@@ -55,6 +61,13 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/odin/analyze', handler: staticHandler(handleOdinAnalyze) },
 	{ method: 'POST', path: '/thor/forge', handler: staticHandler(handleThorForge) },
 	{ method: 'GET', path: /^\/thor\/pdf\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handleThorPdf(req, env, path) },
+	
+	// MARCUS blog routes
+	{ method: 'GET', path: /^\/marcus\/tag\/[a-z0-9-]+$/, handler: (req, env, _ctx, path) => handleMarcusTagGet(req, env, path.replace('/marcus/tag/', '')) },
+	{ method: 'GET', path: /^\/marcus\/[a-z0-9-]+$/, handler: (req, env, _ctx, path) => handleMarcusPostGet(req, env, path.replace('/marcus/', '')) },
+	
+	// Midgard editor routes (private)
+	{ method: 'POST', path: '/midgard/publish', handler: staticHandler(handleMidgardPublish) },
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },

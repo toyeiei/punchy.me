@@ -27,6 +27,27 @@ export interface YaibaData {
 	createdAt: number;
 }
 
+// MARCUS - Stoic Wisdom Blog
+export interface MarcusPost {
+	type: 'marcus:post';
+	id: string;
+	slug: string;
+	title: string;
+	body: string;
+	excerpt: string;
+	coverImage: string | null;
+	tags: string[];
+	createdAt: number;
+	publishedAt: number;
+}
+
+// Midgard - Private Editor
+export interface MidgardSession {
+	type: 'midgard:session';
+	lastSaved: number;
+	draft: Partial<MarcusPost>;
+}
+
 export interface RagnarSlide {
 	header: string;
 	content: string;
@@ -100,4 +121,5 @@ export interface Env {
 	TURNSTILE_SITE_KEY: string;
 	TURNSTILE_SECRET_KEY: string;
 	UNSPLASH_ACCESS_KEY: string;
+	MIDGARD_SECRET?: string; // Access token for /midgard editor
 }
