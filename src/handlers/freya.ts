@@ -79,8 +79,9 @@ export async function handleFreyaSearch(request: Request, env: Env, ctx: Executi
 				id: img.id,
 				url: `${baseUrl}${joiner}w=1200&fit=max&fm=webp&q=70`, // Optimized for Social Media (1200px)
 				preview: `${baseUrl}${joiner}w=600&fit=max&fm=webp&q=30`, // Fast canvas "ghost" load (600px)
+				small: `${baseUrl}${joiner}w=400&fit=max&fm=webp&q=40`, // Editor preview (400px, fast)
 				tiny: `${baseUrl}${joiner}w=100&fit=max&fm=webp&q=15`, // Extreme pre-fetch (100px)
-				thumb: `${baseUrl}${joiner}w=150&fit=crop&fm=webp&q=20`, // Optimized visual balance grid thumb (150px)
+				thumb: `${baseUrl}${joiner}w=150&fit=crop&fm=webp&q=20`, // Sidebar thumbnails (150px)
 				alt: img.alt_description,
 				author: img.user?.name || 'Unknown'
 			};

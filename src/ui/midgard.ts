@@ -170,6 +170,25 @@ export function renderMidgardEditor(): string {
 			min-width: 0;
 		}
 		
+		/* Cover Image Preview (in editor) */
+		.cover-preview {
+			width: 100%;
+			height: 200px;
+			object-fit: cover;
+			border-radius: 8px;
+			margin-bottom: 24px;
+			background: #f5f5f5;
+			display: none;
+		}
+		.cover-preview.visible { display: block; }
+		.cover-preview.loading {
+			animation: pulse-light 1.5s ease-in-out infinite;
+		}
+		@keyframes pulse-light {
+			0%, 100% { background: #f5f5f5; }
+			50% { background: #eee; }
+		}
+		
 		/* Right AI Panel */
 		.ai-panel {
 			width: 22%;
@@ -773,6 +792,7 @@ export function renderMidgardEditor(): string {
 		<!-- Editor Panel -->
 		<main class="editor-panel">
 			<input type="text" name="title" class="title-input" placeholder="Title" required>
+			<img id="cover-preview" class="cover-preview" alt="Cover image preview">
 			<textarea name="body" class="body-input" placeholder="Start writing..." required></textarea>
 			<div class="word-count"><span id="word-count">0</span> words</div>
 		</main>
@@ -895,6 +915,16 @@ export function renderMidgardEditor(): string {
 				slugPreview.textContent = draft.slug || 'your-slug';
 				updateWordCount();
 				updateSaveStatus('restored', draft.savedAt);
+				
+				// Restore cover preview
+				const coverPreview = document.getElementById('cover-preview');
+				if (draft.coverImage) {
+					const optimizedUrl = draft.coverImage.includes('unsplash.com') 
+						? (draft.coverImage.includes('?') ? draft.coverImage + '&w=400&fm=webp&q=40' : draft.coverImage + '?w=400&fm=webp&q=40')
+						: draft.coverImage;
+					coverPreview.src = optimizedUrl;
+					coverPreview.classList.add('visible');
+				}
 			}
 		}
 
@@ -1084,14 +1114,42 @@ export function renderMidgardEditor(): string {
 
 		function selectImage(index) {
 			const coverInput = document.getElementById('cover-image-input');
+			const coverPreview = document.getElementById('cover-preview');
 			const thumbs = document.querySelectorAll('.image-thumb');
 			
 			thumbs.forEach(t => t.classList.remove('selected'));
 			thumbs[index].classList.add('selected');
 			
+			// Update input
 			coverInput.value = inspireImages[index].url;
+			
+			// Show preview in editor (use small size for speed)
+			coverPreview.src = inspireImages[index].small;
+			coverPreview.classList.add('visible');
+			coverPreview.classList.remove('loading');
+			
 			scheduleSave();
 		}
+
+		// Update cover preview when URL is manually changed
+		document.getElementById('cover-image-input').addEventListener('change', function() {
+			const coverPreview = document.getElementById('cover-preview');
+			const url = this.value.trim();
+			
+			if (url) {
+				// Add Unsplash optimization params if it's an Unsplash URL
+				const optimizedUrl = url.includes('unsplash.com') 
+					? (url.includes('?') ? url + '&w=400&fm=webp&q=40' : url + '?w=400&fm=webp&q=40')
+					: url;
+				
+				coverPreview.src = optimizedUrl;
+				coverPreview.classList.add('visible', 'loading');
+				coverPreview.onload = () => coverPreview.classList.remove('loading');
+				coverPreview.onerror = () => coverPreview.classList.remove('visible');
+			} else {
+				coverPreview.classList.remove('visible');
+			}
+		});
 
 		// AI: Generate Title Suggestions
 		async function generateTitles() {
