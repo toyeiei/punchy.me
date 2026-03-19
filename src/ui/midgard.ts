@@ -3,6 +3,7 @@
  * Private writing interface for MARCUS
  * Supports Markdown with preview
  * Zen, calm light theme - black and white
+ * Sidebar layout with auto-save, keyboard shortcuts, markdown help
  */
 
 export function renderMidgardEditor(): string {
@@ -25,97 +26,153 @@ export function renderMidgardEditor(): string {
 			font-family: 'JetBrains Mono', monospace;
 			min-height: 100vh;
 		}
-		.container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
 		
 		/* Header */
 		.header {
 			display: flex;
 			justify-content: space-between;
 			align-items: center;
-			margin-bottom: 40px;
-			padding-bottom: 20px;
+			padding: 16px 24px;
 			border-bottom: 1px solid #eee;
+			position: sticky;
+			top: 0;
+			background: #fff;
+			z-index: 100;
 		}
-		.logo { color: #000; font-size: 12px; letter-spacing: 2px; }
+		.logo { color: #000; font-size: 12px; letter-spacing: 2px; font-weight: 600; }
 		.nav-links a { color: #999; text-decoration: none; margin-left: 24px; font-size: 12px; }
 		.nav-links a:hover { color: #000; }
+		.save-status { font-size: 11px; color: #ccc; margin-right: auto; margin-left: 24px; }
+		.save-status.saved { color: #22c55e; }
 		
-		/* Title */
-		.page-title { font-size: 28px; margin-bottom: 8px; font-weight: 400; }
-		.page-subtitle { color: #999; font-size: 13px; margin-bottom: 40px; }
+		/* Main Layout */
+		.main-layout {
+			display: flex;
+			min-height: calc(100vh - 57px);
+		}
 		
-		/* Form */
-		.form-group { margin-bottom: 24px; }
-		.form-label { display: block; font-size: 11px; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+		/* Sidebar */
+		.sidebar {
+			width: 25%;
+			min-width: 280px;
+			max-width: 360px;
+			background: #fafafa;
+			border-right: 1px solid #eee;
+			padding: 24px;
+			overflow-y: auto;
+			height: calc(100vh - 57px);
+			position: sticky;
+			top: 57px;
+		}
+		
+		/* Editor Panel */
+		.editor-panel {
+			flex: 1;
+			padding: 32px 40px;
+			max-width: 900px;
+		}
+		
+		/* Form Elements */
+		.form-group { margin-bottom: 20px; }
+		.form-label { display: block; font-size: 10px; color: #999; margin-bottom: 6px; text-transform: uppercase; letter-spacing: 1px; }
 		
 		.form-input {
 			width: 100%;
-			background: #fafafa;
+			background: #fff;
 			border: 1px solid #eee;
-			border-radius: 8px;
-			padding: 16px;
+			border-radius: 6px;
+			padding: 12px;
 			color: #000;
 			font-family: inherit;
-			font-size: 16px;
+			font-size: 14px;
 			transition: border-color 0.2s, box-shadow 0.2s;
 		}
 		.form-input:focus {
 			outline: none;
 			border-color: #000;
-			box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
+			box-shadow: 0 0 0 2px rgba(0,0,0,0.05);
 		}
 		.form-input::placeholder { color: #ccc; }
 		
-		/* Title input - larger */
-		.title-input { font-size: 24px; font-weight: 600; background: #fff; }
+		/* Sidebar inputs - smaller */
+		.sidebar .form-input { font-size: 13px; padding: 10px; }
+		.sidebar .form-group { margin-bottom: 16px; }
 		
-		/* Body textarea - larger, serif for writing */
+		/* Slug preview */
+		.slug-preview { margin-top: 6px; font-size: 11px; color: #999; word-break: break-all; }
+		.slug-preview span { color: #666; }
+		
+		/* Tags help */
+		.tags-help { font-size: 10px; color: #ccc; margin-top: 4px; }
+		
+		/* Editor Title */
+		.title-input {
+			font-size: 32px;
+			font-weight: 600;
+			font-family: 'Crimson Pro', Georgia, serif;
+			border: none;
+			background: transparent;
+			padding: 0;
+			margin-bottom: 24px;
+			width: 100%;
+		}
+		.title-input:focus { outline: none; box-shadow: none; }
+		.title-input::placeholder { color: #ddd; }
+		
+		/* Editor Body */
 		.body-input {
 			font-family: 'Crimson Pro', Georgia, serif;
 			font-size: 18px;
-			line-height: 1.8;
-			min-height: 400px;
-			resize: vertical;
-			background: #fff;
+			line-height: 1.9;
+			min-height: 500px;
+			resize: none;
+			border: none;
+			background: transparent;
+			width: 100%;
+		}
+		.body-input:focus { outline: none; }
+		.body-input::placeholder { color: #ddd; }
+		
+		/* Word count */
+		.word-count {
+			font-size: 11px;
+			color: #ccc;
+			margin-top: 16px;
+			padding-top: 16px;
+			border-top: 1px solid #eee;
 		}
 		
-		/* Excerpt */
-		.excerpt-input { min-height: 80px; font-size: 14px; }
-		
-		/* Slug preview */
-		.slug-preview { 
-			margin-top: 8px; 
-			font-size: 12px; 
-			color: #999; 
+		/* Divider */
+		.divider {
+			height: 1px;
+			background: #eee;
+			margin: 20px 0;
 		}
-		.slug-preview span { color: #666; }
-		
-		/* Tags */
-		.tags-help { font-size: 11px; color: #ccc; margin-top: 8px; }
 		
 		/* Actions */
 		.actions {
 			display: flex;
-			gap: 16px;
-			margin-top: 32px;
+			flex-direction: column;
+			gap: 10px;
+			margin-top: 24px;
 		}
 		.btn {
-			padding: 14px 32px;
-			border-radius: 8px;
+			padding: 12px 20px;
+			border-radius: 6px;
 			font-family: inherit;
 			font-size: 13px;
 			font-weight: 600;
 			cursor: pointer;
 			transition: all 0.2s;
+			text-align: center;
 		}
 		.btn-primary {
 			background: #000;
 			color: #fff;
 			border: none;
 		}
-		.btn-primary:hover {
-			background: #333;
-		}
+		.btn-primary:hover { background: #333; }
+		.btn-primary:disabled { background: #ccc; cursor: not-allowed; }
 		.btn-secondary {
 			background: transparent;
 			color: #666;
@@ -123,94 +180,255 @@ export function renderMidgardEditor(): string {
 		}
 		.btn-secondary:hover { border-color: #999; color: #000; }
 		
+		/* Markdown Help */
+		.markdown-help { margin-top: 24px; }
+		.help-toggle {
+			font-size: 10px;
+			color: #999;
+			cursor: pointer;
+			display: flex;
+			align-items: center;
+			gap: 4px;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+		}
+		.help-toggle:hover { color: #000; }
+		.help-content {
+			display: none;
+			margin-top: 12px;
+			font-size: 11px;
+			color: #666;
+			line-height: 1.6;
+		}
+		.help-content.show { display: block; }
+		.help-content code {
+			background: #eee;
+			padding: 2px 6px;
+			border-radius: 3px;
+			font-size: 10px;
+		}
+		.help-content p { margin-bottom: 8px; }
+		
 		/* Success message */
 		.success-msg {
 			background: #f0f0f0;
 			border: 1px solid #000;
-			border-radius: 8px;
-			padding: 20px;
-			margin-bottom: 24px;
+			border-radius: 6px;
+			padding: 12px;
+			margin-bottom: 16px;
 			display: none;
+			font-size: 12px;
 		}
 		.success-msg.show { display: block; }
 		.success-msg a { color: #000; text-decoration: underline; }
 		
-		/* Word count */
-		.word-count {
-			text-align: right;
-			font-size: 11px;
+		/* Keyboard shortcuts hint */
+		.shortcuts-hint {
+			font-size: 10px;
 			color: #ccc;
-			margin-top: 8px;
+			margin-top: 16px;
+			line-height: 1.6;
+		}
+		.shortcuts-hint kbd {
+			background: #eee;
+			padding: 2px 6px;
+			border-radius: 3px;
+			font-family: inherit;
+		}
+		
+		/* Mobile Responsive */
+		@media (max-width: 900px) {
+			.main-layout { flex-direction: column; }
+			.sidebar {
+				width: 100%;
+				max-width: none;
+				min-width: auto;
+				height: auto;
+				position: static;
+				border-right: none;
+				border-bottom: 1px solid #eee;
+				padding: 20px;
+			}
+			.editor-panel { padding: 24px 20px; }
+			.body-input { min-height: 350px; }
+			.title-input { font-size: 26px; }
+			.save-status { display: none; }
 		}
 	</style>
 </head>
 <body>
-	<div class="container">
-		<header class="header">
-			<div class="logo">MIDGARD</div>
-			<nav class="nav-links">
-				<a href="/marcus">View Blog</a>
-				<a href="/">Home</a>
-			</nav>
-		</header>
+	<header class="header">
+		<div class="logo">MIDGARD</div>
+		<div class="save-status" id="save-status"></div>
+		<nav class="nav-links">
+			<a href="/marcus">View Blog</a>
+			<a href="/">Home</a>
+		</nav>
+	</header>
 
-		<h1 class="page-title">Write for MARCUS</h1>
-		<p class="page-subtitle">Timeless wisdom for modern builders</p>
-
-		<div id="success-msg" class="success-msg">
-			<strong>Published!</strong> View at: <a id="post-link" href="#"></a>
-		</div>
-
-		<form id="publish-form">
-			<div class="form-group">
-				<label class="form-label">Title</label>
-				<input type="text" name="title" class="form-input title-input" placeholder="The obstacle becomes the way" required>
+	<div class="main-layout">
+		<!-- Sidebar -->
+		<aside class="sidebar">
+			<div id="success-msg" class="success-msg">
+				<strong>Published!</strong> <a id="post-link" href="#"></a>
 			</div>
 
-			<div class="form-group">
-				<label class="form-label">Slug (URL path)</label>
-				<input type="text" name="slug" class="form-input" placeholder="the-obstacle-becomes-the-way" required pattern="[a-z0-9-]+" title="Lowercase letters, numbers, and hyphens only">
-				<div class="slug-preview">URL: <span>punchy.me/marcus/<span id="slug-preview-text">your-slug</span></span></div>
-			</div>
+			<form id="publish-form">
+				<!-- Slug -->
+				<div class="form-group">
+					<label class="form-label">Slug</label>
+					<input type="text" name="slug" class="form-input" placeholder="post-url-slug" required pattern="[a-z0-9-]+" title="Lowercase letters, numbers, and hyphens only">
+					<div class="slug-preview">punchy.me/marcus/<span id="slug-preview-text">your-slug</span></div>
+				</div>
 
-			<div class="form-group">
-				<label class="form-label">Body</label>
-				<textarea name="body" class="form-input body-input" placeholder="Write your thoughts here..." required></textarea>
-				<div class="word-count"><span id="word-count">0</span> words</div>
-			</div>
+				<!-- Cover Image -->
+				<div class="form-group">
+					<label class="form-label">Cover Image</label>
+					<input type="url" name="coverImage" class="form-input" placeholder="https://...">
+				</div>
 
-			<div class="form-group">
-				<label class="form-label">Excerpt (optional)</label>
-				<textarea name="excerpt" class="form-input excerpt-input" placeholder="Brief summary for previews and SEO..."></textarea>
-			</div>
+				<!-- Excerpt -->
+				<div class="form-group">
+					<label class="form-label">Excerpt</label>
+					<textarea name="excerpt" class="form-input" rows="3" placeholder="Brief summary..."></textarea>
+				</div>
 
-			<div class="form-group">
-				<label class="form-label">Cover Image URL (optional)</label>
-				<input type="url" name="coverImage" class="form-input" placeholder="https://images.unsplash.com/...">
-			</div>
+				<!-- Tags -->
+				<div class="form-group">
+					<label class="form-label">Tags</label>
+					<input type="text" name="tags" class="form-input" placeholder="stoicism, discipline">
+					<div class="tags-help">Comma-separated</div>
+				</div>
 
-			<div class="form-group">
-				<label class="form-label">Tags</label>
-				<input type="text" name="tags" class="form-input" placeholder="stoicism, discipline, mindset">
-				<div class="tags-help">Comma-separated, lowercase</div>
-			</div>
+				<div class="divider"></div>
 
-			<div class="actions">
-				<button type="submit" class="btn btn-primary">Publish</button>
-				<button type="button" class="btn btn-secondary" onclick="previewMarkdown()">Preview</button>
-				<button type="button" class="btn btn-secondary" onclick="clearForm()">Clear</button>
-			</div>
-		</form>
+				<!-- Actions -->
+				<div class="actions">
+					<button type="submit" class="btn btn-primary" id="publish-btn">Publish</button>
+					<button type="button" class="btn btn-secondary" onclick="previewMarkdown()">Preview</button>
+					<button type="button" class="btn btn-secondary" onclick="clearDraft()">Clear Draft</button>
+				</div>
+
+				<!-- Markdown Help -->
+				<div class="markdown-help">
+					<div class="help-toggle" onclick="toggleHelp()">
+						<span id="help-icon">+</span> Markdown Help
+					</div>
+					<div class="help-content" id="help-content">
+						<p><code># H1</code> <code>## H2</code> <code>### H3</code></p>
+						<p><code>**bold**</code> <code>*italic*</code></p>
+						<p><code>- list item</code></p>
+						<p><code>1. numbered</code></p>
+						<p><code>> blockquote</code></p>
+						<p><code>\`code\`</code> <code>\`\`\`code block\`\`\`</code></p>
+						<p><code>[link](url)</code> <code>![img](url)</code></p>
+						<p><code>---</code> horizontal rule</p>
+					</div>
+				</div>
+
+				<!-- Keyboard shortcuts -->
+				<div class="shortcuts-hint">
+					<kbd>Ctrl</kbd>+<kbd>S</kbd> Save draft<br>
+					<kbd>Ctrl</kbd>+<kbd>P</kbd> Preview
+				</div>
+			</form>
+		</aside>
+
+		<!-- Editor Panel -->
+		<main class="editor-panel">
+			<input type="text" name="title" class="title-input" placeholder="Title" required>
+			<textarea name="body" class="body-input" placeholder="Start writing..." required></textarea>
+			<div class="word-count"><span id="word-count">0</span> words</div>
+		</main>
 	</div>
 
 	<script>
 		const form = document.getElementById('publish-form');
+		const titleInput = document.querySelector('.title-input');
+		const bodyInput = document.querySelector('.body-input');
 		const slugInput = form.querySelector('[name="slug"]');
 		const slugPreview = document.getElementById('slug-preview-text');
-		const bodyInput = form.querySelector('[name="body"]');
 		const wordCount = document.getElementById('word-count');
 		const successMsg = document.getElementById('success-msg');
 		const postLink = document.getElementById('post-link');
+		const saveStatus = document.getElementById('save-status');
+		const publishBtn = document.getElementById('publish-btn');
+
+		// Draft auto-save
+		const DRAFT_KEY = 'midgard_draft';
+		let saveTimeout = null;
+
+		function saveDraft() {
+			const draft = {
+				title: titleInput.value,
+				slug: slugInput.value,
+				body: bodyInput.value,
+				excerpt: form.querySelector('[name="excerpt"]').value,
+				coverImage: form.querySelector('[name="coverImage"]').value,
+				tags: form.querySelector('[name="tags"]').value,
+				savedAt: Date.now()
+			};
+			localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
+			updateSaveStatus('saved');
+		}
+
+		function loadDraft() {
+			const saved = localStorage.getItem(DRAFT_KEY);
+			if (saved) {
+				const draft = JSON.parse(saved);
+				titleInput.value = draft.title || '';
+				slugInput.value = draft.slug || '';
+				bodyInput.value = draft.body || '';
+				form.querySelector('[name="excerpt"]').value = draft.excerpt || '';
+				form.querySelector('[name="coverImage"]').value = draft.coverImage || '';
+				form.querySelector('[name="tags"]').value = draft.tags || '';
+				slugPreview.textContent = draft.slug || 'your-slug';
+				updateWordCount();
+				updateSaveStatus('restored', draft.savedAt);
+			}
+		}
+
+		function clearDraft() {
+			if (confirm('Clear all fields and delete saved draft?')) {
+				localStorage.removeItem(DRAFT_KEY);
+				titleInput.value = '';
+				slugInput.value = '';
+				bodyInput.value = '';
+				form.querySelector('[name="excerpt"]').value = '';
+				form.querySelector('[name="coverImage"]').value = '';
+				form.querySelector('[name="tags"]').value = '';
+				slugPreview.textContent = 'your-slug';
+				wordCount.textContent = '0';
+				successMsg.classList.remove('show');
+				saveStatus.textContent = '';
+			}
+		}
+
+		function updateSaveStatus(state, timestamp) {
+			if (state === 'saved') {
+				saveStatus.textContent = 'Draft saved';
+				saveStatus.className = 'save-status saved';
+				setTimeout(() => { saveStatus.className = 'save-status'; }, 2000);
+			} else if (state === 'restored' && timestamp) {
+				const ago = Math.floor((Date.now() - timestamp) / 1000);
+				const text = ago < 60 ? 'just now' : ago < 3600 ? Math.floor(ago/60) + ' min ago' : Math.floor(ago/3600) + ' hr ago';
+				saveStatus.textContent = 'Draft restored (' + text + ')';
+				saveStatus.className = 'save-status saved';
+			}
+		}
+
+		// Auto-save on input (debounced)
+		function scheduleSave() {
+			clearTimeout(saveTimeout);
+			saveTimeout = setTimeout(saveDraft, 1000);
+		}
+
+		[titleInput, bodyInput, slugInput].forEach(el => {
+			el.addEventListener('input', scheduleSave);
+		});
+		form.querySelectorAll('.form-input').forEach(el => {
+			el.addEventListener('input', scheduleSave);
+		});
 
 		// Slug preview
 		slugInput.addEventListener('input', () => {
@@ -218,28 +436,51 @@ export function renderMidgardEditor(): string {
 		});
 
 		// Word count
-		bodyInput.addEventListener('input', () => {
+		function updateWordCount() {
 			const words = bodyInput.value.trim().split(/\\s+/).filter(w => w.length > 0);
 			wordCount.textContent = words.length;
+		}
+		bodyInput.addEventListener('input', updateWordCount);
+
+		// Keyboard shortcuts
+		document.addEventListener('keydown', (e) => {
+			if (e.ctrlKey || e.metaKey) {
+				if (e.key === 's') {
+					e.preventDefault();
+					saveDraft();
+				} else if (e.key === 'p') {
+					e.preventDefault();
+					previewMarkdown();
+				}
+			}
 		});
 
-		// Markdown preview - opens in new tab
+		// Markdown help toggle
+		function toggleHelp() {
+			const content = document.getElementById('help-content');
+			const icon = document.getElementById('help-icon');
+			if (content.classList.contains('show')) {
+				content.classList.remove('show');
+				icon.textContent = '+';
+			} else {
+				content.classList.add('show');
+				icon.textContent = '−';
+			}
+		}
+
+		// Preview
 		function previewMarkdown() {
-			const title = form.querySelector('[name="title"]').value;
+			const title = titleInput.value;
 			const body = bodyInput.value;
 			const excerpt = form.querySelector('[name="excerpt"]').value;
 			const coverImage = form.querySelector('[name="coverImage"]').value;
 			const tags = form.querySelector('[name="tags"]').value;
 
-			// Parse markdown with DOMPurify
 			const renderedBody = DOMPurify.sanitize(marked.parse(body || ''));
-
-			// Build preview HTML (same style as MARCUS post page - dark theme)
 			const tagsHtml = tags ? tags.split(',').map(t => '<span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:4px 12px;border-radius:20px;font-size:12px;margin-right:8px;">' + t.trim() + '</span>').join('') : '';
 
 			const previewHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + (title || 'Preview') + ' - MARCUS</title><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#000;color:#fff;font-family:JetBrains Mono,monospace;line-height:1.8}.container{max-width:800px;margin:0 auto;padding:40px 20px}.cover-img{width:100%;height:300px;object-fit:cover;border-radius:12px;margin-bottom:40px}.title{font-family:Crimson Pro,Georgia,serif;font-size:42px;margin-bottom:24px;line-height:1.2}.meta{color:#666;font-size:12px;margin-bottom:40px}.tags{margin-bottom:40px}.body{font-family:Crimson Pro,Georgia,serif;font-size:18px;line-height:1.9}.body h1,.body h2,.body h3{font-family:Crimson Pro,Georgia,serif;margin:2rem 0 1rem;color:#fff}.body p{margin-bottom:1.5rem}.body ul,.body ol{margin:1.5rem 0;padding-left:2rem}.body li{margin-bottom:0.5rem}.body blockquote{border-left:3px solid #22c55e;padding-left:1.5rem;margin:1.5rem 0;color:#888;font-style:italic}.body code{background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:4px;font-size:0.9em}.body pre{background:rgba(0,0,0,0.5);padding:1.5rem;border-radius:8px;overflow-x:auto;margin:1.5rem 0}.body pre code{background:none;padding:0}.body a{color:#22c55e;text-decoration:none}.watermark{position:fixed;top:20px;right:20px;background:#000;color:#fff;border:1px solid #fff;font-size:10px;padding:8px 16px;border-radius:20px;z-index:100}</style></head><body><div class="watermark">PREVIEW</div><div class="container">' + (coverImage ? '<img src="' + coverImage + '" class="cover-img" alt="">' : '') + '<h1 class="title">' + (title || 'Untitled') + '</h1><div class="meta">Just now · ' + (wordCount.textContent) + ' words</div>' + (tagsHtml ? '<div class="tags">' + tagsHtml + '</div>' : '') + (excerpt ? '<p style="color:#888;font-style:italic;margin-bottom:40px;">' + excerpt + '</p>' : '') + '<div class="body">' + renderedBody + '</div></div></body></html>';
 
-			// Open in new tab
 			const blob = new Blob([previewHtml], { type: 'text/html' });
 			const url = URL.createObjectURL(blob);
 			window.open(url, '_blank');
@@ -249,10 +490,16 @@ export function renderMidgardEditor(): string {
 		form.addEventListener('submit', async (e) => {
 			e.preventDefault();
 			
-			const formData = new FormData(form);
-			const btn = form.querySelector('.btn-primary');
-			btn.textContent = 'Publishing...';
-			btn.disabled = true;
+			const formData = new FormData();
+			formData.append('title', titleInput.value);
+			formData.append('slug', slugInput.value);
+			formData.append('body', bodyInput.value);
+			formData.append('excerpt', form.querySelector('[name="excerpt"]').value);
+			formData.append('coverImage', form.querySelector('[name="coverImage"]').value);
+			formData.append('tags', form.querySelector('[name="tags"]').value);
+
+			publishBtn.textContent = 'Publishing...';
+			publishBtn.disabled = true;
 
 			try {
 				const res = await fetch('/midgard/publish', {
@@ -266,13 +513,19 @@ export function renderMidgardEditor(): string {
 					postLink.href = data.url;
 					postLink.textContent = data.url;
 					successMsg.classList.add('show');
+					localStorage.removeItem(DRAFT_KEY);
 					
-					// Clear form after success
 					setTimeout(() => {
-						form.reset();
+						titleInput.value = '';
+						slugInput.value = '';
+						bodyInput.value = '';
+						form.querySelector('[name="excerpt"]').value = '';
+						form.querySelector('[name="coverImage"]').value = '';
+						form.querySelector('[name="tags"]').value = '';
 						slugPreview.textContent = 'your-slug';
 						wordCount.textContent = '0';
-					}, 2000);
+						successMsg.classList.remove('show');
+					}, 3000);
 				} else {
 					alert('Error: ' + (data.error || 'Unknown error'));
 				}
@@ -280,18 +533,12 @@ export function renderMidgardEditor(): string {
 				alert('Failed to publish: ' + err.message);
 			}
 
-			btn.textContent = 'Publish';
-			btn.disabled = false;
+			publishBtn.textContent = 'Publish';
+			publishBtn.disabled = false;
 		});
 
-		function clearForm() {
-			if (confirm('Clear all fields?')) {
-				form.reset();
-				slugPreview.textContent = 'your-slug';
-				wordCount.textContent = '0';
-				successMsg.classList.remove('show');
-			}
-		}
+		// Load draft on page load
+		loadDraft();
 	</script>
 </body>
 </html>`;
