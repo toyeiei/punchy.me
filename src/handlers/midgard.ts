@@ -4,48 +4,59 @@ import { jsonResponse, generateUniqueId } from '../core/utils';
 
 /**
  * Check if request has valid Midgard access
+ * Returns { hasAccess: boolean, shouldSetCookie: boolean, token?: string }
  */
-function checkMidgardAccess(request: Request, env: Env): boolean {
-	// Check header token
+function checkMidgardAccess(request: Request, env: Env): { hasAccess: boolean; shouldSetCookie: boolean; token?: string } {
+	// Check header token (no cookie needed)
 	const headerToken = request.headers.get('x-midgard-token');
 	if (headerToken && env.MIDGARD_SECRET && headerToken === env.MIDGARD_SECRET) {
-		return true;
+		return { hasAccess: true, shouldSetCookie: false };
 	}
 
-	// Check query param (for browser access)
+	// Check query param (for browser access - set cookie)
 	const url = new URL(request.url);
 	const queryToken = url.searchParams.get('token');
 	if (queryToken && env.MIDGARD_SECRET && queryToken === env.MIDGARD_SECRET) {
-		return true;
+		return { hasAccess: true, shouldSetCookie: true, token: queryToken };
 	}
 
-	// Check cookie
+	// Check cookie (already authenticated)
 	const cookie = request.headers.get('cookie') || '';
 	const cookieMatch = cookie.match(/midgard_token=([^;]+)/);
 	if (cookieMatch && env.MIDGARD_SECRET && cookieMatch[1] === env.MIDGARD_SECRET) {
-		return true;
+		return { hasAccess: true, shouldSetCookie: false };
 	}
 
 	// No secret configured = no access (secure by default)
 	if (!env.MIDGARD_SECRET) {
-		return false;
+		return { hasAccess: false, shouldSetCookie: false };
 	}
 
-	return false;
+	return { hasAccess: false, shouldSetCookie: false };
 }
 
 /**
  * Handle GET /midgard
- * Show the editor page
+ * Show the editor page (sets cookie if accessing via token)
  */
 export async function handleMidgardGet(request: Request, env: Env): Promise<Response> {
-	if (!checkMidgardAccess(request, env)) {
-		return new Response('Unauthorized', { status: 401 });
+	const access = checkMidgardAccess(request, env);
+	
+	if (!access.hasAccess) {
+		return new Response('Unauthorized - Visit /midgard?token=YOUR_SECRET to authenticate', { status: 401 });
 	}
 
-	return new Response(renderMidgardEditor(), {
-		headers: { 'Content-Type': 'text/html' },
-	});
+	const html = renderMidgardEditor();
+	const headers: HeadersInit = { 'Content-Type': 'text/html' };
+
+	// Set cookie if this is first access via token
+	if (access.shouldSetCookie && access.token) {
+		// Cookie expires in 30 days
+		const expires = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toUTCString();
+		headers['Set-Cookie'] = `midgard_token=${access.token}; Path=/; HttpOnly; SameSite=Strict; Expires=${expires}`;
+	}
+
+	return new Response(html, { headers });
 }
 
 /**
@@ -53,7 +64,8 @@ export async function handleMidgardGet(request: Request, env: Env): Promise<Resp
  * Publish a new post to MARCUS
  */
 export async function handleMidgardPublish(request: Request, env: Env): Promise<Response> {
-	if (!checkMidgardAccess(request, env)) {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
@@ -126,7 +138,8 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
  * List all posts for editing
  */
 export async function handleMidgardList(request: Request, env: Env): Promise<Response> {
-	if (!checkMidgardAccess(request, env)) {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
@@ -140,7 +153,8 @@ export async function handleMidgardList(request: Request, env: Env): Promise<Res
  * Delete a post
  */
 export async function handleMidgardDelete(request: Request, env: Env, postId: string): Promise<Response> {
-	if (!checkMidgardAccess(request, env)) {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
 		return new Response('Unauthorized', { status: 401 });
 	}
 
