@@ -27,6 +27,17 @@ export function renderMidgardEditor(): string {
 			min-height: 100vh;
 		}
 		
+		/* Custom Scrollbar - Light Theme */
+		::-webkit-scrollbar { width: 6px; height: 6px; }
+		::-webkit-scrollbar-track { background: transparent; }
+		::-webkit-scrollbar-thumb { background: #ddd; border-radius: 3px; }
+		::-webkit-scrollbar-thumb:hover { background: #ccc; }
+		* { scrollbar-width: thin; scrollbar-color: #ddd transparent; }
+		
+		/* Text Selection */
+		::selection { background: #e5e5e5; color: #000; }
+		::-moz-selection { background: #e5e5e5; color: #000; }
+		
 		/* Header */
 		.header {
 			display: flex;
@@ -245,6 +256,7 @@ export function renderMidgardEditor(): string {
 			display: flex;
 			gap: 8px;
 			margin-top: 8px;
+			min-height: 60px;
 		}
 		.image-thumb {
 			width: 60px;
@@ -255,9 +267,17 @@ export function renderMidgardEditor(): string {
 			cursor: pointer;
 			opacity: 0.7;
 			transition: all 0.2s;
+			background: #f5f5f5;
 		}
 		.image-thumb:hover { opacity: 1; border-color: #000; }
 		.image-thumb.selected { border-color: #000; opacity: 1; }
+		.image-thumb.loading { 
+			animation: pulse-light 1.5s ease-in-out infinite; 
+		}
+		@keyframes pulse-light {
+			0%, 100% { background: #f5f5f5; }
+			50% { background: #eee; }
+		}
 
 		/* Keyboard shortcuts hint */
 		.shortcuts-hint {
@@ -610,14 +630,16 @@ export function renderMidgardEditor(): string {
 			const loading = document.getElementById('inspire-loading');
 			const coverInput = document.getElementById('cover-image-input');
 			
+			// Pre-fill with placeholder divs (no UI shift)
+			picker.innerHTML = '<div class="image-thumb loading"></div><div class="image-thumb loading"></div><div class="image-thumb loading"></div>';
 			loading.textContent = 'Loading...';
-			picker.innerHTML = '';
 
 			try {
 				const res = await fetch('/freya/search');
 				const data = await res.json();
 				inspireImages = (data.images || []).slice(0, 3);
 
+				picker.innerHTML = '';
 				inspireImages.forEach((img, i) => {
 					const thumb = document.createElement('img');
 					thumb.src = img.thumb;
