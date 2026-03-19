@@ -50,11 +50,98 @@ export function renderMidgardEditor(): string {
 			background: #fff;
 			z-index: 100;
 		}
+		.header-left {
+			display: flex;
+			align-items: center;
+			gap: 24px;
+		}
 		.logo { color: #000; font-size: 12px; letter-spacing: 2px; font-weight: 600; }
-		.nav-links a { color: #999; text-decoration: none; margin-left: 24px; font-size: 12px; }
-		.nav-links a:hover { color: #000; }
-		.save-status { font-size: 11px; color: #ccc; margin-right: auto; margin-left: 24px; }
+		.save-status { font-size: 11px; color: #ccc; }
 		.save-status.saved { color: #22c55e; }
+		
+		.header-actions {
+			display: flex;
+			align-items: center;
+			gap: 12px;
+		}
+		.header-btn {
+			padding: 8px 16px;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 12px;
+			font-weight: 600;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+		.header-btn-primary {
+			background: #000;
+			color: #fff;
+			border: none;
+		}
+		.header-btn-primary:hover { background: #333; }
+		.header-btn-primary:disabled { background: #ccc; cursor: not-allowed; }
+		.header-btn-secondary {
+			background: transparent;
+			color: #666;
+			border: 1px solid #ddd;
+		}
+		.header-btn-secondary:hover { border-color: #999; color: #000; }
+		.header-link {
+			color: #999;
+			text-decoration: none;
+			font-size: 12px;
+		}
+		.header-link:hover { color: #000; }
+		
+		/* Drafts Modal */
+		.drafts-modal {
+			display: none;
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,0.5);
+			z-index: 200;
+			align-items: center;
+			justify-content: center;
+		}
+		.drafts-modal.open { display: flex; }
+		.drafts-content {
+			background: #fff;
+			border-radius: 12px;
+			padding: 24px;
+			max-width: 500px;
+			width: 90%;
+			max-height: 80vh;
+			overflow-y: auto;
+		}
+		.drafts-header {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			margin-bottom: 20px;
+		}
+		.drafts-title { font-size: 18px; font-weight: 600; }
+		.drafts-close {
+			background: none;
+			border: none;
+			font-size: 20px;
+			cursor: pointer;
+			color: #999;
+		}
+		.drafts-close:hover { color: #000; }
+		.draft-item {
+			padding: 12px;
+			border: 1px solid #eee;
+			border-radius: 8px;
+			margin-bottom: 12px;
+			cursor: pointer;
+		}
+		.draft-item:hover { border-color: #000; }
+		.draft-item-title { font-weight: 600; margin-bottom: 4px; }
+		.draft-item-meta { font-size: 11px; color: #999; }
+		.drafts-empty { text-align: center; color: #999; padding: 40px 0; }
 		
 		/* Main Layout - 3 columns */
 		.main-layout {
@@ -453,37 +540,6 @@ export function renderMidgardEditor(): string {
 			margin: 20px 0;
 		}
 		
-		/* Actions */
-		.actions {
-			display: flex;
-			flex-direction: column;
-			gap: 10px;
-			margin-top: 24px;
-		}
-		.btn {
-			padding: 12px 20px;
-			border-radius: 6px;
-			font-family: inherit;
-			font-size: 13px;
-			font-weight: 600;
-			cursor: pointer;
-			transition: all 0.2s;
-			text-align: center;
-		}
-		.btn-primary {
-			background: #000;
-			color: #fff;
-			border: none;
-		}
-		.btn-primary:hover { background: #333; }
-		.btn-primary:disabled { background: #ccc; cursor: not-allowed; }
-		.btn-secondary {
-			background: transparent;
-			color: #666;
-			border: 1px solid #ddd;
-		}
-		.btn-secondary:hover { border-color: #999; color: #000; }
-		
 		/* Markdown Help */
 		.markdown-help { margin-top: 24px; }
 		.help-toggle {
@@ -616,12 +672,16 @@ export function renderMidgardEditor(): string {
 </head>
 <body>
 	<header class="header">
-		<div class="logo">MIDGARD</div>
-		<div class="save-status" id="save-status"></div>
-		<nav class="nav-links">
-			<a href="/marcus">View Blog</a>
-			<a href="/">Home</a>
-		</nav>
+		<div class="header-left">
+			<div class="logo">MIDGARD</div>
+			<div class="save-status" id="save-status"></div>
+		</div>
+		<div class="header-actions">
+			<a href="/midgard/posts" class="header-link">Drafts</a>
+			<a href="/marcus" class="header-link">View Blog</a>
+			<button type="button" class="header-btn header-btn-secondary" onclick="previewMarkdown()">Preview</button>
+			<button type="button" class="header-btn header-btn-primary" id="publish-btn" onclick="publishPost()">Publish</button>
+		</div>
 	</header>
 
 	<div class="main-layout">
@@ -683,15 +743,6 @@ export function renderMidgardEditor(): string {
 						</div>
 						<div id="schema-status"></div>
 					</div>
-				</div>
-
-				<div class="divider"></div>
-
-				<!-- Actions -->
-				<div class="actions">
-					<button type="submit" class="btn btn-primary" id="publish-btn">Publish</button>
-					<button type="button" class="btn btn-secondary" onclick="previewMarkdown()">Preview</button>
-					<button type="button" class="btn btn-secondary" onclick="clearDraft()">Clear Draft</button>
 				</div>
 
 				<!-- Markdown Help -->
@@ -847,22 +898,6 @@ export function renderMidgardEditor(): string {
 			}
 		}
 
-		function clearDraft() {
-			if (confirm('Clear all fields and delete saved draft?')) {
-				localStorage.removeItem(DRAFT_KEY);
-				titleInput.value = '';
-				slugInput.value = '';
-				bodyInput.value = '';
-				form.querySelector('[name="excerpt"]').value = '';
-				form.querySelector('[name="coverImage"]').value = '';
-				form.querySelector('[name="tags"]').value = '';
-				slugPreview.textContent = 'your-slug';
-				wordCount.textContent = '0';
-				successMsg.classList.remove('show');
-				saveStatus.textContent = '';
-			}
-		}
-
 		function updateSaveStatus(state, timestamp) {
 			if (state === 'saved') {
 				saveStatus.textContent = 'Draft saved';
@@ -954,10 +989,14 @@ export function renderMidgardEditor(): string {
 			previewWindow.focus();
 		}
 
-		// Form submit
-		form.addEventListener('submit', async (e) => {
-			e.preventDefault();
-			
+		// Publish post
+		async function publishPost() {
+			// Validate required fields
+			if (!titleInput.value.trim() || !bodyInput.value.trim() || !slugInput.value.trim()) {
+				alert('Title, body, and slug are required');
+				return;
+			}
+
 			const formData = new FormData();
 			formData.append('title', titleInput.value);
 			formData.append('slug', slugInput.value);
@@ -991,6 +1030,7 @@ export function renderMidgardEditor(): string {
 						form.querySelector('[name="excerpt"]').value = '';
 						form.querySelector('[name="coverImage"]').value = '';
 						form.querySelector('[name="tags"]').value = '';
+						document.getElementById('schema-textarea').value = '';
 						slugPreview.textContent = 'your-slug';
 						wordCount.textContent = '0';
 						successMsg.classList.remove('show');
@@ -1004,7 +1044,7 @@ export function renderMidgardEditor(): string {
 
 			publishBtn.textContent = 'Publish';
 			publishBtn.disabled = false;
-		});
+		}
 
 		// Inspire images from Unsplash (via FREYA)
 		let inspireImages = [];
