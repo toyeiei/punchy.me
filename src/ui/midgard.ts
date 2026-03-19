@@ -2,6 +2,7 @@
  * Midgard Editor UI
  * Private writing interface for MARCUS
  * Supports Markdown with preview
+ * Zen, calm light theme - black and white
  */
 
 export function renderMidgardEditor(): string {
@@ -19,8 +20,8 @@ export function renderMidgardEditor(): string {
 	<style>
 		* { box-sizing: border-box; margin: 0; padding: 0; }
 		body {
-			background: #000;
-			color: #fff;
+			background: #fff;
+			color: #000;
 			font-family: 'JetBrains Mono', monospace;
 			min-height: 100vh;
 		}
@@ -33,39 +34,40 @@ export function renderMidgardEditor(): string {
 			align-items: center;
 			margin-bottom: 40px;
 			padding-bottom: 20px;
-			border-bottom: 1px solid rgba(34,197,94,0.2);
+			border-bottom: 1px solid #eee;
 		}
-		.logo { color: #22c55e; font-size: 12px; letter-spacing: 2px; }
-		.nav-links a { color: #666; text-decoration: none; margin-left: 24px; font-size: 12px; }
-		.nav-links a:hover { color: #22c55e; }
+		.logo { color: #000; font-size: 12px; letter-spacing: 2px; }
+		.nav-links a { color: #999; text-decoration: none; margin-left: 24px; font-size: 12px; }
+		.nav-links a:hover { color: #000; }
 		
 		/* Title */
-		.page-title { font-size: 28px; margin-bottom: 8px; }
-		.page-subtitle { color: #666; font-size: 13px; margin-bottom: 40px; }
+		.page-title { font-size: 28px; margin-bottom: 8px; font-weight: 400; }
+		.page-subtitle { color: #999; font-size: 13px; margin-bottom: 40px; }
 		
 		/* Form */
 		.form-group { margin-bottom: 24px; }
-		.form-label { display: block; font-size: 11px; color: #22c55e; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
+		.form-label { display: block; font-size: 11px; color: #666; margin-bottom: 8px; text-transform: uppercase; letter-spacing: 1px; }
 		
 		.form-input {
 			width: 100%;
-			background: rgba(255,255,255,0.03);
-			border: 1px solid rgba(34,197,94,0.2);
+			background: #fafafa;
+			border: 1px solid #eee;
 			border-radius: 8px;
 			padding: 16px;
-			color: #fff;
+			color: #000;
 			font-family: inherit;
 			font-size: 16px;
-			transition: border-color 0.2s;
+			transition: border-color 0.2s, box-shadow 0.2s;
 		}
 		.form-input:focus {
 			outline: none;
-			border-color: #22c55e;
+			border-color: #000;
+			box-shadow: 0 0 0 3px rgba(0,0,0,0.05);
 		}
-		.form-input::placeholder { color: #444; }
+		.form-input::placeholder { color: #ccc; }
 		
 		/* Title input - larger */
-		.title-input { font-size: 24px; font-weight: 600; }
+		.title-input { font-size: 24px; font-weight: 600; background: #fff; }
 		
 		/* Body textarea - larger, serif for writing */
 		.body-input {
@@ -74,6 +76,7 @@ export function renderMidgardEditor(): string {
 			line-height: 1.8;
 			min-height: 400px;
 			resize: vertical;
+			background: #fff;
 		}
 		
 		/* Excerpt */
@@ -83,12 +86,12 @@ export function renderMidgardEditor(): string {
 		.slug-preview { 
 			margin-top: 8px; 
 			font-size: 12px; 
-			color: #666; 
+			color: #999; 
 		}
-		.slug-preview span { color: #22c55e; }
+		.slug-preview span { color: #666; }
 		
 		/* Tags */
-		.tags-help { font-size: 11px; color: #444; margin-top: 8px; }
+		.tags-help { font-size: 11px; color: #ccc; margin-top: 8px; }
 		
 		/* Actions */
 		.actions {
@@ -106,38 +109,37 @@ export function renderMidgardEditor(): string {
 			transition: all 0.2s;
 		}
 		.btn-primary {
-			background: #22c55e;
-			color: #000;
+			background: #000;
+			color: #fff;
 			border: none;
 		}
 		.btn-primary:hover {
-			transform: scale(1.02);
-			box-shadow: 0 0 20px rgba(34,197,94,0.3);
+			background: #333;
 		}
 		.btn-secondary {
 			background: transparent;
 			color: #666;
-			border: 1px solid #333;
+			border: 1px solid #ddd;
 		}
-		.btn-secondary:hover { border-color: #666; color: #fff; }
+		.btn-secondary:hover { border-color: #999; color: #000; }
 		
 		/* Success message */
 		.success-msg {
-			background: rgba(34,197,94,0.1);
-			border: 1px solid #22c55e;
+			background: #f0f0f0;
+			border: 1px solid #000;
 			border-radius: 8px;
 			padding: 20px;
 			margin-bottom: 24px;
 			display: none;
 		}
 		.success-msg.show { display: block; }
-		.success-msg a { color: #22c55e; }
+		.success-msg a { color: #000; text-decoration: underline; }
 		
 		/* Word count */
 		.word-count {
 			text-align: right;
 			font-size: 11px;
-			color: #444;
+			color: #ccc;
 			margin-top: 8px;
 		}
 	</style>
@@ -145,7 +147,7 @@ export function renderMidgardEditor(): string {
 <body>
 	<div class="container">
 		<header class="header">
-			<div class="logo">PUNCHY.ME / MIDGARD</div>
+			<div class="logo">MIDGARD</div>
 			<nav class="nav-links">
 				<a href="/marcus">View Blog</a>
 				<a href="/">Home</a>
@@ -232,10 +234,10 @@ export function renderMidgardEditor(): string {
 			// Parse markdown with DOMPurify
 			const renderedBody = DOMPurify.sanitize(marked.parse(body || ''));
 
-			// Build preview HTML (same style as MARCUS post page)
+			// Build preview HTML (same style as MARCUS post page - dark theme)
 			const tagsHtml = tags ? tags.split(',').map(t => '<span style="background:rgba(34,197,94,0.1);color:#22c55e;padding:4px 12px;border-radius:20px;font-size:12px;margin-right:8px;">' + t.trim() + '</span>').join('') : '';
 
-			const previewHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + (title || 'Preview') + ' - MARCUS</title><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#000;color:#fff;font-family:JetBrains Mono,monospace;line-height:1.8}.container{max-width:800px;margin:0 auto;padding:40px 20px}.cover-img{width:100%;height:300px;object-fit:cover;border-radius:12px;margin-bottom:40px}.title{font-family:Crimson Pro,Georgia,serif;font-size:42px;margin-bottom:24px;line-height:1.2}.meta{color:#666;font-size:12px;margin-bottom:40px}.tags{margin-bottom:40px}.body{font-family:Crimson Pro,Georgia,serif;font-size:18px;line-height:1.9}.body h1,.body h2,.body h3{font-family:Crimson Pro,Georgia,serif;margin:2rem 0 1rem}.body p{margin-bottom:1.5rem}.body ul,.body ol{margin:1.5rem 0;padding-left:2rem}.body li{margin-bottom:0.5rem}.body blockquote{border-left:3px solid #22c55e;padding-left:1.5rem;margin:1.5rem 0;color:#888;font-style:italic}.body code{background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:4px;font-size:0.9em}.body pre{background:rgba(0,0,0,0.5);padding:1.5rem;border-radius:8px;overflow-x:auto;margin:1.5rem 0}.body pre code{background:none;padding:0}.body a{color:#22c55e;text-decoration:none}.watermark{position:fixed;top:20px;right:20px;background:rgba(34,197,94,0.1);color:#22c55e;font-size:10px;padding:8px 16px;border-radius:20px;z-index:100}</style></head><body><div class="watermark">PREVIEW</div><div class="container">' + (coverImage ? '<img src="' + coverImage + '" class="cover-img" alt="">' : '') + '<h1 class="title">' + (title || 'Untitled') + '</h1><div class="meta">Just now · ' + (wordCount.textContent) + ' words</div>' + (tagsHtml ? '<div class="tags">' + tagsHtml + '</div>' : '') + (excerpt ? '<p style="color:#888;font-style:italic;margin-bottom:40px;">' + excerpt + '</p>' : '') + '<div class="body">' + renderedBody + '</div></div></body></html>';
+			const previewHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + (title || 'Preview') + ' - MARCUS</title><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#000;color:#fff;font-family:JetBrains Mono,monospace;line-height:1.8}.container{max-width:800px;margin:0 auto;padding:40px 20px}.cover-img{width:100%;height:300px;object-fit:cover;border-radius:12px;margin-bottom:40px}.title{font-family:Crimson Pro,Georgia,serif;font-size:42px;margin-bottom:24px;line-height:1.2}.meta{color:#666;font-size:12px;margin-bottom:40px}.tags{margin-bottom:40px}.body{font-family:Crimson Pro,Georgia,serif;font-size:18px;line-height:1.9}.body h1,.body h2,.body h3{font-family:Crimson Pro,Georgia,serif;margin:2rem 0 1rem;color:#fff}.body p{margin-bottom:1.5rem}.body ul,.body ol{margin:1.5rem 0;padding-left:2rem}.body li{margin-bottom:0.5rem}.body blockquote{border-left:3px solid #22c55e;padding-left:1.5rem;margin:1.5rem 0;color:#888;font-style:italic}.body code{background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:4px;font-size:0.9em}.body pre{background:rgba(0,0,0,0.5);padding:1.5rem;border-radius:8px;overflow-x:auto;margin:1.5rem 0}.body pre code{background:none;padding:0}.body a{color:#22c55e;text-decoration:none}.watermark{position:fixed;top:20px;right:20px;background:#000;color:#fff;border:1px solid #fff;font-size:10px;padding:8px 16px;border-radius:20px;z-index:100}</style></head><body><div class="watermark">PREVIEW</div><div class="container">' + (coverImage ? '<img src="' + coverImage + '" class="cover-img" alt="">' : '') + '<h1 class="title">' + (title || 'Untitled') + '</h1><div class="meta">Just now · ' + (wordCount.textContent) + ' words</div>' + (tagsHtml ? '<div class="tags">' + tagsHtml + '</div>' : '') + (excerpt ? '<p style="color:#888;font-style:italic;margin-bottom:40px;">' + excerpt + '</p>' : '') + '<div class="body">' + renderedBody + '</div></div></body></html>';
 
 			// Open in new tab
 			const blob = new Blob([previewHtml], { type: 'text/html' });
