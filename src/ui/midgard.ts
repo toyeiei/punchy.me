@@ -2088,14 +2088,27 @@ export function renderMidgardEditor(): string {
 }
 
 export function renderMidgardPostsList(posts: MarcusPost[]): string {
+	// Calculate stats
+	const totalPosts = posts.length;
+	const draftCount = posts.filter(p => p.status === 'draft').length;
+	const publishedCount = posts.filter(p => p.status === 'published').length;
+
 	const postsHtml = posts.map(post => {
 		const isDraft = post.status === 'draft';
 		const statusBadge = isDraft 
 			? '<span class="status-badge draft">Draft</span>'
 			: '<span class="status-badge published">Published</span>';
-		const date = isDraft 
-			? new Date(post.createdAt).toLocaleDateString()
-			: new Date(post.publishedAt).toLocaleDateString();
+		
+		// Format date and time
+		const timestamp = isDraft ? post.createdAt : post.publishedAt;
+		const date = new Date(timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+		const time = new Date(timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+		
+		// Tags
+		const tagsHtml = post.tags.length > 0 
+			? post.tags.map(t => '<span class="meta-tag">' + t + '</span>').join('')
+			: '';
+		
 		const viewLink = isDraft 
 			? ''
 			: '<a href="/marcus/' + post.slug + '" class="action-btn" target="_blank">View</a>';
@@ -2106,12 +2119,18 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 					'<span class="post-title">' + escapeHTML(post.title) + '</span>' +
 					statusBadge +
 				'</div>' +
-				'<div class="post-meta">/' + post.slug + ' · ' + date + '</div>' +
+				'<div class="post-meta">' +
+					'<span>/' + post.slug + '</span>' +
+					'<span class="meta-dot">·</span>' +
+					'<span>' + date + '</span>' +
+					'<span class="meta-time">' + time + '</span>' +
+					tagsHtml +
+				'</div>' +
 			'</div>' +
 			'<div class="post-actions">' +
 				'<a href="/midgard?edit=' + post.slug + '" class="action-btn">Edit</a>' +
 				viewLink +
-				'<button class="action-btn delete-btn" onclick="confirmDelete(\'' + post.id + '\', \'' + escapeHTML(post.title).replace(/'/g, "\\'") + '\')">Delete</button>' +
+				'<button class="delete-icon" onclick="confirmDelete(\'' + post.id + '\', \'' + escapeHTML(post.title).replace(/'/g, "\\'") + '\')" title="Delete">🗑</button>' +
 			'</div>' +
 		'</div>';
 	}).join('');
@@ -2122,41 +2141,62 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
 	<title>Posts - Midgard</title>
-	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 	<style>
 		* { box-sizing: border-box; margin: 0; padding: 0; }
 		body { background: #fff; color: #000; font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
 		.container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
-		.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
-		.title { font-size: 24px; font-weight: 600; }
+		
+		/* Header */
+		.header { margin-bottom: 40px; }
+		.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 		.back-link { color: #999; text-decoration: none; font-size: 12px; }
 		.back-link:hover { color: #000; }
-		.post-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #eee; }
+		
+		/* New Post Section */
+		.new-post-section { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; margin-bottom: 24px; }
+		.new-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; }
+		.new-btn:hover { background: #333; }
+		.post-stats { font-size: 12px; color: #666; }
+		.post-stats span { margin: 0 8px; }
+		.stat-total { color: #000; font-weight: 500; }
+		.stat-draft { color: #92400e; }
+		.stat-published { color: #166534; }
+		
+		/* Post rows */
+		.posts-list { display: flex; flex-direction: column; }
+		.post-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f5f5f5; }
 		.post-row:last-child { border-bottom: none; }
-		.post-info { flex: 1; }
-		.post-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
-		.post-title { font-size: 16px; }
-		.status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+		.post-row:hover { background: #fafafa; margin: 0 -12px; padding: 16px 12px; border-radius: 6px; }
+		
+		.post-info { flex: 1; min-width: 0; }
+		.post-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+		.post-title { font-size: 15px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+		.status-badge { font-size: 9px; padding: 3px 8px; border-radius: 10px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; flex-shrink: 0; }
 		.status-badge.draft { background: #fef3c7; color: #92400e; }
 		.status-badge.published { background: #dcfce7; color: #166534; }
-		.post-meta { font-size: 12px; color: #999; }
-		.post-actions { display: flex; gap: 12px; }
-		.action-btn { padding: 8px 16px; font-size: 12px; border-radius: 6px; text-decoration: none; border: 1px solid #eee; color: #666; cursor: pointer; background: #fff; font-family: inherit; }
+		
+		.post-meta { font-size: 11px; color: #999; display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+		.meta-dot { color: #ddd; }
+		.meta-time { color: #bbb; }
+		.meta-tag { background: #f5f5f5; color: #888; padding: 2px 8px; border-radius: 10px; font-size: 10px; }
+		
+		.post-actions { display: flex; align-items: center; gap: 8px; margin-left: 16px; }
+		.action-btn { padding: 6px 12px; font-size: 11px; border-radius: 4px; text-decoration: none; border: 1px solid #eee; color: #666; cursor: pointer; background: #fff; font-family: inherit; white-space: nowrap; }
 		.action-btn:hover { border-color: #000; color: #000; }
-		.delete-btn { color: #dc2626; border-color: #fecaca; }
-		.delete-btn:hover { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
-		.new-btn { display: inline-block; margin-top: 24px; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; }
-		.new-btn:hover { background: #333; }
-		.empty { text-align: center; padding: 60px 0; color: #999; }
+		.delete-icon { background: none; border: none; cursor: pointer; font-size: 16px; padding: 4px 8px; opacity: 0.4; transition: opacity 0.15s; }
+		.delete-icon:hover { opacity: 1; }
+		
+		.empty { text-align: center; padding: 60px 0; color: #999; font-size: 14px; }
 		
 		/* Delete Confirmation Modal */
 		.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
 		.modal-overlay.visible { display: flex; }
-		.modal { background: #fff; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; text-align: center; }
-		.modal-title { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
-		.modal-text { color: #666; font-size: 14px; margin-bottom: 24px; }
-		.modal-actions { display: flex; gap: 12px; justify-content: center; }
-		.modal-btn { padding: 10px 24px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit; border: none; }
+		.modal { background: #fff; border-radius: 8px; padding: 28px; max-width: 380px; width: 90%; text-align: center; }
+		.modal-title { font-size: 16px; font-weight: 600; margin-bottom: 10px; }
+		.modal-text { color: #666; font-size: 13px; margin-bottom: 20px; line-height: 1.5; }
+		.modal-actions { display: flex; gap: 10px; justify-content: center; }
+		.modal-btn { padding: 10px 20px; border-radius: 4px; font-size: 12px; cursor: pointer; font-family: inherit; border: none; }
 		.modal-btn-cancel { background: #f5f5f5; color: #666; }
 		.modal-btn-cancel:hover { background: #eee; }
 		.modal-btn-delete { background: #dc2626; color: #fff; }
@@ -2166,11 +2206,24 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 <body>
 	<div class="container">
 		<div class="header">
-			<div class="title">Your Posts</div>
-			<a href="/midgard" class="back-link">← Back to Editor</a>
+			<div class="header-top">
+				<div style="font-size: 20px; font-weight: 600;">Your Posts</div>
+				<a href="/midgard" class="back-link">← Back to Editor</a>
+			</div>
+			
+			<div class="new-post-section">
+				<a href="/midgard?new=true" class="new-btn">+ New Post</a>
+				<div class="post-stats">
+					<span class="stat-total">${totalPosts} total</span>
+					<span class="stat-draft">${draftCount} draft</span>
+					<span class="stat-published">${publishedCount} published</span>
+				</div>
+			</div>
 		</div>
-		${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
-		<a href="/midgard?new=true" class="new-btn">+ New Post</a>
+		
+		<main class="posts-list">
+			${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
+		</main>
 	</div>
 	
 	<!-- Delete Confirmation Modal -->
@@ -2190,14 +2243,13 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		
 		function confirmDelete(postId, postTitle) {
 			deletePostId = postId;
-			document.getElementById('delete-modal-text').textContent = '"' + postTitle + '" will be permanently deleted. This action cannot be undone.';
+			document.getElementById('delete-modal-text').textContent = '"' + postTitle + '" will be permanently deleted.';
 			document.getElementById('delete-modal').classList.add('visible');
 		}
 		
 		function closeModal() {
 			deletePostId = null;
 			document.getElementById('delete-modal').classList.remove('visible');
-			// Reset button state
 			const btn = document.getElementById('confirm-delete-btn');
 			btn.textContent = 'Delete';
 			btn.disabled = false;
@@ -2219,10 +2271,13 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 					const row = document.querySelector('.post-row[data-post-id="' + deletePostId + '"]');
 					if (row) row.remove();
 					
+					// Update stats
+					updateStats();
+					
 					// Check if empty
 					const remaining = document.querySelectorAll('.post-row');
 					if (remaining.length === 0) {
-						document.querySelector('.container').innerHTML = '<div class="header"><div class="title">Your Posts</div><a href="/midgard" class="back-link">← Back to Editor</a></div><div class="empty">No posts yet. Start writing!</div><a href="/midgard?new=true" class="new-btn">+ New Post</a>';
+						document.querySelector('.posts-list').innerHTML = '<div class="empty">No posts yet. Start writing!</div>';
 					}
 					
 					closeModal();
@@ -2237,6 +2292,22 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 				btn.disabled = false;
 			}
 		});
+		
+		function updateStats() {
+			const rows = document.querySelectorAll('.post-row');
+			const total = rows.length;
+			let drafts = 0, published = 0;
+			
+			rows.forEach(row => {
+				const badge = row.querySelector('.status-badge');
+				if (badge && badge.classList.contains('draft')) drafts++;
+				else published++;
+			});
+			
+			document.querySelector('.stat-total').textContent = total + ' total';
+			document.querySelector('.stat-draft').textContent = drafts + ' draft';
+			document.querySelector('.stat-published').textContent = published + ' published';
+		}
 		
 		// Close modal on overlay click
 		document.getElementById('delete-modal').addEventListener('click', function(e) {
