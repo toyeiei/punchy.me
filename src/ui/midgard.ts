@@ -1528,9 +1528,14 @@ export function renderMidgardEditor(): string {
 			setTimeout(() => { btn.textContent = originalText; }, 1500);
 		}
 		
-		// Close modal on overlay click
-		document.getElementById('publish-modal').addEventListener('click', function(e) {
-			if (e.target === this) closePublishModal();
+		// Close modal on overlay click (wait for DOM to be ready)
+		document.addEventListener('DOMContentLoaded', function() {
+			const modal = document.getElementById('publish-modal');
+			if (modal) {
+				modal.addEventListener('click', function(e) {
+					if (e.target === this) closePublishModal();
+				});
+			}
 		});
 
 		// Inspire images from Unsplash (via FREYA)
