@@ -273,23 +273,31 @@ export function renderMidgardEditor(): string {
 			font-family: inherit;
 		}
 		
-		/* Mobile Responsive */
+		/* Mobile - Desktop Only Message */
+		.desktop-only-msg {
+			display: none;
+			text-align: center;
+			padding: 60px 20px;
+		}
+		.desktop-only-msg h2 {
+			font-family: 'Crimson Pro', Georgia, serif;
+			font-size: 28px;
+			margin-bottom: 16px;
+		}
+		.desktop-only-msg p {
+			color: #999;
+			font-size: 14px;
+			margin-bottom: 24px;
+		}
+		.desktop-only-msg a {
+			color: #000;
+			text-decoration: underline;
+		}
+		
 		@media (max-width: 900px) {
-			.main-layout { flex-direction: column; }
-			.sidebar {
-				width: 100%;
-				max-width: none;
-				min-width: auto;
-				height: auto;
-				position: static;
-				border-right: none;
-				border-bottom: 1px solid #eee;
-				padding: 20px;
-			}
-			.editor-panel { padding: 24px 20px; }
-			.body-input { min-height: 350px; }
-			.title-input { font-size: 26px; }
-			.save-status { display: none; }
+			.header { display: none; }
+			.main-layout { display: none; }
+			.desktop-only-msg { display: block; }
 		}
 	</style>
 </head>
@@ -382,6 +390,13 @@ export function renderMidgardEditor(): string {
 			<textarea name="body" class="body-input" placeholder="Start writing..." required></textarea>
 			<div class="word-count"><span id="word-count">0</span> words</div>
 		</main>
+	</div>
+
+	<!-- Desktop Only Message -->
+	<div class="desktop-only-msg">
+		<h2>Desktop Required</h2>
+		<p>Midgard editor is designed for desktop writing.</p>
+		<p><a href="/marcus">View MARCUS Blog</a> or <a href="/">Return Home</a></p>
 	</div>
 
 	<script>
