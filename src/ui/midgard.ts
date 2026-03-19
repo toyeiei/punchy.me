@@ -129,7 +129,7 @@ export function renderMidgardEditor(): string {
 			border-color: #ccc;
 		}
 		.ai-toggle.open {
-			border-color: #000;
+			border-color: #999;
 			border-bottom-left-radius: 0;
 			border-bottom-right-radius: 0;
 		}
@@ -145,7 +145,7 @@ export function renderMidgardEditor(): string {
 			display: none;
 			padding: 12px;
 			background: #fff;
-			border: 1px solid #000;
+			border: 1px solid #999;
 			border-top: none;
 			border-radius: 0 0 6px 6px;
 		}
@@ -168,7 +168,7 @@ export function renderMidgardEditor(): string {
 			gap: 8px;
 		}
 		.ai-btn:hover {
-			border-color: #000;
+			border-color: #999;
 			color: #000;
 		}
 		.ai-btn:disabled {
@@ -195,10 +195,10 @@ export function renderMidgardEditor(): string {
 			line-height: 1.4;
 		}
 		.ai-result-item:hover {
-			border-color: #000;
+			border-color: #999;
 		}
 		.ai-result-item.selected {
-			border-color: #000;
+			border-color: #999;
 			background: #f5f5f5;
 		}
 		.ai-loading {
