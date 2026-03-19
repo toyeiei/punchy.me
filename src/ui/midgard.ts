@@ -1076,6 +1076,9 @@ export function renderMidgardEditor(): string {
 		const DRAFT_KEY = 'midgard_draft';
 		let saveTimeout = null;
 
+		// Inspire images from Unsplash (via FREYA)
+		let inspireImages = [];
+
 		function saveDraft() {
 			const draft = {
 				title: titleInput.value,
@@ -1531,7 +1534,6 @@ export function renderMidgardEditor(): string {
 		});
 
 		// Inspire images from Unsplash (via FREYA)
-		let inspireImages = [];
 		async function loadInspireImages() {
 			const picker = document.getElementById('image-picker');
 			const loading = document.getElementById('inspire-loading');
