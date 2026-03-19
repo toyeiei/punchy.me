@@ -61,7 +61,7 @@ export async function handleMidgardGet(request: Request, env: Env): Promise<Resp
 
 /**
  * Handle POST /midgard/publish
- * Publish a new post to MARCUS
+ * Publish a new post OR publish an existing draft
  */
 export async function handleMidgardPublish(request: Request, env: Env): Promise<Response> {
 	const access = checkMidgardAccess(request, env);
@@ -72,6 +72,7 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
 	try {
 		const formData = await request.formData();
 
+		const postId = formData.get('id')?.toString()?.trim(); // Optional - for publishing existing draft
 		const title = formData.get('title')?.toString()?.trim();
 		const body = formData.get('body')?.toString()?.trim();
 		const excerpt = formData.get('excerpt')?.toString()?.trim() || '';
@@ -106,9 +107,50 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
 		}
 
 		const now = Date.now();
+
+		// If publishing existing draft
+		if (postId) {
+			const existingData = await env.SHORT_LINKS.get(`marcus:post:${postId}`);
+			if (!existingData) {
+				return jsonResponse({ error: 'Post not found' }, 404);
+			}
+			
+			const existing = JSON.parse(existingData) as MarcusPost;
+			const oldSlug = existing.slug;
+			
+			// Update slug mapping if slug changed
+			if (oldSlug !== slug) {
+				await env.SHORT_LINKS.delete(`marcus:slug:${oldSlug}`);
+				await env.SHORT_LINKS.put(`marcus:slug:${slug}`, postId);
+			}
+			
+			// Publish the draft
+			const publishedPost: MarcusPost = {
+				...existing,
+				title,
+				body,
+				excerpt: excerpt || body.substring(0, 160) + '...',
+				coverImage,
+				tags,
+				schema,
+				slug,
+				status: 'published',
+				publishedAt: existing.publishedAt || now, // Keep original publish date or set new
+			};
+			
+			await env.SHORT_LINKS.put(`marcus:post:${postId}`, JSON.stringify(publishedPost));
+			
+			return jsonResponse({ 
+				success: true, 
+				id: postId, 
+				slug,
+				url: `/marcus/${slug}` 
+			});
+		}
+
+		// Create new published post
 		const id = generateUniqueId(8);
 
-		// Create post
 		const post: MarcusPost = {
 			type: 'marcus:post',
 			id,
@@ -223,7 +265,7 @@ export async function handleMidgardDelete(request: Request, env: Env, postId: st
 
 /**
  * Handle POST /midgard/update
- * Update an existing post
+ * Update an existing post (preserves status)
  */
 export async function handleMidgardUpdate(request: Request, env: Env): Promise<Response> {
 	const access = checkMidgardAccess(request, env);
@@ -241,6 +283,7 @@ export async function handleMidgardUpdate(request: Request, env: Env): Promise<R
 		const coverImage = formData.get('coverImage')?.toString()?.trim() || null;
 		const tagsStr = formData.get('tags')?.toString()?.trim() || '';
 		const schemaStr = formData.get('schema')?.toString()?.trim() || '';
+		const newSlug = formData.get('slug')?.toString()?.trim();
 
 		if (!postId) {
 			return jsonResponse({ error: 'Post ID is required' }, 400);
@@ -253,6 +296,8 @@ export async function handleMidgardUpdate(request: Request, env: Env): Promise<R
 		}
 
 		const existing = JSON.parse(existingData) as MarcusPost;
+		const oldSlug = existing.slug;
+		const finalSlug = newSlug || oldSlug;
 
 		// Parse tags
 		const tags = tagsStr
@@ -270,7 +315,13 @@ export async function handleMidgardUpdate(request: Request, env: Env): Promise<R
 			}
 		}
 
-		// Update post (keep original timestamps)
+		// Update slug mapping if slug changed
+		if (oldSlug !== finalSlug) {
+			await env.SHORT_LINKS.delete(`marcus:slug:${oldSlug}`);
+			await env.SHORT_LINKS.put(`marcus:slug:${finalSlug}`, postId);
+		}
+
+		// Update post (keep original status and timestamps)
 		const updatedPost: MarcusPost = {
 			...existing,
 			title: title || existing.title,
@@ -279,6 +330,7 @@ export async function handleMidgardUpdate(request: Request, env: Env): Promise<R
 			coverImage,
 			tags,
 			schema,
+			slug: finalSlug,
 		};
 
 		// Store updated post
@@ -315,7 +367,7 @@ export async function handleMidgardSaveDraft(request: Request, env: Env): Promis
 		const coverImage = formData.get('coverImage')?.toString()?.trim() || null;
 		const tagsStr = formData.get('tags')?.toString()?.trim() || '';
 		const schemaStr = formData.get('schema')?.toString()?.trim() || '';
-		const slug = formData.get('slug')?.toString()?.trim() || `draft-${Date.now()}`;
+		const newSlug = formData.get('slug')?.toString()?.trim() || `draft-${Date.now()}`;
 
 		// Parse tags
 		const tags = tagsStr
@@ -335,11 +387,19 @@ export async function handleMidgardSaveDraft(request: Request, env: Env): Promis
 
 		const now = Date.now();
 
-		// If updating existing draft
+		// If updating existing draft/post
 		if (postId) {
 			const existingData = await env.SHORT_LINKS.get(`marcus:post:${postId}`);
 			if (existingData) {
 				const existing = JSON.parse(existingData) as MarcusPost;
+				const oldSlug = existing.slug;
+				
+				// Update slug mapping if slug changed
+				if (oldSlug !== newSlug) {
+					await env.SHORT_LINKS.delete(`marcus:slug:${oldSlug}`);
+					await env.SHORT_LINKS.put(`marcus:slug:${newSlug}`, postId);
+				}
+				
 				const updatedPost: MarcusPost = {
 					...existing,
 					title,
@@ -348,7 +408,7 @@ export async function handleMidgardSaveDraft(request: Request, env: Env): Promis
 					coverImage,
 					tags,
 					schema,
-					slug,
+					slug: newSlug,
 				};
 				await env.SHORT_LINKS.put(`marcus:post:${postId}`, JSON.stringify(updatedPost));
 				return jsonResponse({ success: true, id: postId });
@@ -360,7 +420,7 @@ export async function handleMidgardSaveDraft(request: Request, env: Env): Promis
 		const draft: MarcusPost = {
 			type: 'marcus:post',
 			id,
-			slug,
+			slug: newSlug,
 			title,
 			body,
 			excerpt,
@@ -376,7 +436,7 @@ export async function handleMidgardSaveDraft(request: Request, env: Env): Promis
 		await env.SHORT_LINKS.put(`marcus:post:${id}`, JSON.stringify(draft));
 
 		// Store by slug
-		await env.SHORT_LINKS.put(`marcus:slug:${slug}`, id);
+		await env.SHORT_LINKS.put(`marcus:slug:${newSlug}`, id);
 
 		// Update index
 		await updatePostIndex(env, id, now);

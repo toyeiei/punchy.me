@@ -1244,7 +1244,7 @@ export function renderMidgardEditor(): string {
 			previewWindow.focus();
 		}
 
-		// Publish post
+		// Publish post (creates new or publishes existing draft)
 		async function publishPost() {
 			// Validate required fields
 			if (!titleInput.value.trim() || !bodyInput.value.trim() || !slugInput.value.trim()) {
@@ -1261,18 +1261,17 @@ export function renderMidgardEditor(): string {
 			formData.append('tags', form.querySelector('[name="tags"]').value);
 			formData.append('schema', document.getElementById('schema-textarea').value);
 
-			// Check if we're updating an existing post
-			const isEditing = window.editingPostId;
-			if (isEditing) {
+			// If editing existing post/draft, include ID (will publish draft)
+			if (window.editingPostId) {
 				formData.append('id', window.editingPostId);
 			}
 
-			publishBtn.textContent = isEditing ? 'Updating...' : 'Publishing...';
+			publishBtn.textContent = 'Publishing...';
 			publishBtn.disabled = true;
 
 			try {
-				const endpoint = isEditing ? '/midgard/update' : '/midgard/publish';
-				const res = await fetch(endpoint, {
+				// Always use /midgard/publish - it handles both new and existing
+				const res = await fetch('/midgard/publish', {
 					method: 'POST',
 					body: formData
 				});
@@ -1850,7 +1849,7 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 			? ''
 			: '<a href="/marcus/' + post.slug + '" class="action-btn" target="_blank">View</a>';
 		
-		return '<div class="post-row">' +
+		return '<div class="post-row" data-post-id="' + post.id + '" data-post-title="' + escapeHTML(post.title) + '">' +
 			'<div class="post-info">' +
 				'<div class="post-title-row">' +
 					'<span class="post-title">' + escapeHTML(post.title) + '</span>' +
@@ -1861,6 +1860,7 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 			'<div class="post-actions">' +
 				'<a href="/midgard?edit=' + post.slug + '" class="action-btn">Edit</a>' +
 				viewLink +
+				'<button class="action-btn delete-btn" onclick="confirmDelete(\'' + post.id + '\', \'' + escapeHTML(post.title).replace(/'/g, "\\'") + '\')">Delete</button>' +
 			'</div>' +
 		'</div>';
 	}).join('');
@@ -1890,11 +1890,26 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		.status-badge.published { background: #dcfce7; color: #166534; }
 		.post-meta { font-size: 12px; color: #999; }
 		.post-actions { display: flex; gap: 12px; }
-		.action-btn { padding: 8px 16px; font-size: 12px; border-radius: 6px; text-decoration: none; border: 1px solid #eee; color: #666; }
+		.action-btn { padding: 8px 16px; font-size: 12px; border-radius: 6px; text-decoration: none; border: 1px solid #eee; color: #666; cursor: pointer; background: #fff; font-family: inherit; }
 		.action-btn:hover { border-color: #000; color: #000; }
+		.delete-btn { color: #dc2626; border-color: #fecaca; }
+		.delete-btn:hover { background: #fef2f2; border-color: #dc2626; color: #dc2626; }
 		.new-btn { display: inline-block; margin-top: 24px; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; }
 		.new-btn:hover { background: #333; }
 		.empty { text-align: center; padding: 60px 0; color: #999; }
+		
+		/* Delete Confirmation Modal */
+		.modal-overlay { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; z-index: 1000; }
+		.modal-overlay.visible { display: flex; }
+		.modal { background: #fff; border-radius: 12px; padding: 32px; max-width: 400px; width: 90%; text-align: center; }
+		.modal-title { font-size: 18px; font-weight: 600; margin-bottom: 12px; }
+		.modal-text { color: #666; font-size: 14px; margin-bottom: 24px; }
+		.modal-actions { display: flex; gap: 12px; justify-content: center; }
+		.modal-btn { padding: 10px 24px; border-radius: 6px; font-size: 13px; cursor: pointer; font-family: inherit; border: none; }
+		.modal-btn-cancel { background: #f5f5f5; color: #666; }
+		.modal-btn-cancel:hover { background: #eee; }
+		.modal-btn-delete { background: #dc2626; color: #fff; }
+		.modal-btn-delete:hover { background: #b91c1c; }
 	</style>
 </head>
 <body>
@@ -1906,6 +1921,72 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
 		<a href="/midgard" class="new-btn">+ New Post</a>
 	</div>
+	
+	<!-- Delete Confirmation Modal -->
+	<div id="delete-modal" class="modal-overlay">
+		<div class="modal">
+			<div class="modal-title">Delete Post?</div>
+			<div class="modal-text" id="delete-modal-text">This action cannot be undone.</div>
+			<div class="modal-actions">
+				<button class="modal-btn modal-btn-cancel" onclick="closeModal()">Cancel</button>
+				<button class="modal-btn modal-btn-delete" id="confirm-delete-btn">Delete</button>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		let deletePostId = null;
+		
+		function confirmDelete(postId, postTitle) {
+			deletePostId = postId;
+			document.getElementById('delete-modal-text').textContent = '"' + postTitle + '" will be permanently deleted. This action cannot be undone.';
+			document.getElementById('delete-modal').classList.add('visible');
+		}
+		
+		function closeModal() {
+			deletePostId = null;
+			document.getElementById('delete-modal').classList.remove('visible');
+		}
+		
+		document.getElementById('confirm-delete-btn').addEventListener('click', async function() {
+			if (!deletePostId) return;
+			
+			this.textContent = 'Deleting...';
+			this.disabled = true;
+			
+			try {
+				const res = await fetch('/midgard/post/' + deletePostId, { method: 'DELETE' });
+				const data = await res.json();
+				
+				if (data.success) {
+					// Remove row from UI
+					const row = document.querySelector('.post-row[data-post-id="' + deletePostId + '"]');
+					if (row) row.remove();
+					
+					// Check if empty
+					const remaining = document.querySelectorAll('.post-row');
+					if (remaining.length === 0) {
+						document.querySelector('.container').innerHTML = '<div class="header"><div class="title">Your Posts</div><a href="/midgard" class="back-link">← Back to Editor</a></div><div class="empty">No posts yet. Start writing!</div><a href="/midgard" class="new-btn">+ New Post</a>';
+					}
+					
+					closeModal();
+				} else {
+					alert('Error: ' + (data.error || 'Failed to delete'));
+					this.textContent = 'Delete';
+					this.disabled = false;
+				}
+			} catch (err) {
+				alert('Failed to delete: ' + err.message);
+				this.textContent = 'Delete';
+				this.disabled = false;
+			}
+		});
+		
+		// Close modal on overlay click
+		document.getElementById('delete-modal').addEventListener('click', function(e) {
+			if (e.target === this) closeModal();
+		});
+	</script>
 </body>
 </html>`;
 }
