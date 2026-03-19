@@ -119,6 +119,7 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
 			coverImage,
 			tags,
 			schema,
+			status: 'published',
 			createdAt: now,
 			publishedAt: now,
 		};
@@ -291,6 +292,100 @@ export async function handleMidgardUpdate(request: Request, env: Env): Promise<R
 	} catch (error) {
 		console.error('Midgard update error:', error);
 		return jsonResponse({ error: 'Failed to update post' }, 500);
+	}
+}
+
+/**
+ * Handle POST /midgard/draft
+ * Save a draft (unpublished post)
+ */
+export async function handleMidgardSaveDraft(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return new Response('Unauthorized', { status: 401 });
+	}
+
+	try {
+		const formData = await request.formData();
+
+		const postId = formData.get('id')?.toString()?.trim(); // Optional - for updating existing draft
+		const title = formData.get('title')?.toString()?.trim() || 'Untitled Draft';
+		const body = formData.get('body')?.toString()?.trim() || '';
+		const excerpt = formData.get('excerpt')?.toString()?.trim() || '';
+		const coverImage = formData.get('coverImage')?.toString()?.trim() || null;
+		const tagsStr = formData.get('tags')?.toString()?.trim() || '';
+		const schemaStr = formData.get('schema')?.toString()?.trim() || '';
+		const slug = formData.get('slug')?.toString()?.trim() || `draft-${Date.now()}`;
+
+		// Parse tags
+		const tags = tagsStr
+			.split(',')
+			.map(t => t.trim().toLowerCase())
+			.filter(t => t.length > 0);
+
+		// Parse schema if provided
+		let schema: Record<string, unknown> | undefined;
+		if (schemaStr) {
+			try {
+				schema = JSON.parse(schemaStr);
+			} catch {
+				// Invalid JSON, ignore
+			}
+		}
+
+		const now = Date.now();
+
+		// If updating existing draft
+		if (postId) {
+			const existingData = await env.SHORT_LINKS.get(`marcus:post:${postId}`);
+			if (existingData) {
+				const existing = JSON.parse(existingData) as MarcusPost;
+				const updatedPost: MarcusPost = {
+					...existing,
+					title,
+					body,
+					excerpt,
+					coverImage,
+					tags,
+					schema,
+					slug,
+				};
+				await env.SHORT_LINKS.put(`marcus:post:${postId}`, JSON.stringify(updatedPost));
+				return jsonResponse({ success: true, id: postId });
+			}
+		}
+
+		// Create new draft
+		const id = postId || generateUniqueId(8);
+		const draft: MarcusPost = {
+			type: 'marcus:post',
+			id,
+			slug,
+			title,
+			body,
+			excerpt,
+			coverImage,
+			tags,
+			schema,
+			status: 'draft',
+			createdAt: now,
+			publishedAt: 0, // Not published yet
+		};
+
+		// Store by ID
+		await env.SHORT_LINKS.put(`marcus:post:${id}`, JSON.stringify(draft));
+
+		// Store by slug
+		await env.SHORT_LINKS.put(`marcus:slug:${slug}`, id);
+
+		// Update index
+		await updatePostIndex(env, id, now);
+
+		return jsonResponse({ success: true, id });
+
+	} catch (error) {
+		console.error('Midgard save draft error:', error);
+		return jsonResponse({ error: 'Failed to save draft' }, 500);
 	}
 }
 

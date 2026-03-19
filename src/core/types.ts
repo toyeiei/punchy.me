@@ -38,6 +38,7 @@ export interface MarcusPost {
 	coverImage: string | null;
 	tags: string[];
 	schema?: Record<string, unknown>; // JSON-LD structured data
+	status: 'draft' | 'published'; // Post status
 	createdAt: number;
 	publishedAt: number;
 }

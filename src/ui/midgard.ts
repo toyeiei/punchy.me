@@ -756,6 +756,7 @@ export function renderMidgardEditor(): string {
 		<div class="header-actions">
 			<a href="/midgard/posts" class="header-link">Drafts</a>
 			<a href="/marcus" class="header-link">View Blog</a>
+			<button type="button" class="header-btn header-btn-secondary" onclick="saveDraftOnly()">Save Draft</button>
 			<button type="button" class="header-btn header-btn-secondary" onclick="previewMarkdown()">Preview</button>
 			<button type="button" class="header-btn header-btn-primary" id="publish-btn" onclick="publishPost()">Publish</button>
 		</div>
@@ -998,6 +999,10 @@ export function renderMidgardEditor(): string {
 		function updateSaveStatus(state, timestamp) {
 			if (state === 'saved') {
 				saveStatus.textContent = 'Draft saved';
+				saveStatus.className = 'save-status saved';
+				setTimeout(() => { saveStatus.className = 'save-status'; }, 2000);
+			} else if (state === 'server-saved') {
+				saveStatus.textContent = 'Saved to server';
 				saveStatus.className = 'save-status saved';
 				setTimeout(() => { saveStatus.className = 'save-status'; }, 2000);
 			} else if (state === 'restored' && timestamp) {
@@ -1308,6 +1313,53 @@ export function renderMidgardEditor(): string {
 
 			publishBtn.textContent = 'Publish';
 			publishBtn.disabled = false;
+		}
+
+		// Save draft only (not published)
+		async function saveDraftOnly() {
+			const formData = new FormData();
+			formData.append('title', titleInput.value || 'Untitled Draft');
+			formData.append('slug', slugInput.value || 'draft-' + Date.now());
+			formData.append('body', bodyInput.value);
+			formData.append('excerpt', form.querySelector('[name="excerpt"]').value);
+			formData.append('coverImage', form.querySelector('[name="coverImage"]').value);
+			formData.append('tags', form.querySelector('[name="tags"]').value);
+			formData.append('schema', document.getElementById('schema-textarea').value);
+
+			// If editing existing draft/post, include ID
+			if (window.editingPostId) {
+				formData.append('id', window.editingPostId);
+			}
+
+			try {
+				const res = await fetch('/midgard/draft', {
+					method: 'POST',
+					body: formData
+				});
+
+				const data = await res.json();
+
+				if (data.success) {
+					// Store the draft ID
+					window.editingPostId = data.id;
+					
+					// Save to localStorage too
+					saveDraft();
+					
+					// Show feedback
+					updateSaveStatus('server-saved');
+					successMsg.innerHTML = '<strong>Draft saved!</strong>';
+					successMsg.classList.add('show');
+					
+					setTimeout(() => {
+						successMsg.classList.remove('show');
+					}, 2000);
+				} else {
+					alert('Error: ' + (data.error || 'Unknown error'));
+				}
+			} catch (err) {
+				alert('Failed to save draft: ' + err.message);
+			}
 		}
 
 		// Inspire images from Unsplash (via FREYA)
@@ -1786,18 +1838,32 @@ export function renderMidgardEditor(): string {
 }
 
 export function renderMidgardPostsList(posts: MarcusPost[]): string {
-	const postsHtml = posts.map(post => `
-		<div class="post-row">
-			<div class="post-info">
-				<div class="post-title">${escapeHTML(post.title)}</div>
-				<div class="post-meta">/${post.slug} · ${new Date(post.publishedAt).toLocaleDateString()}</div>
-			</div>
-			<div class="post-actions">
-				<a href="/midgard?edit=${post.slug}" class="action-btn">Edit</a>
-				<a href="/marcus/${post.slug}" class="action-btn" target="_blank">View</a>
-			</div>
-		</div>
-	`).join('');
+	const postsHtml = posts.map(post => {
+		const isDraft = post.status === 'draft';
+		const statusBadge = isDraft 
+			? '<span class="status-badge draft">Draft</span>'
+			: '<span class="status-badge published">Published</span>';
+		const date = isDraft 
+			? new Date(post.createdAt).toLocaleDateString()
+			: new Date(post.publishedAt).toLocaleDateString();
+		const viewLink = isDraft 
+			? ''
+			: '<a href="/marcus/' + post.slug + '" class="action-btn" target="_blank">View</a>';
+		
+		return '<div class="post-row">' +
+			'<div class="post-info">' +
+				'<div class="post-title-row">' +
+					'<span class="post-title">' + escapeHTML(post.title) + '</span>' +
+					statusBadge +
+				'</div>' +
+				'<div class="post-meta">/' + post.slug + ' · ' + date + '</div>' +
+			'</div>' +
+			'<div class="post-actions">' +
+				'<a href="/midgard?edit=' + post.slug + '" class="action-btn">Edit</a>' +
+				viewLink +
+			'</div>' +
+		'</div>';
+	}).join('');
 
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -1809,14 +1875,19 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 	<style>
 		* { box-sizing: border-box; margin: 0; padding: 0; }
 		body { background: #fff; color: #000; font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
-		.container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+		.container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
 		.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
 		.title { font-size: 24px; font-weight: 600; }
 		.back-link { color: #999; text-decoration: none; font-size: 12px; }
 		.back-link:hover { color: #000; }
 		.post-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #eee; }
 		.post-row:last-child { border-bottom: none; }
-		.post-title { font-size: 16px; margin-bottom: 4px; }
+		.post-info { flex: 1; }
+		.post-title-row { display: flex; align-items: center; gap: 12px; margin-bottom: 4px; }
+		.post-title { font-size: 16px; }
+		.status-badge { font-size: 10px; padding: 4px 10px; border-radius: 12px; font-weight: 500; text-transform: uppercase; letter-spacing: 0.5px; }
+		.status-badge.draft { background: #fef3c7; color: #92400e; }
+		.status-badge.published { background: #dcfce7; color: #166534; }
 		.post-meta { font-size: 12px; color: #999; }
 		.post-actions { display: flex; gap: 12px; }
 		.action-btn { padding: 8px 16px; font-size: 12px; border-radius: 6px; text-decoration: none; border: 1px solid #eee; color: #666; }
