@@ -2147,12 +2147,25 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 	<style>
 		* { box-sizing: border-box; margin: 0; padding: 0; }
-		body { background: #fff; color: #000; font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
-		.container { max-width: 900px; margin: 0 auto; padding: 40px 20px; }
+		body {
+			background: #fff;
+			color: #000;
+			font-family: 'JetBrains Mono', monospace;
+			height: 100vh;
+			overflow: hidden;
+			display: flex;
+			flex-direction: column;
+		}
 		
-		/* Header */
-		.header { margin-bottom: 40px; }
+		/* Header - Fixed */
+		.header {
+			flex-shrink: 0;
+			padding: 24px 40px;
+			border-bottom: 1px solid #eee;
+			background: #fff;
+		}
 		.header-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+		.page-title { font-size: 20px; font-weight: 600; }
 		.back-link { color: #999; text-decoration: none; font-size: 12px; }
 		.back-link:hover { color: #000; }
 		
@@ -2172,8 +2185,8 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		.search-box::placeholder { color: #bbb; }
 		
 		/* New Post Section */
-		.new-post-section { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; margin-bottom: 24px; }
-		.new-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; }
+		.new-post-section { display: flex; justify-content: space-between; align-items: center; padding-top: 4px; }
+		.new-btn { display: inline-flex; align-items: center; gap: 8px; padding: 10px 18px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; }
 		.new-btn:hover { background: #333; }
 		.post-stats { font-size: 12px; color: #666; }
 		.post-stats span { margin: 0 8px; }
@@ -2181,11 +2194,23 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		.stat-draft { color: #92400e; }
 		.stat-published { color: #166534; }
 		
-		/* Post rows */
-		.posts-list { display: flex; flex-direction: column; }
-		.post-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f5f5f5; }
-		.post-row:last-child { border-bottom: none; }
-		.post-row:hover { background: #fafafa; margin: 0 -12px; padding: 16px 12px; border-radius: 6px; }
+		/* Posts List - Scrollable */
+		.posts-list {
+			flex: 1;
+			overflow-y: auto;
+			padding: 24px 40px;
+		}
+		
+		.post-row {
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+			padding: 16px 12px;
+			border-bottom: 1px solid #f5f5f5;
+			border-radius: 6px;
+			transition: background 0.1s;
+		}
+		.post-row:hover { background: #fafafa; }
 		.post-row.hidden { display: none; }
 		
 		.post-info { flex: 1; min-width: 0; }
@@ -2223,31 +2248,29 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 	</style>
 </head>
 <body>
-	<div class="container">
-		<div class="header">
-			<div class="header-top">
-				<div style="font-size: 20px; font-weight: 600;">Your Posts</div>
-				<a href="/midgard" class="back-link">← Back to Editor</a>
-			</div>
-			
-			<div class="search-section">
-				<input type="text" id="search-box" class="search-box" placeholder="Search posts by title, slug, or tag..." oninput="filterPosts()">
-			</div>
-			
-			<div class="new-post-section">
-				<a href="/midgard?new=true" class="new-btn">+ New Post</a>
-				<div class="post-stats">
-					<span class="stat-total">${totalPosts} total</span>
-					<span class="stat-draft">${draftCount} draft</span>
-					<span class="stat-published">${publishedCount} published</span>
-				</div>
-			</div>
+	<div class="header">
+		<div class="header-top">
+			<div class="page-title">Your Posts</div>
+			<a href="/midgard" class="back-link">← Back to Editor</a>
 		</div>
 		
-		<main class="posts-list">
-			${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
-		</main>
+		<div class="search-section">
+			<input type="text" id="search-box" class="search-box" placeholder="Search posts by title, slug, or tag..." oninput="filterPosts()">
+		</div>
+		
+		<div class="new-post-section">
+			<a href="/midgard?new=true" class="new-btn">+ New Post</a>
+			<div class="post-stats">
+				<span class="stat-total">${totalPosts} total</span>
+				<span class="stat-draft">${draftCount} draft</span>
+				<span class="stat-published">${publishedCount} published</span>
+			</div>
+		</div>
 	</div>
+	
+	<main class="posts-list">
+		${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
+	</main>
 	
 	<!-- Delete Confirmation Modal -->
 	<div id="delete-modal" class="modal-overlay">
