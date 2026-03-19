@@ -1544,6 +1544,15 @@ export function renderMidgardEditor(): string {
 			try {
 				const res = await fetch('/freya/search');
 				const data = await res.json();
+				
+				// Check for error response
+				if (data.error) {
+					loading.textContent = data.error;
+					picker.innerHTML = '';
+					console.error('Freya error:', data.error);
+					return;
+				}
+				
 				inspireImages = (data.images || []).slice(0, 3);
 
 				picker.innerHTML = '';
