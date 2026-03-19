@@ -8,7 +8,7 @@ import { Env } from './types';
 export type RouteHandler = (request: Request, env: Env, ctx: ExecutionContext, path: string) => Promise<Response> | Response;
 
 export interface Route {
-	method: 'GET' | 'POST';
+	method: 'GET' | 'POST' | 'DELETE';
 	path: string | RegExp;
 	handler: RouteHandler;
 }

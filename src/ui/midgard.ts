@@ -6,6 +6,8 @@
  * Sidebar layout with auto-save, keyboard shortcuts, markdown help
  */
 
+import { MarcusPost } from '../core/types';
+
 export function renderMidgardEditor(): string {
 	return `<!DOCTYPE html>
 <html lang="en">
@@ -1036,11 +1038,18 @@ export function renderMidgardEditor(): string {
 			formData.append('tags', form.querySelector('[name="tags"]').value);
 			formData.append('schema', document.getElementById('schema-textarea').value);
 
-			publishBtn.textContent = 'Publishing...';
+			// Check if we're updating an existing post
+			const isEditing = window.editingPostId;
+			if (isEditing) {
+				formData.append('id', window.editingPostId);
+			}
+
+			publishBtn.textContent = isEditing ? 'Updating...' : 'Publishing...';
 			publishBtn.disabled = true;
 
 			try {
-				const res = await fetch('/midgard/publish', {
+				const endpoint = isEditing ? '/midgard/update' : '/midgard/publish';
+				const res = await fetch(endpoint, {
 					method: 'POST',
 					body: formData
 				});
@@ -1053,6 +1062,12 @@ export function renderMidgardEditor(): string {
 					successMsg.classList.add('show');
 					localStorage.removeItem(DRAFT_KEY);
 					
+					// Clear editing state
+					window.editingPostId = null;
+					
+					// Clear URL param
+					window.history.replaceState({}, '', '/midgard');
+					
 					setTimeout(() => {
 						titleInput.value = '';
 						slugInput.value = '';
@@ -1061,6 +1076,7 @@ export function renderMidgardEditor(): string {
 						form.querySelector('[name="coverImage"]').value = '';
 						form.querySelector('[name="tags"]').value = '';
 						document.getElementById('schema-textarea').value = '';
+						document.getElementById('cover-preview').classList.remove('visible');
 						slugPreview.textContent = 'your-slug';
 						wordCount.textContent = '0';
 						successMsg.classList.remove('show');
@@ -1501,7 +1517,106 @@ export function renderMidgardEditor(): string {
 		// Load draft and inspire images on page load
 		loadDraft();
 		loadInspireImages();
+		
+		// Check if we're editing an existing post (URL has ?edit=slug)
+		const urlParams = new URLSearchParams(window.location.search);
+		const editSlug = urlParams.get('edit');
+		if (editSlug) {
+			loadPostForEdit(editSlug);
+		}
+
+		async function loadPostForEdit(slug) {
+			try {
+				const res = await fetch('/midgard/edit/' + slug);
+				if (!res.ok) {
+					console.error('Failed to load post');
+					return;
+				}
+				const data = await res.json();
+				if (data.post) {
+					const post = data.post;
+					titleInput.value = post.title || '';
+					slugInput.value = post.slug || '';
+					bodyInput.value = post.body || '';
+					form.querySelector('[name="excerpt"]').value = post.excerpt || '';
+					form.querySelector('[name="coverImage"]').value = post.coverImage || '';
+					form.querySelector('[name="tags"]').value = (post.tags || []).join(', ');
+					document.getElementById('schema-textarea').value = post.schema ? JSON.stringify(post.schema, null, 2) : '';
+					slugPreview.textContent = post.slug || 'your-slug';
+					updateWordCount();
+					
+					// Store post ID for update
+					window.editingPostId = post.id;
+					
+					// Show cover preview
+					if (post.coverImage) {
+						const coverPreview = document.getElementById('cover-preview');
+						const optimizedUrl = post.coverImage.includes('unsplash.com') 
+							? (post.coverImage.includes('?') ? post.coverImage + '&w=720&fm=webp&q=70' : post.coverImage + '?w=720&fm=webp&q=70')
+							: post.coverImage;
+						coverPreview.src = optimizedUrl;
+						coverPreview.classList.add('visible');
+					}
+				}
+			} catch (err) {
+				console.error('Error loading post:', err);
+			}
+		}
 	</script>
+</body>
+</html>`;
+}
+
+export function renderMidgardPostsList(posts: MarcusPost[]): string {
+	const postsHtml = posts.map(post => `
+		<div class="post-row">
+			<div class="post-info">
+				<div class="post-title">${escapeHTML(post.title)}</div>
+				<div class="post-meta">/${post.slug} · ${new Date(post.publishedAt).toLocaleDateString()}</div>
+			</div>
+			<div class="post-actions">
+				<a href="/midgard?edit=${post.slug}" class="action-btn">Edit</a>
+				<a href="/marcus/${post.slug}" class="action-btn" target="_blank">View</a>
+			</div>
+		</div>
+	`).join('');
+
+	return `<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<title>Posts - Midgard</title>
+	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono&display=swap" rel="stylesheet">
+	<style>
+		* { box-sizing: border-box; margin: 0; padding: 0; }
+		body { background: #fff; color: #000; font-family: 'JetBrains Mono', monospace; min-height: 100vh; }
+		.container { max-width: 800px; margin: 0 auto; padding: 40px 20px; }
+		.header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 40px; padding-bottom: 20px; border-bottom: 1px solid #eee; }
+		.title { font-size: 24px; font-weight: 600; }
+		.back-link { color: #999; text-decoration: none; font-size: 12px; }
+		.back-link:hover { color: #000; }
+		.post-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #eee; }
+		.post-row:last-child { border-bottom: none; }
+		.post-title { font-size: 16px; margin-bottom: 4px; }
+		.post-meta { font-size: 12px; color: #999; }
+		.post-actions { display: flex; gap: 12px; }
+		.action-btn { padding: 8px 16px; font-size: 12px; border-radius: 6px; text-decoration: none; border: 1px solid #eee; color: #666; }
+		.action-btn:hover { border-color: #000; color: #000; }
+		.new-btn { display: inline-block; margin-top: 24px; padding: 12px 24px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; }
+		.new-btn:hover { background: #333; }
+		.empty { text-align: center; padding: 60px 0; color: #999; }
+	</style>
+</head>
+<body>
+	<div class="container">
+		<div class="header">
+			<div class="title">Your Posts</div>
+			<a href="/midgard" class="back-link">← Back to Editor</a>
+		</div>
+		${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
+		<a href="/midgard" class="new-btn">+ New Post</a>
+	</div>
 </body>
 </html>`;
 }
@@ -1528,4 +1643,13 @@ export function renderMidgardSuccess(postUrl: string): string {
 	<p class="link">View at: <a href="${postUrl}">${postUrl}</a></p>
 </body>
 </html>`;
+}
+
+function escapeHTML(str: string): string {
+	return str
+		.replace(/&/g, '&amp;')
+		.replace(/</g, '&lt;')
+		.replace(/>/g, '&gt;')
+		.replace(/"/g, '&quot;')
+		.replace(/'/g, '&#039;');
 }

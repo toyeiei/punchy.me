@@ -13,7 +13,7 @@ import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleThorGet, handleThorForge, handleThorPdf } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
 import { handleMarcusGet, handleMarcusPostGet, handleMarcusTagGet, handleMarcusRss } from './handlers/marcus';
-import { handleMidgardGet, handleMidgardPublish, handleMidgardList, handleMidgardAITitles, handleMidgardAIExcerpt, handleMidgardAIPolish, handleMidgardAISeo, handleMidgardAISchema } from './handlers/midgard';
+import { handleMidgardGet, handleMidgardPublish, handleMidgardList, handleMidgardEdit, handleMidgardUpdate, handleMidgardDelete, handleMidgardAITitles, handleMidgardAIExcerpt, handleMidgardAIPolish, handleMidgardAISeo, handleMidgardAISchema } from './handlers/midgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -50,6 +50,7 @@ const ROUTES: Route[] = [
 	{ method: 'GET', path: '/marcus/rss', handler: simpleHandler(handleMarcusRss) },
 	{ method: 'GET', path: '/midgard', handler: simpleHandler(handleMidgardGet) },
 	{ method: 'GET', path: '/midgard/posts', handler: simpleHandler(handleMidgardList) },
+	{ method: 'GET', path: /^\/midgard\/edit\/[a-z0-9-]+$/, handler: (req, env, _ctx, path) => handleMidgardEdit(req, env, path.replace('/midgard/edit/', '')) },
 	
 	// Tool APIs (POST) - More specific routes MUST come before general ones
 	{ method: 'POST', path: '/bazuka', handler: staticHandler(handleBazukaPost) },
@@ -68,6 +69,8 @@ const ROUTES: Route[] = [
 	
 	// Midgard editor routes (private)
 	{ method: 'POST', path: '/midgard/publish', handler: staticHandler(handleMidgardPublish) },
+	{ method: 'POST', path: '/midgard/update', handler: staticHandler(handleMidgardUpdate) },
+	{ method: 'DELETE', path: /^\/midgard\/post\/[a-zA-Z0-9]+$/, handler: (req, env, _ctx, path) => handleMidgardDelete(req, env, path.replace('/midgard/post/', '')) },
 	{ method: 'POST', path: '/midgard/ai/titles', handler: staticHandler(handleMidgardAITitles) },
 	{ method: 'POST', path: '/midgard/ai/excerpt', handler: staticHandler(handleMidgardAIExcerpt) },
 	{ method: 'POST', path: '/midgard/ai/polish', handler: staticHandler(handleMidgardAIPolish) },

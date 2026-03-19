@@ -1,5 +1,5 @@
 import { Env, MarcusPost } from '../core/types';
-import { renderMidgardEditor } from '../ui/midgard';
+import { renderMidgardEditor, renderMidgardPostsList } from '../ui/midgard';
 import { jsonResponse, generateUniqueId } from '../core/utils';
 
 /**
@@ -157,7 +157,35 @@ export async function handleMidgardList(request: Request, env: Env): Promise<Res
 
 	const posts = await getPostList(env);
 
-	return jsonResponse({ posts });
+	// Check if client wants JSON (API) or HTML (browser)
+	const accept = request.headers.get('accept') || '';
+	if (accept.includes('application/json')) {
+		return jsonResponse({ posts });
+	}
+
+	// Return HTML page for browser
+	return new Response(renderMidgardPostsList(posts), {
+		headers: { 'Content-Type': 'text/html' }
+	});
+}
+
+/**
+ * Handle GET /midgard/edit/{slug}
+ * Load existing post for editing
+ */
+export async function handleMidgardEdit(request: Request, env: Env, slug: string): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return new Response('Unauthorized', { status: 401 });
+	}
+
+	const post = await getPostBySlug(env, slug);
+	if (!post) {
+		return new Response('Post not found', { status: 404 });
+	}
+
+	// Return post data as JSON for the editor to load
+	return jsonResponse({ post });
 }
 
 /**
@@ -186,6 +214,80 @@ export async function handleMidgardDelete(request: Request, env: Env, postId: st
 	await removeFromPostIndex(env, postId);
 
 	return jsonResponse({ success: true });
+}
+
+/**
+ * Handle POST /midgard/update
+ * Update an existing post
+ */
+export async function handleMidgardUpdate(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return new Response('Unauthorized', { status: 401 });
+	}
+
+	try {
+		const formData = await request.formData();
+
+		const postId = formData.get('id')?.toString()?.trim();
+		const title = formData.get('title')?.toString()?.trim();
+		const body = formData.get('body')?.toString()?.trim();
+		const excerpt = formData.get('excerpt')?.toString()?.trim() || '';
+		const coverImage = formData.get('coverImage')?.toString()?.trim() || null;
+		const tagsStr = formData.get('tags')?.toString()?.trim() || '';
+		const schemaStr = formData.get('schema')?.toString()?.trim() || '';
+
+		if (!postId) {
+			return jsonResponse({ error: 'Post ID is required' }, 400);
+		}
+
+		// Get existing post
+		const existingData = await env.SHORT_LINKS.get(`marcus:post:${postId}`);
+		if (!existingData) {
+			return jsonResponse({ error: 'Post not found' }, 404);
+		}
+
+		const existing = JSON.parse(existingData) as MarcusPost;
+
+		// Parse tags
+		const tags = tagsStr
+			.split(',')
+			.map(t => t.trim().toLowerCase())
+			.filter(t => t.length > 0);
+
+		// Parse schema if provided
+		let schema: Record<string, unknown> | undefined;
+		if (schemaStr) {
+			try {
+				schema = JSON.parse(schemaStr);
+			} catch {
+				// Invalid JSON, ignore
+			}
+		}
+
+		// Update post (keep original timestamps)
+		const updatedPost: MarcusPost = {
+			...existing,
+			title: title || existing.title,
+			body: body || existing.body,
+			excerpt: excerpt || existing.excerpt,
+			coverImage,
+			tags,
+			schema,
+		};
+
+		// Store updated post
+		await env.SHORT_LINKS.put(`marcus:post:${postId}`, JSON.stringify(updatedPost));
+
+		return jsonResponse({ 
+			success: true, 
+			id: postId,
+			url: `https://punchy.me/marcus/${updatedPost.slug}`
+		});
+	} catch (error) {
+		console.error('Midgard update error:', error);
+		return jsonResponse({ error: 'Failed to update post' }, 500);
+	}
 }
 
 /**
