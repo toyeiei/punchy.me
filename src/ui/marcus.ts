@@ -308,7 +308,7 @@ export function renderMarcusPost(post: MarcusPost): string {
 		// Render markdown body
 		const bodyEl = document.getElementById('post-body');
 		const markdown = ${JSON.stringify(post.body)};
-		bodyEl.innerHTML = DOMPurify.sanitize(marked.parse(markdown || ''));
+		bodyEl.innerHTML = DOMPurify.sanitize(marked.parse(markdown || '', { breaks: true }));
 	</script>
 </body>
 </html>`;
