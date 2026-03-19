@@ -1790,8 +1790,33 @@ export function renderMidgardEditor(): string {
 		// Check if we're editing an existing post (URL has ?edit=slug)
 		const urlParams = new URLSearchParams(window.location.search);
 		const editSlug = urlParams.get('edit');
-		if (editSlug) {
+		const isNewPost = urlParams.get('new') === 'true';
+		
+		if (isNewPost) {
+			// Clear editor for new post
+			clearEditor();
+			// Clear any saved draft from localStorage
+			localStorage.removeItem(DRAFT_KEY);
+		} else if (editSlug) {
+			// Load existing post for editing
 			loadPostForEdit(editSlug);
+		} else {
+			// Restore draft from localStorage (if any)
+			loadDraft();
+		}
+		
+		function clearEditor() {
+			titleInput.value = '';
+			slugInput.value = '';
+			bodyInput.value = '';
+			form.querySelector('[name="excerpt"]').value = '';
+			form.querySelector('[name="coverImage"]').value = '';
+			form.querySelector('[name="tags"]').value = '';
+			document.getElementById('schema-textarea').value = '';
+			document.getElementById('cover-preview').classList.remove('visible');
+			slugPreview.textContent = 'your-slug';
+			wordCount.textContent = '0';
+			window.editingPostId = null;
 		}
 
 		async function loadPostForEdit(slug) {
@@ -1919,7 +1944,7 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 			<a href="/midgard" class="back-link">← Back to Editor</a>
 		</div>
 		${posts.length > 0 ? postsHtml : '<div class="empty">No posts yet. Start writing!</div>'}
-		<a href="/midgard" class="new-btn">+ New Post</a>
+		<a href="/midgard?new=true" class="new-btn">+ New Post</a>
 	</div>
 	
 	<!-- Delete Confirmation Modal -->
@@ -1966,7 +1991,7 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 					// Check if empty
 					const remaining = document.querySelectorAll('.post-row');
 					if (remaining.length === 0) {
-						document.querySelector('.container').innerHTML = '<div class="header"><div class="title">Your Posts</div><a href="/midgard" class="back-link">← Back to Editor</a></div><div class="empty">No posts yet. Start writing!</div><a href="/midgard" class="new-btn">+ New Post</a>';
+						document.querySelector('.container').innerHTML = '<div class="header"><div class="title">Your Posts</div><a href="/midgard" class="back-link">← Back to Editor</a></div><div class="empty">No posts yet. Start writing!</div><a href="/midgard?new=true" class="new-btn">+ New Post</a>';
 					}
 					
 					closeModal();
