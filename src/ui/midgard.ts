@@ -110,13 +110,47 @@ export function renderMidgardEditor(): string {
 		
 		/* AI Section */
 		.ai-section {
-			margin-bottom: 24px;
+			margin-bottom: 16px;
 		}
-		.ai-section-title {
-			font-size: 11px;
-			color: #666;
-			margin-bottom: 12px;
-			font-weight: 600;
+		.ai-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 12px;
+			background: #fff;
+			border: 1px solid #eee;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-size: 12px;
+			font-weight: 500;
+		}
+		.ai-toggle:hover {
+			border-color: #ccc;
+		}
+		.ai-toggle.open {
+			border-color: #000;
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+		.ai-toggle-icon {
+			font-size: 10px;
+			color: #999;
+			transition: transform 0.2s;
+		}
+		.ai-toggle.open .ai-toggle-icon {
+			transform: rotate(180deg);
+		}
+		.ai-content {
+			display: none;
+			padding: 12px;
+			background: #fff;
+			border: 1px solid #000;
+			border-top: none;
+			border-radius: 0 0 6px 6px;
+		}
+		.ai-content.open {
+			display: block;
 		}
 		.ai-btn {
 			width: 100%;
@@ -176,6 +210,70 @@ export function renderMidgardEditor(): string {
 			font-size: 11px;
 			color: #c00;
 			padding: 8px 0;
+		}
+		
+		/* SEO Score Display */
+		.seo-score {
+			text-align: center;
+			padding: 16px;
+			background: #f5f5f5;
+			border-radius: 8px;
+			margin-bottom: 12px;
+		}
+		.seo-score-num {
+			font-size: 36px;
+			font-weight: 700;
+			color: #000;
+		}
+		.seo-score-label {
+			font-size: 14px;
+			color: #999;
+		}
+		.seo-checklist {
+			margin-bottom: 12px;
+		}
+		.seo-item {
+			font-size: 11px;
+			padding: 6px 0;
+			border-bottom: 1px solid #eee;
+		}
+		.seo-item:last-child { border-bottom: none; }
+		.seo-ok { color: #22c55e; }
+		.seo-warn { color: #f59e0b; }
+		.seo-error { color: #ef4444; }
+		.seo-fix {
+			font-size: 10px;
+			color: #999;
+			padding-left: 16px;
+			margin-bottom: 4px;
+		}
+		.seo-section {
+			font-size: 10px;
+			color: #666;
+			text-transform: uppercase;
+			letter-spacing: 0.5px;
+			margin-top: 12px;
+			margin-bottom: 8px;
+		}
+		.seo-keywords {
+			display: flex;
+			flex-wrap: wrap;
+			gap: 6px;
+		}
+		.seo-keyword {
+			font-size: 11px;
+			padding: 4px 10px;
+			background: #f5f5f5;
+			border: 1px solid #eee;
+			border-radius: 20px;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+		.seo-keyword:hover { border-color: #999; }
+		.seo-keyword.selected {
+			background: #000;
+			color: #fff;
+			border-color: #000;
 		}
 		
 		/* Form Elements */
@@ -512,32 +610,62 @@ export function renderMidgardEditor(): string {
 
 			<!-- Title Suggestions -->
 			<div class="ai-section">
-				<div class="ai-section-title">Title Suggestions</div>
-				<button type="button" class="ai-btn" onclick="generateTitles()">
-					<span class="ai-btn-icon">✨</span>
-					<span>Generate titles</span>
-				</button>
-				<div class="ai-results" id="title-results"></div>
+				<div class="ai-toggle" onclick="toggleAISection('titles')">
+					<span>✨ Title Suggestions</span>
+					<span class="ai-toggle-icon">▼</span>
+				</div>
+				<div class="ai-content" id="ai-titles">
+					<button type="button" class="ai-btn" onclick="generateTitles()">
+						<span class="ai-btn-icon">✨</span>
+						<span>Generate titles</span>
+					</button>
+					<div class="ai-results" id="title-results"></div>
+				</div>
 			</div>
 
 			<!-- Auto Excerpt -->
 			<div class="ai-section">
-				<div class="ai-section-title">Auto Excerpt</div>
-				<button type="button" class="ai-btn" onclick="generateExcerpt()">
-					<span class="ai-btn-icon">📝</span>
-					<span>Generate excerpt</span>
-				</button>
-				<div class="ai-results" id="excerpt-results"></div>
+				<div class="ai-toggle" onclick="toggleAISection('excerpt')">
+					<span>📝 Auto Excerpt</span>
+					<span class="ai-toggle-icon">▼</span>
+				</div>
+				<div class="ai-content" id="ai-excerpt">
+					<button type="button" class="ai-btn" onclick="generateExcerpt()">
+						<span class="ai-btn-icon">📝</span>
+						<span>Generate excerpt</span>
+					</button>
+					<div class="ai-results" id="excerpt-results"></div>
+				</div>
 			</div>
 
 			<!-- Polish Prose -->
 			<div class="ai-section">
-				<div class="ai-section-title">Polish Prose</div>
-				<button type="button" class="ai-btn" onclick="polishProse()">
-					<span class="ai-btn-icon">✒️</span>
-					<span>Improve writing</span>
-				</button>
-				<div class="ai-results" id="polish-results"></div>
+				<div class="ai-toggle" onclick="toggleAISection('polish')">
+					<span>✒️ Polish Prose</span>
+					<span class="ai-toggle-icon">▼</span>
+				</div>
+				<div class="ai-content" id="ai-polish">
+					<button type="button" class="ai-btn" onclick="polishProse()">
+						<span class="ai-btn-icon">✒️</span>
+						<span>Improve writing</span>
+					</button>
+					<div class="ai-results" id="polish-results"></div>
+				</div>
+			</div>
+
+			<!-- SEO Optimizer -->
+			<div class="ai-section">
+				<div class="ai-toggle" onclick="toggleAISection('seo')">
+					<span>📊 SEO Optimizer</span>
+					<span class="ai-toggle-icon">▼</span>
+				</div>
+				<div class="ai-content" id="ai-seo">
+					<button type="button" class="ai-btn" onclick="analyzeSEO()">
+						<span class="ai-btn-icon">📊</span>
+						<span>Analyze SEO</span>
+					</button>
+					<div class="ai-results" id="seo-results"></div>
+				</div>
 			</div>
 		</aside>
 	</div>
@@ -917,6 +1045,159 @@ export function renderMidgardEditor(): string {
 				bodyInput.value = window.aiPolished;
 				document.querySelector('#polish-results .ai-result-item').classList.add('selected');
 				updateWordCount();
+				scheduleSave();
+			}
+		}
+
+		// AI Panel Toggle
+		function toggleAISection(section) {
+			const content = document.getElementById('ai-' + section);
+			const toggle = content.previousElementSibling;
+			const isOpen = content.classList.contains('open');
+			
+			// Close all sections first
+			document.querySelectorAll('.ai-content').forEach(el => el.classList.remove('open'));
+			document.querySelectorAll('.ai-toggle').forEach(el => el.classList.remove('open'));
+			
+			// Open clicked section (if wasn't open)
+			if (!isOpen) {
+				content.classList.add('open');
+				toggle.classList.add('open');
+			}
+		}
+
+		// SEO Optimizer - Hybrid (Rules + AI)
+		async function analyzeSEO() {
+			const resultsEl = document.getElementById('seo-results');
+			const title = titleInput.value.trim();
+			const body = bodyInput.value.trim();
+			const excerpt = form.querySelector('[name="excerpt"]').value.trim();
+			
+			if (!body) {
+				resultsEl.innerHTML = '<div class="ai-error">Write some content first</div>';
+				return;
+			}
+
+			resultsEl.innerHTML = '<div class="ai-loading">Analyzing...</div>';
+
+			// RULES ENGINE (instant, no AI tokens)
+			const issues = [];
+			let score = 100;
+
+			// Title length check
+			if (title.length === 0) {
+				issues.push({ type: 'error', text: 'Missing title', fix: null });
+				score -= 20;
+			} else if (title.length < 40) {
+				issues.push({ type: 'warn', text: 'Title too short (' + title.length + ' chars)', fix: 'Aim for 50-60 chars' });
+				score -= 5;
+			} else if (title.length > 70) {
+				issues.push({ type: 'warn', text: 'Title too long (' + title.length + ' chars)', fix: 'Keep under 60 chars' });
+				score -= 5;
+			} else {
+				issues.push({ type: 'ok', text: 'Title length: Good (' + title.length + ' chars)', fix: null });
+			}
+
+			// Excerpt check
+			if (!excerpt) {
+				issues.push({ type: 'error', text: 'Missing excerpt', fix: 'Add a 150-160 char summary' });
+				score -= 15;
+			} else if (excerpt.length < 100) {
+				issues.push({ type: 'warn', text: 'Excerpt too short (' + excerpt.length + ' chars)', fix: 'Aim for 150-160 chars' });
+				score -= 5;
+			} else if (excerpt.length > 170) {
+				issues.push({ type: 'warn', text: 'Excerpt too long (' + excerpt.length + ' chars)', fix: 'Keep under 160 chars' });
+				score -= 5;
+			} else {
+				issues.push({ type: 'ok', text: 'Excerpt length: Good (' + excerpt.length + ' chars)', fix: null });
+			}
+
+			// Word count check
+			const wordCount = body.trim().split(/\\s+/).filter(w => w.length > 0).length;
+			if (wordCount < 300) {
+				issues.push({ type: 'warn', text: 'Content too short (' + wordCount + ' words)', fix: 'Aim for 1000+ words' });
+				score -= 10;
+			} else {
+				issues.push({ type: 'ok', text: 'Word count: ' + wordCount + ' words', fix: null });
+			}
+
+			// Heading check (markdown)
+			const h2Count = (body.match(/^## /gm) || []).length;
+			if (h2Count === 0 && wordCount > 300) {
+				issues.push({ type: 'warn', text: 'No H2 headings', fix: 'Add ## headings for structure' });
+				score -= 5;
+			} else if (h2Count > 0) {
+				issues.push({ type: 'ok', text: 'H2 headings: ' + h2Count, fix: null });
+			}
+
+			// Internal links check
+			const linkCount = (body.match(/\\[.*\\]\\(.*\\)/g) || []).length;
+			if (linkCount === 0 && wordCount > 500) {
+				issues.push({ type: 'warn', text: 'No links in content', fix: 'Add relevant links' });
+				score -= 5;
+			} else if (linkCount > 0) {
+				issues.push({ type: 'ok', text: 'Links: ' + linkCount, fix: null });
+			}
+
+			// Clamp score
+			score = Math.max(0, Math.min(100, score));
+
+			// Render score and checklist
+			let html = '<div class="seo-score"><span class="seo-score-num">' + score + '</span><span class="seo-score-label">/100</span></div>';
+			html += '<div class="seo-checklist">';
+			issues.forEach(issue => {
+				const icon = issue.type === 'ok' ? '✓' : issue.type === 'warn' ? '⚠' : '✗';
+				const cls = issue.type === 'ok' ? 'seo-ok' : issue.type === 'warn' ? 'seo-warn' : 'seo-error';
+				html += '<div class="seo-item ' + cls + '">' + icon + ' ' + issue.text + '</div>';
+				if (issue.fix) {
+					html += '<div class="seo-fix">→ ' + issue.fix + '</div>';
+				}
+			});
+			html += '</div>';
+
+			// AI-enhanced features (keywords, meta)
+			if (body.length >= 100) {
+				html += '<div class="ai-loading" style="margin-top:12px;">Generating keywords & meta...</div>';
+				
+				try {
+					const res = await fetch('/midgard/ai/seo', {
+						method: 'POST',
+						headers: { 'Content-Type': 'application/json' },
+						body: JSON.stringify({ title, body, excerpt })
+					});
+					const data = await res.json();
+
+					if (data.keywords) {
+						html += '<div class="seo-section">Focus Keywords:</div>';
+						html += '<div class="seo-keywords">';
+						data.keywords.forEach((kw, i) => {
+							html += '<div class="seo-keyword" onclick="selectKeyword(' + i + ')">' + kw + '</div>';
+						});
+						html += '</div>';
+						window.seoKeywords = data.keywords;
+					}
+
+					if (data.metaDescription) {
+						html += '<div class="seo-section">Suggested Meta:</div>';
+						html += '<div class="ai-result-item" onclick="applyMeta()">' + data.metaDescription + '</div>';
+						window.seoMeta = data.metaDescription;
+					}
+				} catch (err) {
+					html += '<div class="ai-error">AI analysis failed</div>';
+				}
+			}
+
+			resultsEl.innerHTML = html;
+		}
+
+		function selectKeyword(index) {
+			const keywords = document.querySelectorAll('.seo-keyword');
+			keywords.forEach((el, i) => el.classList.toggle('selected', i === index));
+		}
+
+		function applyMeta() {
+			if (window.seoMeta) {
+				form.querySelector('[name="excerpt"]').value = window.seoMeta;
 				scheduleSave();
 			}
 		}

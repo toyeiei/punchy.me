@@ -361,3 +361,54 @@ ${body.substring(0, 2000)}`;
 		return jsonResponse({ error: 'Failed to polish prose' }, 500);
 	}
 }
+
+/**
+ * AI: SEO Analysis (Keywords + Meta)
+ * POST /midgard/ai/seo
+ */
+export async function handleMidgardAISeo(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return jsonResponse({ error: 'Unauthorized' }, 401);
+	}
+
+	try {
+		const { title, body, excerpt } = await request.json() as { title: string; body: string; excerpt: string };
+		
+		if (!body || body.trim().length < 100) {
+			return jsonResponse({ error: 'Content too short' }, 400);
+		}
+
+		const prompt = `Analyze this blog post for SEO. Return JSON with:
+1. "keywords": array of 3 focus keywords/phrases (short, SEO-friendly)
+2. "metaDescription": optimized meta description (150-160 chars, include main keyword)
+
+Title: ${title || 'Untitled'}
+Excerpt: ${excerpt || 'None'}
+Content: ${body.substring(0, 1500)}
+
+Return ONLY valid JSON, no other text.`;
+
+		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+			prompt,
+			max_tokens: 200
+		});
+
+		const text = ((aiResponse as { response?: string }).response || '').trim();
+		
+		// Parse JSON from response
+		const jsonMatch = text.match(/\{[\s\S]*\}/);
+		if (jsonMatch) {
+			const result = JSON.parse(jsonMatch[0]) as { keywords?: string[]; metaDescription?: string };
+			return jsonResponse({
+				keywords: result.keywords || [],
+				metaDescription: result.metaDescription || null
+			});
+		}
+
+		return jsonResponse({ keywords: [], metaDescription: null });
+	} catch (error) {
+		console.error('AI SEO error:', error);
+		return jsonResponse({ error: 'Failed SEO analysis' }, 500);
+	}
+}
