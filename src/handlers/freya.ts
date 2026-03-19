@@ -18,6 +18,12 @@ export async function handleFreyaGet(): Promise<Response> {
 
 export async function handleFreyaSearch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
 	try {
+		// Check if Unsplash API key is configured
+		if (!env.UNSPLASH_ACCESS_KEY) {
+			console.error('UNSPLASH_ACCESS_KEY not configured');
+			return jsonResponse({ error: 'Unsplash API key not configured. Set UNSPLASH_ACCESS_KEY secret in Cloudflare.' }, 500);
+		}
+
 		const url = new URL(request.url);
 		const query = url.searchParams.get('q');
 		const page = url.searchParams.get('p') || '1';

@@ -122,6 +122,6 @@ export interface Env {
 	CLOUDFLARE_ACCOUNT_ID?: string;
 	TURNSTILE_SITE_KEY: string;
 	TURNSTILE_SECRET_KEY: string;
-	UNSPLASH_ACCESS_KEY: string;
+	UNSPLASH_ACCESS_KEY?: string; // Optional - for Freya image search
 	MIDGARD_SECRET?: string; // Access token for /midgard editor
 }
