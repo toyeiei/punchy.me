@@ -78,6 +78,7 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
 		const coverImage = formData.get('coverImage')?.toString()?.trim() || null;
 		const tagsStr = formData.get('tags')?.toString()?.trim() || '';
 		const slug = formData.get('slug')?.toString()?.trim();
+		const schemaStr = formData.get('schema')?.toString()?.trim() || '';
 
 		// Validation
 		if (!title || !body) {
@@ -94,6 +95,16 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
 			.map(t => t.trim().toLowerCase())
 			.filter(t => t.length > 0);
 
+		// Parse schema if provided
+		let schema: Record<string, unknown> | undefined;
+		if (schemaStr) {
+			try {
+				schema = JSON.parse(schemaStr);
+			} catch {
+				// Invalid JSON, ignore schema
+			}
+		}
+
 		const now = Date.now();
 		const id = generateUniqueId(8);
 
@@ -107,6 +118,7 @@ export async function handleMidgardPublish(request: Request, env: Env): Promise<
 			excerpt: excerpt || body.substring(0, 160) + '...',
 			coverImage,
 			tags,
+			schema,
 			createdAt: now,
 			publishedAt: now,
 		};
@@ -410,5 +422,74 @@ Return ONLY valid JSON, no other text.`;
 	} catch (error) {
 		console.error('AI SEO error:', error);
 		return jsonResponse({ error: 'Failed SEO analysis' }, 500);
+	}
+}
+
+/**
+ * AI: Generate JSON-LD Schema
+ * POST /midgard/ai/schema
+ */
+export async function handleMidgardAISchema(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return jsonResponse({ error: 'Unauthorized' }, 401);
+	}
+
+	try {
+		const { title, body, excerpt, coverImage } = await request.json() as { 
+			title: string; 
+			body: string; 
+			excerpt: string;
+			coverImage?: string;
+		};
+		
+		if (!body || body.trim().length < 100) {
+			return jsonResponse({ error: 'Content too short' }, 400);
+		}
+
+		const prompt = `Generate JSON-LD structured data for this blog post. Return ONLY valid JSON object (no markdown, no explanation).
+
+Requirements:
+- @context: "https://schema.org"
+- @type: "Article"
+- headline: the title
+- description: the excerpt or a summary
+- author: { "@type": "Person", "name": "PUNCHY.ME" }
+- publisher: { "@type": "Organization", "name": "PUNCHY.ME", "url": "https://punchy.me" }
+- datePublished: current date in ISO format
+- dateModified: same as datePublished
+- mainEntityOfPage: { "@type": "WebPage", "@id": "https://punchy.me/marcus/[slug]" }
+
+${coverImage ? `Include image: "${coverImage}"` : 'Skip image field'}
+
+Title: ${title || 'Untitled'}
+Excerpt: ${excerpt || 'No excerpt'}
+Content preview: ${body.substring(0, 500)}
+
+Return ONLY the JSON object, no other text.`;
+
+		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+			prompt,
+			max_tokens: 400
+		});
+
+		const text = ((aiResponse as { response?: string }).response || '').trim();
+		
+		// Parse JSON from response
+		const jsonMatch = text.match(/\{[\s\S]*\}/);
+		if (jsonMatch) {
+			try {
+				const schema = JSON.parse(jsonMatch[0]) as Record<string, unknown>;
+				return jsonResponse({ schema });
+			} catch {
+				// Return raw text if parsing fails
+				return jsonResponse({ schema: null, raw: text });
+			}
+		}
+
+		return jsonResponse({ schema: null });
+	} catch (error) {
+		console.error('AI schema error:', error);
+		return jsonResponse({ error: 'Failed to generate schema' }, 500);
 	}
 }

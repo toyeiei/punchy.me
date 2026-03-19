@@ -315,6 +315,100 @@ export function renderMidgardEditor(): string {
 		/* Tags help */
 		.tags-help { font-size: 10px; color: #ccc; margin-top: 4px; }
 		
+		/* Schema Toggle (Left Sidebar) */
+		.schema-section {
+			margin-top: 16px;
+		}
+		.schema-toggle {
+			display: flex;
+			align-items: center;
+			justify-content: space-between;
+			padding: 10px 12px;
+			background: #fff;
+			border: 1px solid #eee;
+			border-radius: 6px;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-size: 11px;
+			font-weight: 500;
+		}
+		.schema-toggle:hover {
+			border-color: #ccc;
+		}
+		.schema-toggle.open {
+			border-color: #999;
+			border-bottom-left-radius: 0;
+			border-bottom-right-radius: 0;
+		}
+		.schema-toggle-icon {
+			font-size: 10px;
+			color: #999;
+			transition: transform 0.2s;
+		}
+		.schema-toggle.open .schema-toggle-icon {
+			transform: rotate(180deg);
+		}
+		.schema-content {
+			display: none;
+			padding: 12px;
+			background: #fff;
+			border: 1px solid #999;
+			border-top: none;
+			border-radius: 0 0 6px 6px;
+		}
+		.schema-content.open {
+			display: block;
+		}
+		.schema-type {
+			font-size: 10px;
+			color: #666;
+			margin-bottom: 8px;
+		}
+		.schema-textarea {
+			width: 100%;
+			min-height: 120px;
+			font-family: 'JetBrains Mono', monospace;
+			font-size: 11px;
+			background: #fafafa;
+			border: 1px solid #eee;
+			border-radius: 4px;
+			padding: 8px;
+			color: #000;
+			resize: vertical;
+		}
+		.schema-textarea:focus {
+			outline: none;
+			border-color: #999;
+		}
+		.schema-actions {
+			display: flex;
+			gap: 8px;
+			margin-top: 8px;
+		}
+		.schema-btn {
+			flex: 1;
+			padding: 8px;
+			font-size: 10px;
+			background: #f5f5f5;
+			border: 1px solid #eee;
+			border-radius: 4px;
+			cursor: pointer;
+			transition: all 0.2s;
+		}
+		.schema-btn:hover {
+			border-color: #999;
+		}
+		.schema-valid {
+			font-size: 10px;
+			color: #22c55e;
+			margin-top: 6px;
+		}
+		.schema-invalid {
+			font-size: 10px;
+			color: #ef4444;
+			margin-top: 6px;
+		}
+		
 		/* Editor Title */
 		.title-input {
 			font-size: 32px;
@@ -569,6 +663,28 @@ export function renderMidgardEditor(): string {
 					<div class="tags-help">Comma-separated</div>
 				</div>
 
+				<!-- JSON-LD Schema (Advanced) -->
+				<div class="schema-section">
+					<div class="schema-toggle" onclick="toggleSchema()">
+						<span>📋 JSON-LD Schema</span>
+						<span class="schema-toggle-icon">▼</span>
+					</div>
+					<div class="schema-content" id="schema-content">
+						<div class="schema-type">Type: Article (Blog Post)</div>
+						<textarea name="schema" class="schema-textarea" id="schema-textarea" placeholder='{
+  "@context": "https://schema.org",
+  "@type": "Article",
+  "headline": "...",
+  "author": { "@type": "Person", "name": "..." }
+}'></textarea>
+						<div class="schema-actions">
+							<button type="button" class="schema-btn" onclick="generateSchema()">✨ Auto-generate</button>
+							<button type="button" class="schema-btn" onclick="validateSchema()">✓ Validate</button>
+						</div>
+						<div id="schema-status"></div>
+					</div>
+				</div>
+
 				<div class="divider"></div>
 
 				<!-- Actions -->
@@ -707,6 +823,7 @@ export function renderMidgardEditor(): string {
 				excerpt: form.querySelector('[name="excerpt"]').value,
 				coverImage: form.querySelector('[name="coverImage"]').value,
 				tags: form.querySelector('[name="tags"]').value,
+				schema: document.getElementById('schema-textarea').value,
 				savedAt: Date.now()
 			};
 			localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -723,6 +840,7 @@ export function renderMidgardEditor(): string {
 				form.querySelector('[name="excerpt"]').value = draft.excerpt || '';
 				form.querySelector('[name="coverImage"]').value = draft.coverImage || '';
 				form.querySelector('[name="tags"]').value = draft.tags || '';
+				document.getElementById('schema-textarea').value = draft.schema || '';
 				slugPreview.textContent = draft.slug || 'your-slug';
 				updateWordCount();
 				updateSaveStatus('restored', draft.savedAt);
@@ -847,6 +965,7 @@ export function renderMidgardEditor(): string {
 			formData.append('excerpt', form.querySelector('[name="excerpt"]').value);
 			formData.append('coverImage', form.querySelector('[name="coverImage"]').value);
 			formData.append('tags', form.querySelector('[name="tags"]').value);
+			formData.append('schema', document.getElementById('schema-textarea').value);
 
 			publishBtn.textContent = 'Publishing...';
 			publishBtn.disabled = true;
@@ -1205,6 +1324,79 @@ export function renderMidgardEditor(): string {
 			if (window.seoMeta) {
 				form.querySelector('[name="excerpt"]').value = window.seoMeta;
 				scheduleSave();
+			}
+		}
+
+		// JSON-LD Schema Functions
+		function toggleSchema() {
+			const content = document.getElementById('schema-content');
+			const toggle = content.previousElementSibling;
+			const isOpen = content.classList.contains('open');
+			
+			content.classList.toggle('open', !isOpen);
+			toggle.classList.toggle('open', !isOpen);
+		}
+
+		async function generateSchema() {
+			const textarea = document.getElementById('schema-textarea');
+			const status = document.getElementById('schema-status');
+			const title = titleInput.value.trim();
+			const body = bodyInput.value.trim();
+			const excerpt = form.querySelector('[name="excerpt"]').value.trim();
+			const coverImage = form.querySelector('[name="coverImage"]').value.trim();
+
+			if (!body) {
+				status.innerHTML = '<div class="schema-invalid">Write content first</div>';
+				return;
+			}
+
+			status.innerHTML = '<div class="schema-valid">Generating...</div>';
+
+			try {
+				const res = await fetch('/midgard/ai/schema', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ title, body, excerpt, coverImage })
+				});
+				const data = await res.json();
+
+				if (data.schema) {
+					textarea.value = JSON.stringify(data.schema, null, 2);
+					status.innerHTML = '<div class="schema-valid">✓ Schema generated</div>';
+					scheduleSave();
+				} else {
+					status.innerHTML = '<div class="schema-invalid">Failed to generate</div>';
+				}
+			} catch (err) {
+				status.innerHTML = '<div class="schema-invalid">Error generating schema</div>';
+			}
+		}
+
+		function validateSchema() {
+			const textarea = document.getElementById('schema-textarea');
+			const status = document.getElementById('schema-status');
+			const value = textarea.value.trim();
+
+			if (!value) {
+				status.innerHTML = '<div class="schema-invalid">Schema is empty</div>';
+				return;
+			}
+
+			try {
+				const parsed = JSON.parse(value);
+				
+				// Check required fields
+				const hasContext = parsed['@context'];
+				const hasType = parsed['@type'];
+				
+				if (!hasContext || !hasType) {
+					status.innerHTML = '<div class="schema-invalid">Missing @context or @type</div>';
+					return;
+				}
+
+				status.innerHTML = '<div class="schema-valid">✓ Valid JSON-LD (' + parsed['@type'] + ')</div>';
+			} catch (err) {
+				status.innerHTML = '<div class="schema-invalid">Invalid JSON: ' + err.message + '</div>';
 			}
 		}
 

@@ -13,7 +13,7 @@ import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleThorGet, handleThorForge, handleThorPdf } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
 import { handleMarcusGet, handleMarcusPostGet, handleMarcusTagGet, handleMarcusRss } from './handlers/marcus';
-import { handleMidgardGet, handleMidgardPublish, handleMidgardList, handleMidgardAITitles, handleMidgardAIExcerpt, handleMidgardAIPolish, handleMidgardAISeo } from './handlers/midgard';
+import { handleMidgardGet, handleMidgardPublish, handleMidgardList, handleMidgardAITitles, handleMidgardAIExcerpt, handleMidgardAIPolish, handleMidgardAISeo, handleMidgardAISchema } from './handlers/midgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -72,6 +72,7 @@ const ROUTES: Route[] = [
 	{ method: 'POST', path: '/midgard/ai/excerpt', handler: staticHandler(handleMidgardAIExcerpt) },
 	{ method: 'POST', path: '/midgard/ai/polish', handler: staticHandler(handleMidgardAIPolish) },
 	{ method: 'POST', path: '/midgard/ai/seo', handler: staticHandler(handleMidgardAISeo) },
+	{ method: 'POST', path: '/midgard/ai/schema', handler: staticHandler(handleMidgardAISchema) },
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },

@@ -179,6 +179,11 @@ export function renderMarcusPost(post: MarcusPost): string {
 		.map(tag => `<a href="/marcus/tag/${tag}" class="tag">${tag}</a>`)
 		.join('');
 
+	// JSON-LD Schema
+	const schemaHtml = post.schema
+		? `<script type="application/ld+json">${JSON.stringify(post.schema)}</script>`
+		: '';
+
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -188,6 +193,8 @@ export function renderMarcusPost(post: MarcusPost): string {
 	<meta name="description" content="${escapeHTML(post.excerpt)}">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+	<!-- JSON-LD Structured Data -->
+	${schemaHtml}
 	<!-- Markdown rendering -->
 	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
