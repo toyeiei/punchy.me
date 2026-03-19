@@ -56,17 +56,17 @@ export function renderMidgardEditor(): string {
 		.save-status { font-size: 11px; color: #ccc; margin-right: auto; margin-left: 24px; }
 		.save-status.saved { color: #22c55e; }
 		
-		/* Main Layout */
+		/* Main Layout - 3 columns */
 		.main-layout {
 			display: flex;
 			min-height: calc(100vh - 57px);
 		}
 		
-		/* Sidebar */
+		/* Left Sidebar */
 		.sidebar {
-			width: 25%;
-			min-width: 280px;
-			max-width: 360px;
+			width: 22%;
+			min-width: 260px;
+			max-width: 320px;
 			background: #fafafa;
 			border-right: 1px solid #eee;
 			padding: 24px;
@@ -76,11 +76,106 @@ export function renderMidgardEditor(): string {
 			top: 57px;
 		}
 		
-		/* Editor Panel */
+		/* Editor Panel - Center */
 		.editor-panel {
 			flex: 1;
 			padding: 32px 40px;
-			max-width: 900px;
+			min-width: 0;
+		}
+		
+		/* Right AI Panel */
+		.ai-panel {
+			width: 22%;
+			min-width: 240px;
+			max-width: 300px;
+			background: #fafafa;
+			border-left: 1px solid #eee;
+			padding: 24px;
+			overflow-y: auto;
+			height: calc(100vh - 57px);
+			position: sticky;
+			top: 57px;
+		}
+		
+		/* AI Panel Header */
+		.ai-header {
+			font-size: 10px;
+			color: #999;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			margin-bottom: 20px;
+			padding-bottom: 12px;
+			border-bottom: 1px solid #eee;
+		}
+		
+		/* AI Section */
+		.ai-section {
+			margin-bottom: 24px;
+		}
+		.ai-section-title {
+			font-size: 11px;
+			color: #666;
+			margin-bottom: 12px;
+			font-weight: 600;
+		}
+		.ai-btn {
+			width: 100%;
+			padding: 10px 14px;
+			background: #fff;
+			border: 1px solid #eee;
+			border-radius: 6px;
+			font-family: inherit;
+			font-size: 12px;
+			color: #666;
+			cursor: pointer;
+			transition: all 0.2s;
+			display: flex;
+			align-items: center;
+			gap: 8px;
+		}
+		.ai-btn:hover {
+			border-color: #000;
+			color: #000;
+		}
+		.ai-btn:disabled {
+			opacity: 0.5;
+			cursor: not-allowed;
+		}
+		.ai-btn-icon {
+			font-size: 14px;
+		}
+		
+		/* AI Results */
+		.ai-results {
+			margin-top: 12px;
+		}
+		.ai-result-item {
+			padding: 10px 12px;
+			background: #fff;
+			border: 1px solid #eee;
+			border-radius: 6px;
+			margin-bottom: 8px;
+			cursor: pointer;
+			transition: all 0.2s;
+			font-size: 12px;
+			line-height: 1.4;
+		}
+		.ai-result-item:hover {
+			border-color: #000;
+		}
+		.ai-result-item.selected {
+			border-color: #000;
+			background: #f5f5f5;
+		}
+		.ai-loading {
+			font-size: 11px;
+			color: #999;
+			padding: 8px 0;
+		}
+		.ai-error {
+			font-size: 11px;
+			color: #c00;
+			padding: 8px 0;
 		}
 		
 		/* Form Elements */
@@ -410,6 +505,41 @@ export function renderMidgardEditor(): string {
 			<textarea name="body" class="body-input" placeholder="Start writing..." required></textarea>
 			<div class="word-count"><span id="word-count">0</span> words</div>
 		</main>
+
+		<!-- AI Panel -->
+		<aside class="ai-panel">
+			<div class="ai-header">AI Assistant</div>
+
+			<!-- Title Suggestions -->
+			<div class="ai-section">
+				<div class="ai-section-title">Title Suggestions</div>
+				<button type="button" class="ai-btn" onclick="generateTitles()">
+					<span class="ai-btn-icon">✨</span>
+					<span>Generate titles</span>
+				</button>
+				<div class="ai-results" id="title-results"></div>
+			</div>
+
+			<!-- Auto Excerpt -->
+			<div class="ai-section">
+				<div class="ai-section-title">Auto Excerpt</div>
+				<button type="button" class="ai-btn" onclick="generateExcerpt()">
+					<span class="ai-btn-icon">📝</span>
+					<span>Generate excerpt</span>
+				</button>
+				<div class="ai-results" id="excerpt-results"></div>
+			</div>
+
+			<!-- Polish Prose -->
+			<div class="ai-section">
+				<div class="ai-section-title">Polish Prose</div>
+				<button type="button" class="ai-btn" onclick="polishProse()">
+					<span class="ai-btn-icon">✒️</span>
+					<span>Improve writing</span>
+				</button>
+				<div class="ai-results" id="polish-results"></div>
+			</div>
+		</aside>
 	</div>
 
 	<!-- Desktop Only Message -->
@@ -668,6 +798,127 @@ export function renderMidgardEditor(): string {
 			
 			coverInput.value = inspireImages[index].url;
 			scheduleSave();
+		}
+
+		// AI: Generate Title Suggestions
+		async function generateTitles() {
+			const resultsEl = document.getElementById('title-results');
+			const body = bodyInput.value.trim();
+			
+			if (!body) {
+				resultsEl.innerHTML = '<div class="ai-error">Write some content first</div>';
+				return;
+			}
+
+			resultsEl.innerHTML = '<div class="ai-loading">Generating titles...</div>';
+
+			try {
+				const res = await fetch('/midgard/ai/titles', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ body })
+				});
+				const data = await res.json();
+
+				if (data.titles && data.titles.length > 0) {
+					resultsEl.innerHTML = data.titles.map((t, i) => 
+						'<div class="ai-result-item" onclick="selectTitle(' + i + ')">' + t + '</div>'
+					).join('');
+					window.aiTitles = data.titles;
+				} else {
+					resultsEl.innerHTML = '<div class="ai-error">No titles generated</div>';
+				}
+			} catch (err) {
+				resultsEl.innerHTML = '<div class="ai-error">Failed to generate</div>';
+			}
+		}
+
+		function selectTitle(index) {
+			titleInput.value = window.aiTitles[index];
+			document.querySelectorAll('#title-results .ai-result-item').forEach((el, i) => {
+				el.classList.toggle('selected', i === index);
+			});
+			scheduleSave();
+		}
+
+		// AI: Generate Excerpt
+		async function generateExcerpt() {
+			const resultsEl = document.getElementById('excerpt-results');
+			const body = bodyInput.value.trim();
+			
+			if (!body) {
+				resultsEl.innerHTML = '<div class="ai-error">Write some content first</div>';
+				return;
+			}
+
+			resultsEl.innerHTML = '<div class="ai-loading">Generating excerpt...</div>';
+
+			try {
+				const res = await fetch('/midgard/ai/excerpt', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ body })
+				});
+				const data = await res.json();
+
+				if (data.excerpt) {
+					resultsEl.innerHTML = '<div class="ai-result-item" onclick="selectExcerpt()">' + data.excerpt + '</div>';
+					window.aiExcerpt = data.excerpt;
+				} else {
+					resultsEl.innerHTML = '<div class="ai-error">No excerpt generated</div>';
+				}
+			} catch (err) {
+				resultsEl.innerHTML = '<div class="ai-error">Failed to generate</div>';
+			}
+		}
+
+		function selectExcerpt() {
+			form.querySelector('[name="excerpt"]').value = window.aiExcerpt;
+			document.querySelector('#excerpt-results .ai-result-item').classList.add('selected');
+			scheduleSave();
+		}
+
+		// AI: Polish Prose
+		async function polishProse() {
+			const resultsEl = document.getElementById('polish-results');
+			const body = bodyInput.value.trim();
+			
+			if (!body) {
+				resultsEl.innerHTML = '<div class="ai-error">Write some content first</div>';
+				return;
+			}
+
+			resultsEl.innerHTML = '<div class="ai-loading">Polishing prose...</div>';
+
+			try {
+				const res = await fetch('/midgard/ai/polish', {
+					method: 'POST',
+					headers: { 'Content-Type': 'application/json' },
+					body: JSON.stringify({ body })
+				});
+				const data = await res.json();
+
+				if (data.polished) {
+					resultsEl.innerHTML = 
+						'<div class="ai-result-item" onclick="applyPolished()">' + 
+						(data.polished.substring(0, 150) + '...') + '</div>' +
+						'<div style="font-size:10px;color:#999;margin-top:8px;">Click to replace body</div>';
+					window.aiPolished = data.polished;
+				} else {
+					resultsEl.innerHTML = '<div class="ai-error">No polish generated</div>';
+				}
+			} catch (err) {
+				resultsEl.innerHTML = '<div class="ai-error">Failed to polish</div>';
+			}
+		}
+
+		function applyPolished() {
+			if (confirm('Replace your body text with polished version?')) {
+				bodyInput.value = window.aiPolished;
+				document.querySelector('#polish-results .ai-result-item').classList.add('selected');
+				updateWordCount();
+				scheduleSave();
+			}
 		}
 
 		// Load draft and inspire images on page load

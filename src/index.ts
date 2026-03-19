@@ -13,7 +13,7 @@ import { handleFreyaGet, handleFreyaSearch } from './handlers/freya';
 import { handleThorGet, handleThorForge, handleThorPdf } from './handlers/thor';
 import { handleAsgardGet } from './handlers/asgard';
 import { handleMarcusGet, handleMarcusPostGet, handleMarcusTagGet, handleMarcusRss } from './handlers/marcus';
-import { handleMidgardGet, handleMidgardPublish, handleMidgardList } from './handlers/midgard';
+import { handleMidgardGet, handleMidgardPublish, handleMidgardList, handleMidgardAITitles, handleMidgardAIExcerpt, handleMidgardAIPolish } from './handlers/midgard';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
 
@@ -68,6 +68,9 @@ const ROUTES: Route[] = [
 	
 	// Midgard editor routes (private)
 	{ method: 'POST', path: '/midgard/publish', handler: staticHandler(handleMidgardPublish) },
+	{ method: 'POST', path: '/midgard/ai/titles', handler: staticHandler(handleMidgardAITitles) },
+	{ method: 'POST', path: '/midgard/ai/excerpt', handler: staticHandler(handleMidgardAIExcerpt) },
+	{ method: 'POST', path: '/midgard/ai/polish', handler: staticHandler(handleMidgardAIPolish) },
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },

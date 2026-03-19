@@ -240,3 +240,124 @@ export async function getPostsByTag(env: Env, tag: string): Promise<MarcusPost[]
 	const allPosts = await getPostList(env, 100);
 	return allPosts.filter(post => post.tags.includes(tag.toLowerCase()));
 }
+
+/**
+ * AI: Generate Title Suggestions
+ * POST /midgard/ai/titles
+ */
+export async function handleMidgardAITitles(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return jsonResponse({ error: 'Unauthorized' }, 401);
+	}
+
+	try {
+		const { body } = await request.json() as { body: string };
+		
+		if (!body || body.trim().length < 50) {
+			return jsonResponse({ error: 'Content too short' }, 400);
+		}
+
+		const prompt = `Generate 5 catchy, engaging title suggestions for this blog post. Return ONLY a JSON array of strings, no other text.
+
+Content:
+${body.substring(0, 1000)}`;
+
+		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+			prompt,
+			max_tokens: 200
+		});
+
+		const text = (aiResponse as { response?: string }).response || '';
+		
+		// Parse JSON array from response
+		const jsonMatch = text.match(/\[[\s\S]*\]/);
+		if (jsonMatch) {
+			const titles = JSON.parse(jsonMatch[0]) as string[];
+			return jsonResponse({ titles: titles.slice(0, 5) });
+		}
+
+		// Fallback: parse line by line
+		const titles = text.split('\n')
+			.map(line => line.replace(/^[\d]+[.)]?\s*/, '').replace(/"/g, '').replace(/\[|\]/g, '').trim())
+			.filter(line => line.length > 5 && line.length < 100)
+			.slice(0, 5);
+		
+		return jsonResponse({ titles });
+	} catch (error) {
+		console.error('AI titles error:', error);
+		return jsonResponse({ error: 'Failed to generate titles' }, 500);
+	}
+}
+
+/**
+ * AI: Generate Excerpt
+ * POST /midgard/ai/excerpt
+ */
+export async function handleMidgardAIExcerpt(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return jsonResponse({ error: 'Unauthorized' }, 401);
+	}
+
+	try {
+		const { body } = await request.json() as { body: string };
+		
+		if (!body || body.trim().length < 50) {
+			return jsonResponse({ error: 'Content too short' }, 400);
+		}
+
+		const prompt = `Summarize this blog post in 1-2 sentences for SEO. Keep it under 160 characters. Return ONLY the summary text, no quotes or extra formatting.
+
+Content:
+${body.substring(0, 1500)}`;
+
+		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+			prompt,
+			max_tokens: 100
+		});
+
+		const excerpt = ((aiResponse as { response?: string }).response || '').trim();
+		
+		return jsonResponse({ excerpt });
+	} catch (error) {
+		console.error('AI excerpt error:', error);
+		return jsonResponse({ error: 'Failed to generate excerpt' }, 500);
+	}
+}
+
+/**
+ * AI: Polish Prose
+ * POST /midgard/ai/polish
+ */
+export async function handleMidgardAIPolish(request: Request, env: Env): Promise<Response> {
+	const access = checkMidgardAccess(request, env);
+	if (!access.hasAccess) {
+		return jsonResponse({ error: 'Unauthorized' }, 401);
+	}
+
+	try {
+		const { body } = await request.json() as { body: string };
+		
+		if (!body || body.trim().length < 50) {
+			return jsonResponse({ error: 'Content too short' }, 400);
+		}
+
+		const prompt = `Improve this writing for clarity, flow, and impact. Fix grammar. Keep the same meaning and tone. Return ONLY the improved text, no explanations.
+
+Text:
+${body.substring(0, 2000)}`;
+
+		const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+			prompt,
+			max_tokens: 2000
+		});
+
+		const polished = ((aiResponse as { response?: string }).response || '').trim();
+		
+		return jsonResponse({ polished });
+	} catch (error) {
+		console.error('AI polish error:', error);
+		return jsonResponse({ error: 'Failed to polish prose' }, 500);
+	}
+}
