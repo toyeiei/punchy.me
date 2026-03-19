@@ -587,18 +587,146 @@ export function renderMidgardEditor(): string {
 		}
 		.help-content p { margin-bottom: 8px; }
 		
-		/* Success message */
+		/* Success message (legacy - keeping for compatibility) */
 		.success-msg {
-			background: #f0f0f0;
-			border: 1px solid #000;
-			border-radius: 6px;
-			padding: 12px;
-			margin-bottom: 16px;
 			display: none;
-			font-size: 12px;
 		}
-		.success-msg.show { display: block; }
-		.success-msg a { color: #000; text-decoration: underline; }
+		
+		/* Terminal-style save indicator (bottom-left) */
+		.save-indicator {
+			position: fixed;
+			bottom: 20px;
+			left: 20px;
+			background: #fff;
+			border: 1px solid #ddd;
+			border-radius: 4px;
+			padding: 8px 14px;
+			font-size: 11px;
+			font-family: 'JetBrains Mono', monospace;
+			color: #666;
+			opacity: 0;
+			transform: translateY(10px);
+			transition: all 0.2s ease;
+			z-index: 1000;
+		}
+		.save-indicator.visible {
+			opacity: 1;
+			transform: translateY(0);
+		}
+		.save-indicator-icon { color: #22c55e; margin-right: 6px; }
+		
+		/* Terminal-style publish modal */
+		.publish-modal-overlay {
+			position: fixed;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			background: rgba(0,0,0,0.4);
+			display: none;
+			align-items: center;
+			justify-content: center;
+			z-index: 2000;
+		}
+		.publish-modal-overlay.visible { display: flex; }
+		.publish-modal {
+			background: #fff;
+			border: 2px solid #000;
+			border-radius: 0;
+			padding: 0;
+			max-width: 420px;
+			width: 90%;
+			font-family: 'JetBrains Mono', monospace;
+			box-shadow: 8px 8px 0 rgba(0,0,0,0.1);
+		}
+		.publish-modal-header {
+			background: #000;
+			color: #22c55e;
+			padding: 16px 20px;
+			font-size: 14px;
+			font-weight: 600;
+			display: flex;
+			align-items: center;
+			gap: 10px;
+		}
+		.publish-modal-header-icon {
+			font-size: 18px;
+		}
+		.publish-modal-body {
+			padding: 20px;
+		}
+		.publish-modal-divider {
+			border: none;
+			border-top: 1px dashed #ddd;
+			margin: 16px 0;
+		}
+		.publish-modal-row {
+			display: flex;
+			justify-content: space-between;
+			margin-bottom: 12px;
+			font-size: 13px;
+		}
+		.publish-modal-label {
+			color: #999;
+			text-transform: uppercase;
+			font-size: 10px;
+			letter-spacing: 1px;
+		}
+		.publish-modal-value {
+			color: #000;
+			word-break: break-all;
+		}
+		.publish-modal-url {
+			color: #22c55e;
+			text-decoration: none;
+		}
+		.publish-modal-url:hover {
+			text-decoration: underline;
+		}
+		.publish-modal-actions {
+			display: flex;
+			gap: 10px;
+			margin-top: 20px;
+		}
+		.publish-modal-btn {
+			flex: 1;
+			padding: 12px 16px;
+			font-size: 12px;
+			font-family: inherit;
+			cursor: pointer;
+			border-radius: 0;
+			transition: all 0.1s ease;
+		}
+		.publish-modal-btn-primary {
+			background: #000;
+			color: #fff;
+			border: 1px solid #000;
+		}
+		.publish-modal-btn-primary:hover {
+			background: #333;
+		}
+		.publish-modal-btn-secondary {
+			background: #fff;
+			color: #000;
+			border: 1px solid #000;
+		}
+		.publish-modal-btn-secondary:hover {
+			background: #f5f5f5;
+		}
+		.publish-modal-close {
+			position: absolute;
+			top: 12px;
+			right: 12px;
+			background: none;
+			border: none;
+			color: #22c55e;
+			cursor: pointer;
+			font-size: 20px;
+			line-height: 1;
+		}
+		.publish-modal-close:hover {
+			color: #fff;
+		}
 		
 		/* Cover Image Picker */
 		.inspire-row {
@@ -765,10 +893,6 @@ export function renderMidgardEditor(): string {
 	<div class="main-layout">
 		<!-- Sidebar -->
 		<aside class="sidebar">
-			<div id="success-msg" class="success-msg">
-				<strong>Published!</strong> <a id="post-link" href="#"></a>
-			</div>
-
 			<form id="publish-form">
 				<!-- Slug -->
 				<div class="form-group">
@@ -945,8 +1069,6 @@ export function renderMidgardEditor(): string {
 		const slugInput = form.querySelector('[name="slug"]');
 		const slugPreview = document.getElementById('slug-preview-text');
 		const wordCount = document.getElementById('word-count');
-		const successMsg = document.getElementById('success-msg');
-		const postLink = document.getElementById('post-link');
 		const saveStatus = document.getElementById('save-status');
 		const publishBtn = document.getElementById('publish-btn');
 
@@ -1279,9 +1401,10 @@ export function renderMidgardEditor(): string {
 				const data = await res.json();
 
 				if (data.success) {
-					postLink.href = data.url;
-					postLink.textContent = data.url;
-					successMsg.classList.add('show');
+					// Show terminal-style publish modal
+					showPublishModal(data.url, titleInput.value);
+					
+					// Clear localStorage draft
 					localStorage.removeItem(DRAFT_KEY);
 					
 					// Clear editing state
@@ -1290,6 +1413,7 @@ export function renderMidgardEditor(): string {
 					// Clear URL param
 					window.history.replaceState({}, '', '/midgard');
 					
+					// Clear editor after short delay (modal stays open)
 					setTimeout(() => {
 						titleInput.value = '';
 						slugInput.value = '';
@@ -1301,8 +1425,7 @@ export function renderMidgardEditor(): string {
 						document.getElementById('cover-preview').classList.remove('visible');
 						slugPreview.textContent = 'your-slug';
 						wordCount.textContent = '0';
-						successMsg.classList.remove('show');
-					}, 3000);
+					}, 500);
 				} else {
 					alert('Error: ' + (data.error || 'Unknown error'));
 				}
@@ -1345,14 +1468,8 @@ export function renderMidgardEditor(): string {
 					// Save to localStorage too
 					saveDraft();
 					
-					// Show feedback
-					updateSaveStatus('server-saved');
-					successMsg.innerHTML = '<strong>Draft saved!</strong>';
-					successMsg.classList.add('show');
-					
-					setTimeout(() => {
-						successMsg.classList.remove('show');
-					}, 2000);
+					// Show terminal-style save indicator
+					showSaveIndicator();
 				} else {
 					alert('Error: ' + (data.error || 'Unknown error'));
 				}
@@ -1360,6 +1477,58 @@ export function renderMidgardEditor(): string {
 				alert('Failed to save draft: ' + err.message);
 			}
 		}
+		
+		// Show terminal-style save indicator (bottom-left)
+		function showSaveIndicator() {
+			const indicator = document.getElementById('save-indicator');
+			const text = document.getElementById('save-indicator-text');
+			const now = new Date();
+			const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+			text.textContent = 'saved ' + timeStr;
+			
+			indicator.classList.add('visible');
+			
+			// Hide after 3 seconds
+			clearTimeout(window.saveIndicatorTimeout);
+			window.saveIndicatorTimeout = setTimeout(() => {
+				indicator.classList.remove('visible');
+			}, 3000);
+		}
+		
+		// Terminal-style publish modal
+		function showPublishModal(url, title) {
+			const modal = document.getElementById('publish-modal');
+			const now = new Date();
+			const dateStr = now.toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+			const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
+			
+			document.getElementById('publish-modal-title').textContent = title || 'Untitled';
+			document.getElementById('publish-modal-url').textContent = 'punchy.me' + url;
+			document.getElementById('publish-modal-url').href = url;
+			document.getElementById('publish-modal-date').textContent = dateStr + ' · ' + timeStr;
+			
+			modal.classList.add('visible');
+		}
+		
+		function closePublishModal() {
+			document.getElementById('publish-modal').classList.remove('visible');
+		}
+		
+		function copyPublishUrl() {
+			const url = document.getElementById('publish-modal-url').href;
+			navigator.clipboard.writeText('https://punchy.me' + url.replace('https://punchy.me', '').replace('http://punchy.me', ''));
+			
+			// Brief feedback
+			const btn = event.target;
+			const originalText = btn.textContent;
+			btn.textContent = 'Copied!';
+			setTimeout(() => { btn.textContent = originalText; }, 1500);
+		}
+		
+		// Close modal on overlay click
+		document.getElementById('publish-modal').addEventListener('click', function(e) {
+			if (e.target === this) closePublishModal();
+		});
 
 		// Inspire images from Unsplash (via FREYA)
 		let inspireImages = [];
@@ -1857,6 +2026,43 @@ export function renderMidgardEditor(): string {
 			}
 		}
 	</script>
+	
+	<!-- Terminal-style save indicator (bottom-left) -->
+	<div id="save-indicator" class="save-indicator">
+		<span class="save-indicator-icon">💾</span>
+		<span id="save-indicator-text">saved</span>
+	</div>
+	
+	<!-- Terminal-style publish modal -->
+	<div id="publish-modal" class="publish-modal-overlay">
+		<div class="publish-modal" style="position: relative;">
+			<div class="publish-modal-header">
+				<span class="publish-modal-header-icon">✓</span>
+				<span>PUBLISHED</span>
+			</div>
+			<div class="publish-modal-body">
+				<hr class="publish-modal-divider">
+				<div class="publish-modal-row">
+					<span class="publish-modal-label">Post</span>
+					<span class="publish-modal-value" id="publish-modal-title"></span>
+				</div>
+				<div class="publish-modal-row">
+					<span class="publish-modal-label">URL</span>
+					<a class="publish-modal-value publish-modal-url" id="publish-modal-url" href="#" target="_blank"></a>
+				</div>
+				<div class="publish-modal-row">
+					<span class="publish-modal-label">Published</span>
+					<span class="publish-modal-value" id="publish-modal-date"></span>
+				</div>
+				<hr class="publish-modal-divider">
+				<div class="publish-modal-actions">
+					<button class="publish-modal-btn publish-modal-btn-primary" onclick="window.open(document.getElementById('publish-modal-url').href, '_blank')">View Post</button>
+					<button class="publish-modal-btn publish-modal-btn-secondary" onclick="copyPublishUrl()">Copy Link</button>
+					<button class="publish-modal-btn publish-modal-btn-secondary" onclick="closePublishModal()">Close</button>
+				</div>
+			</div>
+		</div>
+	</div>
 </body>
 </html>`;
 }
