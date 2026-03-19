@@ -1193,7 +1193,7 @@ export function renderMidgardEditor(): string {
 			if (e.ctrlKey || e.metaKey) {
 				if (e.key === 's') {
 					e.preventDefault();
-					saveDraft();
+					saveDraftOnly();
 				} else if (e.key === 'p') {
 					e.preventDefault();
 					previewMarkdown();
@@ -1447,7 +1447,7 @@ export function renderMidgardEditor(): string {
 		// Save draft only (not published)
 		async function saveDraftOnly() {
 			const formData = new FormData();
-			formData.append('title', titleInput.value || 'Untitled Draft');
+			formData.append('title', titleInput.value.trim() || 'Untitled Post');
 			formData.append('slug', slugInput.value || 'draft-' + Date.now());
 			formData.append('body', bodyInput.value);
 			formData.append('excerpt', form.querySelector('[name="excerpt"]').value);
@@ -1472,7 +1472,7 @@ export function renderMidgardEditor(): string {
 					// Store the draft ID
 					window.editingPostId = data.id;
 					
-					// Save to localStorage too
+					// Save to localStorage too (with the ID)
 					saveDraft();
 					
 					// Show terminal-style save indicator
