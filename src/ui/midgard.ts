@@ -2109,11 +2109,14 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 			? post.tags.map(t => '<span class="meta-tag">' + t + '</span>').join('')
 			: '';
 		
+		// Data attributes for search
+		const searchData = (post.title + ' ' + post.slug + ' ' + post.tags.join(' ')).toLowerCase();
+		
 		const viewLink = isDraft 
 			? ''
 			: '<a href="/marcus/' + post.slug + '" class="action-btn" target="_blank">View</a>';
 		
-		return '<div class="post-row" data-post-id="' + post.id + '" data-post-title="' + escapeHTML(post.title) + '">' +
+		return '<div class="post-row" data-post-id="' + post.id + '" data-post-title="' + escapeHTML(post.title) + '" data-search="' + searchData + '">' +
 			'<div class="post-info">' +
 				'<div class="post-title-row">' +
 					'<span class="post-title">' + escapeHTML(post.title) + '</span>' +
@@ -2153,6 +2156,21 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		.back-link { color: #999; text-decoration: none; font-size: 12px; }
 		.back-link:hover { color: #000; }
 		
+		/* Search Box */
+		.search-section { margin-bottom: 20px; }
+		.search-box {
+			width: 100%;
+			padding: 12px 16px;
+			font-size: 14px;
+			font-family: inherit;
+			border: 1px solid #eee;
+			border-radius: 6px;
+			outline: none;
+			transition: border-color 0.15s;
+		}
+		.search-box:focus { border-color: #000; }
+		.search-box::placeholder { color: #bbb; }
+		
 		/* New Post Section */
 		.new-post-section { display: flex; justify-content: space-between; align-items: center; padding: 20px 0; border-bottom: 1px solid #eee; margin-bottom: 24px; }
 		.new-btn { display: inline-flex; align-items: center; gap: 8px; padding: 12px 20px; background: #000; color: #fff; text-decoration: none; border-radius: 6px; font-size: 13px; font-weight: 500; }
@@ -2168,6 +2186,7 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		.post-row { display: flex; justify-content: space-between; align-items: center; padding: 16px 0; border-bottom: 1px solid #f5f5f5; }
 		.post-row:last-child { border-bottom: none; }
 		.post-row:hover { background: #fafafa; margin: 0 -12px; padding: 16px 12px; border-radius: 6px; }
+		.post-row.hidden { display: none; }
 		
 		.post-info { flex: 1; min-width: 0; }
 		.post-title-row { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
@@ -2209,6 +2228,10 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 			<div class="header-top">
 				<div style="font-size: 20px; font-weight: 600;">Your Posts</div>
 				<a href="/midgard" class="back-link">← Back to Editor</a>
+			</div>
+			
+			<div class="search-section">
+				<input type="text" id="search-box" class="search-box" placeholder="Search posts by title, slug, or tag..." oninput="filterPosts()">
 			</div>
 			
 			<div class="new-post-section">
@@ -2295,6 +2318,53 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		
 		function updateStats() {
 			const rows = document.querySelectorAll('.post-row');
+			const total = rows.length;
+			let drafts = 0, published = 0;
+			
+			rows.forEach(row => {
+				const badge = row.querySelector('.status-badge');
+				if (badge && badge.classList.contains('draft')) drafts++;
+				else published++;
+			});
+			
+			document.querySelector('.stat-total').textContent = total + ' total';
+			document.querySelector('.stat-draft').textContent = drafts + ' draft';
+			document.querySelector('.stat-published').textContent = published + ' published';
+		}
+		
+		// Search/Filter posts
+		function filterPosts() {
+			const query = document.getElementById('search-box').value.toLowerCase().trim();
+			const rows = document.querySelectorAll('.post-row');
+			let visibleCount = 0;
+			
+			rows.forEach(row => {
+				const searchData = row.getAttribute('data-search') || '';
+				if (query === '' || searchData.includes(query)) {
+					row.classList.remove('hidden');
+					visibleCount++;
+				} else {
+					row.classList.add('hidden');
+				}
+			});
+			
+			// Update stats to show visible count
+			updateStatsFromVisible();
+			
+			// Show "no results" message if needed
+			const existingEmpty = document.querySelector('.no-results');
+			if (existingEmpty) existingEmpty.remove();
+			
+			if (visibleCount === 0 && query !== '') {
+				const emptyDiv = document.createElement('div');
+				emptyDiv.className = 'empty no-results';
+				emptyDiv.textContent = 'No posts match "' + query + '"';
+				document.querySelector('.posts-list').appendChild(emptyDiv);
+			}
+		}
+		
+		function updateStatsFromVisible() {
+			const rows = document.querySelectorAll('.post-row:not(.hidden)');
 			const total = rows.length;
 			let drafts = 0, published = 0;
 			
