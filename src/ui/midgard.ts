@@ -681,6 +681,65 @@ export function renderMidgardEditor(): string {
 			text-decoration: underline;
 		}
 		
+		/* Slash Command Dropdown (internal link picker) */
+		.slash-dropdown {
+			position: absolute;
+			display: none;
+			background: #fff;
+			border: 1px solid #ddd;
+			border-radius: 8px;
+			box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+			max-height: 300px;
+			overflow-y: auto;
+			z-index: 1000;
+			min-width: 300px;
+		}
+		.slash-dropdown.visible { display: block; }
+		.slash-search {
+			padding: 12px;
+			border-bottom: 1px solid #eee;
+		}
+		.slash-search input {
+			width: 100%;
+			padding: 8px 12px;
+			border: 1px solid #eee;
+			border-radius: 4px;
+			font-family: inherit;
+			font-size: 13px;
+		}
+		.slash-search input:focus {
+			outline: none;
+			border-color: #999;
+		}
+		.slash-list { padding: 8px 0; }
+		.slash-item {
+			padding: 10px 16px;
+			cursor: pointer;
+			font-size: 13px;
+			display: flex;
+			justify-content: space-between;
+			align-items: center;
+		}
+		.slash-item:hover,
+		.slash-item.selected {
+			background: #f5f5f5;
+		}
+		.slash-item-title { font-weight: 500; }
+		.slash-item-slug { color: #999; font-size: 11px; }
+		.slash-empty {
+			padding: 20px;
+			text-align: center;
+			color: #999;
+			font-size: 12px;
+		}
+		.slash-hint {
+			padding: 8px 16px;
+			border-top: 1px solid #eee;
+			font-size: 10px;
+			color: #999;
+			background: #fafafa;
+		}
+		
 		@media (max-width: 900px) {
 			.header { display: none; }
 			.main-layout { display: none; }
@@ -792,8 +851,17 @@ export function renderMidgardEditor(): string {
 		<main class="editor-panel">
 			<input type="text" name="title" class="title-input" placeholder="Title" required>
 			<img id="cover-preview" class="cover-preview" alt="Cover image preview">
-			<textarea name="body" class="body-input" placeholder="Start writing..." required></textarea>
+			<textarea name="body" class="body-input" id="body-textarea" placeholder="Start writing... (type '/' for internal links)" required></textarea>
 			<div class="word-count"><span id="word-count">0</span> words</div>
+			
+			<!-- Slash Command Dropdown (internal link picker) -->
+			<div id="slash-dropdown" class="slash-dropdown">
+				<div class="slash-search">
+					<input type="text" id="slash-search-input" placeholder="Search posts...">
+				</div>
+				<div class="slash-list" id="slash-list"></div>
+				<div class="slash-hint">↑↓ Navigate · Enter Select · Esc Close</div>
+			</div>
 		</main>
 
 		<!-- AI Panel -->
@@ -967,6 +1035,27 @@ export function renderMidgardEditor(): string {
 
 		// Keyboard shortcuts
 		document.addEventListener('keydown', (e) => {
+			// Handle slash dropdown navigation
+			if (slashDropdown.classList.contains('visible')) {
+				if (e.key === 'ArrowDown') {
+					e.preventDefault();
+					navigateSlash(1);
+					return;
+				} else if (e.key === 'ArrowUp') {
+					e.preventDefault();
+					navigateSlash(-1);
+					return;
+				} else if (e.key === 'Enter') {
+					e.preventDefault();
+					selectSlashItem();
+					return;
+				} else if (e.key === 'Escape') {
+					e.preventDefault();
+					hideSlashDropdown();
+					return;
+				}
+			}
+			
 			if (e.ctrlKey || e.metaKey) {
 				if (e.key === 's') {
 					e.preventDefault();
@@ -975,6 +1064,138 @@ export function renderMidgardEditor(): string {
 					e.preventDefault();
 					previewMarkdown();
 				}
+			}
+		});
+
+		// Slash Command - Internal Link Picker
+		const slashDropdown = document.getElementById('slash-dropdown');
+		const slashSearchInput = document.getElementById('slash-search-input');
+		const slashList = document.getElementById('slash-list');
+		let allPosts = [];
+		let filteredPosts = [];
+		let selectedIndex = -1;
+		let slashStartPos = -1;
+		
+		// Fetch posts on load
+		async function loadPostsForSlash() {
+			try {
+				const res = await fetch('/midgard/posts');
+				const data = await res.json();
+				allPosts = data.posts || [];
+			} catch (e) {
+				console.error('Failed to load posts for slash command');
+			}
+		}
+		loadPostsForSlash();
+		
+		// Listen for "/" in textarea
+		bodyInput.addEventListener('keydown', (e) => {
+			if (e.key === '/' && !slashDropdown.classList.contains('visible')) {
+				slashStartPos = bodyInput.selectionStart;
+			}
+		});
+		
+		bodyInput.addEventListener('input', (e) => {
+			const pos = bodyInput.selectionStart;
+			const text = bodyInput.value;
+			
+			// Check if we're in a slash command
+			if (slashStartPos !== -1 && pos > slashStartPos) {
+				const searchTerm = text.substring(slashStartPos + 1, pos).toLowerCase();
+				showSlashDropdown(searchTerm);
+			} else if (slashStartPos === -1 && text.endsWith('/')) {
+				// Just typed "/"
+				slashStartPos = pos - 1;
+				showSlashDropdown('');
+			} else {
+				hideSlashDropdown();
+			}
+		});
+		
+		function showSlashDropdown(searchTerm) {
+			// Filter posts
+			filteredPosts = allPosts.filter(post => 
+				post.title.toLowerCase().includes(searchTerm) ||
+				post.slug.toLowerCase().includes(searchTerm)
+			);
+			
+			if (filteredPosts.length === 0) {
+				slashList.innerHTML = '<div class="slash-empty">No posts found</div>';
+			} else {
+				slashList.innerHTML = filteredPosts.map((post, i) => 
+					'<div class="slash-item' + (i === selectedIndex ? ' selected' : '') + '" data-index="' + i + '" data-title="' + post.title + '" data-slug="' + post.slug + '" onclick="selectSlashItemByIndex(' + i + ')">' +
+					'<span class="slash-item-title">' + post.title + '</span>' +
+					'<span class="slash-item-slug">/marcus/' + post.slug + '</span>' +
+					'</div>'
+				).join('');
+			}
+			
+			// Position dropdown near cursor
+			const rect = bodyInput.getBoundingClientRect();
+			const lineHeight = parseInt(getComputedStyle(bodyInput).lineHeight) || 24;
+			const charWidth = 8; // approximate
+			const text = bodyInput.value.substring(0, bodyInput.selectionStart);
+			const lines = text.split('\\n');
+			const currentLine = lines.length;
+			const colInLine = lines[lines.length - 1].length;
+			
+			slashDropdown.style.top = (rect.top + (currentLine * lineHeight) - bodyInput.scrollTop + 30) + 'px';
+			slashDropdown.style.left = (rect.left + (colInLine * charWidth) + 20) + 'px';
+			slashDropdown.classList.add('visible');
+			
+			selectedIndex = 0;
+			updateSlashSelection();
+		}
+		
+		function hideSlashDropdown() {
+			slashDropdown.classList.remove('visible');
+			slashStartPos = -1;
+			selectedIndex = -1;
+		}
+		
+		function navigateSlash(direction) {
+			selectedIndex = Math.max(0, Math.min(filteredPosts.length - 1, selectedIndex + direction));
+			updateSlashSelection();
+		}
+		
+		function updateSlashSelection() {
+			const items = slashList.querySelectorAll('.slash-item');
+			items.forEach((item, i) => {
+				item.classList.toggle('selected', i === selectedIndex);
+			});
+		}
+		
+		function selectSlashItem() {
+			if (selectedIndex >= 0 && selectedIndex < filteredPosts.length) {
+				insertLink(filteredPosts[selectedIndex]);
+			}
+		}
+		
+		function selectSlashItemByIndex(index) {
+			selectedIndex = index;
+			selectSlashItem();
+		}
+		
+		function insertLink(post) {
+			const text = bodyInput.value;
+			const before = text.substring(0, slashStartPos);
+			const after = text.substring(bodyInput.selectionStart);
+			const link = '[' + post.title + '](/marcus/' + post.slug + ')';
+			
+			bodyInput.value = before + link + after;
+			const newPos = before.length + link.length;
+			bodyInput.setSelectionRange(newPos, newPos);
+			bodyInput.focus();
+			
+			hideSlashDropdown();
+			saveDraft();
+			updateWordCount();
+		}
+		
+		// Close dropdown when clicking outside
+		document.addEventListener('click', (e) => {
+			if (!slashDropdown.contains(e.target) && e.target !== bodyInput) {
+				hideSlashDropdown();
 			}
 		});
 

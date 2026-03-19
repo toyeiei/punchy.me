@@ -158,8 +158,12 @@ export async function handleMidgardList(request: Request, env: Env): Promise<Res
 	const posts = await getPostList(env);
 
 	// Check if client wants JSON (API) or HTML (browser)
+	// Default to JSON for slash command, HTML for direct browser access
+	const url = new URL(request.url);
+	const format = url.searchParams.get('format');
 	const accept = request.headers.get('accept') || '';
-	if (accept.includes('application/json')) {
+	
+	if (format === 'json' || accept.includes('application/json') || !accept.includes('text/html')) {
 		return jsonResponse({ posts });
 	}
 
