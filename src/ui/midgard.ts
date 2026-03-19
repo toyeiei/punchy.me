@@ -510,7 +510,10 @@ export function renderMidgardEditor(): string {
 			}
 		}
 
-		// Preview
+		// Preview window reference (reuse same tab)
+		let previewWindow = null;
+		let previewUrl = null;
+
 		function previewMarkdown() {
 			const title = titleInput.value;
 			const body = bodyInput.value;
@@ -523,9 +526,21 @@ export function renderMidgardEditor(): string {
 
 			const previewHtml = '<!DOCTYPE html><html><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>' + (title || 'Preview') + ' - MARCUS</title><link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet"><style>*{box-sizing:border-box;margin:0;padding:0}body{background:#000;color:#fff;font-family:JetBrains Mono,monospace;line-height:1.8}.container{max-width:800px;margin:0 auto;padding:40px 20px}.cover-img{width:100%;height:300px;object-fit:cover;border-radius:12px;margin-bottom:40px}.title{font-family:Crimson Pro,Georgia,serif;font-size:42px;margin-bottom:24px;line-height:1.2}.meta{color:#666;font-size:12px;margin-bottom:40px}.tags{margin-bottom:40px}.body{font-family:Crimson Pro,Georgia,serif;font-size:18px;line-height:1.9}.body h1,.body h2,.body h3{font-family:Crimson Pro,Georgia,serif;margin:2rem 0 1rem;color:#fff}.body p{margin-bottom:1.5rem}.body ul,.body ol{margin:1.5rem 0;padding-left:2rem}.body li{margin-bottom:0.5rem}.body blockquote{border-left:3px solid #22c55e;padding-left:1.5rem;margin:1.5rem 0;color:#888;font-style:italic}.body code{background:rgba(255,255,255,0.1);padding:2px 8px;border-radius:4px;font-size:0.9em}.body pre{background:rgba(0,0,0,0.5);padding:1.5rem;border-radius:8px;overflow-x:auto;margin:1.5rem 0}.body pre code{background:none;padding:0}.body a{color:#22c55e;text-decoration:none}.watermark{position:fixed;top:20px;right:20px;background:#000;color:#fff;border:1px solid #fff;font-size:10px;padding:8px 16px;border-radius:20px;z-index:100}</style></head><body><div class="watermark">PREVIEW</div><div class="container">' + (coverImage ? '<img src="' + coverImage + '" class="cover-img" alt="">' : '') + '<h1 class="title">' + (title || 'Untitled') + '</h1><div class="meta">Just now · ' + (wordCount.textContent) + ' words</div>' + (tagsHtml ? '<div class="tags">' + tagsHtml + '</div>' : '') + (excerpt ? '<p style="color:#888;font-style:italic;margin-bottom:40px;">' + excerpt + '</p>' : '') + '<div class="body">' + renderedBody + '</div></div></body></html>';
 
+			// Revoke old blob URL to prevent memory leak
+			if (previewUrl) {
+				URL.revokeObjectURL(previewUrl);
+			}
+
 			const blob = new Blob([previewHtml], { type: 'text/html' });
-			const url = URL.createObjectURL(blob);
-			window.open(url, '_blank');
+			previewUrl = URL.createObjectURL(blob);
+
+			// Open or refresh preview window
+			if (previewWindow && !previewWindow.closed) {
+				previewWindow.location.href = previewUrl;
+				previewWindow.focus();
+			} else {
+				previewWindow = window.open(previewUrl, 'midgard-preview');
+			}
 		}
 
 		// Form submit
