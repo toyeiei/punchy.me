@@ -173,7 +173,7 @@ export function renderMidgardEditor(): string {
 		/* Cover Image Preview (in editor) */
 		.cover-preview {
 			width: 100%;
-			height: 200px;
+			height: 280px;
 			object-fit: cover;
 			border-radius: 8px;
 			margin-bottom: 24px;
@@ -920,7 +920,7 @@ export function renderMidgardEditor(): string {
 				const coverPreview = document.getElementById('cover-preview');
 				if (draft.coverImage) {
 					const optimizedUrl = draft.coverImage.includes('unsplash.com') 
-						? (draft.coverImage.includes('?') ? draft.coverImage + '&w=400&fm=webp&q=40' : draft.coverImage + '?w=400&fm=webp&q=40')
+						? (draft.coverImage.includes('?') ? draft.coverImage + '&w=600&fm=webp&q=60' : draft.coverImage + '?w=600&fm=webp&q=60')
 						: draft.coverImage;
 					coverPreview.src = optimizedUrl;
 					coverPreview.classList.add('visible');
@@ -1139,7 +1139,7 @@ export function renderMidgardEditor(): string {
 			if (url) {
 				// Add Unsplash optimization params if it's an Unsplash URL
 				const optimizedUrl = url.includes('unsplash.com') 
-					? (url.includes('?') ? url + '&w=400&fm=webp&q=40' : url + '?w=400&fm=webp&q=40')
+					? (url.includes('?') ? url + '&w=600&fm=webp&q=60' : url + '?w=600&fm=webp&q=60')
 					: url;
 				
 				coverPreview.src = optimizedUrl;
