@@ -592,11 +592,11 @@ export function renderMidgardEditor(): string {
 			display: none;
 		}
 		
-		/* Terminal-style save indicator (bottom-left) */
+		/* Terminal-style save indicator (bottom-right) */
 		.save-indicator {
 			position: fixed;
 			bottom: 20px;
-			left: 20px;
+			right: 20px;
 			background: #fff;
 			border: 1px solid #ddd;
 			border-radius: 4px;
