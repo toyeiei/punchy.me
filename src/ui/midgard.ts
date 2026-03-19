@@ -411,7 +411,7 @@ export function renderMidgardEditor(): string {
 		/* Excerpt textarea - vertical resize only */
 		.sidebar textarea[name="excerpt"] {
 			resize: vertical;
-			min-height: 80px;
+			min-height: 128px;
 		}
 		
 		/* Slug preview */
@@ -732,7 +732,7 @@ export function renderMidgardEditor(): string {
 				<!-- Excerpt -->
 				<div class="form-group">
 					<label class="form-label">Excerpt</label>
-					<textarea name="excerpt" class="form-input" rows="3" placeholder="Brief summary..."></textarea>
+					<textarea name="excerpt" class="form-input" rows="5" placeholder="Brief summary..."></textarea>
 				</div>
 
 				<!-- Tags -->
