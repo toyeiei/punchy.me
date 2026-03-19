@@ -26,7 +26,8 @@ export function renderMidgardEditor(): string {
 			background: #fff;
 			color: #000;
 			font-family: 'JetBrains Mono', monospace;
-			min-height: 100vh;
+			height: 100vh;
+			overflow: hidden;
 		}
 		
 		/* Custom Scrollbar - Light Theme */
@@ -47,10 +48,9 @@ export function renderMidgardEditor(): string {
 			align-items: center;
 			padding: 16px 24px;
 			border-bottom: 1px solid #eee;
-			position: sticky;
-			top: 0;
 			background: #fff;
 			z-index: 100;
+			flex-shrink: 0;
 		}
 		.header-left {
 			display: flex;
@@ -145,13 +145,13 @@ export function renderMidgardEditor(): string {
 		.draft-item-meta { font-size: 11px; color: #999; }
 		.drafts-empty { text-align: center; color: #999; padding: 40px 0; }
 		
-		/* Main Layout - 3 columns */
+		/* Main Layout - 3 columns, fills viewport */
 		.main-layout {
 			display: flex;
-			min-height: calc(100vh - 57px);
+			height: calc(100vh - 57px);
 		}
 		
-		/* Left Sidebar */
+		/* Left Sidebar - independent scroll */
 		.sidebar {
 			width: 22%;
 			min-width: 260px;
@@ -160,16 +160,15 @@ export function renderMidgardEditor(): string {
 			border-right: 1px solid #eee;
 			padding: 24px;
 			overflow-y: auto;
-			height: calc(100vh - 57px);
-			position: sticky;
-			top: 57px;
+			flex-shrink: 0;
 		}
 		
-		/* Editor Panel - Center */
+		/* Editor Panel - Center, independent scroll */
 		.editor-panel {
 			flex: 1;
 			padding: 32px 40px;
 			min-width: 0;
+			overflow-y: auto;
 		}
 		
 		/* Cover Image Preview (in editor) */
@@ -191,7 +190,7 @@ export function renderMidgardEditor(): string {
 			50% { background: #eee; }
 		}
 		
-		/* Right AI Panel */
+		/* Right AI Panel - independent scroll */
 		.ai-panel {
 			width: 22%;
 			min-width: 240px;
@@ -200,9 +199,7 @@ export function renderMidgardEditor(): string {
 			border-left: 1px solid #eee;
 			padding: 24px;
 			overflow-y: auto;
-			height: calc(100vh - 57px);
-			position: sticky;
-			top: 57px;
+			flex-shrink: 0;
 		}
 		
 		/* AI Panel Header */
