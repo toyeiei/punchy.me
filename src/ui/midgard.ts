@@ -302,6 +302,12 @@ export function renderMidgardEditor(): string {
 		.sidebar .form-input { font-size: 13px; padding: 10px; }
 		.sidebar .form-group { margin-bottom: 16px; }
 		
+		/* Excerpt textarea - vertical resize only */
+		.sidebar textarea[name="excerpt"] {
+			resize: vertical;
+			min-height: 80px;
+		}
+		
 		/* Slug preview */
 		.slug-preview { margin-top: 6px; font-size: 11px; color: #999; word-break: break-all; }
 		.slug-preview span { color: #666; }
