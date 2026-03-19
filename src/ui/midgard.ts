@@ -2177,13 +2177,18 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 		function closeModal() {
 			deletePostId = null;
 			document.getElementById('delete-modal').classList.remove('visible');
+			// Reset button state
+			const btn = document.getElementById('confirm-delete-btn');
+			btn.textContent = 'Delete';
+			btn.disabled = false;
 		}
 		
 		document.getElementById('confirm-delete-btn').addEventListener('click', async function() {
 			if (!deletePostId) return;
 			
-			this.textContent = 'Deleting...';
-			this.disabled = true;
+			const btn = this;
+			btn.textContent = 'Deleting...';
+			btn.disabled = true;
 			
 			try {
 				const res = await fetch('/midgard/post/' + deletePostId, { method: 'DELETE' });
@@ -2203,13 +2208,13 @@ export function renderMidgardPostsList(posts: MarcusPost[]): string {
 					closeModal();
 				} else {
 					alert('Error: ' + (data.error || 'Failed to delete'));
-					this.textContent = 'Delete';
-					this.disabled = false;
+					btn.textContent = 'Delete';
+					btn.disabled = false;
 				}
 			} catch (err) {
 				alert('Failed to delete: ' + err.message);
-				this.textContent = 'Delete';
-				this.disabled = false;
+				btn.textContent = 'Delete';
+				btn.disabled = false;
 			}
 		});
 		
