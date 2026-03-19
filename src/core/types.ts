@@ -198,4 +198,31 @@ export interface Env {
 	TURNSTILE_SITE_KEY: string;
 	TURNSTILE_SECRET_KEY: string;
 	UNSPLASH_ACCESS_KEY: string;
+	STRIPE_SECRET_KEY?: string;
+	STRIPE_WEBHOOK_SECRET?: string;
 }
+
+// Stripe Types
+export interface StripeCustomer {
+	id: string;
+	email: string;
+	createdAt: number;
+	subscription?: StripeSubscription;
+	purchases: Record<string, number>; // tool -> purchasedAt
+}
+
+export interface StripeSubscription {
+	id: string;
+	status: 'active' | 'trialing' | 'past_due' | 'canceled' | 'incomplete';
+	currentPeriodStart: number;
+	currentPeriodEnd: number;
+	cancelAtPeriodEnd: boolean;
+}
+
+export interface StripeCheckoutSession {
+	id: string;
+	url: string;
+}
+
+export const PREMIUM_TOOLS = ['thor', 'marcus', 'zeus'] as const;
+export type PremiumTool = typeof PREMIUM_TOOLS[number];

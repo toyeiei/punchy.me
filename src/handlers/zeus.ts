@@ -1,7 +1,7 @@
 import { Env, ZeusSimulation } from '../core/types';
 import { ZEUS_HTML } from '../ui/zeus';
 import { validateZeusRequest } from '../core/validation';
-import { handleValidatedRequest } from '../core/middleware';
+import { handleValidatedRequest, handlePremiumRequest } from '../core/middleware';
 import { htmlPage, generateUniqueId } from '../core/utils';
 
 const NUM_ITERATIONS = 1000;
@@ -23,31 +23,51 @@ export async function handleZeusGet(): Promise<Response> {
  * - Salary growth: Income compounds annually at specified rate
  * - Crisis events: Random wealth drops (20-40% severity) simulating market crashes
  * - Comparison: Shows success probability with vs without crises
+ * 
+ * Premium feature when Stripe is configured
  */
 export async function handleZeusSimulate(request: Request, env: Env): Promise<Response> {
+	// Use premium handler when Stripe is configured
+	if (env.STRIPE_SECRET_KEY) {
+		return handlePremiumRequest(
+			request,
+			env,
+			'zeus',
+			validateZeusRequest,
+			async (data, _ip, env) => zeusSimulationHandler(data, env),
+			{ rateLimit: { key: 'zeus-simulate', limit: 10 } }
+		);
+	}
+
+	// Fallback to free access
 	return handleValidatedRequest(
 		request,
 		env,
 		validateZeusRequest,
-		async (data, _ip, env) => {
-			const {
-				age,
-				income,
-				savingsRate,
-				currentSavings,
-				returnRate,
-				inflationRate,
-				retirementTarget,
-				salaryGrowth,
-				crisisEvents,
-				monthlyExpenses,
-				healthcareBase,
-				healthcareGrowth,
-				lifeEvents
-			} = data;
+		async (data, _ip, env) => zeusSimulationHandler(data, env),
+		{ rateLimit: { key: 'zeus-simulate', limit: 10 } }
+	);
+}
 
-			// Calculate years to simulate (up to age 100)
-			const yearsToSimulate = Math.min(100 - age, MAX_YEARS);
+async function zeusSimulationHandler(data: ZeusSimulation['inputs'], _env: Env) {
+	const {
+		age,
+		income,
+		savingsRate,
+		currentSavings,
+		returnRate,
+		inflationRate,
+		retirementTarget,
+		salaryGrowth,
+		crisisEvents,
+		monthlyExpenses,
+		healthcareBase,
+		healthcareGrowth,
+		lifeEvents
+	} = data;
+
+	// Calculate years to simulate (up to age 100)
+	const yearsToSimulate = Math.min(100 - age, MAX_YEARS);
 			
 			// Real return rate (adjusted for inflation volatility)
 			const realReturnMean = returnRate - inflationRate;
@@ -244,25 +264,22 @@ export async function handleZeusSimulate(request: Request, env: Env): Promise<Re
 			};
 
 			// Store for 1 day (optional - can be stateless)
-			await env.SHORT_LINKS.put(id, JSON.stringify(result), { expirationTtl: 86400 });
+	await _env.SHORT_LINKS.put(id, JSON.stringify(result), { expirationTtl: 86400 });
 
-			// Return results
-			return {
-				id,
-				medianFinal,
-				p10,
-				p90,
-				successProbability,
-				ruinProbability,
-				successProbabilityNoCrisis,
-				medianYearsToFire,
-				medianPath,
-				crisisYears: topCrisisYears,
-				iterations: iterations.slice(0, 200)
-			};
-		},
-		{ rateLimit: { key: 'zeus', limit: 10, ttl: 60 } }
-	);
+	// Return results
+	return {
+		id,
+		medianFinal,
+		p10,
+		p90,
+		successProbability,
+		ruinProbability,
+		successProbabilityNoCrisis,
+		medianYearsToFire,
+		medianPath,
+		crisisYears: topCrisisYears,
+		iterations: iterations.slice(0, 200)
+	};
 }
 
 /**

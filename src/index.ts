@@ -19,6 +19,7 @@ import { handleZeusGet, handleZeusSimulate } from './handlers/zeus';
 import { handleZinsserGet, handleZinsserSubscribe, handleZinsserConfirm, handleZinsserUnsubscribe, handleZinsserBroadcast } from './handlers/zinsser';
 import { handleHome, handleFavicon, handleRobots, handleSitemap } from './handlers/static';
 import { handleRender } from './handlers/render';
+import { handleStripeCheckout, handleStripeSuccess, handleStripePortal, handleStripeWebhook, handleStripeStatus, handleStripePricing } from './handlers/stripe';
 
 // Services
 import { validatePayloadSize } from './services/security';
@@ -78,6 +79,14 @@ const ROUTES: Route[] = [
 	
 	// Freya search (special GET with query params)
 	{ method: 'GET', path: '/freya/search', handler: simpleHandler(handleFreyaSearch) },
+
+	// Stripe payment endpoints
+	{ method: 'GET', path: '/stripe/pricing', handler: simpleHandler(handleStripePricing) },
+	{ method: 'GET', path: '/stripe/checkout', handler: simpleHandler(handleStripeCheckout) },
+	{ method: 'GET', path: '/stripe/success', handler: simpleHandler(handleStripeSuccess) },
+	{ method: 'GET', path: '/stripe/portal', handler: simpleHandler(handleStripePortal) },
+	{ method: 'GET', path: '/stripe/status', handler: simpleHandler(handleStripeStatus) },
+	{ method: 'POST', path: '/stripe/webhook', handler: staticHandler(handleStripeWebhook) },
 ];
 
 export default {

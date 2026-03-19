@@ -1193,4 +1193,124 @@ Hope this helps!`
     });
   });
 
+  describe("Stripe Payment Integration", () => {
+    describe("Pricing Page", () => {
+      it("serves the pricing page", async () => {
+        const res = await SELF.fetch("http://localhost/stripe/pricing");
+        expect(res.status).toBe(200);
+        const html = await res.text();
+        expect(html).toContain("Upgrade to Premium");
+        expect(html).toContain("Pro Subscription");
+        expect(html).toContain("THOR");
+        expect(html).toContain("MARCUS");
+        expect(html).toContain("ZEUS");
+      });
+    });
+
+    describe("Success Page", () => {
+      it("serves the success page", async () => {
+        const res = await SELF.fetch("http://localhost/stripe/success");
+        expect(res.status).toBe(200);
+        const html = await res.text();
+        expect(html).toContain("Payment Successful");
+      });
+    });
+
+    describe("Status Check", () => {
+      it("requires customer_id parameter", async () => {
+        const res = await SELF.fetch("http://localhost/stripe/status");
+        expect(res.status).toBe(400);
+        const data = await res.json() as { error: string };
+        expect(data.error).toBe("customer_id required");
+      });
+
+      it("returns no_customer for unknown customer", async () => {
+        const res = await SELF.fetch("http://localhost/stripe/status?customer_id=cus_unknown123");
+        expect(res.status).toBe(200);
+        const data = await res.json() as { hasAccess: boolean; reason: string };
+        expect(data.hasAccess).toBe(false);
+        expect(data.reason).toBe("no_customer");
+      });
+
+      it("returns access status for customer with subscription", async () => {
+        const customerId = "cus_test_active";
+        // Create customer with active subscription
+        await env.SHORT_LINKS.put(`stripe:customer:${customerId}`, JSON.stringify({
+          id: customerId,
+          email: "test@example.com",
+          createdAt: Date.now(),
+          subscription: {
+            id: "sub_test",
+            status: "active",
+            currentPeriodStart: Date.now(),
+            currentPeriodEnd: Date.now() + 30 * 24 * 60 * 60 * 1000,
+            cancelAtPeriodEnd: false,
+          },
+          purchases: {},
+        }));
+
+        const res = await SELF.fetch(`http://localhost/stripe/status?customer_id=${customerId}`);
+        expect(res.status).toBe(200);
+        const data = await res.json() as { hasAccess: boolean; customer: { subscription: { status: string } } };
+        expect(data.hasAccess).toBe(true);
+        expect(data.customer.subscription.status).toBe("active");
+      });
+
+      it("returns tool access for customer with one-time purchase", async () => {
+        const customerId = "cus_test_purchase";
+        await env.SHORT_LINKS.put(`stripe:customer:${customerId}`, JSON.stringify({
+          id: customerId,
+          email: "test@example.com",
+          createdAt: Date.now(),
+          subscription: undefined,
+          purchases: { thor: Date.now() },
+        }));
+
+        const res = await SELF.fetch(`http://localhost/stripe/status?customer_id=${customerId}&tool=thor`);
+        expect(res.status).toBe(200);
+        const data = await res.json() as { hasAccess: boolean };
+        expect(data.hasAccess).toBe(true);
+      });
+
+      it("returns no access for tool not purchased", async () => {
+        const customerId = "cus_test_no_thor";
+        await env.SHORT_LINKS.put(`stripe:customer:${customerId}`, JSON.stringify({
+          id: customerId,
+          email: "test@example.com",
+          createdAt: Date.now(),
+          subscription: undefined,
+          purchases: { marcus: Date.now() },
+        }));
+
+        const res = await SELF.fetch(`http://localhost/stripe/status?customer_id=${customerId}&tool=thor`);
+        expect(res.status).toBe(200);
+        const data = await res.json() as { hasAccess: boolean };
+        expect(data.hasAccess).toBe(false);
+      });
+    });
+
+    describe("Webhook Handler", () => {
+      it("rejects requests without webhook secret configured", async () => {
+        // This test runs without STRIPE_WEBHOOK_SECRET
+        const res = await SELF.fetch("http://localhost/stripe/webhook", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ type: "test" }),
+        });
+        expect(res.status).toBe(500);
+        const data = await res.json() as { error: string };
+        expect(data.error).toContain("not configured");
+      });
+    });
+
+    describe("Portal Handler", () => {
+      it("requires customer_id parameter", async () => {
+        const res = await SELF.fetch("http://localhost/stripe/portal");
+        expect(res.status).toBe(400);
+        const data = await res.json() as { error: string };
+        expect(data.error).toBe("customer_id required");
+      });
+    });
+  });
+
 });

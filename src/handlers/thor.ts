@@ -2,7 +2,7 @@ import { Env, BrowserRenderingResponse, ThorReport, ThorIntelligence } from '../
 import { generateUniqueId, htmlPage } from '../core/utils';
 import { validateThorRequest } from '../core/validation';
 import { THOR_UI_HTML } from '../ui/thor';
-import { handleValidatedRequest } from '../core/middleware';
+import { handleValidatedRequest, handlePremiumRequest } from '../core/middleware';
 import { ExternalServiceError, InternalError, ValidationError } from '../core/errors';
 import { THOR_SYSTEM_PROMPT, buildThorUserPrompt } from '../prompts/thor';
 
@@ -17,8 +17,22 @@ export const handleThorGet = async (): Promise<Response> => {
 
 /**
  * Thor Intelligence Forge - Scrape → Analyze → Report
+ * Premium feature when Stripe is configured
  */
 export const handleThorForge = async (request: Request, env: Env): Promise<Response> => {
+	// Use premium handler when Stripe is configured
+	if (env.STRIPE_SECRET_KEY) {
+		return handlePremiumRequest(
+			request,
+			env,
+			'thor',
+			validateThorRequest,
+			async (data: { url: string }, _ip: string, env: Env) => forgeThorIntelligence(data.url, env),
+			{ rateLimit: { key: 'thor', limit: THOR_RATE_LIMIT } }
+		);
+	}
+
+	// Fallback to free access when Stripe not configured
 	return handleValidatedRequest(
 		request,
 		env,

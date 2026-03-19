@@ -1,7 +1,7 @@
 import { Env } from '../core/types';
 import { MARCUS_HTML } from '../ui/marcus';
 import { validateMarcusRequest } from '../core/validation';
-import { handleValidatedRequest } from '../core/middleware';
+import { handleValidatedRequest, handlePremiumRequest } from '../core/middleware';
 import { jsonResponse, htmlPage } from '../core/utils';
 import { checkRateLimit } from '../services/security';
 import { AI_MAX_TOKENS_STANDARD } from '../core/constants';
@@ -39,41 +39,56 @@ Keep it under 150 words. Help them visualize the data.`
 };
 
 export async function handleMarcusExplain(request: Request, env: Env): Promise<Response> {
+	// Use premium handler when Stripe is configured
+	if (env.STRIPE_SECRET_KEY) {
+		return handlePremiumRequest(
+			request,
+			env,
+			'marcus',
+			validateMarcusRequest,
+			async (data, ip, env) => marcusExplainHandler(data, ip, env),
+			{ rateLimit: { key: 'marcus-explain', limit: 15, ttl: 60 } }
+		);
+	}
+
+	// Fallback to free access
 	return handleValidatedRequest(
 		request,
 		env,
 		validateMarcusRequest,
-		async (data, ip, env) => {
-			// Rate limit
-			const allowed = await checkRateLimit(env, `rl:marcus:${ip}`, 10, 60);
-			if (!allowed) {
-				return jsonResponse({ error: 'Too many analyses. Wait a moment.' }, 429);
-			}
-
-			const systemPrompt = EXPLANATION_PROMPTS[data.template] || EXPLANATION_PROMPTS.summary;
-
-			// Generate AI explanation
-			const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
-				max_tokens: AI_MAX_TOKENS_STANDARD,
-				temperature: 0.4,
-				messages: [
-					{ role: 'system', content: systemPrompt },
-					{ role: 'user', content: `R Output:\n${data.data}\n\nData sample: ${data.template}` }
-				]
-			}) as { response: string };
-
-			let explanation: string;
-			try {
-				const parsed = parseAIResponse(aiResponse.response);
-				explanation = typeof parsed === 'object' && parsed.explanation 
-					? String(parsed.explanation)
-					: aiResponse.response.substring(0, 300);
-			} catch {
-				explanation = aiResponse.response.substring(0, 300);
-			}
-
-			return { explanation };
-		},
+		async (data, ip, env) => marcusExplainHandler(data, ip, env),
 		{ rateLimit: { key: 'marcus-explain', limit: 15, ttl: 60 } }
 	);
+}
+
+async function marcusExplainHandler(data: { data: string; template: string }, ip: string, env: Env) {
+	// Rate limit
+	const allowed = await checkRateLimit(env, `rl:marcus:${ip}`, 10, 60);
+	if (!allowed) {
+		return jsonResponse({ error: 'Too many analyses. Wait a moment.' }, 429);
+	}
+
+	const systemPrompt = EXPLANATION_PROMPTS[data.template] || EXPLANATION_PROMPTS.summary;
+
+	// Generate AI explanation
+	const aiResponse = await env.AI.run('@cf/meta/llama-3-8b-instruct', {
+		max_tokens: AI_MAX_TOKENS_STANDARD,
+		temperature: 0.4,
+		messages: [
+			{ role: 'system', content: systemPrompt },
+			{ role: 'user', content: `R Output:\n${data.data}\n\nData sample: ${data.template}` }
+		]
+	}) as { response: string };
+
+	let explanation: string;
+	try {
+		const parsed = parseAIResponse(aiResponse.response);
+		explanation = typeof parsed === 'object' && parsed.explanation 
+			? String(parsed.explanation)
+			: aiResponse.response.substring(0, 300);
+	} catch {
+		explanation = aiResponse.response.substring(0, 300);
+	}
+
+	return { explanation };
 }
