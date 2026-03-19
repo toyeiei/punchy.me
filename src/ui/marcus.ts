@@ -179,14 +179,6 @@ export function renderMarcusPost(post: MarcusPost): string {
 		.map(tag => `<a href="/marcus/tag/${tag}" class="tag">${tag}</a>`)
 		.join('');
 
-	// Convert body to paragraphs
-	const bodyHtml = post.body
-		.split('\n\n')
-		.map(p => p.trim())
-		.filter(p => p.length > 0)
-		.map(p => `<p>${escapeHTML(p)}</p>`)
-		.join('\n');
-
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,6 +188,9 @@ export function renderMarcusPost(post: MarcusPost): string {
 	<meta name="description" content="${escapeHTML(post.excerpt)}">
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+	<!-- Markdown rendering -->
+	<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
 	<style>
 		* { box-sizing: border-box; margin: 0; padding: 0; }
 		body {
@@ -251,6 +246,20 @@ export function renderMarcusPost(post: MarcusPost): string {
 			margin-bottom: 60px;
 		}
 		.post-body p { margin-bottom: 24px; }
+		.post-body h1, .post-body h2, .post-body h3 { font-family: 'Crimson Pro', serif; color: #fff; margin: 2rem 0 1rem; line-height: 1.2; }
+		.post-body h1 { font-size: 32px; }
+		.post-body h2 { font-size: 26px; }
+		.post-body h3 { font-size: 22px; }
+		.post-body ul, .post-body ol { margin: 1.5rem 0; padding-left: 2rem; }
+		.post-body li { margin-bottom: 0.5rem; }
+		.post-body blockquote { border-left: 3px solid #22c55e; padding-left: 1.5rem; margin: 1.5rem 0; color: #888; font-style: italic; }
+		.post-body code { background: rgba(255,255,255,0.1); padding: 2px 8px; border-radius: 4px; font-size: 0.9em; }
+		.post-body pre { background: rgba(0,0,0,0.5); padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin: 1.5rem 0; }
+		.post-body pre code { background: none; padding: 0; }
+		.post-body a { color: #22c55e; text-decoration: none; }
+		.post-body a:hover { text-decoration: underline; }
+		.post-body img { max-width: 100%; border-radius: 8px; margin: 1.5rem 0; }
+		.post-body hr { border: none; border-top: 1px solid #222; margin: 2rem 0; }
 		
 		/* Footer */
 		.post-footer {
@@ -285,8 +294,8 @@ export function renderMarcusPost(post: MarcusPost): string {
 			<div class="post-tags">${tagsHtml}</div>
 		</header>
 
-		<article class="post-body">
-			${bodyHtml}
+		<article class="post-body" id="post-body">
+			<!-- Markdown content rendered by JS -->
 		</article>
 
 		<footer class="post-footer">
@@ -295,6 +304,12 @@ export function renderMarcusPost(post: MarcusPost): string {
 		</footer>
 	</div>
 	${PUNCHY_PORTAL_HTML}
+	<script>
+		// Render markdown body
+		const bodyEl = document.getElementById('post-body');
+		const markdown = ${JSON.stringify(post.body)};
+		bodyEl.innerHTML = DOMPurify.sanitize(marked.parse(markdown || ''));
+	</script>
 </body>
 </html>`;
 }
