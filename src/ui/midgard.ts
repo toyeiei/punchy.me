@@ -222,6 +222,43 @@ export function renderMidgardEditor(): string {
 		.success-msg.show { display: block; }
 		.success-msg a { color: #000; text-decoration: underline; }
 		
+		/* Cover Image Picker */
+		.inspire-row {
+			display: flex;
+			align-items: center;
+			gap: 8px;
+			margin-top: 8px;
+		}
+		.inspire-btn {
+			font-size: 10px;
+			color: #999;
+			cursor: pointer;
+			text-transform: uppercase;
+			letter-spacing: 1px;
+			background: none;
+			border: none;
+			padding: 4px 0;
+		}
+		.inspire-btn:hover { color: #000; }
+		.inspire-loading { font-size: 10px; color: #ccc; }
+		.image-picker {
+			display: flex;
+			gap: 8px;
+			margin-top: 8px;
+		}
+		.image-thumb {
+			width: 60px;
+			height: 60px;
+			border-radius: 6px;
+			object-fit: cover;
+			border: 2px solid #eee;
+			cursor: pointer;
+			opacity: 0.7;
+			transition: all 0.2s;
+		}
+		.image-thumb:hover { opacity: 1; border-color: #000; }
+		.image-thumb.selected { border-color: #000; opacity: 1; }
+
 		/* Keyboard shortcuts hint */
 		.shortcuts-hint {
 			font-size: 10px;
@@ -284,7 +321,12 @@ export function renderMidgardEditor(): string {
 				<!-- Cover Image -->
 				<div class="form-group">
 					<label class="form-label">Cover Image</label>
-					<input type="url" name="coverImage" class="form-input" placeholder="https://...">
+					<input type="url" name="coverImage" class="form-input" placeholder="https://..." id="cover-image-input">
+					<div class="inspire-row">
+						<button type="button" class="inspire-btn" onclick="loadInspireImages()">↻ Refresh</button>
+						<span class="inspire-loading" id="inspire-loading"></span>
+					</div>
+					<div class="image-picker" id="image-picker"></div>
 				</div>
 
 				<!-- Excerpt -->
@@ -537,8 +579,54 @@ export function renderMidgardEditor(): string {
 			publishBtn.disabled = false;
 		});
 
-		// Load draft on page load
+		// Inspire images from Unsplash (via FREYA)
+		let inspireImages = [];
+		async function loadInspireImages() {
+			const picker = document.getElementById('image-picker');
+			const loading = document.getElementById('inspire-loading');
+			const coverInput = document.getElementById('cover-image-input');
+			
+			loading.textContent = 'Loading...';
+			picker.innerHTML = '';
+
+			try {
+				const res = await fetch('/freya/search');
+				const data = await res.json();
+				inspireImages = (data.images || []).slice(0, 3);
+
+				inspireImages.forEach((img, i) => {
+					const thumb = document.createElement('img');
+					thumb.src = img.thumb;
+					thumb.className = 'image-thumb';
+					thumb.alt = img.alt || 'Cover option ' + (i + 1);
+					thumb.title = img.author || 'Unsplash';
+					thumb.onclick = () => selectImage(i);
+					if (coverInput.value === img.url) {
+						thumb.classList.add('selected');
+					}
+					picker.appendChild(thumb);
+				});
+				loading.textContent = inspireImages.length + ' images';
+			} catch (err) {
+				loading.textContent = 'Failed to load';
+				console.error('Inspire error:', err);
+			}
+		}
+
+		function selectImage(index) {
+			const coverInput = document.getElementById('cover-image-input');
+			const thumbs = document.querySelectorAll('.image-thumb');
+			
+			thumbs.forEach(t => t.classList.remove('selected'));
+			thumbs[index].classList.add('selected');
+			
+			coverInput.value = inspireImages[index].url;
+			scheduleSave();
+		}
+
+		// Load draft and inspire images on page load
 		loadDraft();
+		loadInspireImages();
 	</script>
 </body>
 </html>`;
