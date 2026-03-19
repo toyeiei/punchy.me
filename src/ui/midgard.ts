@@ -1088,6 +1088,7 @@ export function renderMidgardEditor(): string {
 				coverImage: form.querySelector('[name="coverImage"]').value,
 				tags: form.querySelector('[name="tags"]').value,
 				schema: document.getElementById('schema-textarea').value,
+				editingPostId: window.editingPostId || null,
 				savedAt: Date.now()
 			};
 			localStorage.setItem(DRAFT_KEY, JSON.stringify(draft));
@@ -1107,6 +1108,9 @@ export function renderMidgardEditor(): string {
 				document.getElementById('schema-textarea').value = draft.schema || '';
 				slugPreview.textContent = draft.slug || 'your-slug';
 				updateWordCount();
+				
+				// Restore editingPostId so Save Draft updates instead of creating new
+				window.editingPostId = draft.editingPostId || null;
 				updateSaveStatus('restored', draft.savedAt);
 				
 				// Restore cover preview

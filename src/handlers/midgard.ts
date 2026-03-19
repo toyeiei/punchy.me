@@ -456,7 +456,15 @@ async function updatePostIndex(env: Env, postId: string, timestamp: number): Pro
 	const indexData = await env.SHORT_LINKS.get('marcus:index');
 	const index = indexData ? JSON.parse(indexData) : [];
 	
-	// Add new post to front
+	// Check if post already exists in index
+	const existingIndex = index.findIndex((item: { id: string }) => item.id === postId);
+	
+	if (existingIndex >= 0) {
+		// Update existing entry's timestamp and move to front
+		index.splice(existingIndex, 1);
+	}
+	
+	// Add to front
 	index.unshift({ id: postId, timestamp });
 	
 	await env.SHORT_LINKS.put('marcus:index', JSON.stringify(index));
