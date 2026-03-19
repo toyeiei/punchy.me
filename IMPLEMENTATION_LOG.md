@@ -23,7 +23,11 @@ This log tracks the successful implementation of features and milestones for the
 - **Auto-Save Draft**: localStorage with 1s debounce, restores on page load.
 - **Keyboard Shortcuts**: `Ctrl+S` save draft, `Ctrl+P` preview.
 - **Unsplash Cover Images**: Auto-load 3 random images, click to select.
+- **Cover Image Preview**: 720px @ 70% quality, displayed in editor below title.
 - **Zen Light Theme**: Black on white, minimal borders, clean aesthetic.
+- **Header Actions**: Publish/Preview buttons in top-right header.
+- **Posts List Page**: `/midgard/posts` with Edit/View buttons for each post.
+- **Post Editing**: Load existing posts via `?edit=slug` parameter.
 
 #### AI Assistant Panel (4 Features)
 - **Title Suggestions**: AI generates 5 catchy titles from content.
@@ -57,7 +61,11 @@ This log tracks the successful implementation of features and milestones for the
 - `GET /marcus/tag/{tag}` - Posts by tag
 - `GET /marcus/rss` - RSS feed
 - `GET /midgard` - Editor (auth required)
-- `POST /midgard/publish` - Publish post
+- `GET /midgard/posts` - List all posts (HTML page)
+- `GET /midgard/edit/{slug}` - Load post for editing
+- `POST /midgard/publish` - Publish new post
+- `POST /midgard/update` - Update existing post
+- `DELETE /midgard/post/{id}` - Delete post
 - `POST /midgard/ai/titles` - Generate titles
 - `POST /midgard/ai/excerpt` - Generate excerpt
 - `POST /midgard/ai/polish` - Polish prose
@@ -72,12 +80,15 @@ This log tracks the successful implementation of features and milestones for the
 
 #### Files Modified
 - `src/core/types.ts` - Added `MarcusPost`, `MidgardSession`, `MIDGARD_SECRET`
+- `src/core/router.ts` - Added DELETE method support
 - `src/index.ts` - Added MARCUS/Midgard routes
+- `src/handlers/freya.ts` - Added `small` image size for editor preview
 
 #### Validation Status
 - ✅ `npx tsc --noEmit` — zero errors
 - ✅ `npm run lint` — zero errors (1 pre-existing warning)
 - ✅ `npm test` — 87/87 tests passing
+- ✅ Branch: `marcus-revamp` pushed to GitHub
 - ✅ Branch: `marcus-revamp` pushed to GitHub
 
 ---
