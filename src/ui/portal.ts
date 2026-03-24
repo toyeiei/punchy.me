@@ -48,7 +48,14 @@ export const PUNCHY_PORTAL_HTML = `
         .portal-tool-link:hover { transform: scale(1.3) !important; filter: grayscale(0) !important; }
 
         @media screen and (max-width: 1024px), screen and (max-height: 500px) {
-            .punchy-portal { display: none !important; pointer-events: none !important; opacity: 0 !important; }
+            .punchy-portal { bottom: 16px !important; right: 16px !important; }
+            .punchy-portal:hover { max-width: 44px !important; gap: 0 !important; border-color: rgba(34, 197, 94, 0.2) !important; box-shadow: none !important; }
+            .punchy-portal:hover .portal-tools { opacity: 0 !important; }
+            .punchy-portal:hover .portal-brand { opacity: 0 !important; }
+            .punchy-portal.portal-open { max-width: 85vw !important; gap: 12px !important; border-color: #22c55e !important; box-shadow: 0 0 20px rgba(34, 197, 94, 0.2) !important; }
+            .punchy-portal.portal-open .portal-tools { opacity: 1 !important; }
+            .punchy-portal.portal-open .portal-brand { opacity: 1 !important; }
+            .portal-tool-link { font-size: 20px !important; }
         }
 
         @media print {
@@ -71,4 +78,20 @@ export const PUNCHY_PORTAL_HTML = `
             <a href="/asgard" class="portal-tool-link" title="ASGARD">🌌</a>
         </div>
     </div>
+    <script>
+    (function() {
+        var p = document.querySelector('.punchy-portal');
+        if (!p) return;
+        var t = p.querySelector('.portal-trigger');
+        function isMobile() { return window.innerWidth <= 1024 || window.innerHeight <= 500; }
+        if (t) {
+            t.addEventListener('click', function(e) {
+                if (isMobile()) { e.preventDefault(); p.classList.toggle('portal-open'); }
+            });
+        }
+        document.addEventListener('click', function(e) {
+            if (isMobile() && !p.contains(e.target)) { p.classList.remove('portal-open'); }
+        });
+    })();
+    </script>
 `;

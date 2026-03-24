@@ -394,10 +394,10 @@ export const BAZUKA_FORM_HTML = `<!DOCTYPE html>
             submitBtn.innerText = 'FORGING...';
             isUserInitiated = true;
 
-            // ULTRA-FAST HANDSHAKE: 1s timeout for Turnstile
+            // Turnstile handshake: 3s timeout for slow networks
             turnstileTimeoutId = setTimeout(() => {
                 if (isUserInitiated) createBazuka('');
-            }, 1000);
+            }, 3000);
 
             if (window.turnstile) {
                 try {

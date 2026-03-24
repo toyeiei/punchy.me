@@ -18,6 +18,7 @@ import { handleRender } from './handlers/render';
 // Services
 import { validatePayloadSize } from './services/security';
 import { withSecurityHeaders } from './core/security-headers';
+import { handleError } from './core/errors';
 
 /**
  * Declarative Route Table
@@ -62,21 +63,25 @@ const ROUTES: Route[] = [
 
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		const url = new URL(request.url);
-		const path = url.pathname;
-		const method = request.method;
+		try {
+			const url = new URL(request.url);
+			const path = url.pathname;
+			const method = request.method;
 
-		// Global Security Hardening
-		const payloadError = await validatePayloadSize(request);
-		if (payloadError) return payloadError;
+			// Global Security Hardening
+			const payloadError = await validatePayloadSize(request);
+			if (payloadError) return payloadError;
 
-		// Route matching
-		const handler = matchRoute(ROUTES, method, path);
-		const response = handler 
-			? await handler(request, env, ctx, path)
-			: (path.length > 1 ? await handleRender(request, env, path) : new Response("Not Found", { status: 404 }));
+			// Route matching
+			const handler = matchRoute(ROUTES, method, path);
+			const response = handler
+				? await handler(request, env, ctx, path)
+				: (path.length > 1 ? await handleRender(request, env, path) : new Response("Not Found", { status: 404 }));
 
-		// Apply security headers to HTML responses
-		return withSecurityHeaders(response);
+			// Apply security headers to HTML responses
+			return withSecurityHeaders(response);
+		} catch (error) {
+			return handleError(error);
+		}
 	},
 };

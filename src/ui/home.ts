@@ -651,6 +651,21 @@ export const HTML = `<!DOCTYPE html>
             successIcon.style.display = 'none';
             modalTitle.innerText = 'PUNCHING...';
 
+            function showModalError(msg) {
+                radar.style.display = 'none';
+                modalTitle.innerText = 'FAILED';
+                resultLink.innerText = msg;
+                resultLink.href = '#';
+                resultLink.style.color = '#ef4444';
+                setTimeout(function() {
+                    modalOverlay.classList.remove('show');
+                    setTimeout(function() {
+                        modalOverlay.style.display = 'none';
+                        resultLink.style.color = '';
+                    }, 300);
+                }, 2500);
+            }
+
             try {
                 const res = await fetch('/shorten', {
                     method: 'POST',
@@ -659,18 +674,22 @@ export const HTML = `<!DOCTYPE html>
                 });
                 if (res.ok) {
                     const data = await res.json();
-                    
+
                     // Artificial delay for animation impact
                     setTimeout(() => {
                         resultLink.innerText = window.location.origin + '/' + data.id;
                         resultLink.href = window.location.origin + '/' + data.id;
-                        
+
                         radar.style.display = 'none';
                         successIcon.style.display = 'flex';
                         modalTitle.innerText = 'PUNCHED!';
                     }, 800);
+                } else {
+                    let errMsg = 'Something went wrong. Please try again.';
+                    try { const errData = await res.json(); errMsg = errData.error || errMsg; } catch(_e) {}
+                    showModalError(errMsg);
                 }
-            } catch (err) { alert('Sync failed.'); }
+            } catch (err) { showModalError('Connection failed. Please try again.'); }
         }
 
         copyBtn.onclick = () => {

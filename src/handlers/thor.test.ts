@@ -224,7 +224,10 @@ Workers on the edge. Fast, secure, scalable.
     const { mockEnv } = createMockEnv();
 
     const request = new Request('https://punchy.me/thor/pdf/abc');
-    await expect(handleThorPdf(request, mockEnv as Env, '/thor/pdf/abc')).rejects.toThrow('Invalid report ID');
+    const response = await handleThorPdf(request, mockEnv as Env, '/thor/pdf/abc');
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error).toContain('Invalid report ID');
   });
 
   it('should return error for expired PDF reports', async () => {
@@ -232,7 +235,10 @@ Workers on the edge. Fast, secure, scalable.
     kvGet.mockResolvedValueOnce(null);
 
     const request = new Request('https://punchy.me/thor/pdf/notfound');
-    await expect(handleThorPdf(request, mockEnv as Env, '/thor/pdf/notfound')).rejects.toThrow('not found');
+    const response = await handleThorPdf(request, mockEnv as Env, '/thor/pdf/notfound');
+    expect(response.status).toBe(400);
+    const data = await response.json() as { error: string };
+    expect(data.error).toContain('not found');
   });
 
   it('should reject URLs with embedded credentials', async () => {

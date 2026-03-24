@@ -1,9 +1,9 @@
 import { Env, BrowserRenderingResponse, ThorReport, ThorIntelligence } from '../core/types';
-import { generateUniqueId, htmlPage } from '../core/utils';
+import { generateUniqueId, htmlPage, escapeHTML } from '../core/utils';
 import { validateThorRequest } from '../core/validation';
 import { THOR_UI_HTML } from '../ui/thor';
 import { handleValidatedRequest } from '../core/middleware';
-import { ExternalServiceError, InternalError, ValidationError } from '../core/errors';
+import { ExternalServiceError, InternalError, ValidationError, handleError } from '../core/errors';
 import { THOR_SYSTEM_PROMPT, buildThorUserPrompt } from '../prompts/thor';
 
 const THOR_RATE_LIMIT = 5;
@@ -32,18 +32,22 @@ export const handleThorForge = async (request: Request, env: Env): Promise<Respo
  * Thor PDF Report Handler - Returns cached intelligence report as printable HTML
  */
 export const handleThorPdf = async (request: Request, env: Env, path: string): Promise<Response> => {
-	const id = path.replace('/thor/pdf/', '');
-	if (!id || id.length < 6) {
-		throw new ValidationError('Invalid report ID');
-	}
+	try {
+		const id = path.replace('/thor/pdf/', '');
+		if (!id || id.length < 6) {
+			throw new ValidationError('Invalid report ID');
+		}
 
-	const cached = await env.SHORT_LINKS.get(`thor:${id}`);
-	if (!cached) {
-		throw new ValidationError('Report not found or expired');
-	}
+		const cached = await env.SHORT_LINKS.get(`thor:${id}`);
+		if (!cached) {
+			throw new ValidationError('Report not found or expired');
+		}
 
-	const report = JSON.parse(cached) as ThorReport;
-	return htmlPage(buildThorPdfHtml(report));
+		const report = JSON.parse(cached) as ThorReport;
+		return htmlPage(buildThorPdfHtml(report));
+	} catch (error) {
+		return handleError(error);
+	}
 };
 
 async function forgeThorIntelligence(url: string, env: Env): Promise<ThorReport> {
@@ -308,34 +312,24 @@ function buildThorPdfHtml(report: ThorReport): string {
 
 	// Build conditional sections
 	const keyEntitiesSection = intelligence.content.keyEntities.length > 0
-		? '<div style="margin-top: 15px;"><div class="label">Key Entities</div><div class="value">' + intelligence.content.keyEntities.map(e => escapeHtml(e)).join(', ') + '</div></div>'
+		? '<div style="margin-top: 15px;"><div class="label">Key Entities</div><div class="value">' + intelligence.content.keyEntities.map(e => escapeHTML(e)).join(', ') + '</div></div>'
 		: '';
 
 	const h1TextsSection = intelligence.structure.h1Texts.length > 0
-		? '<div style="margin-top: 15px;"><div class="label">H1 Text</div><ul class="heading-list">' + intelligence.structure.h1Texts.map(h => '<li>' + escapeHtml(h) + '</li>').join('') + '</ul></div>'
+		? '<div style="margin-top: 15px;"><div class="label">H1 Text</div><ul class="heading-list">' + intelligence.structure.h1Texts.map(h => '<li>' + escapeHTML(h) + '</li>').join('') + '</ul></div>'
 		: '';
 
 	const ogImageSection = intelligence.seo.ogImage
-		? '<div style="margin-top: 15px;"><div class="label">OG Image</div><div class="value" style="word-break: break-all; font-size: 12px;">' + escapeHtml(intelligence.seo.ogImage) + '</div></div>'
+		? '<div style="margin-top: 15px;"><div class="label">OG Image</div><div class="value" style="word-break: break-all; font-size: 12px;">' + escapeHTML(intelligence.seo.ogImage) + '</div></div>'
 		: '';
 
 	const schemaTypesSection = intelligence.technical.schemaTypes.length > 0
-		? '<div class="field"><div class="label">Schema Types</div><div class="value">' + intelligence.technical.schemaTypes.map(s => escapeHtml(s)).join(', ') + '</div></div>'
+		? '<div class="field"><div class="label">Schema Types</div><div class="value">' + intelligence.technical.schemaTypes.map(s => escapeHTML(s)).join(', ') + '</div></div>'
 		: '';
 
-	const topicTags = intelligence.content.topics.map(t => '<span class="tag">' + escapeHtml(t) + '</span>').join('');
+	const topicTags = intelligence.content.topics.map(t => '<span class="tag">' + escapeHTML(t) + '</span>').join('');
 
-	return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>THOR Intelligence Report - ' + escapeHtml(report.title) + '</title><style>* { margin: 0; padding: 0; box-sizing: border-box; }body { font-family: "Inter", -apple-system, sans-serif; color: #000; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }.header { border-bottom: 3px solid #22c55e; padding-bottom: 20px; margin-bottom: 30px; }.logo { font-family: monospace; font-size: 14px; color: #22c55e; letter-spacing: 2px; margin-bottom: 10px; }h1 { font-size: 28px; margin-bottom: 8px; }.url { color: #666; font-size: 14px; word-break: break-all; }.timestamp { color: #999; font-size: 12px; margin-top: 5px; }.section { margin-bottom: 30px; }h2 { font-size: 18px; color: #22c55e; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }.field { margin-bottom: 10px; }.label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }.value { font-size: 14px; }.value.null { color: #ccc; font-style: italic; }.summary { background: #f8f8f8; padding: 20px; border-radius: 8px; font-size: 14px; line-height: 1.7; }.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }.tag { background: #22c55e; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }.score { display: flex; align-items: center; gap: 15px; }.score-bar { flex: 1; height: 20px; background: #eee; border-radius: 10px; overflow: hidden; }.score-fill { height: 100%; background: #22c55e; }.score-value { font-weight: 700; font-size: 24px; color: #22c55e; }.heading-list { list-style: none; }.heading-list li { padding: 5px 0; border-bottom: 1px solid #f0f0f0; }.heading-list li:last-child { border-bottom: none; }.footer { margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; text-align: center; color: #999; font-size: 12px; }@media print {body { padding: 20px; }.section { break-inside: avoid; }}</style></head><body><div class="header"><div class="logo">[ THOR INTELLIGENCE REPORT ]</div><h1>' + escapeHtml(report.title) + '</h1><div class="url">' + escapeHtml(report.url) + '</div><div class="timestamp">Analyzed: ' + new Date(report.scrapedAt).toLocaleString() + '</div></div><div class="section"><h2>Content Summary</h2><div class="summary">' + escapeHtml(intelligence.content.summary) + '</div><div class="tags">' + topicTags + '</div></div><div class="section"><h2>Content Intelligence</h2><div class="grid"><div class="field"><div class="label">Content Type</div><div class="value">' + escapeHtml(intelligence.content.contentType) + '</div></div><div class="field"><div class="label">Target Audience</div><div class="value">' + escapeHtml(intelligence.content.targetAudience) + '</div></div><div class="field"><div class="label">Word Count</div><div class="value">' + intelligence.content.wordCount.toLocaleString() + ' words</div></div><div class="field"><div class="label">Reading Time</div><div class="value">~' + intelligence.content.readingTime + ' min</div></div></div>' + keyEntitiesSection + '</div><div class="section"><h2>Page Structure</h2><div class="grid"><div class="field"><div class="label">H1 Headings</div><div class="value">' + intelligence.structure.h1Count + '</div></div><div class="field"><div class="label">H2 Headings</div><div class="value">' + intelligence.structure.h2Count + '</div></div><div class="field"><div class="label">Links</div><div class="value">' + intelligence.structure.linkCount + '</div></div><div class="field"><div class="label">Images</div><div class="value">' + intelligence.structure.imageCount + '</div></div></div>' + h1TextsSection + '</div><div class="section"><h2>SEO Analysis</h2><div class="grid"><div class="field"><div class="label">Open Graph Title</div><div class="value' + (intelligence.seo.ogTitle ? '' : ' null') + '">' + (intelligence.seo.ogTitle ? escapeHtml(intelligence.seo.ogTitle) : 'Not set') + '</div></div><div class="field"><div class="label">Meta Title</div><div class="value' + (intelligence.seo.metaTitle ? '' : ' null') + '">' + (intelligence.seo.metaTitle ? escapeHtml(intelligence.seo.metaTitle) : 'Not set') + '</div></div><div class="field"><div class="label">OG Description</div><div class="value' + (intelligence.seo.ogDescription ? '' : ' null') + '">' + (intelligence.seo.ogDescription ? escapeHtml(intelligence.seo.ogDescription) : 'Not set') + '</div></div><div class="field"><div class="label">Meta Description</div><div class="value' + (intelligence.seo.metaDescription ? '' : ' null') + '">' + (intelligence.seo.metaDescription ? escapeHtml(intelligence.seo.metaDescription) : 'Not set') + '</div></div></div>' + ogImageSection + '</div><div class="section"><h2>Technical Signals</h2><div class="grid"><div class="field"><div class="label">JSON-LD Schema</div><div class="value">' + (intelligence.technical.hasSchema ? 'Present' : 'Not detected') + '</div></div>' + schemaTypesSection + '</div><div style="margin-top: 20px;"><div class="label">Open Graph Score</div><div class="score"><div class="score-bar"><div class="score-fill" style="width: ' + intelligence.technical.ogScore + '%"></div></div><div class="score-value">' + intelligence.technical.ogScore + '/100</div></div></div></div><div class="footer">Generated by THOR Web Intelligence Engine at PUNCHY.ME</div></body></html>';
-}
-
-function escapeHtml(str: string): string {
-	if (!str) return '';
-	return str
-		.replace(/&/g, '&amp;')
-		.replace(/</g, '&lt;')
-		.replace(/>/g, '&gt;')
-		.replace(/"/g, '&quot;')
-		.replace(/'/g, '&#039;');
+	return '<!DOCTYPE html><html lang="en"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><title>THOR Intelligence Report - ' + escapeHTML(report.title) + '</title><style>* { margin: 0; padding: 0; box-sizing: border-box; }body { font-family: "Inter", -apple-system, sans-serif; color: #000; line-height: 1.6; padding: 40px; max-width: 800px; margin: 0 auto; }.header { border-bottom: 3px solid #22c55e; padding-bottom: 20px; margin-bottom: 30px; }.logo { font-family: monospace; font-size: 14px; color: #22c55e; letter-spacing: 2px; margin-bottom: 10px; }h1 { font-size: 28px; margin-bottom: 8px; }.url { color: #666; font-size: 14px; word-break: break-all; }.timestamp { color: #999; font-size: 12px; margin-top: 5px; }.section { margin-bottom: 30px; }h2 { font-size: 18px; color: #22c55e; border-bottom: 1px solid #eee; padding-bottom: 8px; margin-bottom: 15px; text-transform: uppercase; letter-spacing: 1px; }.grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }.field { margin-bottom: 10px; }.label { font-size: 11px; color: #999; text-transform: uppercase; letter-spacing: 0.5px; }.value { font-size: 14px; }.value.null { color: #ccc; font-style: italic; }.summary { background: #f8f8f8; padding: 20px; border-radius: 8px; font-size: 14px; line-height: 1.7; }.tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }.tag { background: #22c55e; color: #fff; padding: 4px 12px; border-radius: 20px; font-size: 12px; font-weight: 600; }.score { display: flex; align-items: center; gap: 15px; }.score-bar { flex: 1; height: 20px; background: #eee; border-radius: 10px; overflow: hidden; }.score-fill { height: 100%; background: #22c55e; }.score-value { font-weight: 700; font-size: 24px; color: #22c55e; }.heading-list { list-style: none; }.heading-list li { padding: 5px 0; border-bottom: 1px solid #f0f0f0; }.heading-list li:last-child { border-bottom: none; }.footer { margin-top: 50px; border-top: 1px solid #eee; padding-top: 20px; text-align: center; color: #999; font-size: 12px; }@media print {body { padding: 20px; }.section { break-inside: avoid; }}</style></head><body><div class="header"><div class="logo">[ THOR INTELLIGENCE REPORT ]</div><h1>' + escapeHTML(report.title) + '</h1><div class="url">' + escapeHTML(report.url) + '</div><div class="timestamp">Analyzed: ' + new Date(report.scrapedAt).toLocaleString() + '</div></div><div class="section"><h2>Content Summary</h2><div class="summary">' + escapeHTML(intelligence.content.summary) + '</div><div class="tags">' + topicTags + '</div></div><div class="section"><h2>Content Intelligence</h2><div class="grid"><div class="field"><div class="label">Content Type</div><div class="value">' + escapeHTML(intelligence.content.contentType) + '</div></div><div class="field"><div class="label">Target Audience</div><div class="value">' + escapeHTML(intelligence.content.targetAudience) + '</div></div><div class="field"><div class="label">Word Count</div><div class="value">' + intelligence.content.wordCount.toLocaleString() + ' words</div></div><div class="field"><div class="label">Reading Time</div><div class="value">~' + intelligence.content.readingTime + ' min</div></div></div>' + keyEntitiesSection + '</div><div class="section"><h2>Page Structure</h2><div class="grid"><div class="field"><div class="label">H1 Headings</div><div class="value">' + intelligence.structure.h1Count + '</div></div><div class="field"><div class="label">H2 Headings</div><div class="value">' + intelligence.structure.h2Count + '</div></div><div class="field"><div class="label">Links</div><div class="value">' + intelligence.structure.linkCount + '</div></div><div class="field"><div class="label">Images</div><div class="value">' + intelligence.structure.imageCount + '</div></div></div>' + h1TextsSection + '</div><div class="section"><h2>SEO Analysis</h2><div class="grid"><div class="field"><div class="label">Open Graph Title</div><div class="value' + (intelligence.seo.ogTitle ? '' : ' null') + '">' + (intelligence.seo.ogTitle ? escapeHTML(intelligence.seo.ogTitle) : 'Not set') + '</div></div><div class="field"><div class="label">Meta Title</div><div class="value' + (intelligence.seo.metaTitle ? '' : ' null') + '">' + (intelligence.seo.metaTitle ? escapeHTML(intelligence.seo.metaTitle) : 'Not set') + '</div></div><div class="field"><div class="label">OG Description</div><div class="value' + (intelligence.seo.ogDescription ? '' : ' null') + '">' + (intelligence.seo.ogDescription ? escapeHTML(intelligence.seo.ogDescription) : 'Not set') + '</div></div><div class="field"><div class="label">Meta Description</div><div class="value' + (intelligence.seo.metaDescription ? '' : ' null') + '">' + (intelligence.seo.metaDescription ? escapeHTML(intelligence.seo.metaDescription) : 'Not set') + '</div></div></div>' + ogImageSection + '</div><div class="section"><h2>Technical Signals</h2><div class="grid"><div class="field"><div class="label">JSON-LD Schema</div><div class="value">' + (intelligence.technical.hasSchema ? 'Present' : 'Not detected') + '</div></div>' + schemaTypesSection + '</div><div style="margin-top: 20px;"><div class="label">Open Graph Score</div><div class="score"><div class="score-bar"><div class="score-fill" style="width: ' + intelligence.technical.ogScore + '%"></div></div><div class="score-value">' + intelligence.technical.ogScore + '/100</div></div></div></div><div class="footer">Generated by THOR Web Intelligence Engine at PUNCHY.ME</div></body></html>';
 }
 
 function isForbiddenThorHostname(hostname: string): boolean {

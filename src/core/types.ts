@@ -94,7 +94,7 @@ export interface ThorReport {
 export interface Env {
 	SHORT_LINKS: KVNamespace;
 	AI: Ai;
-	BROWSER: any; // Puppeteer/Browser binding
+	BROWSER: Fetcher;
 	THOR_API_TOKEN?: string;
 	CLOUDFLARE_ACCOUNT_ID?: string;
 	TURNSTILE_SITE_KEY: string;

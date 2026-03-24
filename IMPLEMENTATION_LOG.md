@@ -4,6 +4,33 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-19 (Version 5.2.1 - Security Mission: Turnstile & Gating)
+
+**Objective**: Harden the ecosystem with global Turnstile enforcement, gate experimental features, and establish new deployment safety protocols.
+
+#### Security & Protocol
+- **Turnstile Bot-Shield Enforcement**: Attempted global integration of mandatory Turnstile checks across all POST routes (`/shorten`, `/bazuka`, `/anakin`, `/musashi`, `/ragnar`, `/thor`, `/odin`).
+- **Middleware Centralization**: Built a security handshake pipeline into `handleValidatedRequest` to ensure unified protection.
+- **Local Dev Bypass**: Engineered a robust bypass for `localhost` and `127.0.0.1` using Cloudflare dummy keys to prevent development friction.
+- **Protocol Enforced**: Updated `GEMINI.md` with a **HARD RULE** requiring explicit user permission ("Handshake") before any commit, push, or deployment.
+
+#### Feature Gating
+- **Experimental Stealth**: Gated **MARCUS** and **MIDGARD** by removing their routes and portal visibility from the production branch to maintain a "Finished-Only" public state.
+
+#### UI & Reliability
+- **Maintenance Bar**: Added a high-visibility white notification bar to the homepage for service status updates.
+- **Handshake Optimization**: Refined the Turnstile script to include a 4s timeout and race-condition prevention to improve reliability on slower connections.
+
+#### Current Status (Post-Revert)
+- **Rollback to v5.2.0**: Due to persistent "Security handshake required" errors on production after deployment, the system was hard-reset and redeployed to yesterday's stable version (`725c9e8`).
+- **Active Mission**: Security hardening is being refined in isolation. The goal remains to fix and enforce Turnstile across all pages without service interruption.
+
+#### Validation Status
+- ✅ `npm test` — 87/87 tests passing (in stable state)
+- ✅ Production: Reverted to Version 5.2.0 (Stable)
+
+---
+
 ### 2026-03-18 (Version 5.2.0 - THOR Web Intelligence Engine)
 
 **Objective**: Launch the Web Intelligence Engine - a stateless one-click URL analysis tool powered by Cloudflare Browser Rendering API and Mistral 24B AI.

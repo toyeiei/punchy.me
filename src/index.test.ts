@@ -429,6 +429,36 @@ Hope this helps!`
 
       aiSpy.mockRestore();
     });
+
+    it("renders ragnar presentation via short link ID (not just /ragnar/slide/)", async () => {
+      const aiSpy = vi.spyOn(env.AI, 'run').mockResolvedValue({
+        response: JSON.stringify({
+          title: "Short Link Ragnar",
+          audience: "Testers",
+          slides: [
+            { header: "Intro", content: "Testing short link access", type: "opening" },
+            { header: "Points", content: "Point A\nPoint B", type: "list" }
+          ]
+        })
+      });
+
+      const forgeRes = await SELF.fetch("http://localhost/ragnar/forge", {
+        method: "POST",
+        body: JSON.stringify({ title: "Short Link Ragnar", audience: "Testers", details: "Test short link rendering." }),
+        headers: { "Content-Type": "application/json" },
+      });
+      expect(forgeRes.status).toBe(200);
+      const { id } = await forgeRes.json() as { id: string };
+
+      // Access via short link ID directly (the bug was this returned 404)
+      const renderRes = await SELF.fetch(`http://localhost/${id}`);
+      expect(renderRes.status).toBe(200);
+      const html = await renderRes.text();
+      expect(html).toContain("Short Link Ragnar");
+      expect(html).toContain("reveal.js");
+
+      aiSpy.mockRestore();
+    });
   });
 
   describe("MUSASHI Feature (Attack Engine)", () => {
@@ -1190,6 +1220,94 @@ Hope this helps!`
 
       aiSpy.mockRestore();
       fetchSpy.mockRestore();
+    });
+
+    it("returns proper error for invalid Thor PDF IDs via route", async () => {
+      const res = await SELF.fetch("http://localhost/thor/pdf/abc123");
+      expect(res.status).toBe(400);
+      const data = await res.json() as { error: string };
+      expect(data.error).toContain("not found");
+    });
+  });
+
+  describe("Render Edge Cases & Data Integrity", () => {
+    it("returns 404 for malformed JSON in KV", async () => {
+      await env.SHORT_LINKS.put("badjson", "{ malformed json data }}}");
+      const res = await SELF.fetch("http://localhost/badjson");
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 404 for unknown JSON type in KV", async () => {
+      await env.SHORT_LINKS.put("unkntype", JSON.stringify({ type: "unknown_tool", data: "test" }));
+      const res = await SELF.fetch("http://localhost/unkntype");
+      expect(res.status).toBe(404);
+    });
+
+    it("returns 405 for non-GET requests to short links", async () => {
+      await env.SHORT_LINKS.put("testid", "https://example.com");
+      const res = await SELF.fetch("http://localhost/testid", { method: "POST" });
+      expect(res.status).toBe(405);
+    });
+
+    it("redirects plain URL values with 301", async () => {
+      await env.SHORT_LINKS.put("redir1", "https://datarockie.com");
+      const res = await SELF.fetch("http://localhost/redir1", { redirect: "manual" });
+      expect(res.status).toBe(301);
+      expect(res.headers.get("Location")).toContain("datarockie.com");
+    });
+
+    it("renders bazuka card from KV correctly", async () => {
+      const card = { type: "bazuka", nickname: "TestUser", job: "Engineer", email: "test@test.com", website: "https://test.com" };
+      await env.SHORT_LINKS.put("bzcard", JSON.stringify(card));
+      const res = await SELF.fetch("http://localhost/bzcard");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("TestUser");
+      expect(html).toContain("Engineer");
+    });
+
+    it("renders anakin resume from KV correctly", async () => {
+      const resume = { type: "anakin", name: "Test Person", job: "Dev", email: "t@t.com", website: "https://t.com", education: "MIT", skills: "JS,TS", experience: "5 years", aiHydrated: false };
+      await env.SHORT_LINKS.put("resume1", JSON.stringify(resume));
+      const res = await SELF.fetch("http://localhost/resume1");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("Test Person");
+    });
+
+    it("renders yaiba note from KV via /y/ path", async () => {
+      const note = { type: "yaiba", content: "Test note content for Yaiba rendering.", tags: ["test"], createdAt: Date.now() };
+      await env.SHORT_LINKS.put("ynote1", JSON.stringify(note));
+      const res = await SELF.fetch("http://localhost/y/ynote1");
+      expect(res.status).toBe(200);
+      const html = await res.text();
+      expect(html).toContain("Test note content");
+    });
+
+    it("shows resyncing page for missing yaiba /y/ path", async () => {
+      const res = await SELF.fetch("http://localhost/y/nonexist");
+      expect(res.status).toBe(404);
+      const html = await res.text();
+      expect(html).toContain("RESYNCING");
+    });
+
+    it("portal is accessible on all tool pages including THOR", async () => {
+      // ASGARD is a full-screen workspace and intentionally omits the portal
+      const routes = ["/bazuka", "/anakin", "/musashi", "/odin", "/yaiba", "/ragnar", "/freya", "/thor"];
+      for (const route of routes) {
+        const res = await SELF.fetch(`http://localhost${route}`);
+        const html = await res.text();
+        expect(html).toContain("punchy-portal");
+        expect(html).toContain('href="/thor"');
+        expect(html).toContain('href="/asgard"');
+      }
+    });
+
+    it("portal includes mobile tap-to-toggle script", async () => {
+      const res = await SELF.fetch("http://localhost/bazuka");
+      const html = await res.text();
+      expect(html).toContain("portal-open");
+      expect(html).toContain("isMobile");
     });
   });
 

@@ -25,7 +25,7 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 
 	// Eventual consistency retry for Yaiba
 	if (!value && path.startsWith('/y/')) {
-		await new Promise(r => setTimeout(r, 300));
+		await new Promise(r => setTimeout(r, 600));
 		value = await env.SHORT_LINKS.get(id);
 	}
 
@@ -41,6 +41,7 @@ export async function handleRender(request: Request, env: Env, path: string): Pr
 					case 'bazuka': return renderBazuka(data);
 					case 'anakin': return renderAnakin(data);
 					case 'yaiba': return renderYaiba(value);
+					case 'ragnar': return renderRagnar(data);
 					default: break;
 				}
 			} catch (_e) {
