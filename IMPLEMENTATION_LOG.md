@@ -4,6 +4,43 @@ This log tracks the successful implementation of features and milestones for the
 
 ## Achievements
 
+### 2026-03-24 (Version 5.3.0 - Bug Hunt, Error Hardening & Mobile Portal)
+
+**Objective**: Full codebase audit to find and fix all bugs, harden error handling across all AI endpoints, expand test coverage, and make the ecosystem portal accessible on mobile.
+
+#### Bug Fixes (Phase 1)
+- **Ragnar Short Link Rendering**: Fixed critical bug where Ragnar presentations accessed via short link ID (`/{id}`) returned 404. Added `case 'ragnar'` to the render.ts switch — presentations now render correctly via both `/{id}` and `/ragnar/slide/{id}`.
+- **Home Modal Error Handling**: Fixed the shortener modal getting permanently stuck in "PUNCHING..." state on API errors. Now shows error message inline and auto-closes after 2.5 seconds.
+- **Bazuka Turnstile Timeout**: Increased Turnstile handshake timeout from 1 second to 3 seconds. Prevents premature token-less submissions on slow networks.
+- **Yaiba Retry Timing**: Corrected eventual-consistency retry from 300ms to 600ms to match documented behavior.
+- **Thor Duplicate Code**: Removed duplicate `escapeHtml()` function from `thor.ts`, now uses shared `escapeHTML()` from `core/utils.ts`.
+
+#### Error Hardening (Phase 2)
+- **Thor PDF Error Handling**: Wrapped `handleThorPdf` in try/catch with `handleError()` — was previously throwing unhandled exceptions that would crash as raw 500 errors.
+- **Global Error Handler**: Added top-level try/catch in `index.ts` fetch handler as defense-in-depth. Any unhandled error from any route now returns a structured JSON error response instead of crashing.
+- **BROWSER Type Safety**: Replaced `BROWSER: any` with `BROWSER: Fetcher` in the Env interface, eliminating the only ESLint warning in the codebase.
+
+#### Test Coverage Expansion (87 → 99 tests)
+- **Ragnar via short link ID**: Verifies the critical render bug fix.
+- **Render edge cases**: Malformed JSON in KV (404, not 500), unknown JSON types (404), non-GET to short links (405), plain URL redirect (301).
+- **Content type rendering**: Direct KV rendering tests for Bazuka cards, Anakin resumes, and Yaiba notes via `/y/` path.
+- **Yaiba resyncing page**: Verifies the eventual-consistency retry UI.
+- **Thor PDF via route**: Validates error response for invalid/expired PDF IDs.
+- **Portal coverage**: Verifies portal presence and mobile script on all 8 tool pages.
+
+#### Architecture: Mobile Portal Navigation (Phase 3)
+- **Before**: Ecosystem portal was completely hidden on screens <1024px (`display: none`), cutting off navigation for all mobile and tablet users.
+- **After**: Portal is now visible on all screen sizes. On mobile/tablet, the ⚡ icon acts as a tap-to-toggle button that expands the full tool navigation. Tapping outside closes it. Desktop hover behavior unchanged.
+- **Implementation**: Added `.portal-open` CSS class with mobile-specific styles and a self-contained IIFE script for tap detection.
+
+#### Validation Status
+- ✅ `npx tsc --noEmit` — zero errors
+- ✅ `npm run lint` — zero errors, zero warnings
+- ✅ `npm test` — 99/99 tests passing (2 test files)
+- ✅ Git: Pushed to `main` (commit `1728234`)
+
+---
+
 ### 2026-03-19 (Version 5.2.1 - Security Mission: Turnstile & Gating)
 
 **Objective**: Harden the ecosystem with global Turnstile enforcement, gate experimental features, and establish new deployment safety protocols.

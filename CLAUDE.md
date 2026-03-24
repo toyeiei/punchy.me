@@ -13,17 +13,17 @@ npx vitest run --reporter=verbose  # Verbose test output for debugging
 wrangler deploy --dry-run           # Validate edge bundle without deploying
 ```
 
-There is no way to run a single test file — the entire suite lives in `src/index.test.ts`. To run a subset, use `npx vitest run -t "test name pattern"`.
+There are two test files: `src/index.test.ts` (integration, 89 tests) and `src/handlers/thor.test.ts` (unit, 10 tests). To run a subset, use `npx vitest run -t "test name pattern"`.
 
 **Never run `wrangler deploy` or `npm run deploy` without explicit user approval.**
 
 ## Architecture
 
-PUNCHY.ME is a Cloudflare Workers application — a URL shortener with 8 integrated professional tools. Single Worker entry point, single KV namespace (`SHORT_LINKS`), zero runtime NPM dependencies.
+PUNCHY.ME is a Cloudflare Workers application — a URL shortener with 9 integrated professional tools. Single Worker entry point, single KV namespace (`SHORT_LINKS`), zero runtime NPM dependencies.
 
 ### Request Flow
 
-`src/index.ts` is a flat if-chain router that dispatches to handlers:
+`src/index.ts` uses a declarative route table (`ROUTES[]`) matched via `src/core/router.ts`. A global try/catch wraps all route handling for defense-in-depth error recovery.
 
 1. **Static routes** → `handlers/static.ts` (homepage, favicon, robots, sitemap)
 2. **POST /shorten** → `handlers/shorten.ts` (core URL shortening)
@@ -33,13 +33,18 @@ PUNCHY.ME is a Cloudflare Workers application — a URL shortener with 8 integra
 
 ### Key Layers
 
-- **`src/core/types.ts`** — All shared interfaces (`Env`, `BazukaData`, `AnakinData`, `RagnarSlide`, etc.)
+- **`src/core/types.ts`** — All shared interfaces (`Env`, `BazukaData`, `AnakinData`, `RagnarSlide`, `ThorReport`, etc.)
 - **`src/core/validation.ts`** — Request validators returning `ValidationResult<T>` — every POST endpoint validates through these
-- **`src/core/utils.ts`** — `escapeHTML()`, `generateUniqueId()`, `jsonResponse()`, `parseAIResponse()`
+- **`src/core/utils.ts`** — `escapeHTML()`, `generateUniqueId()`, `jsonResponse()`, `parseAIResponse()`, `chunkText()`
+- **`src/core/renderers.ts`** — Rendering strategies for bazuka/anakin/yaiba/ragnar content from KV
 - **`src/core/rewriters.ts`** — HTMLRewriter element handlers for Bazuka/Anakin dynamic rendering
+- **`src/core/middleware.ts`** — `handleValidatedRequest()` and `handleAIRequest()` pipelines (JSON parse → validate → honeypot → rate limit → handler)
+- **`src/core/errors.ts`** — Structured error hierarchy (`AppError` → `ValidationError`, `AIError`, `RateLimitError`, etc.) with `handleError()` catch-all
+- **`src/core/security-headers.ts`** — CSP policies, security headers, SSRF prevention (`isUrlSafe`), input sanitization
 - **`src/services/security.ts`** — KV-based rate limiting, Turnstile verification, payload size check
 - **`src/handlers/*.ts`** — One file per tool, exports GET page handler + POST API handler
 - **`src/ui/*.ts`** — Each file exports HTML template strings (full pages as template literals)
+- **`src/prompts/*.ts`** — AI system and user prompt builders for each AI-powered tool
 
 ### Tools and Their AI Models
 
@@ -47,21 +52,26 @@ PUNCHY.ME is a Cloudflare Workers application — a URL shortener with 8 integra
 |------|-------|----------|---------|
 | Shortener | `/shorten` | None | KV: `{id}` → URL, `url:{normalized}` → id |
 | BAZUKA | `/bazuka` | None | KV: `{id}` → JSON with `type: 'bazuka'` |
-| ANAKIN | `/anakin` | Llama 3 8B (hydration) | KV: `{id}` → JSON with `type: 'anakin'` |
+| ANAKIN | `/anakin` | Llama 3 8B (lazy hydration) | KV: `{id}` → JSON with `type: 'anakin'` |
 | MUSASHI | `/musashi/forge` | Llama 3 8B | Stateless (returns JSON) |
 | YAIBA | `/yaiba/publish` | None | KV: `{id}` → JSON with `type: 'yaiba'`, 3-day TTL |
 | RAGNAR | `/ragnar/forge` | Mistral 24B | KV: `{id}` → JSON with `type: 'ragnar'`, 3-day TTL |
-| ODIN | `/odin/analyze` | Llama 3 8B | Stateless (returns JSON) |
+| ODIN | `/odin/analyze` | Llama 3 8B | Stateless (returns JSON), requires Turnstile |
 | FREYA | `/freya/search` | None | Proxies Unsplash API with edge caching |
+| THOR | `/thor/forge` | Mistral 24B | KV: `thor:{id}` → JSON, 1-hour TTL for PDF |
 | ASGARD | `/asgard` | None | Static page with Pomodoro/clock/spotlight |
 
 ### Dynamic Rendering (`render.ts`)
 
 The catch-all handler determines content type by inspecting KV values:
 - Starts with `http` → 301 redirect (short link)
-- Starts with `{` → parse JSON, check `type` field, render via HTMLRewriter (bazuka/anakin) or template injection (yaiba/ragnar)
-- `/ragnar/slide/{id}` — special route for Reveal.js slide decks
+- Starts with `{` → parse JSON, check `type` field, render by type (bazuka/anakin/yaiba/ragnar)
+- `/ragnar/slide/{id}` — special route for Reveal.js slide decks (also accessible via `/{id}`)
 - `/y/{id}` — Yaiba notes with 600ms retry for KV eventual consistency
+
+### Error Handling
+
+All POST handlers use `handleValidatedRequest()` or `handleAIRequest()` middleware which wraps everything in try/catch. `handleThorPdf` has its own try/catch. The global try/catch in `index.ts` is the last line of defense. All errors flow through `handleError()` which maps `AppError` subclasses to HTTP status codes.
 
 ### KV Key Conventions
 
@@ -69,16 +79,24 @@ All data shares the `SHORT_LINKS` namespace. Key prefixes:
 - `{6-char-id}` — short link target URL or JSON data blob
 - `url:{normalized-url}` — reverse lookup for deduplication
 - `rl:{feature}:{ip}` — rate limit counters with TTL
+- `thor:{id}` — cached Thor intelligence reports (1-hour TTL)
 
 ### UI Templates
 
-UI is generated as exported template literal strings in `src/ui/*.ts`. Some handlers import from `'../ui'` (barrel), others import directly (e.g., `'../ui/ragnar'`). The shared ecosystem navigation bar lives in `src/ui/portal.ts` and is injected via `${PUNCHY_PORTAL_HTML}` into each tool's template.
+UI is generated as exported template literal strings in `src/ui/*.ts`. Some handlers import from `'../ui'` (barrel), others import directly (e.g., `'../ui/ragnar'`). The shared ecosystem navigation bar lives in `src/ui/portal.ts` and is injected via `${PUNCHY_PORTAL_HTML}` into each tool's template (except ASGARD which is a full-screen workspace).
+
+The portal supports mobile via tap-to-toggle: on screens <1024px, tapping ⚡ expands/collapses the tool navigation.
 
 Design system: Matte Black (#000) + Neon Green (#22c55e), glassmorphism panels (`rgba(255,255,255,0.03)` + `backdrop-filter: blur(10px)`), JetBrains Mono font.
 
 ### Testing
 
-Single test file: `src/index.test.ts` (~940 lines). Tests run against real Cloudflare Workers runtime via `@cloudflare/vitest-pool-workers`. AI calls are mocked with `vi.spyOn(env.AI, 'run')`. KV is cleared in `beforeEach`. The global `VITEST = true` enables test-token bypass for Turnstile verification.
+Two test files: `src/index.test.ts` (~1250 lines, 89 integration tests) and `src/handlers/thor.test.ts` (10 unit tests). Tests run against real Cloudflare Workers runtime via `@cloudflare/vitest-pool-workers`. AI calls are mocked with `vi.spyOn(env.AI, 'run')`. KV is cleared in `beforeEach`. The global `VITEST = true` enables test-token bypass for Turnstile verification. Total: 99 tests.
+
+### Environment
+
+- **Platform**: Cloudflare Workers (WSL dev environment with Windows-installed wrangler)
+- **Deploy note**: `wrangler deploy` must be run from Windows (not WSL) due to platform-specific `workerd` binary. Alternatively, run `npm ci` in WSL to install Linux binaries.
 
 ## Workflow Constraints
 
@@ -91,3 +109,5 @@ Single test file: `src/index.test.ts` (~940 lines). Tests run against real Cloud
 - **Full test suite required** for any change touching `src/ui/` or `src/index.ts` — isolated tests are insufficient for UI template integrity.
 - **Template literal hazard**: UI files use nested template literals. Never use backticks inside inner HTML — use single quotes and string concatenation instead. After modifying any `src/ui/*.ts` file, verify the template termination points.
 - **Design freeze during test/lint cycles**: Do not make UI aesthetic changes while fixing tests or lint. Validation phases are for correctness only.
+- **Shared utilities**: Always use `escapeHTML()` from `src/core/utils.ts` — never define local escape functions in handlers.
+- **Error handling**: All handlers must catch errors via middleware (`handleValidatedRequest`/`handleAIRequest`) or explicit try/catch with `handleError()`. Never let errors propagate unhandled.
