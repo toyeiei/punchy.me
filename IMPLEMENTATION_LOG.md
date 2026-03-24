@@ -33,11 +33,15 @@ This log tracks the successful implementation of features and milestones for the
 - **After**: Portal is now visible on all screen sizes. On mobile/tablet, the ⚡ icon acts as a tap-to-toggle button that expands the full tool navigation. Tapping outside closes it. Desktop hover behavior unchanged.
 - **Implementation**: Added `.portal-open` CSS class with mobile-specific styles and a self-contained IIFE script for tap detection.
 
+#### Documentation
+- **CLAUDE.md**: Full rewrite to reflect current architecture — 10 tools, 2 test files, 99 tests, declarative router, global error handling, Thor/ASGARD integration, mobile portal, WSL deploy notes, and new workflow constraints (shared utilities rule, error handling rule).
+- **IMPLEMENTATION_LOG.md**: Added v5.3.0 entry covering all phases.
+
 #### Validation Status
 - ✅ `npx tsc --noEmit` — zero errors
 - ✅ `npm run lint` — zero errors, zero warnings
 - ✅ `npm test` — 99/99 tests passing (2 test files)
-- ✅ Git: Pushed to `main` (commit `1728234`)
+- ✅ Git: Pushed to `main` (`1728234` code, `af09666` docs)
 
 ---
 
